@@ -66,6 +66,11 @@ fun AppNavigation(
                 shotId = shotId,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToShot = { newShotId ->
+                    navController.navigate(NavigationDestinations.ShotDetails.createRoute(newShotId)) {
+                        popUpTo(NavigationDestinations.ShotDetails.route) { inclusive = true }
+                    }
                 }
             )
         }

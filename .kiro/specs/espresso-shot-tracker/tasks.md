@@ -180,6 +180,18 @@
   - Display shot success indicators and patterns
   - _Requirements: 2.2, 4.1, 4.2, 5.1, 5.2, 5.3_
 
+- [x] 9.4 Implement shot detail screen
+
+
+
+  - Create dedicated shot detail screen with comprehensive shot information
+  - Display all shot parameters including weights, times, and brew ratio
+  - Show bean information and grinder settings used for the shot
+  - Add edit functionality for shot notes and rating
+  - Implement navigation from shot history list to detail screen
+  - Add delete shot functionality with confirmation dialog
+  - _Requirements: 2.1, 2.3, 2.4, 5.3_
+
 - [ ] 10. Implement comprehensive testing suite
 
 - [ ] 10.1 Create unit tests for data models and business logic
