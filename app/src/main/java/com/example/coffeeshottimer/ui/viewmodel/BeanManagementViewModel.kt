@@ -3,6 +3,7 @@ package com.example.coffeeshottimer.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coffeeshottimer.data.model.Bean
+import com.example.coffeeshottimer.data.repository.BeanRepository
 import com.example.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.example.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.example.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
@@ -21,7 +22,8 @@ class BeanManagementViewModel @Inject constructor(
     private val getActiveBeansUseCase: GetActiveBeansUseCase,
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase,
     private val addBeanUseCase: AddBeanUseCase,
-    private val updateBeanUseCase: UpdateBeanUseCase
+    private val updateBeanUseCase: UpdateBeanUseCase,
+    private val beanRepository: BeanRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BeanManagementUiState())
@@ -169,6 +171,7 @@ class BeanManagementViewModel @Inject constructor(
 
     /**
      * Set a bean as the current active bean for shot recording.
+     * Implements requirement 3.2 for connecting bean selection between screens.
      * Updates the grinder setting memory for the bean.
      */
     fun setCurrentBean(beanId: String, grinderSetting: String? = null) {
@@ -176,24 +179,34 @@ class BeanManagementViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
             
             // Update grinder setting if provided
-            val result = if (!grinderSetting.isNullOrBlank()) {
+            val grinderResult = if (!grinderSetting.isNullOrBlank()) {
                 updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
             } else {
                 Result.success(Unit)
             }
             
-            if (result.isSuccess) {
-                // Update UI state to reflect the current bean selection
-                _uiState.value = _uiState.value.copy(
-                    currentBeanId = beanId,
-                    isLoading = false
-                )
-                // Refresh the bean list to show updated grinder setting
-                loadFilteredBeans(_searchQuery.value, _showInactive.value)
+            if (grinderResult.isSuccess) {
+                // Set the bean as current in the repository
+                val result = beanRepository.setCurrentBean(beanId)
+                
+                if (result.isSuccess) {
+                    // Update UI state to reflect the current bean selection
+                    _uiState.value = _uiState.value.copy(
+                        currentBeanId = beanId,
+                        isLoading = false
+                    )
+                    // Refresh the bean list to show updated grinder setting
+                    loadFilteredBeans(_searchQuery.value, _showInactive.value)
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = result.exceptionOrNull()?.message ?: "Failed to set current bean"
+                    )
+                }
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to set current bean"
+                    error = grinderResult.exceptionOrNull()?.message ?: "Failed to update grinder setting"
                 )
             }
         }

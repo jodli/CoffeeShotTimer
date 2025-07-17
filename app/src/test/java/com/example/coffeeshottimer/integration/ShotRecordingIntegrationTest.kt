@@ -71,9 +71,18 @@ class ShotRecordingIntegrationTest {
         )
         every { beanRepository.getActiveBeans() } returns flowOf(Result.success(listOf(testBean)))
         
+        // Mock the new current bean methods I added
+        coEvery { beanRepository.getCurrentBean() } returns Result.success(null)
+        coEvery { beanRepository.setCurrentBean(any()) } returns Result.success(Unit)
+        every { beanRepository.clearCurrentBean() } just Runs
+        every { beanRepository.getCurrentBeanId() } returns null
+        
         // Mock use case validation and recording
         coEvery { recordShotUseCase.validateShotParameters(any(), any(), any(), any(), any(), any()) } returns 
             ValidationResult(isValid = true, errors = emptyList())
+        
+        // Mock the new grinder setting suggestion method I added
+        coEvery { recordShotUseCase.getSuggestedGrinderSetting(any()) } returns Result.success("15")
         
         val testShot = Shot(
             id = "test-shot-1",

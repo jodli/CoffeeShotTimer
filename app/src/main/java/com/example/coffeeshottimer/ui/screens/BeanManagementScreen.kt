@@ -27,6 +27,7 @@ import com.example.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
 fun BeanManagementScreen(
     onAddBeanClick: () -> Unit = {},
     onEditBeanClick: (String) -> Unit = {},
+    onNavigateToRecordShot: () -> Unit = {},
     viewModel: BeanManagementViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -168,6 +169,12 @@ fun BeanManagementScreen(
                             bean = bean,
                             onEdit = { onEditBeanClick(bean.id) },
                             onDelete = { showDeleteDialog = bean },
+                            onUseForShot = {
+                                if (bean.isActive) {
+                                    viewModel.setCurrentBean(bean.id)
+                                    onNavigateToRecordShot()
+                                }
+                            },
                             onReactivate = if (!bean.isActive) {
                                 { viewModel.reactivateBean(bean.id) }
                             } else null
@@ -214,6 +221,7 @@ private fun BeanListItem(
     bean: Bean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onUseForShot: () -> Unit,
     onReactivate: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
@@ -333,6 +341,21 @@ private fun BeanListItem(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
             ) {
+                // Use for Shot button (only for active beans)
+                if (bean.isActive) {
+                    FilledTonalButton(
+                        onClick = onUseForShot,
+                        modifier = Modifier.height(32.dp),
+                        contentPadding = PaddingValues(horizontal = spacing.small, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = "Use for Shot",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+                
                 if (onReactivate != null) {
                     IconButton(
                         onClick = onReactivate,

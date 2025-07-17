@@ -48,6 +48,18 @@ android {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
+    
+    // Test configuration
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            all {
+                it.jvmArgs("-Xmx4096m", "-XX:MaxMetaspaceSize=1024m", "-XX:+UseG1GC")
+                it.systemProperty("robolectric.enabledSdks", "28,29,30,31,32,33,34")
+                it.maxHeapSize = "4096m"
+            }
+        }
+    }
 }
 
 dependencies {

@@ -26,6 +26,7 @@ import com.example.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordShotScreen(
+    onNavigateToBeanManagement: () -> Unit = {},
     viewModel: ShotRecordingViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
@@ -51,6 +52,7 @@ fun RecordShotScreen(
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
     val isDraftSaved by viewModel.isDraftSaved.collectAsStateWithLifecycle()
+    val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
@@ -77,10 +79,11 @@ fun RecordShotScreen(
             subtitle = "Track your espresso extraction"
         )
         
-        // Bean Selection
+        // Bean Selection with navigation to bean management
         BeanSelectionCard(
             selectedBean = selectedBean,
             onBeanSelect = { showBeanSelector = true },
+            onManageBeans = onNavigateToBeanManagement,
             modifier = Modifier.fillMaxWidth()
         )
         
@@ -124,11 +127,15 @@ fun RecordShotScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
-        // Grinder Setting
+        // Grinder Setting with suggestions
         GrinderSettingSection(
             grinderSetting = grinderSetting,
             onGrinderSettingChange = viewModel::updateGrinderSetting,
             grinderSettingError = grinderSettingError,
+            suggestedSetting = suggestedGrinderSetting,
+            onUseSuggestion = { suggestion ->
+                viewModel.updateGrinderSetting(suggestion)
+            },
             modifier = Modifier.fillMaxWidth()
         )
         
@@ -227,6 +234,10 @@ fun RecordShotScreen(
                 viewModel.selectBean(bean)
                 showBeanSelector = false
             },
+            onManageBeans = {
+                showBeanSelector = false
+                onNavigateToBeanManagement()
+            },
             onDismiss = { showBeanSelector = false }
         )
     }
@@ -236,6 +247,7 @@ fun RecordShotScreen(
 private fun BeanSelectionCard(
     selectedBean: Bean?,
     onBeanSelect: () -> Unit,
+    onManageBeans: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -257,11 +269,28 @@ private fun BeanSelectionCard(
             )
             
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Selected Bean",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Selected Bean",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    TextButton(
+                        onClick = onManageBeans,
+                        contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
+                    ) {
+                        Text(
+                            text = "Manage",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
                 
                 Text(
                     text = selectedBean?.name ?: "Tap to select bean",
@@ -484,16 +513,38 @@ private fun GrinderSettingSection(
     grinderSetting: String,
     onGrinderSettingChange: (String) -> Unit,
     grinderSettingError: String?,
+    suggestedSetting: String?,
+    onUseSuggestion: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     
     CoffeeCard(modifier = modifier) {
-        Text(
-            text = "Grinder Setting",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Grinder Setting",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            
+            // Show suggestion button if available and different from current setting
+            if (suggestedSetting != null && suggestedSetting != grinderSetting && grinderSetting.isEmpty()) {
+                TextButton(
+                    onClick = { onUseSuggestion(suggestedSetting) },
+                    contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "Use: $suggestedSetting",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
         
         Spacer(modifier = Modifier.height(spacing.medium))
         
@@ -501,11 +552,21 @@ private fun GrinderSettingSection(
             value = grinderSetting,
             onValueChange = onGrinderSettingChange,
             label = { Text("Grinder Setting") },
-            placeholder = { Text("e.g., 15, Fine, 2.5") },
+            placeholder = { Text(suggestedSetting ?: "e.g., 15, Fine, 2.5") },
             isError = grinderSettingError != null,
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
+        
+        // Show suggestion hint if available
+        if (suggestedSetting != null && grinderSetting.isEmpty()) {
+            Text(
+                text = "Suggested based on last use with this bean: $suggestedSetting",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = spacing.medium, top = spacing.extraSmall)
+            )
+        }
         
         grinderSettingError?.let { error ->
             Text(
@@ -567,6 +628,7 @@ private fun BeanSelectorBottomSheet(
     beans: List<Bean>,
     selectedBean: Bean?,
     onBeanSelected: (Bean) -> Unit,
+    onManageBeans: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState()
@@ -581,11 +643,28 @@ private fun BeanSelectorBottomSheet(
                 .fillMaxWidth()
                 .padding(spacing.medium)
         ) {
-            Text(
-                text = "Select Bean",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = spacing.medium)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Select Bean",
+                    style = MaterialTheme.typography.headlineSmall
+                )
+                
+                TextButton(
+                    onClick = onManageBeans
+                ) {
+                    Text(
+                        text = "Manage Beans",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(spacing.medium))
             
             if (beans.isEmpty()) {
                 EmptyState(

@@ -130,7 +130,12 @@
   - Add grinder setting memory per bean
   - _Requirements: 3.1, 3.3, 3.4, 3.5, 4.4_
 
-- [ ] 8.3 Integrate bean management with shot recording
+- [x] 8.3 Integrate bean management with shot recording
+
+
+
+
+
   - Connect bean selection in shot recording to bean management
   - Implement grinder setting suggestions based on last used setting
   - Add seamless navigation between bean management and shot recording

@@ -23,7 +23,11 @@ fun AppNavigation(
     ) {
         // Main bottom navigation screens
         composable(NavigationDestinations.RecordShot.route) {
-            RecordShotScreen()
+            RecordShotScreen(
+                onNavigateToBeanManagement = {
+                    navController.navigate(NavigationDestinations.BeanManagement.route)
+                }
+            )
         }
         
         composable(NavigationDestinations.ShotHistory.route) {
@@ -41,6 +45,9 @@ fun AppNavigation(
                 },
                 onEditBeanClick = { beanId ->
                     navController.navigate(NavigationDestinations.AddEditBean.createRoute(beanId))
+                },
+                onNavigateToRecordShot = {
+                    navController.navigate(NavigationDestinations.RecordShot.route)
                 }
             )
         }

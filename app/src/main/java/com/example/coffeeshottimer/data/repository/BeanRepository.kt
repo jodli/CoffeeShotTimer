@@ -19,6 +19,9 @@ class BeanRepository @Inject constructor(
     private val beanDao: BeanDao
 ) {
     
+    // In-memory storage for current bean selection (could be replaced with SharedPreferences for persistence)
+    private var _currentBeanId: String? = null
+    
     /**
      * Get all beans ordered by creation date.
      * @return Flow of list of beans with error handling
@@ -276,6 +279,73 @@ class BeanRepository @Inject constructor(
         }
         
         return validationResult
+    }
+    
+    /**
+     * Set the current bean for shot recording.
+     * Implements requirement 3.3 for remembering bean selection.
+     * @param beanId The ID of the bean to set as current
+     * @return Result indicating success or failure
+     */
+    suspend fun setCurrentBean(beanId: String): Result<Unit> {
+        return try {
+            if (beanId.isBlank()) {
+                return Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
+            }
+            
+            // Check if bean exists and is active
+            val bean = beanDao.getBeanById(beanId)
+            if (bean == null) {
+                return Result.failure(RepositoryException.NotFoundError("Bean not found"))
+            }
+            if (!bean.isActive) {
+                return Result.failure(RepositoryException.ValidationError("Cannot select inactive bean"))
+            }
+            
+            _currentBeanId = beanId
+            Result.success(Unit)
+        } catch (exception: Exception) {
+            Result.failure(RepositoryException.DatabaseError("Failed to set current bean", exception))
+        }
+    }
+    
+    /**
+     * Get the current bean for shot recording.
+     * @return Result containing the current bean or null if none selected
+     */
+    suspend fun getCurrentBean(): Result<Bean?> {
+        return try {
+            val currentBeanId = _currentBeanId
+            if (currentBeanId != null) {
+                val bean = beanDao.getBeanById(currentBeanId)
+                // If bean is no longer active or doesn't exist, clear current selection
+                if (bean == null || !bean.isActive) {
+                    _currentBeanId = null
+                    Result.success(null)
+                } else {
+                    Result.success(bean)
+                }
+            } else {
+                Result.success(null)
+            }
+        } catch (exception: Exception) {
+            Result.failure(RepositoryException.DatabaseError("Failed to get current bean", exception))
+        }
+    }
+    
+    /**
+     * Clear the current bean selection.
+     */
+    fun clearCurrentBean() {
+        _currentBeanId = null
+    }
+    
+    /**
+     * Get the current bean ID.
+     * @return Current bean ID or null if none selected
+     */
+    fun getCurrentBeanId(): String? {
+        return _currentBeanId
     }
 }
 

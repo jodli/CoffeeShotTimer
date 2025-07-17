@@ -121,6 +121,7 @@ class ShotRecordingViewModel @Inject constructor(
     
     init {
         loadActiveBeans()
+        loadCurrentBean()
         startTimerUpdates()
         observeRecordingState()
         startAutoSaveDraft()
@@ -137,7 +138,7 @@ class ShotRecordingViewModel @Inject constructor(
                 result.fold(
                     onSuccess = { beans ->
                         _activeBeans.value = beans
-                        // Auto-select first bean if none selected
+                        // Auto-select first bean if none selected and no current bean
                         if (_selectedBean.value == null && beans.isNotEmpty()) {
                             selectBean(beans.first())
                         }
@@ -149,6 +150,26 @@ class ShotRecordingViewModel @Inject constructor(
                 )
                 _isLoading.value = false
             }
+        }
+    }
+    
+    /**
+     * Load the current bean from repository if one is set.
+     * Implements requirement 3.2 for connecting bean selection between screens.
+     */
+    private fun loadCurrentBean() {
+        viewModelScope.launch {
+            val result = beanRepository.getCurrentBean()
+            result.fold(
+                onSuccess = { currentBean ->
+                    if (currentBean != null) {
+                        selectBean(currentBean)
+                    }
+                },
+                onFailure = { exception ->
+                    // Silently handle error - current bean is optional
+                }
+            )
         }
     }
     
@@ -182,18 +203,26 @@ class ShotRecordingViewModel @Inject constructor(
     
     /**
      * Select a bean and load its suggested grinder setting.
+     * Implements requirements 3.3 and 4.4 for remembering grinder settings per bean.
      */
     fun selectBean(bean: Bean) {
+        val previousBean = _selectedBean.value
         _selectedBean.value = bean
         
-        // Load suggested grinder setting
+        // Load suggested grinder setting from last successful shot with this bean
         viewModelScope.launch {
             val result = recordShotUseCase.getSuggestedGrinderSetting(bean.id)
             result.fold(
                 onSuccess = { suggestion ->
                     _suggestedGrinderSetting.value = suggestion
-                    // Auto-fill grinder setting if available and current setting is empty
-                    if (_grinderSetting.value.isEmpty() && suggestion != null) {
+                    
+                    // Auto-fill grinder setting if:
+                    // 1. Current setting is empty, OR
+                    // 2. We're switching from a different bean and have a suggestion
+                    val shouldAutoFill = _grinderSetting.value.isEmpty() || 
+                                       (previousBean != null && previousBean.id != bean.id && suggestion != null)
+                    
+                    if (shouldAutoFill && suggestion != null) {
                         updateGrinderSetting(suggestion)
                     }
                 },
