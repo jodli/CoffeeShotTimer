@@ -78,10 +78,3 @@ data class Bean(
     }
 }
 
-/**
- * Data class representing the result of bean validation.
- */
-data class ValidationResult(
-    val isValid: Boolean,
-    val errors: List<String> = emptyList()
-)

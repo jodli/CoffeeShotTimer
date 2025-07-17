@@ -155,7 +155,13 @@
   - Create visual indicators for brew ratios and extraction quality
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 5.3_
 
-- [ ] 9.2 Implement shot history ViewModel and filtering logic
+- [x] 9.2 Implement shot history ViewModel and filtering logic
+
+
+
+
+
+
   - Create ShotHistoryViewModel with pagination and filtering
   - Add date range picker and bean filter functionality
   - Implement shot details view with comprehensive information

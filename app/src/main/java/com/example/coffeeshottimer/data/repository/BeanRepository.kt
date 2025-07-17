@@ -357,4 +357,5 @@ sealed class RepositoryException(message: String, cause: Throwable? = null) : Ex
     class ValidationError(message: String) : RepositoryException(message)
     class NotFoundError(message: String) : RepositoryException(message)
     class NetworkError(message: String, cause: Throwable? = null) : RepositoryException(message, cause)
+    class PermissionError(message: String) : RepositoryException(message)
 }
