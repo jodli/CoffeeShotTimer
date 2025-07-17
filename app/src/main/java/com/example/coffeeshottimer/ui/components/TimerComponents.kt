@@ -116,7 +116,6 @@ fun CircularTimer(
 fun TimerControls(
     isRunning: Boolean,
     onStartPause: () -> Unit,
-    onStop: () -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier,
     showReset: Boolean = true
@@ -150,19 +149,6 @@ fun TimerControls(
                     modifier = Modifier.size(24.dp)
                 )
             }
-        }
-        
-        // Stop button
-        FloatingActionButton(
-            onClick = onStop,
-            modifier = Modifier.size(48.dp),
-            containerColor = MaterialTheme.colorScheme.error
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_stop),
-                contentDescription = "Stop",
-                modifier = Modifier.size(20.dp)
-            )
         }
         
         // Reset button (optional)

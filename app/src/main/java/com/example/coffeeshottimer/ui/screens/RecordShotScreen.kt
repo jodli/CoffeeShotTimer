@@ -94,14 +94,12 @@ fun RecordShotScreen(
             timerState = uiTimerState,
             onStartPause = {
                 if (timerState.isRunning) {
-                    viewModel.stopTimer()
+                    viewModel.pauseTimer()
                 } else {
                     viewModel.startTimer()
                 }
             },
-            onStop = {
-                viewModel.stopTimer()
-            },
+
             onReset = {
                 viewModel.resetTimer()
             },
@@ -330,7 +328,6 @@ private fun TimerSection(
     targetTime: Long?,
     timerState: TimerState,
     onStartPause: () -> Unit,
-    onStop: () -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -359,7 +356,6 @@ private fun TimerSection(
             TimerControls(
                 isRunning = timerState == TimerState.RUNNING,
                 onStartPause = onStartPause,
-                onStop = onStop,
                 onReset = onReset,
                 showReset = currentTime > 0L
             )

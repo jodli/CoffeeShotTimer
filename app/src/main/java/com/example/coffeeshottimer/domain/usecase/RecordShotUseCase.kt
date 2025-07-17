@@ -36,17 +36,16 @@ class RecordShotUseCase @Inject constructor(
         if (!currentState.isRunning) {
             _timerState.value = currentState.copy(
                 isRunning = true,
-                startTime = System.currentTimeMillis(),
-                elapsedTimeSeconds = 0
+                startTime = System.currentTimeMillis() - (currentState.elapsedTimeSeconds * 1000L)
             )
         }
     }
     
     /**
-     * Stop the extraction timer and return the elapsed time.
+     * Pause the extraction timer and return the elapsed time.
      * @return Elapsed time in seconds
      */
-    fun stopTimer(): Int {
+    fun pauseTimer(): Int {
         val currentState = _timerState.value
         if (currentState.isRunning) {
             val elapsedTime = ((System.currentTimeMillis() - currentState.startTime) / 1000).toInt()
@@ -57,6 +56,14 @@ class RecordShotUseCase @Inject constructor(
             return elapsedTime
         }
         return currentState.elapsedTimeSeconds
+    }
+
+    /**
+     * Stop the extraction timer and return the elapsed time.
+     * @return Elapsed time in seconds
+     */
+    fun stopTimer(): Int {
+        return pauseTimer() // Stop is the same as pause for now
     }
     
     /**

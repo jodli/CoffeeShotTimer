@@ -315,6 +315,14 @@ class ShotRecordingViewModel @Inject constructor(
     }
     
     /**
+     * Pause the extraction timer.
+     */
+    fun pauseTimer() {
+        recordShotUseCase.pauseTimer()
+        validateForm()
+    }
+
+    /**
      * Stop the extraction timer.
      */
     fun stopTimer() {
