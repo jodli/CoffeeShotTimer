@@ -4,7 +4,12 @@ import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.data.model.Shot
 import com.example.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.example.coffeeshottimer.domain.usecase.GetShotHistoryUseCase
+import com.example.coffeeshottimer.domain.usecase.GetShotStatisticsUseCase
 import com.example.coffeeshottimer.domain.usecase.ShotHistoryFilter
+import com.example.coffeeshottimer.domain.usecase.OverallStatistics
+import com.example.coffeeshottimer.domain.usecase.ShotTrends
+import com.example.coffeeshottimer.domain.usecase.BrewRatioAnalysis
+import com.example.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -27,6 +32,7 @@ class ShotHistoryViewModelTest {
     private lateinit var viewModel: ShotHistoryViewModel
     private val getShotHistoryUseCase = mockk<GetShotHistoryUseCase>()
     private val getActiveBeansUseCase = mockk<GetActiveBeansUseCase>()
+    private val getShotStatisticsUseCase = mockk<GetShotStatisticsUseCase>()
     
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -37,8 +43,12 @@ class ShotHistoryViewModelTest {
         // Setup default mock responses
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(emptyList()))
         every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(emptyList()))
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(OverallStatistics.empty())
+        coEvery { getShotStatisticsUseCase.getShotTrends(any(), any()) } returns Result.success(ShotTrends.empty())
+        coEvery { getShotStatisticsUseCase.getBrewRatioAnalysis(any()) } returns Result.success(BrewRatioAnalysis.empty())
+        coEvery { getShotStatisticsUseCase.getExtractionTimeAnalysis(any()) } returns Result.success(ExtractionTimeAnalysis.empty())
         
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase)
     }
 
     @After
@@ -133,7 +143,7 @@ class ShotHistoryViewModelTest {
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(testBeans))
         
         // Recreate viewModel to pick up the new mock
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase)
         
         // Wait for initial data load
         testScheduler.advanceUntilIdle()
@@ -175,4 +185,163 @@ class ShotHistoryViewModelTest {
         viewModel.toggleTypicalBrewRatioFilter()
         assertFalse(viewModel.currentFilter.value.onlyTypicalBrewRatio == true)
     }
-}
+
+    @Test
+    fun `toggleAnalysisView toggles analysis state correctly`() = runTest {
+        // Initially analysis is not shown
+        assertFalse(viewModel.uiState.value.showAnalysis)
+        
+        // Toggle to show analysis
+        viewModel.toggleAnalysisView()
+        assertTrue(viewModel.uiState.value.showAnalysis)
+        
+        // Toggle back to hide analysis
+        viewModel.toggleAnalysisView()
+        assertFalse(viewModel.uiState.value.showAnalysis)
+    }
+
+    @Test
+    fun `toggleAnalysisView loads analysis data when first shown`() = runTest {
+        // Setup mock data
+        val mockOverallStats = OverallStatistics(
+            totalShots = 10,
+            uniqueBeans = 3,
+            avgBrewRatio = 2.5,
+            avgExtractionTime = 28.0,
+            optimalExtractionPercentage = 70.0,
+            typicalRatioPercentage = 80.0,
+            mostUsedGrinderSetting = "15",
+            recentAvgBrewRatio = 2.3,
+            lastShotDate = LocalDateTime.now(),
+            firstShotDate = LocalDateTime.now().minusDays(30)
+        )
+        
+        val mockTrends = ShotTrends(
+            totalShots = 10,
+            daysAnalyzed = 30,
+            shotsPerDay = 0.33,
+            brewRatioTrend = 0.1,
+            extractionTimeTrend = -1.0,
+            firstHalfAvgRatio = 2.4,
+            secondHalfAvgRatio = 2.5,
+            firstHalfAvgTime = 29.0,
+            secondHalfAvgTime = 28.0,
+            isImproving = true
+        )
+        
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockOverallStats)
+        coEvery { getShotStatisticsUseCase.getShotTrends(days = 30) } returns Result.success(mockTrends)
+        
+        // Toggle analysis view
+        viewModel.toggleAnalysisView()
+        
+        // Wait for async operations
+        testScheduler.advanceUntilIdle()
+        
+        val uiState = viewModel.uiState.value
+        assertTrue(uiState.showAnalysis)
+        assertEquals(mockOverallStats, uiState.overallStatistics)
+        assertEquals(mockTrends, uiState.shotTrends)
+        assertTrue(uiState.hasAnalysisData)
+    }
+
+    @Test
+    fun `analysis loading state is handled correctly`() = runTest {
+        // Initially not loading analysis
+        assertFalse(viewModel.uiState.value.analysisLoading)
+        
+        // Mock a delayed response
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } coAnswers {
+            kotlinx.coroutines.delay(100)
+            Result.success(OverallStatistics.empty())
+        }
+        
+        // Toggle analysis view (this should start loading)
+        viewModel.toggleAnalysisView()
+        
+        // Should be loading initially
+        assertTrue(viewModel.uiState.value.analysisLoading)
+        
+        // Wait for completion
+        testScheduler.advanceUntilIdle()
+        
+        // Should not be loading anymore
+        assertFalse(viewModel.uiState.value.analysisLoading)
+    }
+
+    @Test
+    fun `analysis error is handled correctly`() = runTest {
+        val errorMessage = "Failed to load statistics"
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.failure(Exception(errorMessage))
+        
+        // Toggle analysis view
+        viewModel.toggleAnalysisView()
+        
+        // Wait for async operations
+        testScheduler.advanceUntilIdle()
+        
+        val uiState = viewModel.uiState.value
+        assertTrue(uiState.showAnalysis)
+        assertFalse(uiState.analysisLoading)
+        assertTrue(uiState.error?.contains("Failed to load analysis") == true)
+    }
+
+    @Test
+    fun `refreshAnalysis reloads data when analysis is shown`() = runTest {
+        val mockStats = OverallStatistics(
+            totalShots = 5,
+            uniqueBeans = 2,
+            avgBrewRatio = 2.0,
+            avgExtractionTime = 25.0,
+            optimalExtractionPercentage = 60.0,
+            typicalRatioPercentage = 70.0,
+            mostUsedGrinderSetting = "12",
+            recentAvgBrewRatio = 2.1,
+            lastShotDate = LocalDateTime.now(),
+            firstShotDate = LocalDateTime.now().minusDays(15)
+        )
+        
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockStats)
+        
+        // First show analysis
+        viewModel.toggleAnalysisView()
+        testScheduler.advanceUntilIdle()
+        
+        // Refresh analysis
+        viewModel.refreshAnalysis()
+        testScheduler.advanceUntilIdle()
+        
+        val uiState = viewModel.uiState.value
+        assertEquals(mockStats, uiState.overallStatistics)
+    }
+
+    @Test
+    fun `refreshAnalysis does nothing when analysis is not shown`() = runTest {
+        // Don't show analysis
+        assertFalse(viewModel.uiState.value.showAnalysis)
+        
+        // Refresh analysis (should do nothing)
+        viewModel.refreshAnalysis()
+        testScheduler.advanceUntilIdle()
+        
+        val uiState = viewModel.uiState.value
+        assertFalse(uiState.showAnalysis)
+        assertEquals(null, uiState.overallStatistics)
+        assertFalse(uiState.hasAnalysisData)
+    }
+
+    @Test
+    fun `hasAnalysisData returns true when any analysis data is present`() = runTest {
+        val mockStats = OverallStatistics.empty().copy(totalShots = 1)
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockStats)
+        
+        viewModel.toggleAnalysisView()
+        testScheduler.advanceUntilIdle()
+        
+        assertTrue(viewModel.uiState.value.hasAnalysisData)
+    }
+
+    @Test
+    fun `hasAnalysisData returns false when no analysis data is present`() {
+        assertFalse(viewModel.uiState.value.hasAnalysisData)
+    }}

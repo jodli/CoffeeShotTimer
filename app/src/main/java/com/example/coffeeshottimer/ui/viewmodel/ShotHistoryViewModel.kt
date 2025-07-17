@@ -6,7 +6,13 @@ import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.data.model.Shot
 import com.example.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.example.coffeeshottimer.domain.usecase.GetShotHistoryUseCase
+import com.example.coffeeshottimer.domain.usecase.GetShotStatisticsUseCase
 import com.example.coffeeshottimer.domain.usecase.ShotHistoryFilter
+import com.example.coffeeshottimer.domain.usecase.OverallStatistics
+import com.example.coffeeshottimer.domain.usecase.ShotTrends
+import com.example.coffeeshottimer.domain.usecase.BrewRatioAnalysis
+import com.example.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
+import com.example.coffeeshottimer.domain.usecase.GrinderSettingAnalysis
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +32,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ShotHistoryViewModel @Inject constructor(
     private val getShotHistoryUseCase: GetShotHistoryUseCase,
-    private val getActiveBeansUseCase: GetActiveBeansUseCase
+    private val getActiveBeansUseCase: GetActiveBeansUseCase,
+    private val getShotStatisticsUseCase: GetShotStatisticsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShotHistoryUiState())
@@ -180,6 +187,69 @@ class ShotHistoryViewModel @Inject constructor(
     fun getBeanName(beanId: String): String {
         return _uiState.value.availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
     }
+
+    fun toggleAnalysisView() {
+        val currentShowAnalysis = _uiState.value.showAnalysis
+        _uiState.value = _uiState.value.copy(showAnalysis = !currentShowAnalysis)
+        
+        if (!currentShowAnalysis && !_uiState.value.hasAnalysisData) {
+            loadAnalysisData()
+        }
+    }
+
+    private fun loadAnalysisData() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(analysisLoading = true)
+            
+            try {
+                // Load overall statistics
+                val overallStatsResult = getShotStatisticsUseCase.getOverallStatistics()
+                val overallStats = overallStatsResult.getOrNull()
+                
+                // Load shot trends (last 30 days)
+                val trendsResult = getShotStatisticsUseCase.getShotTrends(days = 30)
+                val trends = trendsResult.getOrNull()
+                
+                // Load brew ratio analysis
+                val brewRatioResult = getShotStatisticsUseCase.getBrewRatioAnalysis()
+                val brewRatioAnalysis = brewRatioResult.getOrNull()
+                
+                // Load extraction time analysis
+                val extractionTimeResult = getShotStatisticsUseCase.getExtractionTimeAnalysis()
+                val extractionTimeAnalysis = extractionTimeResult.getOrNull()
+                
+                // Load grinder setting analysis (for current filter if bean is selected)
+                val currentBeanId = _currentFilter.value.beanId
+                val grinderAnalysisResult = if (currentBeanId != null) {
+                    getShotStatisticsUseCase.getGrinderSettingAnalysis(currentBeanId)
+                } else {
+                    // For overall analysis, we'll need to modify the use case or handle differently
+                    Result.success(null)
+                }
+                val grinderAnalysis = grinderAnalysisResult.getOrNull()
+                
+                _uiState.value = _uiState.value.copy(
+                    analysisLoading = false,
+                    overallStatistics = overallStats,
+                    shotTrends = trends,
+                    brewRatioAnalysis = brewRatioAnalysis,
+                    extractionTimeAnalysis = extractionTimeAnalysis,
+                    grinderSettingAnalysis = grinderAnalysis
+                )
+            } catch (exception: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    analysisLoading = false,
+                    error = "Failed to load analysis: ${exception.message}"
+                )
+            }
+        }
+    }
+
+    fun refreshAnalysis() {
+        if (_uiState.value.showAnalysis) {
+            loadAnalysisData()
+        }
+    }
 }
 
 /**
@@ -189,8 +259,18 @@ data class ShotHistoryUiState(
     val isLoading: Boolean = false,
     val shots: List<Shot> = emptyList(),
     val availableBeans: List<Bean> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val showAnalysis: Boolean = false,
+    val analysisLoading: Boolean = false,
+    val overallStatistics: OverallStatistics? = null,
+    val shotTrends: ShotTrends? = null,
+    val brewRatioAnalysis: BrewRatioAnalysis? = null,
+    val extractionTimeAnalysis: ExtractionTimeAnalysis? = null,
+    val grinderSettingAnalysis: GrinderSettingAnalysis? = null
 ) {
     val isEmpty: Boolean
         get() = shots.isEmpty() && !isLoading
+        
+    val hasAnalysisData: Boolean
+        get() = overallStatistics != null || shotTrends != null || brewRatioAnalysis != null
 }
