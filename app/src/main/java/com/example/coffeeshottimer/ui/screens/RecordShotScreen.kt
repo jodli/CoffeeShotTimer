@@ -49,6 +49,8 @@ fun RecordShotScreen(
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
+    val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
+    val isDraftSaved by viewModel.isDraftSaved.collectAsStateWithLifecycle()
     
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
@@ -147,6 +149,39 @@ fun RecordShotScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
+        // Success message
+        successMessage?.let { success ->
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(spacing.medium),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = success,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.weight(1f)
+                    )
+                    
+                    TextButton(
+                        onClick = { viewModel.clearSuccessMessage() }
+                    ) {
+                        Text(
+                            text = "Dismiss",
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+                }
+            }
+        }
+        
         // Error message
         errorMessage?.let { error ->
             Card(
@@ -159,6 +194,22 @@ fun RecordShotScreen(
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(spacing.medium)
+                )
+            }
+        }
+        
+        // Draft status indicator
+        if (isDraftSaved) {
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
+            ) {
+                Text(
+                    text = "Draft saved automatically",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(spacing.small)
                 )
             }
         }

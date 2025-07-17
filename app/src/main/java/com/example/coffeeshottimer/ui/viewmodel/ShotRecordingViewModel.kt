@@ -2,18 +2,37 @@ package com.example.coffeeshottimer.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.content.Context
 import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.data.model.ValidationResult
 import com.example.coffeeshottimer.data.repository.BeanRepository
 import com.example.coffeeshottimer.domain.usecase.RecordShotUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
+
+/**
+ * Data class representing a draft shot for auto-save functionality.
+ */
+@Serializable
+data class ShotDraft(
+    val selectedBeanId: String? = null,
+    val coffeeWeightIn: String = "",
+    val coffeeWeightOut: String = "",
+    val grinderSetting: String = "",
+    val notes: String = "",
+    val elapsedTimeSeconds: Int = 0,
+    val timestamp: Long = System.currentTimeMillis()
+)
 
 /**
  * ViewModel for shot recording screen.
@@ -22,7 +41,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
-    private val beanRepository: BeanRepository
+    private val beanRepository: BeanRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     
     // Bean management state
@@ -82,13 +102,29 @@ class ShotRecordingViewModel @Inject constructor(
     private val _isFormValid = MutableStateFlow(false)
     val isFormValid: StateFlow<Boolean> = _isFormValid.asStateFlow()
     
+    // Success feedback state
+    private val _successMessage = MutableStateFlow<String?>(null)
+    val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
+    
+    // Draft auto-save state
+    private val _isDraftSaved = MutableStateFlow(false)
+    val isDraftSaved: StateFlow<Boolean> = _isDraftSaved.asStateFlow()
+    
+    private val _lastDraftSaveTime = MutableStateFlow<Long?>(null)
+    val lastDraftSaveTime: StateFlow<Long?> = _lastDraftSaveTime.asStateFlow()
+    
     // Timer update job
     private var timerUpdateJob: Job? = null
+    
+    // Auto-save draft job
+    private var autoSaveDraftJob: Job? = null
     
     init {
         loadActiveBeans()
         startTimerUpdates()
         observeRecordingState()
+        startAutoSaveDraft()
+        restoreDraftIfExists()
     }
     
     /**
@@ -306,10 +342,24 @@ class ShotRecordingViewModel @Inject constructor(
             )
             
             result.fold(
-                onSuccess = {
+                onSuccess = { shot ->
+                    // Clear draft after successful recording
+                    clearDraft()
+                    
+                    // Show success feedback
+                    val brewRatio = shot.getFormattedBrewRatio()
+                    val extractionTime = shot.getFormattedExtractionTime()
+                    _successMessage.value = "Shot recorded successfully! Brew ratio: $brewRatio, Time: $extractionTime"
+                    
                     // Clear form after successful recording
                     clearForm()
                     _errorMessage.value = null
+                    
+                    // Auto-clear success message after 5 seconds
+                    viewModelScope.launch {
+                        delay(5000L)
+                        _successMessage.value = null
+                    }
                 },
                 onFailure = { exception ->
                     _errorMessage.value = exception.message ?: "Failed to record shot"
@@ -357,9 +407,161 @@ class ShotRecordingViewModel @Inject constructor(
         return recordShotUseCase.isOptimalExtractionTime(timerState.value.elapsedTimeSeconds)
     }
     
+    /**
+     * Start auto-save draft functionality.
+     * Saves form data every 30 seconds to prevent data loss.
+     */
+    private fun startAutoSaveDraft() {
+        autoSaveDraftJob = viewModelScope.launch {
+            while (true) {
+                delay(30000L) // Auto-save every 30 seconds
+                saveDraftIfNeeded()
+            }
+        }
+    }
+    
+    /**
+     * Save draft if form has meaningful data.
+     */
+    private suspend fun saveDraftIfNeeded() {
+        val hasData = _coffeeWeightIn.value.isNotBlank() ||
+                _coffeeWeightOut.value.isNotBlank() ||
+                _grinderSetting.value.isNotBlank() ||
+                _notes.value.isNotBlank() ||
+                timerState.value.elapsedTimeSeconds > 0
+        
+        if (hasData) {
+            saveDraft()
+        }
+    }
+    
+    /**
+     * Save current form state as draft.
+     */
+    private suspend fun saveDraft() {
+        try {
+            val draft = ShotDraft(
+                selectedBeanId = _selectedBean.value?.id,
+                coffeeWeightIn = _coffeeWeightIn.value,
+                coffeeWeightOut = _coffeeWeightOut.value,
+                grinderSetting = _grinderSetting.value,
+                notes = _notes.value,
+                elapsedTimeSeconds = timerState.value.elapsedTimeSeconds,
+                timestamp = System.currentTimeMillis()
+            )
+            
+            val sharedPrefs = context.getSharedPreferences("shot_drafts", Context.MODE_PRIVATE)
+            val draftJson = Json.encodeToString(draft)
+            
+            sharedPrefs.edit()
+                .putString("current_draft", draftJson)
+                .apply()
+            
+            _isDraftSaved.value = true
+            _lastDraftSaveTime.value = System.currentTimeMillis()
+        } catch (exception: Exception) {
+            // Silently handle draft save errors to not interrupt user workflow
+        }
+    }
+    
+    /**
+     * Restore draft if it exists.
+     */
+    private fun restoreDraftIfExists() {
+        viewModelScope.launch {
+            try {
+                val sharedPrefs = context.getSharedPreferences("shot_drafts", Context.MODE_PRIVATE)
+                val draftJson = sharedPrefs.getString("current_draft", null)
+                
+                if (draftJson != null) {
+                    val draft = Json.decodeFromString<ShotDraft>(draftJson)
+                    
+                    // Check if draft is not too old (e.g., within last 24 hours)
+                    val draftAge = System.currentTimeMillis() - draft.timestamp
+                    val maxDraftAge = 24 * 60 * 60 * 1000L // 24 hours in milliseconds
+                    
+                    if (draftAge <= maxDraftAge) {
+                        // Restore form data
+                        _coffeeWeightIn.value = draft.coffeeWeightIn
+                        _coffeeWeightOut.value = draft.coffeeWeightOut
+                        _grinderSetting.value = draft.grinderSetting
+                        _notes.value = draft.notes
+                        
+                        // Restore selected bean if it exists
+                        draft.selectedBeanId?.let { beanId ->
+                            _activeBeans.value.find { it.id == beanId }?.let { bean ->
+                                selectBean(bean)
+                            }
+                        }
+                        
+                        // Restore timer if it had meaningful time
+                        if (draft.elapsedTimeSeconds > 0) {
+                            recordShotUseCase.resetTimer()
+                            // Note: We can't restore the exact timer state, but we can indicate there was time
+                        }
+                        
+                        _isDraftSaved.value = true
+                        _lastDraftSaveTime.value = draft.timestamp
+                        
+                        // Validate form after restoration
+                        validateForm()
+                    } else {
+                        // Draft is too old, clear it
+                        clearDraft()
+                    }
+                } else {
+                    _isDraftSaved.value = false
+                    _lastDraftSaveTime.value = null
+                }
+            } catch (exception: Exception) {
+                // Silently handle draft restore errors and clear invalid draft
+                clearDraft()
+            }
+        }
+    }
+    
+    /**
+     * Clear saved draft.
+     */
+    private suspend fun clearDraft() {
+        try {
+            val sharedPrefs = context.getSharedPreferences("shot_drafts", Context.MODE_PRIVATE)
+            sharedPrefs.edit()
+                .remove("current_draft")
+                .apply()
+            
+            _isDraftSaved.value = false
+            _lastDraftSaveTime.value = null
+        } catch (exception: Exception) {
+            // Silently handle draft clear errors
+        }
+    }
+    
+    /**
+     * Clear success message.
+     */
+    fun clearSuccessMessage() {
+        _successMessage.value = null
+    }
+    
+    /**
+     * Manually save draft (called when user navigates away or app goes to background).
+     */
+    fun saveDraftManually() {
+        viewModelScope.launch {
+            saveDraftIfNeeded()
+        }
+    }
+    
     override fun onCleared() {
         super.onCleared()
         timerUpdateJob?.cancel()
+        autoSaveDraftJob?.cancel()
+        
+        // Save draft before clearing
+        viewModelScope.launch {
+            saveDraftIfNeeded()
+        }
     }
     
     // Validation helper functions

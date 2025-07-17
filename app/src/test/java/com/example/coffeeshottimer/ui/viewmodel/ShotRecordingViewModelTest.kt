@@ -1,5 +1,6 @@
 package com.example.coffeeshottimer.ui.viewmodel
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.coffeeshottimer.data.repository.BeanRepository
 import com.example.coffeeshottimer.domain.usecase.RecordShotUseCase
@@ -28,6 +29,7 @@ class ShotRecordingViewModelTest {
     
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var beanRepository: BeanRepository
+    private lateinit var context: Context
     private lateinit var viewModel: ShotRecordingViewModel
     
     @Before
@@ -37,9 +39,10 @@ class ShotRecordingViewModelTest {
         // Create mock dependencies
         recordShotUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
         
         // Create ViewModel with injected dependencies
-        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository)
+        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository, context)
     }
     
     @After
@@ -54,5 +57,20 @@ class ShotRecordingViewModelTest {
         assertNotNull(viewModel.activeBeans)
         assertNotNull(viewModel.isLoading)
         assertNotNull(viewModel.errorMessage)
+        assertNotNull(viewModel.successMessage)
+        assertNotNull(viewModel.isDraftSaved)
+    }
+    
+    @Test
+    fun `viewModel should have draft functionality`() {
+        // Verify that draft-related state flows are available
+        assertNotNull(viewModel.isDraftSaved)
+        assertNotNull(viewModel.lastDraftSaveTime)
+        
+        // Verify that manual draft save method is available
+        viewModel.saveDraftManually()
+        
+        // Verify that success message functionality is available
+        viewModel.clearSuccessMessage()
     }
 }
