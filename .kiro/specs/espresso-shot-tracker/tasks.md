@@ -184,6 +184,8 @@
 
 
 
+
+
   - Create dedicated shot detail screen with comprehensive shot information
   - Display all shot parameters including weights, times, and brew ratio
   - Show bean information and grinder settings used for the shot

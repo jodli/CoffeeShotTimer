@@ -4,6 +4,7 @@ import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.data.model.Shot
 import com.example.coffeeshottimer.data.repository.BeanRepository
 import com.example.coffeeshottimer.data.repository.ShotRepository
+import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -49,12 +50,11 @@ class GetShotDetailsUseCase @Inject constructor(
             val daysSinceRoast = ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now()).toInt()
             
             // Get related shots for context
-            val relatedShotsResult = shotRepository.getShotsByBean(shot.beanId)
-            val relatedShots = mutableListOf<Shot>()
-            relatedShotsResult.collect { result ->
-                if (result.isSuccess) {
-                    relatedShots.addAll(result.getOrNull() ?: emptyList())
-                }
+            val relatedShotsResult = shotRepository.getShotsByBean(shot.beanId).first()
+            val relatedShots = if (relatedShotsResult.isSuccess) {
+                relatedShotsResult.getOrNull() ?: emptyList()
+            } else {
+                emptyList()
             }
             
             // Find previous and next shots chronologically
