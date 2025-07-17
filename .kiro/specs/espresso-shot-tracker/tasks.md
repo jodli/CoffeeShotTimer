@@ -78,7 +78,12 @@
   - Create numeric input fields with decimal precision
   - _Requirements: 1.1, 1.4, 3.2, 7.1, 7.3, 7.4_
 
-- [ ] 7.2 Enhance shot recording ViewModel and integrate with use cases
+- [x] 7.2 Enhance shot recording ViewModel and integrate with use cases
+
+
+
+
+
   - Integrate ShotRecordingViewModel with RecordShotUseCase
   - Implement timer functionality with accurate time tracking
   - Add real-time brew ratio calculation and display

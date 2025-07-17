@@ -2,7 +2,7 @@ package com.example.coffeeshottimer.ui.viewmodel
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.coffeeshottimer.data.repository.BeanRepository
-import com.example.coffeeshottimer.data.repository.ShotRepository
+import com.example.coffeeshottimer.domain.usecase.RecordShotUseCase
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -26,7 +26,7 @@ class ShotRecordingViewModelTest {
     
     private val testDispatcher = StandardTestDispatcher()
     
-    private lateinit var shotRepository: ShotRepository
+    private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var viewModel: ShotRecordingViewModel
     
@@ -34,12 +34,12 @@ class ShotRecordingViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         
-        // Create mock repositories
-        shotRepository = mockk(relaxed = true)
+        // Create mock dependencies
+        recordShotUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         
         // Create ViewModel with injected dependencies
-        viewModel = ShotRecordingViewModel(shotRepository, beanRepository)
+        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository)
     }
     
     @After

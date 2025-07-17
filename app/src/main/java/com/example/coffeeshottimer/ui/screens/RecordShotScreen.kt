@@ -33,47 +33,34 @@ fun RecordShotScreen(
     
     // State from ViewModel
     val activeBeans by viewModel.activeBeans.collectAsStateWithLifecycle()
+    val selectedBean by viewModel.selectedBean.collectAsStateWithLifecycle()
+    val coffeeWeightIn by viewModel.coffeeWeightIn.collectAsStateWithLifecycle()
+    val coffeeWeightOut by viewModel.coffeeWeightOut.collectAsStateWithLifecycle()
+    val grinderSetting by viewModel.grinderSetting.collectAsStateWithLifecycle()
+    val notes by viewModel.notes.collectAsStateWithLifecycle()
+    val coffeeWeightInError by viewModel.coffeeWeightInError.collectAsStateWithLifecycle()
+    val coffeeWeightOutError by viewModel.coffeeWeightOutError.collectAsStateWithLifecycle()
+    val grinderSettingError by viewModel.grinderSettingError.collectAsStateWithLifecycle()
+    val brewRatio by viewModel.brewRatio.collectAsStateWithLifecycle()
+    val formattedBrewRatio by viewModel.formattedBrewRatio.collectAsStateWithLifecycle()
+    val isOptimalBrewRatio by viewModel.isOptimalBrewRatio.collectAsStateWithLifecycle()
+    val timerState by viewModel.timerState.collectAsStateWithLifecycle()
+    val recordingState by viewModel.recordingState.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
     
     // Local UI state
-    var selectedBean by remember { mutableStateOf<Bean?>(null) }
     var showBeanSelector by remember { mutableStateOf(false) }
-    var coffeeWeightIn by remember { mutableStateOf("") }
-    var coffeeWeightOut by remember { mutableStateOf("") }
-    var grinderSetting by remember { mutableStateOf("") }
-    var notes by remember { mutableStateOf("") }
     
-    // Timer state
-    var timerState by remember { mutableStateOf(TimerState.STOPPED) }
-    var currentTime by remember { mutableStateOf(0L) }
-    var targetTime by remember { mutableStateOf<Long?>(null) }
-    
-    // Validation state
-    var coffeeWeightInError by remember { mutableStateOf<String?>(null) }
-    var coffeeWeightOutError by remember { mutableStateOf<String?>(null) }
-    var grinderSettingError by remember { mutableStateOf<String?>(null) }
-    
-    // Auto-select first bean if available and none selected
-    LaunchedEffect(activeBeans) {
-        if (selectedBean == null && activeBeans.isNotEmpty()) {
-            selectedBean = activeBeans.first()
-            // Pre-fill grinder setting if available
-            selectedBean?.lastGrinderSetting?.let { setting ->
-                grinderSetting = setting
-            }
-        }
+    // Convert timer state for UI
+    val uiTimerState = when {
+        timerState.isRunning -> TimerState.RUNNING
+        timerState.elapsedTimeSeconds > 0 -> TimerState.PAUSED
+        else -> TimerState.STOPPED
     }
-    
-    // Timer effect
-    LaunchedEffect(timerState) {
-        if (timerState == TimerState.RUNNING) {
-            while (timerState == TimerState.RUNNING) {
-                kotlinx.coroutines.delay(100L)
-                currentTime += 100L
-            }
-        }
-    }
+    val currentTime = (timerState.elapsedTimeSeconds * 1000).toLong()
+    val targetTime: Long? = null // Can be set for target extraction time if needed
     
     Column(
         modifier = Modifier
@@ -99,20 +86,19 @@ fun RecordShotScreen(
         TimerSection(
             currentTime = currentTime,
             targetTime = targetTime,
-            timerState = timerState,
+            timerState = uiTimerState,
             onStartPause = {
-                timerState = when (timerState) {
-                    TimerState.STOPPED, TimerState.PAUSED -> TimerState.RUNNING
-                    TimerState.RUNNING -> TimerState.PAUSED
+                if (timerState.isRunning) {
+                    viewModel.stopTimer()
+                } else {
+                    viewModel.startTimer()
                 }
             },
             onStop = {
-                timerState = TimerState.STOPPED
-                currentTime = 0L
+                viewModel.stopTimer()
             },
             onReset = {
-                timerState = TimerState.STOPPED
-                currentTime = 0L
+                viewModel.resetTimer()
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -120,34 +106,26 @@ fun RecordShotScreen(
         // Weight Inputs
         WeightInputsSection(
             coffeeWeightIn = coffeeWeightIn,
-            onCoffeeWeightInChange = { 
-                coffeeWeightIn = it
-                coffeeWeightInError = validateWeight(it, "Coffee input weight", 0.1, 50.0)
-            },
+            onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
             coffeeWeightInError = coffeeWeightInError,
             coffeeWeightOut = coffeeWeightOut,
-            onCoffeeWeightOutChange = { 
-                coffeeWeightOut = it
-                coffeeWeightOutError = validateWeight(it, "Coffee output weight", 0.1, 100.0)
-            },
+            onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
             coffeeWeightOutError = coffeeWeightOutError,
             modifier = Modifier.fillMaxWidth()
         )
         
         // Brew Ratio Display
         BrewRatioCard(
-            coffeeWeightIn = coffeeWeightIn.toDoubleOrNull(),
-            coffeeWeightOut = coffeeWeightOut.toDoubleOrNull(),
+            brewRatio = brewRatio,
+            formattedBrewRatio = formattedBrewRatio,
+            isOptimal = isOptimalBrewRatio,
             modifier = Modifier.fillMaxWidth()
         )
         
         // Grinder Setting
         GrinderSettingSection(
             grinderSetting = grinderSetting,
-            onGrinderSettingChange = { 
-                grinderSetting = it
-                grinderSettingError = validateGrinderSetting(it)
-            },
+            onGrinderSettingChange = viewModel::updateGrinderSetting,
             grinderSettingError = grinderSettingError,
             modifier = Modifier.fillMaxWidth()
         )
@@ -155,25 +133,16 @@ fun RecordShotScreen(
         // Notes (Optional)
         NotesSection(
             notes = notes,
-            onNotesChange = { notes = it },
+            onNotesChange = viewModel::updateNotes,
             modifier = Modifier.fillMaxWidth()
         )
         
         // Save Button
         SaveShotButton(
-            enabled = isFormValid(
-                selectedBean = selectedBean,
-                coffeeWeightIn = coffeeWeightIn,
-                coffeeWeightOut = coffeeWeightOut,
-                grinderSetting = grinderSetting,
-                currentTime = currentTime,
-                coffeeWeightInError = coffeeWeightInError,
-                coffeeWeightOutError = coffeeWeightOutError,
-                grinderSettingError = grinderSettingError
-            ),
+            enabled = isFormValid,
             isLoading = isLoading,
             onClick = {
-                // TODO: Implement save functionality in next task
+                viewModel.recordShot()
             },
             modifier = Modifier.fillMaxWidth()
         )
@@ -204,11 +173,7 @@ fun RecordShotScreen(
             beans = activeBeans,
             selectedBean = selectedBean,
             onBeanSelected = { bean ->
-                selectedBean = bean
-                // Pre-fill grinder setting if available
-                bean.lastGrinderSetting?.let { setting ->
-                    grinderSetting = setting
-                }
+                viewModel.selectBean(bean)
                 showBeanSelector = false
             },
             onDismiss = { showBeanSelector = false }
@@ -414,14 +379,12 @@ private fun WeightInputsSection(
 
 @Composable
 private fun BrewRatioCard(
-    coffeeWeightIn: Double?,
-    coffeeWeightOut: Double?,
+    brewRatio: Double?,
+    formattedBrewRatio: String?,
+    isOptimal: Boolean,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    val ratio = if (coffeeWeightIn != null && coffeeWeightOut != null && coffeeWeightIn > 0) {
-        coffeeWeightOut / coffeeWeightIn
-    } else null
     
     CoffeeCard(modifier = modifier) {
         Row(
@@ -436,10 +399,10 @@ private fun BrewRatioCard(
             )
             
             Text(
-                text = ratio?.let { "1:${String.format("%.1f", it)}" } ?: "--",
+                text = formattedBrewRatio ?: "--",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = if (ratio != null && ratio in 1.5..3.0) 
+                color = if (isOptimal) 
                     MaterialTheme.colorScheme.primary 
                 else 
                     MaterialTheme.colorScheme.onSurfaceVariant,
@@ -447,7 +410,7 @@ private fun BrewRatioCard(
             )
         }
         
-        ratio?.let {
+        brewRatio?.let {
             val status = when {
                 it < 1.5 -> "Strong extraction"
                 it > 3.0 -> "Weak extraction"
@@ -598,46 +561,7 @@ private fun BeanSelectorBottomSheet(
     }
 }
 
-// Helper functions
-private fun validateWeight(value: String, fieldName: String, min: Double, max: Double): String? {
-    if (value.isBlank()) return "$fieldName is required"
-    
-    val weight = value.toDoubleOrNull()
-    return when {
-        weight == null -> "Please enter a valid number"
-        weight < min -> "$fieldName must be at least ${min}g"
-        weight > max -> "$fieldName cannot exceed ${max}g"
-        else -> null
-    }
-}
 
-private fun validateGrinderSetting(value: String): String? {
-    return when {
-        value.isBlank() -> "Grinder setting is required"
-        value.length > 50 -> "Grinder setting cannot exceed 50 characters"
-        else -> null
-    }
-}
-
-private fun isFormValid(
-    selectedBean: Bean?,
-    coffeeWeightIn: String,
-    coffeeWeightOut: String,
-    grinderSetting: String,
-    currentTime: Long,
-    coffeeWeightInError: String?,
-    coffeeWeightOutError: String?,
-    grinderSettingError: String?
-): Boolean {
-    return selectedBean != null &&
-            coffeeWeightIn.isNotBlank() &&
-            coffeeWeightOut.isNotBlank() &&
-            grinderSetting.isNotBlank() &&
-            currentTime > 0L &&
-            coffeeWeightInError == null &&
-            coffeeWeightOutError == null &&
-            grinderSettingError == null
-}
 
 enum class TimerState {
     STOPPED, RUNNING, PAUSED
