@@ -32,33 +32,11 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         const val DATABASE_NAME = "espresso_tracker_database"
         
-        @Volatile
-        private var INSTANCE: AppDatabase? = null
-        
-        /**
-         * Get the singleton database instance.
-         * Uses double-checked locking pattern for thread safety.
-         */
-        fun getDatabase(context: Context): AppDatabase {
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    DATABASE_NAME
-                )
-                    .addCallback(DatabaseCallback())
-                    .addMigrations(*getAllMigrations())
-                    .build()
-                INSTANCE = instance
-                instance
-            }
-        }
-        
         /**
          * Get all database migrations.
          * Currently returns empty array as we're on version 1.
          */
-        private fun getAllMigrations(): Array<Migration> {
+        fun getAllMigrations(): Array<Migration> {
             return arrayOf(
                 // Future migrations will be added here
                 // MIGRATION_1_2,

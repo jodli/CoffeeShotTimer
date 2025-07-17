@@ -1,6 +1,6 @@
 # Implementation Plan
 
-**Note:** After completing each task, commit changes with conventional commit messages and clear reasoning in the commit body.
+**Note:** After completing each task, commit all changes with conventional commit messages and clear reasoning in the commit body.
 
 - [x] 1. Set up Android project structure and dependencies
 
@@ -158,7 +158,12 @@
   - Write unit tests for history and filtering logic
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 5.3_
 
-- [ ] 5. Set up dependency injection with Hilt
+- [x] 5. Set up dependency injection with Hilt
+
+
+
+
+
 
 
   - Configure Hilt application class and modules
