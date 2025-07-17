@@ -6,8 +6,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.ui.res.painterResource
+import com.example.coffeeshottimer.R
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -136,11 +137,19 @@ fun TimerControls(
             else 
                 MaterialTheme.colorScheme.primary
         ) {
-            Icon(
-                imageVector = if (isRunning) Icons.Default.Close else Icons.Default.PlayArrow,
-                contentDescription = if (isRunning) "Pause" else "Start",
-                modifier = Modifier.size(24.dp)
-            )
+            if (isRunning) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_pause),
+                    contentDescription = "Pause",
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.PlayArrow,
+                    contentDescription = "Start",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
         
         // Stop button
@@ -150,7 +159,7 @@ fun TimerControls(
             containerColor = MaterialTheme.colorScheme.error
         ) {
             Icon(
-                imageVector = Icons.Default.Close,
+                painter = painterResource(id = R.drawable.ic_stop),
                 contentDescription = "Stop",
                 modifier = Modifier.size(20.dp)
             )
