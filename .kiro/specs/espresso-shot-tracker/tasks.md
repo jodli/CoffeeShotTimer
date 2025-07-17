@@ -66,7 +66,12 @@
 
 - [ ] 7. Implement Shot Recording screen
 
-- [ ] 7.1 Create shot recording UI layout
+- [x] 7.1 Create shot recording UI layout
+
+
+
+
+
   - Design main recording interface with weight inputs and timer
   - Implement bean selection dropdown with current bean highlighting
   - Add large, prominent timer display with start/stop controls

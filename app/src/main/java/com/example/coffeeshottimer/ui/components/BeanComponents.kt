@@ -3,7 +3,7 @@ package com.example.coffeeshottimer.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Coffee
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
@@ -50,7 +50,7 @@ fun BeanCard(
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Coffee,
+                        imageVector = Icons.Default.Home,
                         contentDescription = null,
                         tint = if (isSelected) 
                             MaterialTheme.colorScheme.primary 
@@ -74,21 +74,15 @@ fun BeanCard(
                 
                 Spacer(modifier = Modifier.height(spacing.small))
                 
-                if (bean.origin.isNotBlank()) {
-                    Text(
-                        text = "Origin: ${bean.origin}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                if (bean.roastLevel.isNotBlank()) {
-                    Text(
-                        text = "Roast: ${bean.roastLevel}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                val daysSinceRoast = bean.daysSinceRoast()
+                Text(
+                    text = "Roasted: $daysSinceRoast days ago",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (bean.isFresh()) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
                 
                 if (bean.notes.isNotBlank()) {
                     Spacer(modifier = Modifier.height(spacing.extraSmall))
@@ -154,7 +148,7 @@ fun BeanSelector(
             horizontalArrangement = Arrangement.spacedBy(spacing.small)
         ) {
             Icon(
-                imageVector = Icons.Default.Coffee,
+                imageVector = Icons.Default.Home,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -209,24 +203,15 @@ fun ShotCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 // Shot timing
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(spacing.small)
-                ) {
-                    CompactTimer(
-                        currentTime = shot.extractionTime,
-                        isRunning = false,
-                        showStatus = false
-                    )
-                    
-                    if (shot.targetTime != null) {
-                        Text(
-                            text = "Target: ${formatTime(shot.targetTime)}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
+                Text(
+                    text = shot.getFormattedExtractionTime(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (shot.isOptimalExtractionTime()) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.onSurface
+                )
                 
                 Spacer(modifier = Modifier.height(spacing.small))
                 
@@ -245,61 +230,51 @@ fun ShotCard(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium)
                 ) {
-                    if (shot.grindSize != null) {
-                        Text(
-                            text = "Grind: ${shot.grindSize}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    
-                    if (shot.doseWeight != null) {
-                        Text(
-                            text = "Dose: ${shot.doseWeight}g",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                
-                if (shot.yieldWeight != null) {
                     Text(
-                        text = "Yield: ${shot.yieldWeight}g",
+                        text = "Grind: ${shot.grinderSetting}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    
+                    Text(
+                        text = "In: ${shot.coffeeWeightIn}g",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 
+                Text(
+                    text = "Out: ${shot.coffeeWeightOut}g • ${shot.getFormattedBrewRatio()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                
                 // Date
                 Spacer(modifier = Modifier.height(spacing.small))
                 Text(
-                    text = dateFormat.format(Date(shot.timestamp)),
+                    text = dateFormat.format(Date(shot.timestamp.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli())),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             
-            // Rating or quality indicator
-            if (shot.rating != null) {
-                Surface(
-                    color = when {
-                        shot.rating >= 4 -> MaterialTheme.colorScheme.primaryContainer
-                        shot.rating >= 3 -> MaterialTheme.colorScheme.secondaryContainer
-                        else -> MaterialTheme.colorScheme.errorContainer
-                    },
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text(
-                        text = "${shot.rating}/5",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = when {
-                            shot.rating >= 4 -> MaterialTheme.colorScheme.onPrimaryContainer
-                            shot.rating >= 3 -> MaterialTheme.colorScheme.onSecondaryContainer
-                            else -> MaterialTheme.colorScheme.onErrorContainer
-                        },
-                        modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall)
-                    )
-                }
+            // Brew ratio indicator
+            Surface(
+                color = if (shot.isTypicalBrewRatio()) 
+                    MaterialTheme.colorScheme.primaryContainer 
+                else 
+                    MaterialTheme.colorScheme.secondaryContainer,
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(
+                    text = shot.getFormattedBrewRatio(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (shot.isTypicalBrewRatio()) 
+                        MaterialTheme.colorScheme.onPrimaryContainer 
+                    else 
+                        MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall)
+                )
             }
         }
     }

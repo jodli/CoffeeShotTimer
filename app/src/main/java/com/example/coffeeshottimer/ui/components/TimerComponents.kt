@@ -6,9 +6,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -138,7 +137,7 @@ fun TimerControls(
                 MaterialTheme.colorScheme.primary
         ) {
             Icon(
-                imageVector = if (isRunning) Icons.Default.Pause else Icons.Default.PlayArrow,
+                imageVector = if (isRunning) Icons.Default.Close else Icons.Default.PlayArrow,
                 contentDescription = if (isRunning) "Pause" else "Start",
                 modifier = Modifier.size(24.dp)
             )
@@ -151,7 +150,7 @@ fun TimerControls(
             containerColor = MaterialTheme.colorScheme.error
         ) {
             Icon(
-                imageVector = Icons.Default.Stop,
+                imageVector = Icons.Default.Close,
                 contentDescription = "Stop",
                 modifier = Modifier.size(20.dp)
             )
