@@ -3,7 +3,6 @@ package com.example.coffeeshottimer.data.dao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.coffeeshottimer.data.database.AppDatabase
 import com.example.coffeeshottimer.data.model.Bean
 import kotlinx.coroutines.flow.first
@@ -14,6 +13,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -21,7 +22,8 @@ import java.time.LocalDateTime
  * Unit tests for BeanDao operations.
  * Tests all CRUD operations and queries for Bean entity.
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class BeanDaoTest {
     
     @get:Rule

@@ -1,5 +1,7 @@
 # Implementation Plan
 
+**Note:** After completing each task, commit changes with conventional commit messages and clear reasoning in the commit body.
+
 - [x] 1. Set up Android project structure and dependencies
 
   - Create new Android project with Kotlin and Jetpack Compose
@@ -107,7 +109,13 @@
 
 - [ ] 4. Create domain layer use cases
 
-- [ ] 4.1 Implement shot recording use cases
+- [x] 4.1 Implement shot recording use cases
+
+
+
+
+
+
 
 
   - Create RecordShotUseCase with validation and business rules

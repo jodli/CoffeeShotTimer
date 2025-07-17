@@ -47,7 +47,7 @@ interface ShotDao {
      */
     @Query("""
         SELECT * FROM shots 
-        WHERE (:beanId = '' OR beanId = :beanId)
+        WHERE (:beanId IS NULL OR beanId = :beanId)
         AND (:startDate IS NULL OR timestamp >= :startDate)
         AND (:endDate IS NULL OR timestamp <= :endDate)
         ORDER BY timestamp DESC

@@ -3,7 +3,6 @@ package com.example.coffeeshottimer.data.dao
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.coffeeshottimer.data.database.AppDatabase
 import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.data.model.Shot
@@ -15,6 +14,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -22,7 +23,8 @@ import java.time.LocalDateTime
  * Unit tests for ShotDao operations.
  * Tests all CRUD operations and queries for Shot entity.
  */
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class ShotDaoTest {
     
     @get:Rule
@@ -77,8 +79,8 @@ class ShotDaoTest {
         val retrievedShot = shotDao.getShotById(shot.id)
         assertNotNull("Shot should be inserted", retrievedShot)
         assertEquals("Shot bean ID should match", shot.beanId, retrievedShot?.beanId)
-        assertEquals("Shot coffee weight in should match", shot.coffeeWeightIn, retrievedShot?.coffeeWeightIn, 0.01)
-        assertEquals("Shot coffee weight out should match", shot.coffeeWeightOut, retrievedShot?.coffeeWeightOut, 0.01)
+        assertEquals("Shot coffee weight in should match", shot.coffeeWeightIn, retrievedShot?.coffeeWeightIn ?: 0.0, 0.01)
+        assertEquals("Shot coffee weight out should match", shot.coffeeWeightOut, retrievedShot?.coffeeWeightOut ?: 0.0, 0.01)
     }
     
     @Test

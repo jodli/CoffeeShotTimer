@@ -430,10 +430,10 @@ class ShotRepositoryTest {
         assertTrue("Getting shot statistics should succeed", result.isSuccess)
         val statistics = result.getOrNull()
         assertNotNull("Statistics should not be null", statistics)
-        assertEquals("Should have correct shot count", 2, statistics?.shotCount)
-        assertEquals("Should have correct average input weight", 18.5, statistics?.avgCoffeeWeightIn, 0.1)
-        assertEquals("Should have correct average output weight", 37.0, statistics?.avgCoffeeWeightOut, 0.1)
-        assertEquals("Should have correct average extraction time", 27.5, statistics?.avgExtractionTimeSeconds, 0.1)
+        assertEquals("Should have correct shot count", 2, statistics?.totalShots)
+        assertEquals("Should have correct average input weight", 18.5, statistics?.avgWeightIn ?: 0.0, 0.1)
+        assertEquals("Should have correct average output weight", 37.0, statistics?.avgWeightOut ?: 0.0, 0.1)
+        assertEquals("Should have correct average extraction time", 27.5, statistics?.avgExtractionTime ?: 0.0, 0.1)
     }
     
     @Test
