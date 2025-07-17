@@ -51,7 +51,13 @@
   - Update MainActivity to use navigation
   - _Requirements: 7.1, 7.2_
 
-- [ ] 6.2 Create common UI components and theme
+- [x] 6.2 Create common UI components and theme
+
+
+
+
+
+
   - Enhance app theme with colors, typography, and spacing
   - Create reusable components for input fields, buttons, and cards
   - Add touch-friendly design with 44dp minimum touch targets

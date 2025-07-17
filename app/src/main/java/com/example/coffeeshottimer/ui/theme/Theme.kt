@@ -9,28 +9,67 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+
+// Custom spacing system
+data class Spacing(
+    val extraSmall: Dp = 4.dp,
+    val small: Dp = 8.dp,
+    val medium: Dp = 16.dp,
+    val large: Dp = 24.dp,
+    val extraLarge: Dp = 32.dp,
+    val touchTarget: Dp = 44.dp, // Minimum touch target size for accessibility
+    val cardPadding: Dp = 16.dp,
+    val screenPadding: Dp = 16.dp
+)
+
+val LocalSpacing = staticCompositionLocalOf { Spacing() }
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = LightCoffee,
+    onPrimary = DarkEspresso,
+    primaryContainer = RichBrown,
+    onPrimaryContainer = WarmCream,
+    secondary = WarmCream,
+    onSecondary = DeepBrown,
+    secondaryContainer = DeepBrown,
+    onSecondaryContainer = WarmCream,
+    tertiary = GoldenAccent,
+    onTertiary = DarkEspresso,
+    background = DarkEspresso,
+    onBackground = WarmCream,
+    surface = DeepBrown,
+    onSurface = WarmCream,
+    surfaceVariant = RichBrown,
+    onSurfaceVariant = LightCream,
+    error = ErrorRed,
+    onError = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    primary = CoffeeBrown,
+    onPrimary = CreamWhite,
+    primaryContainer = LightCream,
+    onPrimaryContainer = EspressoBlack,
+    secondary = WarmBrown,
+    onSecondary = CreamWhite,
+    secondaryContainer = LightCream,
+    onSecondaryContainer = MediumBrown,
+    tertiary = GoldenAccent,
+    onTertiary = EspressoBlack,
+    background = CreamWhite,
+    onBackground = EspressoBlack,
+    surface = Color.White,
+    onSurface = EspressoBlack,
+    surfaceVariant = LightCream,
+    onSurfaceVariant = MediumBrown,
+    error = ErrorRed,
+    onError = Color.White
 )
 
 @Composable
@@ -50,9 +89,11 @@ fun CoffeeShotTimerTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    CompositionLocalProvider(LocalSpacing provides Spacing()) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            content = content
+        )
+    }
 }
