@@ -27,6 +27,8 @@ An Android mobile application designed for home barista enthusiasts to track and
 2. WHEN the user views a shot entry THEN the system SHALL show coffee weight, output weight, extraction time, grinder setting, and timestamp
 3. WHEN the user wants to find specific shots THEN the system SHALL provide filtering options by date range or grinder setting
 4. WHEN the user selects a shot from history THEN the system SHALL display detailed shot information
+5. WHEN the user views shot trends and analysis THEN the system SHALL filter analysis by the currently selected bean for meaningful comparison
+6. WHEN the user views overall statistics THEN the system SHALL display global statistics across all beans
 
 ### Requirement 3
 

@@ -60,12 +60,13 @@ The application follows the MVVM (Model-View-ViewModel) architecture pattern wit
   - Detailed shot view with all parameters
   - Visual indicators for brew ratios (good/needs adjustment)
 
-#### 4. Analytics Dashboard (Future Enhancement)
-- **Purpose**: Provide insights into brewing patterns
+#### 4. Analytics Dashboard
+- **Purpose**: Provide insights into brewing patterns with bean-specific analysis
 - **Key Features**:
-  - Average extraction times per bean
-  - Brew ratio trends
-  - Grinder setting recommendations
+  - Bean-specific shot trends and analysis for meaningful comparison
+  - Bean-filtered brew ratio analysis and extraction time trends
+  - Overall statistics across all beans for general insights
+  - Grinder setting recommendations per bean
 
 ### User Interface Design
 

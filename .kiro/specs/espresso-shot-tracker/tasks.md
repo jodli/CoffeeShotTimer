@@ -83,6 +83,9 @@
 
 
 
+
+
+
   - Integrate ShotRecordingViewModel with RecordShotUseCase
   - Implement timer functionality with accurate time tracking
   - Add real-time brew ratio calculation and display
@@ -171,16 +174,16 @@
 - [x] 9.3 Add shot history analysis features
 
 
-
-
-
-  - Implement brew ratio analysis and recommendations
-  - Add extraction time trends and statistics
-  - Create grinder setting correlation analysis
+  - Implement brew ratio analysis and recommendations with bean-specific filtering
+  - Add extraction time trends and statistics filtered by selected bean
+  - Create grinder setting correlation analysis for specific beans
   - Display shot success indicators and patterns
-  - _Requirements: 2.2, 4.1, 4.2, 5.1, 5.2, 5.3_
+  - Ensure analysis and trends are filtered by bean for meaningful comparison
+  - Keep overall statistics global across all beans
+  - _Requirements: 2.2, 2.5, 2.6, 4.1, 4.2, 5.1, 5.2, 5.3_
 
 - [x] 9.4 Implement shot detail screen
+
 
 
 

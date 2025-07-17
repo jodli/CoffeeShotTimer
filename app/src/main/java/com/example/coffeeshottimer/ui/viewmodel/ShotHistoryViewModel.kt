@@ -114,11 +114,19 @@ class ShotHistoryViewModel @Inject constructor(
     fun applyFilter(filter: ShotHistoryFilter) {
         _currentFilter.value = filter
         loadShotHistory()
+        // Refresh analysis if currently showing to reflect new filter
+        if (_uiState.value.showAnalysis) {
+            loadAnalysisData()
+        }
     }
 
     fun clearFilters() {
         _currentFilter.value = ShotHistoryFilter()
         loadShotHistory()
+        // Refresh analysis if currently showing to reflect cleared filters
+        if (_uiState.value.showAnalysis) {
+            loadAnalysisData()
+        }
     }
 
     fun setDateRangeFilter(startDate: LocalDate?, endDate: LocalDate?) {
@@ -202,28 +210,28 @@ class ShotHistoryViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(analysisLoading = true)
             
             try {
-                // Load overall statistics
+                val currentBeanId = _currentFilter.value.beanId
+                
+                // Load overall statistics (always global)
                 val overallStatsResult = getShotStatisticsUseCase.getOverallStatistics()
                 val overallStats = overallStatsResult.getOrNull()
                 
-                // Load shot trends (last 30 days)
-                val trendsResult = getShotStatisticsUseCase.getShotTrends(days = 30)
+                // Load shot trends (filtered by bean if selected, last 30 days)
+                val trendsResult = getShotStatisticsUseCase.getShotTrends(beanId = currentBeanId, days = 30)
                 val trends = trendsResult.getOrNull()
                 
-                // Load brew ratio analysis
-                val brewRatioResult = getShotStatisticsUseCase.getBrewRatioAnalysis()
+                // Load brew ratio analysis (filtered by bean if selected)
+                val brewRatioResult = getShotStatisticsUseCase.getBrewRatioAnalysis(beanId = currentBeanId)
                 val brewRatioAnalysis = brewRatioResult.getOrNull()
                 
-                // Load extraction time analysis
-                val extractionTimeResult = getShotStatisticsUseCase.getExtractionTimeAnalysis()
+                // Load extraction time analysis (filtered by bean if selected)
+                val extractionTimeResult = getShotStatisticsUseCase.getExtractionTimeAnalysis(beanId = currentBeanId)
                 val extractionTimeAnalysis = extractionTimeResult.getOrNull()
                 
-                // Load grinder setting analysis (for current filter if bean is selected)
-                val currentBeanId = _currentFilter.value.beanId
+                // Load grinder setting analysis (only for specific bean)
                 val grinderAnalysisResult = if (currentBeanId != null) {
                     getShotStatisticsUseCase.getGrinderSettingAnalysis(currentBeanId)
                 } else {
-                    // For overall analysis, we'll need to modify the use case or handle differently
                     Result.success(null)
                 }
                 val grinderAnalysis = grinderAnalysisResult.getOrNull()
