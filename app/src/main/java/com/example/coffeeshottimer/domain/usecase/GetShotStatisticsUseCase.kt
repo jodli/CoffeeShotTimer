@@ -5,6 +5,7 @@ import com.example.coffeeshottimer.data.model.Shot
 import com.example.coffeeshottimer.data.repository.ShotRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
@@ -35,21 +36,21 @@ class GetShotStatisticsUseCase @Inject constructor(
      */
     suspend fun getBeanAnalytics(beanId: String): Result<BeanAnalytics> {
         return try {
-            val shotsResult = shotRepository.getShotsByBean(beanId)
-            val shots = mutableListOf<Shot>()
+            val result = shotRepository.getShotsByBean(beanId).first()
             
-            shotsResult.collect { result ->
-                if (result.isSuccess) {
-                    shots.addAll(result.getOrNull() ?: emptyList())
+            result.fold(
+                onSuccess = { shots ->
+                    if (shots.isEmpty()) {
+                        Result.success(BeanAnalytics.empty())
+                    } else {
+                        val analytics = calculateBeanAnalytics(shots)
+                        Result.success(analytics)
+                    }
+                },
+                onFailure = { error ->
+                    Result.failure(error)
                 }
-            }
-            
-            if (shots.isEmpty()) {
-                return Result.success(BeanAnalytics.empty())
-            }
-            
-            val analytics = calculateBeanAnalytics(shots)
-            Result.success(analytics)
+            )
         } catch (exception: Exception) {
             Result.failure(exception)
         }
@@ -61,21 +62,21 @@ class GetShotStatisticsUseCase @Inject constructor(
      */
     suspend fun getOverallStatistics(): Result<OverallStatistics> {
         return try {
-            val shotsResult = shotRepository.getAllShots()
-            val shots = mutableListOf<Shot>()
+            val result = shotRepository.getAllShots().first()
             
-            shotsResult.collect { result ->
-                if (result.isSuccess) {
-                    shots.addAll(result.getOrNull() ?: emptyList())
+            result.fold(
+                onSuccess = { shots ->
+                    if (shots.isEmpty()) {
+                        Result.success(OverallStatistics.empty())
+                    } else {
+                        val statistics = calculateOverallStatistics(shots)
+                        Result.success(statistics)
+                    }
+                },
+                onFailure = { error ->
+                    Result.failure(error)
                 }
-            }
-            
-            if (shots.isEmpty()) {
-                return Result.success(OverallStatistics.empty())
-            }
-            
-            val statistics = calculateOverallStatistics(shots)
-            Result.success(statistics)
+            )
         } catch (exception: Exception) {
             Result.failure(exception)
         }
@@ -98,15 +99,17 @@ class GetShotStatisticsUseCase @Inject constructor(
                 shotRepository.getShotsByDateRange(startDate, endDate)
             }
             
-            val shots = mutableListOf<Shot>()
-            shotsFlow.collect { result ->
-                if (result.isSuccess) {
-                    shots.addAll(result.getOrNull() ?: emptyList())
-                }
-            }
+            val result = shotsFlow.first()
             
-            val trends = calculateShotTrends(shots, days)
-            Result.success(trends)
+            result.fold(
+                onSuccess = { shots ->
+                    val trends = calculateShotTrends(shots, days)
+                    Result.success(trends)
+                },
+                onFailure = { error ->
+                    Result.failure(error)
+                }
+            )
         } catch (exception: Exception) {
             Result.failure(exception)
         }
@@ -119,17 +122,17 @@ class GetShotStatisticsUseCase @Inject constructor(
      */
     suspend fun getGrinderSettingAnalysis(beanId: String): Result<GrinderSettingAnalysis> {
         return try {
-            val shotsResult = shotRepository.getShotsByBean(beanId)
-            val shots = mutableListOf<Shot>()
+            val result = shotRepository.getShotsByBean(beanId).first()
             
-            shotsResult.collect { result ->
-                if (result.isSuccess) {
-                    shots.addAll(result.getOrNull() ?: emptyList())
+            result.fold(
+                onSuccess = { shots ->
+                    val analysis = calculateGrinderSettingAnalysis(shots)
+                    Result.success(analysis)
+                },
+                onFailure = { error ->
+                    Result.failure(error)
                 }
-            }
-            
-            val analysis = calculateGrinderSettingAnalysis(shots)
-            Result.success(analysis)
+            )
         } catch (exception: Exception) {
             Result.failure(exception)
         }
@@ -148,15 +151,17 @@ class GetShotStatisticsUseCase @Inject constructor(
                 shotRepository.getAllShots()
             }
             
-            val shots = mutableListOf<Shot>()
-            shotsFlow.collect { result ->
-                if (result.isSuccess) {
-                    shots.addAll(result.getOrNull() ?: emptyList())
-                }
-            }
+            val result = shotsFlow.first()
             
-            val analysis = calculateBrewRatioAnalysis(shots)
-            Result.success(analysis)
+            result.fold(
+                onSuccess = { shots ->
+                    val analysis = calculateBrewRatioAnalysis(shots)
+                    Result.success(analysis)
+                },
+                onFailure = { error ->
+                    Result.failure(error)
+                }
+            )
         } catch (exception: Exception) {
             Result.failure(exception)
         }
@@ -175,15 +180,17 @@ class GetShotStatisticsUseCase @Inject constructor(
                 shotRepository.getAllShots()
             }
             
-            val shots = mutableListOf<Shot>()
-            shotsFlow.collect { result ->
-                if (result.isSuccess) {
-                    shots.addAll(result.getOrNull() ?: emptyList())
-                }
-            }
+            val result = shotsFlow.first()
             
-            val analysis = calculateExtractionTimeAnalysis(shots)
-            Result.success(analysis)
+            result.fold(
+                onSuccess = { shots ->
+                    val analysis = calculateExtractionTimeAnalysis(shots)
+                    Result.success(analysis)
+                },
+                onFailure = { error ->
+                    Result.failure(error)
+                }
+            )
         } catch (exception: Exception) {
             Result.failure(exception)
         }
