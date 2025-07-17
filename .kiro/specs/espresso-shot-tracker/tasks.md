@@ -104,6 +104,11 @@
 - [ ] 8. Implement Bean Management screen
 
 - [ ] 8.1 Create bean management UI layout
+
+
+
+
+
   - Design bean list interface with active beans and roast dates
   - Implement add/edit bean modal with form inputs
   - Add visual indicators for days since roasting
@@ -111,6 +116,8 @@
   - _Requirements: 3.1, 3.5, 7.1_
 
 - [ ] 8.2 Implement bean management ViewModel and business logic
+
+
   - Create BeanManagementViewModel with CRUD operations
   - Add form validation for bean name, roast date, and notes
   - Implement active bean management and selection
