@@ -101,7 +101,7 @@ class EnhancedShotRecordingViewModel : ValidatedViewModel() {
         _coffeeWeightIn.value = value
         
         val validationResult = value.validateCoffeeWeightIn()
-        _coffeeWeightInError.value = validationResult.getFirstError()
+        _coffeeWeightInError.value = validationResult.errors.firstOrNull()
         
         validateFormAndUpdateBrewRatio()
     }
@@ -113,7 +113,7 @@ class EnhancedShotRecordingViewModel : ValidatedViewModel() {
         _coffeeWeightOut.value = value
         
         val validationResult = value.validateCoffeeWeightOut()
-        _coffeeWeightOutError.value = validationResult.getFirstError()
+        _coffeeWeightOutError.value = validationResult.errors.firstOrNull()
         
         validateFormAndUpdateBrewRatio()
     }
@@ -125,7 +125,7 @@ class EnhancedShotRecordingViewModel : ValidatedViewModel() {
         _grinderSetting.value = value
         
         val validationResult = value.validateGrinderSettingEnhanced()
-        _grinderSettingError.value = validationResult.getFirstError()
+        _grinderSettingError.value = validationResult.errors.firstOrNull()
         
         validateForm()
     }

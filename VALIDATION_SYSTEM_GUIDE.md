@@ -121,7 +121,7 @@ class MyViewModel : ValidatedViewModel() {
         
         // Apply enhanced validation
         val result = value.validateCoffeeWeightIn()
-        _fieldError.value = result.getFirstError()
+        _fieldError.value = result.errors.firstOrNull()
         
         // Update overall form validation
         validateForm()
@@ -306,7 +306,7 @@ Run validation tests with:
    
    // After
    val result = weight.validateCoffeeWeightIn()
-   error = result.getFirstError()
+   error = result.errors.firstOrNull()
    ```
 
 2. Use specialized UI components:

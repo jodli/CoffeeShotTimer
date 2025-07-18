@@ -107,7 +107,7 @@ class AddEditBeanViewModel @Inject constructor(
             val validationResult = name.validateBeanNameEnhanced(existingNames)
             
             if (!validationResult.isValid) {
-                _uiState.value = _uiState.value.copy(nameError = validationResult.getFirstError())
+                _uiState.value = _uiState.value.copy(nameError = validationResult.errors.firstOrNull())
             } else {
                 // Check uniqueness with the use case
                 val isAvailable = if (editingBeanId != null) {
@@ -132,13 +132,13 @@ class AddEditBeanViewModel @Inject constructor(
     private fun validateRoastDate(date: LocalDate) {
         // Use enhanced validation with contextual tips
         val validationResult = date.validateRoastDateEnhanced()
-        _uiState.value = _uiState.value.copy(roastDateError = validationResult.getFirstError())
+        _uiState.value = _uiState.value.copy(roastDateError = validationResult.errors.firstOrNull())
     }
 
     private fun validateNotes(notes: String) {
         // Use enhanced validation with helpful suggestions
         val validationResult = notes.validateNotesEnhanced()
-        _uiState.value = _uiState.value.copy(notesError = validationResult.getFirstError())
+        _uiState.value = _uiState.value.copy(notesError = validationResult.errors.firstOrNull())
     }
 
     fun saveBean() {
@@ -209,7 +209,7 @@ class AddEditBeanViewModel @Inject constructor(
         
         _uiState.value = _uiState.value.copy(
             lastGrinderSetting = setting,
-            grinderSettingError = validationResult.getFirstError()
+            grinderSettingError = validationResult.errors.firstOrNull()
         )
     }
 
