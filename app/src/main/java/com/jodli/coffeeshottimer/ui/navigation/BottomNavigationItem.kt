@@ -1,8 +1,8 @@
 package com.jodli.coffeeshottimer.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -23,7 +23,7 @@ val bottomNavigationItems = listOf(
     ),
     BottomNavigationItem(
         route = NavigationDestinations.ShotHistory.route,
-        icon = Icons.Default.List,
+        icon = Icons.AutoMirrored.Filled.List,
         label = "History"
     ),
     BottomNavigationItem(
