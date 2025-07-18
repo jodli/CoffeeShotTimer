@@ -117,12 +117,19 @@ data class Shot(
     }
     
     /**
-     * Gets the extraction time formatted as MM:SS.
+     * Gets the extraction time formatted with seconds-only for times under 60s, MM:SS for longer times.
      * @return Formatted extraction time string
      */
     fun getFormattedExtractionTime(): String {
-        val minutes = extractionTimeSeconds / 60
-        val seconds = extractionTimeSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
+        val timeMs = extractionTimeSeconds * 1000L
+        val totalSeconds = maxOf(0, extractionTimeSeconds) // Handle negative values
+        return when {
+            totalSeconds < 60 -> "${totalSeconds}s"
+            else -> {
+                val minutes = totalSeconds / 60
+                val seconds = totalSeconds % 60
+                String.format("%02d:%02d", minutes, seconds)
+            }
+        }
     }
 }

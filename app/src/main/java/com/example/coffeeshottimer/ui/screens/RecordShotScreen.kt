@@ -349,7 +349,8 @@ private fun TimerSection(
                 currentTime = currentTime,
                 targetTime = targetTime,
                 isRunning = timerState == TimerState.RUNNING,
-                modifier = Modifier.size(200.dp)
+                modifier = Modifier.size(200.dp),
+                showColorCoding = true
             )
             
             // Timer controls
