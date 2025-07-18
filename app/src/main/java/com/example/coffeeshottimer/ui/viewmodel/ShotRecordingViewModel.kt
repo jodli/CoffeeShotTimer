@@ -7,6 +7,7 @@ import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.data.model.ValidationResult
 import com.example.coffeeshottimer.data.repository.BeanRepository
 import com.example.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.example.coffeeshottimer.ui.validation.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -87,6 +88,13 @@ class ShotRecordingViewModel @Inject constructor(
     
     private val _isOptimalBrewRatio = MutableStateFlow(false)
     val isOptimalBrewRatio: StateFlow<Boolean> = _isOptimalBrewRatio.asStateFlow()
+    
+    // Enhanced validation warnings
+    private val _brewRatioWarnings = MutableStateFlow<List<String>>(emptyList())
+    val brewRatioWarnings: StateFlow<List<String>> = _brewRatioWarnings.asStateFlow()
+    
+    private val _extractionTimeWarnings = MutableStateFlow<List<String>>(emptyList())
+    val extractionTimeWarnings: StateFlow<List<String>> = _extractionTimeWarnings.asStateFlow()
     
     // Timer state (delegated to use case)
     val timerState = recordShotUseCase.timerState
@@ -236,31 +244,43 @@ class ShotRecordingViewModel @Inject constructor(
     }
     
     /**
-     * Update coffee weight in and validate.
+     * Update coffee weight in and validate using enhanced validation.
      */
     fun updateCoffeeWeightIn(value: String) {
         _coffeeWeightIn.value = value
-        _coffeeWeightInError.value = validateWeight(value, "Coffee input weight", 0.1, 50.0)
+        
+        // Use enhanced validation with contextual tips
+        val validationResult = value.validateCoffeeWeightIn()
+        _coffeeWeightInError.value = validationResult.getFirstError()
+        
         calculateBrewRatio()
         validateForm()
     }
     
     /**
-     * Update coffee weight out and validate.
+     * Update coffee weight out and validate using enhanced validation.
      */
     fun updateCoffeeWeightOut(value: String) {
         _coffeeWeightOut.value = value
-        _coffeeWeightOutError.value = validateWeight(value, "Coffee output weight", 0.1, 100.0)
+        
+        // Use enhanced validation with contextual tips
+        val validationResult = value.validateCoffeeWeightOut()
+        _coffeeWeightOutError.value = validationResult.getFirstError()
+        
         calculateBrewRatio()
         validateForm()
     }
     
     /**
-     * Update grinder setting and validate.
+     * Update grinder setting and validate using enhanced validation.
      */
     fun updateGrinderSetting(value: String) {
         _grinderSetting.value = value
-        _grinderSettingError.value = validateGrinderSetting(value)
+        
+        // Use enhanced validation with helpful tips
+        val validationResult = value.validateGrinderSettingEnhanced()
+        _grinderSettingError.value = validationResult.getFirstError()
+        
         validateForm()
     }
     
@@ -272,7 +292,7 @@ class ShotRecordingViewModel @Inject constructor(
     }
     
     /**
-     * Calculate and update brew ratio in real-time.
+     * Calculate and update brew ratio in real-time with enhanced warnings.
      */
     private fun calculateBrewRatio() {
         val weightIn = _coffeeWeightIn.value.toDoubleOrNull()
@@ -284,9 +304,13 @@ class ShotRecordingViewModel @Inject constructor(
         if (ratio != null) {
             _formattedBrewRatio.value = recordShotUseCase.formatBrewRatio(ratio)
             _isOptimalBrewRatio.value = recordShotUseCase.isTypicalBrewRatio(ratio)
+            
+            // Update brew ratio warnings using enhanced validation
+            _brewRatioWarnings.value = ratio.getBrewRatioWarnings()
         } else {
             _formattedBrewRatio.value = null
             _isOptimalBrewRatio.value = false
+            _brewRatioWarnings.value = emptyList()
         }
     }
     
@@ -442,6 +466,15 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun isOptimalExtractionTime(): Boolean {
         return recordShotUseCase.isOptimalExtractionTime(timerState.value.elapsedTimeSeconds)
+    }
+    
+    /**
+     * Update extraction time warnings based on current timer state.
+     * Should be called when timer state changes.
+     */
+    fun updateExtractionTimeWarnings() {
+        val currentTime = timerState.value.elapsedTimeSeconds
+        _extractionTimeWarnings.value = currentTime.getExtractionTimeWarnings()
     }
     
     /**

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.coffeeshottimer.data.model.Bean
 import com.example.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.example.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.example.coffeeshottimer.ui.validation.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -93,57 +94,51 @@ class AddEditBeanViewModel @Inject constructor(
 
     private fun validateName(name: String) {
         viewModelScope.launch {
-            val trimmedName = name.trim()
-            when {
-                trimmedName.isEmpty() -> {
-                    _uiState.value = _uiState.value.copy(nameError = "Bean name is required")
+            // Get existing bean names for uniqueness check
+            val existingNames = try {
+                // This would need to be implemented in the use case
+                // For now, we'll do basic validation and handle uniqueness in the use case
+                emptyList<String>()
+            } catch (e: Exception) {
+                emptyList<String>()
+            }
+            
+            // Use enhanced validation with contextual tips
+            val validationResult = name.validateBeanNameEnhanced(existingNames)
+            
+            if (!validationResult.isValid) {
+                _uiState.value = _uiState.value.copy(nameError = validationResult.getFirstError())
+            } else {
+                // Check uniqueness with the use case
+                val isAvailable = if (editingBeanId != null) {
+                    updateBeanUseCase.isBeanNameAvailableForUpdate(editingBeanId!!, name.trim())
+                } else {
+                    addBeanUseCase.isBeanNameAvailable(name.trim())
                 }
-                trimmedName.length > 100 -> {
-                    _uiState.value = _uiState.value.copy(nameError = "Bean name cannot exceed 100 characters")
-                }
-                trimmedName.length < 2 -> {
-                    _uiState.value = _uiState.value.copy(nameError = "Bean name must be at least 2 characters")
-                }
-                !trimmedName.matches(Regex("^[a-zA-Z0-9\\s\\-_&.()]+$")) -> {
-                    _uiState.value = _uiState.value.copy(nameError = "Bean name contains invalid characters")
-                }
-                else -> {
-                    // Check uniqueness
-                    val isAvailable = if (editingBeanId != null) {
-                        updateBeanUseCase.isBeanNameAvailableForUpdate(editingBeanId!!, trimmedName)
+                
+                if (isAvailable.isSuccess) {
+                    if (isAvailable.getOrNull() == false) {
+                        _uiState.value = _uiState.value.copy(nameError = "Bean name already exists")
                     } else {
-                        addBeanUseCase.isBeanNameAvailable(trimmedName)
+                        _uiState.value = _uiState.value.copy(nameError = null)
                     }
-                    
-                    if (isAvailable.isSuccess) {
-                        if (isAvailable.getOrNull() == false) {
-                            _uiState.value = _uiState.value.copy(nameError = "Bean name already exists")
-                        } else {
-                            _uiState.value = _uiState.value.copy(nameError = null)
-                        }
-                    } else {
-                        _uiState.value = _uiState.value.copy(nameError = "Unable to validate bean name")
-                    }
+                } else {
+                    _uiState.value = _uiState.value.copy(nameError = "Unable to validate bean name")
                 }
             }
         }
     }
 
     private fun validateRoastDate(date: LocalDate) {
-        val today = LocalDate.now()
-        val error = when {
-            date.isAfter(today) -> "Roast date cannot be in the future"
-            date.isBefore(today.minusDays(365)) -> "Roast date cannot be more than 365 days ago"
-            else -> null
-        }
-        _uiState.value = _uiState.value.copy(roastDateError = error)
+        // Use enhanced validation with contextual tips
+        val validationResult = date.validateRoastDateEnhanced()
+        _uiState.value = _uiState.value.copy(roastDateError = validationResult.getFirstError())
     }
 
     private fun validateNotes(notes: String) {
-        val error = if (notes.length > 500) {
-            "Notes cannot exceed 500 characters"
-        } else null
-        _uiState.value = _uiState.value.copy(notesError = error)
+        // Use enhanced validation with helpful suggestions
+        val validationResult = notes.validateNotesEnhanced()
+        _uiState.value = _uiState.value.copy(notesError = validationResult.getFirstError())
     }
 
     fun saveBean() {
@@ -206,20 +201,15 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     /**
-     * Validate grinder setting input.
+     * Validate grinder setting input using enhanced validation.
      */
     fun updateAndValidateGrinderSetting(setting: String) {
-        val trimmedSetting = setting.trim()
-        val error = when {
-            trimmedSetting.length > 50 -> "Grinder setting cannot exceed 50 characters"
-            trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.#]+$")) -> 
-                "Grinder setting contains invalid characters"
-            else -> null
-        }
+        // Use enhanced validation with helpful tips
+        val validationResult = setting.validateGrinderSettingEnhanced(false) // Not required for beans
         
         _uiState.value = _uiState.value.copy(
             lastGrinderSetting = setting,
-            grinderSettingError = error
+            grinderSettingError = validationResult.getFirstError()
         )
     }
 
