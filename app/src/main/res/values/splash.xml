@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Splash Screen Theme -->
+    <style name="Theme.CoffeeShotTimer.SplashScreen" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/coffee_primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.CoffeeShotTimer</item>
+    </style>
+
+    <!-- Coffee themed colors for splash -->
+    <color name="coffee_primary">#8B4513</color>
+    <color name="coffee_cream">#F5DEB3</color>
+</resources>

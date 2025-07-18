@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="record_shot"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/record_shot_short"
+        android:shortcutLongLabel="@string/record_shot_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.coffeeshottimer"
+            android:targetClass="com.example.coffeeshottimer.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="view_history"
+        android:enabled="true"
+        android:icon="@mipmap/ic_launcher"
+        android:shortcutShortLabel="@string/view_history_short"
+        android:shortcutLongLabel="@string/view_history_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.example.coffeeshottimer"
+            android:targetClass="com.example.coffeeshottimer.MainActivity" />
+    </shortcut>
+</shortcuts>

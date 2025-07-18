@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -5,6 +7,13 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.kapt)
+}
+
+// Load keystore properties
+val keystorePropertiesFile = rootProject.file("keystore.properties")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(keystorePropertiesFile.inputStream())
 }
 
 android {
@@ -16,9 +25,27 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Enable vector drawable support for older Android versions
+        vectorDrawables.useSupportLibrary = true
+
+        // Localization support
+        androidResources.localeFilters.addAll(listOf("en"))
+    }
+
+    // Signing configuration
+    signingConfigs {
+        create("release") {
+            if (keystoreProperties.containsKey("storeFile")) {
+                storeFile = file(keystoreProperties["storeFile"].toString())
+                storePassword = keystoreProperties["storePassword"].toString()
+                keyAlias = keystoreProperties["keyAlias"].toString()
+                keyPassword = keystoreProperties["keyPassword"].toString()
+            }
+        }
     }
 
     buildTypes {
@@ -28,6 +55,40 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
+            // Use release signing configuration
+            signingConfig = signingConfigs.getByName("release")
+
+            // Performance optimizations
+            isDebuggable = false
+            isJniDebuggable = false
+            renderscriptOptimLevel = 3
+
+            // Set application name for release
+            manifestPlaceholders["appName"] = "@string/app_name"
+
+            // Packaging options for smaller APK
+            packaging {
+                resources {
+                    excludes += "/META-INF/{AL2.0,LGPL2.1}"
+                    excludes += "META-INF/DEPENDENCIES"
+                    excludes += "META-INF/LICENSE"
+                    excludes += "META-INF/LICENSE.txt"
+                    excludes += "META-INF/license.txt"
+                    excludes += "META-INF/NOTICE"
+                    excludes += "META-INF/NOTICE.txt"
+                    excludes += "META-INF/notice.txt"
+                    excludes += "META-INF/ASL2.0"
+                    excludes += "META-INF/*.kotlin_module"
+                }
+            }
+        }
+
+        debug {
+            isMinifyEnabled = false
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
     }
     compileOptions {
@@ -41,14 +102,14 @@ android {
     buildFeatures {
         compose = true
     }
-    
+
     // Room schema export configuration
     kapt {
         arguments {
             arg("room.schemaLocation", "$projectDir/schemas")
         }
     }
-    
+
     // Test configuration
     testOptions {
         unitTests {
@@ -96,6 +157,12 @@ dependencies {
 
     // Core library desugaring for Java 8 time APIs
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // Material Icons Extended
+    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+
+    // Splash Screen API
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

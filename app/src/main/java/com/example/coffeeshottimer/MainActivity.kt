@@ -10,6 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coffeeshottimer.ui.components.BottomNavigationBar
@@ -21,6 +22,9 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Install splash screen before super.onCreate()
+        installSplashScreen()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -36,7 +40,7 @@ fun EspressoShotTrackerApp() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    
+
     // Determine if bottom navigation should be shown
     val showBottomNavigation = when (currentRoute) {
         NavigationDestinations.RecordShot.route,
@@ -44,7 +48,7 @@ fun EspressoShotTrackerApp() {
         NavigationDestinations.BeanManagement.route -> true
         else -> false
     }
-    
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {

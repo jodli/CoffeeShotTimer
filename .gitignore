@@ -13,3 +13,24 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Release and signing files - NEVER commit these!
+keystore.properties
+*.keystore
+*.jks
+*.p12
+release-key.*
+release-outputs/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+Thumbs.db
+.DS_Store?
+ehthumbs.db
+
+# Log files
+*.log

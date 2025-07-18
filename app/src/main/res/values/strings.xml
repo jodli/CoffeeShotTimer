@@ -1,3 +1,20 @@
 <resources>
-    <string name="app_name">CoffeeShotTimer</string>
+    <string name="app_name">Coffee Shot Timer</string>
+    <string name="app_description">Track your espresso shots with precision timing and detailed measurements</string>
+
+    <!-- Content descriptions for accessibility -->
+    <string name="app_icon_description">Coffee Shot Timer app icon</string>
+
+    <!-- App store listing strings -->
+    <string name="app_short_description">Espresso shot tracking for home baristas</string>
+    <string name="app_long_description">Coffee Shot Timer helps home baristas perfect their espresso shots with precise timing, weight measurements, and detailed tracking. Record shot parameters, manage coffee beans, and analyze your brewing patterns to consistently pull amazing espresso.</string>
+
+    <!-- Keywords for app store -->
+    <string name="app_keywords">espresso, coffee, timer, barista, brewing, shot tracking, coffee beans</string>
+
+    <!-- App shortcuts -->
+    <string name="record_shot_short">Record Shot</string>
+    <string name="record_shot_long">Record new espresso shot</string>
+    <string name="view_history_short">History</string>
+    <string name="view_history_long">View shot history</string>
 </resources>
