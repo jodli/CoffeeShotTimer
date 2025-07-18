@@ -17,11 +17,11 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.example.coffeeshottimer"
+    namespace = "com.jodli.coffeeshottimer"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.coffeeshottimer"
+        applicationId = "com.jodli.coffeeshottimer"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

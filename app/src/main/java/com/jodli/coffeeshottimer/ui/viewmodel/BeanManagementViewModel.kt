@@ -1,0 +1,326 @@
+package com.jodli.coffeeshottimer.ui.viewmodel
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
+import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+/**
+ * ViewModel for managing coffee bean profiles.
+ * Handles bean listing, filtering, and management operations.
+ */
+@HiltViewModel
+class BeanManagementViewModel @Inject constructor(
+    private val getActiveBeansUseCase: GetActiveBeansUseCase,
+    private val getBeanHistoryUseCase: GetBeanHistoryUseCase,
+    private val addBeanUseCase: AddBeanUseCase,
+    private val updateBeanUseCase: UpdateBeanUseCase,
+    private val beanRepository: BeanRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(BeanManagementUiState())
+    val uiState: StateFlow<BeanManagementUiState> = _uiState.asStateFlow()
+
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    private val _showInactive = MutableStateFlow(false)
+    val showInactive: StateFlow<Boolean> = _showInactive.asStateFlow()
+
+    init {
+        loadBeans()
+        observeSearchAndFilter()
+    }
+
+    private fun observeSearchAndFilter() {
+        combine(
+            _searchQuery,
+            _showInactive
+        ) { query, showInactive ->
+            Pair(query, showInactive)
+        }.onEach { (query, showInactive) ->
+            loadFilteredBeans(query, showInactive)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun loadBeans() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            
+            getActiveBeansUseCase.execute()
+                .catch { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = "Failed to load beans: ${exception.message}"
+                    )
+                }
+                .collect { result ->
+                    if (result.isSuccess) {
+                        val beans = result.getOrNull() ?: emptyList()
+                        _uiState.value = _uiState.value.copy(
+                            beans = beans,
+                            isLoading = false,
+                            error = null
+                        )
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.exceptionOrNull()?.message ?: "Failed to load beans"
+                        )
+                    }
+                }
+        }
+    }
+
+    private fun loadFilteredBeans(query: String, showInactive: Boolean) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            
+            val useCase = if (showInactive) {
+                getBeanHistoryUseCase.getBeanHistoryWithSearch(query, activeOnly = false)
+            } else {
+                if (query.isBlank()) {
+                    getActiveBeansUseCase.execute()
+                } else {
+                    getActiveBeansUseCase.getActiveBeansWithSearch(query)
+                }
+            }
+            
+            useCase
+                .catch { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = "Failed to load beans: ${exception.message}"
+                    )
+                }
+                .collect { result ->
+                    if (result.isSuccess) {
+                        val beans = result.getOrNull() ?: emptyList()
+                        _uiState.value = _uiState.value.copy(
+                            beans = beans,
+                            isLoading = false,
+                            error = null
+                        )
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.exceptionOrNull()?.message ?: "Failed to load beans"
+                        )
+                    }
+                }
+        }
+    }
+
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
+
+    fun toggleShowInactive() {
+        _showInactive.value = !_showInactive.value
+    }
+
+    fun deleteBean(beanId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            
+            val result = updateBeanUseCase.updateActiveStatus(beanId, false)
+            if (result.isSuccess) {
+                // Refresh the bean list
+                loadFilteredBeans(_searchQuery.value, _showInactive.value)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to delete bean"
+                )
+            }
+        }
+    }
+
+    fun reactivateBean(beanId: String) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            
+            val result = updateBeanUseCase.updateActiveStatus(beanId, true)
+            if (result.isSuccess) {
+                // Refresh the bean list
+                loadFilteredBeans(_searchQuery.value, _showInactive.value)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to reactivate bean"
+                )
+            }
+        }
+    }
+
+    fun clearError() {
+        _uiState.value = _uiState.value.copy(error = null)
+    }
+
+    fun refresh() {
+        loadFilteredBeans(_searchQuery.value, _showInactive.value)
+    }
+
+    /**
+     * Set a bean as the current active bean for shot recording.
+     * Implements requirement 3.2 for connecting bean selection between screens.
+     * Updates the grinder setting memory for the bean.
+     */
+    fun setCurrentBean(beanId: String, grinderSetting: String? = null) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            
+            // Update grinder setting if provided
+            val grinderResult = if (!grinderSetting.isNullOrBlank()) {
+                updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
+            } else {
+                Result.success(Unit)
+            }
+            
+            if (grinderResult.isSuccess) {
+                // Set the bean as current in the repository
+                val result = beanRepository.setCurrentBean(beanId)
+                
+                if (result.isSuccess) {
+                    // Update UI state to reflect the current bean selection
+                    _uiState.value = _uiState.value.copy(
+                        currentBeanId = beanId,
+                        isLoading = false
+                    )
+                    // Refresh the bean list to show updated grinder setting
+                    loadFilteredBeans(_searchQuery.value, _showInactive.value)
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = result.exceptionOrNull()?.message ?: "Failed to set current bean"
+                    )
+                }
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = grinderResult.exceptionOrNull()?.message ?: "Failed to update grinder setting"
+                )
+            }
+        }
+    }
+
+    /**
+     * Update grinder setting for a specific bean (grinder setting memory).
+     */
+    fun updateBeanGrinderSetting(beanId: String, grinderSetting: String) {
+        viewModelScope.launch {
+            val result = updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
+            if (result.isSuccess) {
+                // Refresh the bean list to show updated grinder setting
+                loadFilteredBeans(_searchQuery.value, _showInactive.value)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    error = result.exceptionOrNull()?.message ?: "Failed to update grinder setting"
+                )
+            }
+        }
+    }
+
+    /**
+     * Get the most recently used active bean for auto-selection.
+     */
+    fun getMostRecentActiveBean() {
+        viewModelScope.launch {
+            val result = getActiveBeansUseCase.getMostRecentActiveBean()
+            if (result.isSuccess) {
+                val bean = result.getOrNull()
+                _uiState.value = _uiState.value.copy(
+                    currentBeanId = bean?.id
+                )
+            }
+        }
+    }
+
+    /**
+     * Bulk delete multiple beans (set as inactive).
+     */
+    fun bulkDeleteBeans(beanIds: List<String>) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            
+            val result = updateBeanUseCase.bulkUpdateActiveStatus(beanIds, false)
+            if (result.isSuccess) {
+                // Refresh the bean list
+                loadFilteredBeans(_searchQuery.value, _showInactive.value)
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = result.exceptionOrNull()?.message ?: "Failed to delete beans"
+                )
+            }
+        }
+    }
+
+    /**
+     * Check if there are any active beans available.
+     */
+    fun checkForActiveBeans() {
+        viewModelScope.launch {
+            val result = getActiveBeansUseCase.hasActiveBeans()
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    hasActiveBeans = result.getOrNull() ?: false
+                )
+            }
+        }
+    }
+
+    /**
+     * Get beans grouped by freshness for better organization.
+     */
+    fun loadBeansByFreshness() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            
+            getActiveBeansUseCase.getActiveBeansByFreshness()
+                .catch { exception ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = "Failed to load beans by freshness: ${exception.message}"
+                    )
+                }
+                .collect { result ->
+                    if (result.isSuccess) {
+                        val beansWithFreshness = result.getOrNull() ?: emptyList()
+                        val beans = beansWithFreshness.map { it.bean }
+                        _uiState.value = _uiState.value.copy(
+                            beans = beans,
+                            beansWithFreshness = beansWithFreshness,
+                            isLoading = false,
+                            error = null
+                        )
+                    } else {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = result.exceptionOrNull()?.message ?: "Failed to load beans by freshness"
+                        )
+                    }
+                }
+        }
+    }
+}
+
+/**
+ * UI state for the bean management screen.
+ */
+data class BeanManagementUiState(
+    val beans: List<Bean> = emptyList(),
+    val beansWithFreshness: List<com.jodli.coffeeshottimer.domain.usecase.BeanWithFreshness> = emptyList(),
+    val currentBeanId: String? = null,
+    val hasActiveBeans: Boolean = true,
+    val isLoading: Boolean = false,
+    val error: String? = null
+)

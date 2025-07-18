@@ -4,7 +4,7 @@
 
 ### Basic Information
 - **App Name:** Coffee Shot Timer
-- **Package Name:** com.example.coffeeshottimer
+- **Package Name:** com.jodli.coffeeshottimer
 - **Category:** Food & Drink
 - **Content Rating:** Everyone
 - **Price:** Free

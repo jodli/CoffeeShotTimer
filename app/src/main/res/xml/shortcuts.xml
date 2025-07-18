@@ -8,8 +8,8 @@
         android:shortcutLongLabel="@string/record_shot_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.example.coffeeshottimer"
-            android:targetClass="com.example.coffeeshottimer.MainActivity" />
+            android:targetPackage="com.jodli.coffeeshottimer"
+            android:targetClass="com.jodli.coffeeshottimer.MainActivity" />
         <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
@@ -21,7 +21,7 @@
         android:shortcutLongLabel="@string/view_history_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="com.example.coffeeshottimer"
-            android:targetClass="com.example.coffeeshottimer.MainActivity" />
+            android:targetPackage="com.jodli.coffeeshottimer"
+            android:targetClass="com.jodli.coffeeshottimer.MainActivity" />
     </shortcut>
 </shortcuts>
