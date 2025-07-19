@@ -5,6 +5,8 @@ import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.dao.ShotStatistics
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import com.jodli.coffeeshottimer.data.model.PaginatedResult
+import com.jodli.coffeeshottimer.data.model.PaginationConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -403,6 +405,74 @@ class ShotRepository @Inject constructor(
             }
         } catch (exception: Exception) {
             Result.failure(RepositoryException.DatabaseError("Failed to get suggested grinder setting", exception))
+        }
+    }
+    
+    // PERFORMANCE OPTIMIZATION METHODS
+    
+    /**
+     * Get shots with pagination support for large datasets.
+     * @param paginationConfig Configuration for pagination
+     * @return Result containing paginated shots
+     */
+    suspend fun getShotsPaginated(paginationConfig: PaginationConfig): Result<PaginatedResult<Shot>> {
+        return try {
+            val shots = shotDao.getShotsPaginated(paginationConfig.pageSize, paginationConfig.offset)
+            val totalCount = shotDao.getTotalShotCount()
+            
+            val paginatedResult = PaginatedResult(
+                items = shots,
+                totalCount = totalCount,
+                currentPage = paginationConfig.page,
+                pageSize = paginationConfig.pageSize,
+                hasNextPage = (paginationConfig.offset + paginationConfig.pageSize) < totalCount,
+                hasPreviousPage = paginationConfig.page > 0
+            )
+            
+            Result.success(paginatedResult)
+        } catch (exception: Exception) {
+            Result.failure(RepositoryException.DatabaseError("Failed to get paginated shots", exception))
+        }
+    }
+    
+    /**
+     * Get filtered shots with pagination support for large datasets.
+     * @param beanId Optional bean ID filter
+     * @param startDate Optional start date filter
+     * @param endDate Optional end date filter
+     * @param paginationConfig Configuration for pagination
+     * @return Result containing paginated filtered shots
+     */
+    suspend fun getFilteredShotsPaginated(
+        beanId: String?,
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        paginationConfig: PaginationConfig
+    ): Result<PaginatedResult<Shot>> {
+        return try {
+            // Validate date range if both dates are provided
+            if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
+                return Result.failure(RepositoryException.ValidationError("Start date cannot be after end date"))
+            }
+            
+            val shots = shotDao.getFilteredShotsPaginated(
+                beanId, startDate, endDate, 
+                paginationConfig.pageSize, paginationConfig.offset
+            )
+            val totalCount = shotDao.getFilteredShotsCount(beanId, startDate, endDate)
+            
+            val paginatedResult = PaginatedResult(
+                items = shots,
+                totalCount = totalCount,
+                currentPage = paginationConfig.page,
+                pageSize = paginationConfig.pageSize,
+                hasNextPage = (paginationConfig.offset + paginationConfig.pageSize) < totalCount,
+                hasPreviousPage = paginationConfig.page > 0
+            )
+            
+            Result.success(paginatedResult)
+        } catch (exception: Exception) {
+            Result.failure(RepositoryException.DatabaseError("Failed to get paginated filtered shots", exception))
         }
     }
 }

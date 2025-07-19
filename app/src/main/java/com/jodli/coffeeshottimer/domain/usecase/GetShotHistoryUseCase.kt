@@ -1,6 +1,8 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
 import com.jodli.coffeeshottimer.data.model.Shot
+import com.jodli.coffeeshottimer.data.model.PaginatedResult
+import com.jodli.coffeeshottimer.data.model.PaginationConfig
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -191,6 +193,34 @@ class GetShotHistoryUseCase @Inject constructor(
      */
     suspend fun getTotalShotCount(): Result<Int> {
         return shotRepository.getTotalShotCount()
+    }
+    
+    // PERFORMANCE OPTIMIZATION METHODS
+    
+    /**
+     * Get shots with pagination support for large datasets.
+     * @param paginationConfig Configuration for pagination
+     * @return Result containing paginated shots
+     */
+    suspend fun getShotsPaginated(paginationConfig: PaginationConfig): Result<PaginatedResult<Shot>> {
+        return shotRepository.getShotsPaginated(paginationConfig)
+    }
+    
+    /**
+     * Get filtered shots with pagination support for large datasets.
+     * @param beanId Optional bean ID filter
+     * @param startDate Optional start date filter
+     * @param endDate Optional end date filter
+     * @param paginationConfig Configuration for pagination
+     * @return Result containing paginated filtered shots
+     */
+    suspend fun getFilteredShotsPaginated(
+        beanId: String?,
+        startDate: LocalDateTime?,
+        endDate: LocalDateTime?,
+        paginationConfig: PaginationConfig
+    ): Result<PaginatedResult<Shot>> {
+        return shotRepository.getFilteredShotsPaginated(beanId, startDate, endDate, paginationConfig)
     }
 }
 

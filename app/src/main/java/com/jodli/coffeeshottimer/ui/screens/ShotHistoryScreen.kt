@@ -38,7 +38,7 @@ fun ShotHistoryScreen(
     val spacing = LocalSpacing.current
     val uiState by viewModel.uiState.collectAsState()
     val currentFilter by viewModel.currentFilter.collectAsState()
-    
+
     var showFilterDialog by remember { mutableStateOf(false) }
 
     Column(
@@ -66,7 +66,7 @@ fun ShotHistoryScreen(
                     )
                 }
             }
-            
+
             Row {
                 // Analysis toggle button
                 IconButton(
@@ -82,7 +82,7 @@ fun ShotHistoryScreen(
                         }
                     )
                 }
-                
+
                 // Filter button
                 IconButton(
                     onClick = { showFilterDialog = true }
@@ -97,10 +97,10 @@ fun ShotHistoryScreen(
                         }
                     )
                 }
-                
+
                 // Refresh button
                 IconButton(
-                    onClick = { 
+                    onClick = {
                         viewModel.refreshData()
                         viewModel.refreshAnalysis()
                     }
@@ -112,9 +112,9 @@ fun ShotHistoryScreen(
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Active filters display
         if (currentFilter.hasFilters()) {
             ActiveFiltersDisplay(
@@ -125,7 +125,7 @@ fun ShotHistoryScreen(
             )
             Spacer(modifier = Modifier.height(spacing.medium))
         }
-        
+
         // Content
         Box(modifier = Modifier.fillMaxSize()) {
             when {
@@ -135,7 +135,7 @@ fun ShotHistoryScreen(
                         message = "Loading shot history..."
                     )
                 }
-                
+
                 uiState.error != null -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
@@ -160,7 +160,7 @@ fun ShotHistoryScreen(
                         )
                     }
                 }
-                
+
                 uiState.isEmpty -> {
                     EmptyState(
                         icon = Icons.Default.Home,
@@ -173,14 +173,14 @@ fun ShotHistoryScreen(
                         modifier = Modifier.align(Alignment.Center)
                     )
                 }
-                
+
                 uiState.showAnalysis -> {
                     ShotAnalysisView(
                         uiState = uiState,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
-                
+
                 else -> {
                     ShotHistoryList(
                         shots = uiState.shots,
@@ -192,7 +192,7 @@ fun ShotHistoryScreen(
             }
         }
     }
-    
+
     // Filter dialog
     if (showFilterDialog) {
         ShotHistoryFilterDialog(
@@ -215,7 +215,7 @@ private fun ActiveFiltersDisplay(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -239,48 +239,48 @@ private fun ActiveFiltersDisplay(
                     Text("Clear All")
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             // Display active filters
             val filterTexts = mutableListOf<String>()
-            
+
             filter.beanId?.let { beanId ->
                 val beanName = availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
                 filterTexts.add("Bean: $beanName")
             }
-            
+
             if (filter.startDate != null || filter.endDate != null) {
                 val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
                 val startText = filter.startDate?.format(dateFormatter) ?: "Start"
                 val endText = filter.endDate?.format(dateFormatter) ?: "End"
                 filterTexts.add("Date: $startText - $endText")
             }
-            
+
             filter.grinderSetting?.let { setting ->
                 filterTexts.add("Grinder: $setting")
             }
-            
+
             if (filter.minBrewRatio != null || filter.maxBrewRatio != null) {
                 val min = filter.minBrewRatio?.let { "%.1f".format(it) } ?: "0"
                 val max = filter.maxBrewRatio?.let { "%.1f".format(it) } ?: "∞"
                 filterTexts.add("Brew Ratio: 1:$min - 1:$max")
             }
-            
+
             if (filter.minExtractionTime != null || filter.maxExtractionTime != null) {
                 val min = filter.minExtractionTime ?: 0
                 val max = filter.maxExtractionTime ?: 999
                 filterTexts.add("Time: ${min}s - ${max}s")
             }
-            
+
             if (filter.onlyOptimalExtractionTime == true) {
                 filterTexts.add("Optimal extraction time only")
             }
-            
+
             if (filter.onlyTypicalBrewRatio == true) {
                 filterTexts.add("Typical brew ratio only")
             }
-            
+
             filterTexts.forEach { text ->
                 Text(
                     text = "• $text",
@@ -322,7 +322,7 @@ private fun ShotHistoryItem(
 ) {
     val spacing = LocalSpacing.current
     val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, HH:mm")
-    
+
     CoffeeCard(
         onClick = onClick,
         modifier = modifier
@@ -344,15 +344,15 @@ private fun ShotHistoryItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                
+
                 Text(
                     text = shot.timestamp.format(dateFormatter),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 // Key metrics row
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium)
@@ -362,13 +362,13 @@ private fun ShotHistoryItem(
                         value = shot.getFormattedBrewRatio(),
                         isGood = shot.isTypicalBrewRatio()
                     )
-                    
+
                     MetricChip(
                         label = "Time",
                         value = shot.getFormattedExtractionTime(),
                         isGood = shot.isOptimalExtractionTime()
                     )
-                    
+
                     MetricChip(
                         label = "Grinder",
                         value = shot.grinderSetting,
@@ -376,7 +376,7 @@ private fun ShotHistoryItem(
                     )
                 }
             }
-            
+
             // Right side - weights
             Column(
                 horizontalAlignment = Alignment.End
@@ -386,7 +386,7 @@ private fun ShotHistoryItem(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 // Quality indicator with success score
                 Column(
                     horizontalAlignment = Alignment.End
@@ -416,13 +416,13 @@ private fun MetricChip(
         isGood -> MaterialTheme.colorScheme.primaryContainer
         else -> MaterialTheme.colorScheme.errorContainer
     }
-    
+
     val contentColor = when {
         isNeutral -> MaterialTheme.colorScheme.onSurfaceVariant
         isGood -> MaterialTheme.colorScheme.onPrimaryContainer
         else -> MaterialTheme.colorScheme.onErrorContainer
     }
-    
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
@@ -454,7 +454,7 @@ private fun QualityIndicator(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
@@ -472,7 +472,7 @@ private fun QualityIndicator(
                     }
                 )
         )
-        
+
         // Ratio indicator
         Box(
             modifier = Modifier
@@ -495,7 +495,7 @@ private fun ShotAnalysisView(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     if (uiState.analysisLoading) {
         Box(
             modifier = modifier,
@@ -505,7 +505,7 @@ private fun ShotAnalysisView(
         }
         return
     }
-    
+
     if (!uiState.hasAnalysisData) {
         Box(
             modifier = modifier,
@@ -519,7 +519,7 @@ private fun ShotAnalysisView(
         }
         return
     }
-    
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(spacing.medium),
@@ -531,28 +531,28 @@ private fun ShotAnalysisView(
                 OverallStatisticsCard(statistics = stats)
             }
         }
-        
+
         // Shot Trends
         uiState.shotTrends?.let { trends ->
             item {
                 ShotTrendsCard(trends = trends)
             }
         }
-        
+
         // Brew Ratio Analysis
         uiState.brewRatioAnalysis?.let { analysis ->
             item {
                 BrewRatioAnalysisCard(analysis = analysis)
             }
         }
-        
+
         // Extraction Time Analysis
         uiState.extractionTimeAnalysis?.let { analysis ->
             item {
                 ExtractionTimeAnalysisCard(analysis = analysis)
             }
         }
-        
+
         // Grinder Setting Analysis (if available)
         uiState.grinderSettingAnalysis?.let { analysis ->
             item {
@@ -568,7 +568,7 @@ private fun OverallStatisticsCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -576,9 +576,9 @@ private fun OverallStatisticsCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Key metrics grid
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -600,9 +600,9 @@ private fun OverallStatisticsCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -625,7 +625,7 @@ private fun OverallStatisticsCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             statistics.mostUsedGrinderSetting?.let { setting ->
                 Spacer(modifier = Modifier.height(spacing.medium))
                 Text(
@@ -644,7 +644,7 @@ private fun ShotTrendsCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -652,9 +652,9 @@ private fun ShotTrendsCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Trend indicators
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -678,9 +678,9 @@ private fun ShotTrendsCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Overall improvement indicator
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -718,7 +718,7 @@ private fun BrewRatioAnalysisCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -726,9 +726,9 @@ private fun BrewRatioAnalysisCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Key statistics
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -745,9 +745,9 @@ private fun BrewRatioAnalysisCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Quality breakdown
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -772,9 +772,9 @@ private fun BrewRatioAnalysisCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Distribution
             Text(
                 text = "Distribution",
@@ -782,7 +782,7 @@ private fun BrewRatioAnalysisCard(
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             analysis.distribution.forEach { (range, count) ->
                 if (count > 0) {
                     Row(
@@ -811,7 +811,7 @@ private fun ExtractionTimeAnalysisCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -819,9 +819,9 @@ private fun ExtractionTimeAnalysisCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Key statistics
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -838,9 +838,9 @@ private fun ExtractionTimeAnalysisCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Quality breakdown
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -865,9 +865,9 @@ private fun ExtractionTimeAnalysisCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Distribution
             Text(
                 text = "Distribution",
@@ -875,7 +875,7 @@ private fun ExtractionTimeAnalysisCard(
                 fontWeight = FontWeight.Medium
             )
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             analysis.distribution.forEach { (range, count) ->
                 if (count > 0) {
                     Row(
@@ -904,7 +904,7 @@ private fun GrinderSettingAnalysisCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -912,17 +912,17 @@ private fun GrinderSettingAnalysisCard(
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             Text(
                 text = "${analysis.totalSettings} different settings used",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Most used setting
             analysis.mostUsedSetting?.let { setting ->
                 Text(
@@ -931,15 +931,15 @@ private fun GrinderSettingAnalysisCard(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 GrinderSettingItem(
                     setting = setting,
                     isHighlighted = true
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.medium))
             }
-            
+
             // Best performing setting
             analysis.bestPerformingSetting?.let { setting ->
                 Text(
@@ -948,7 +948,7 @@ private fun GrinderSettingAnalysisCard(
                     fontWeight = FontWeight.Medium
                 )
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 GrinderSettingItem(
                     setting = setting,
                     isHighlighted = true
@@ -965,7 +965,7 @@ private fun GrinderSettingItem(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -994,9 +994,9 @@ private fun GrinderSettingItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
@@ -1082,7 +1082,7 @@ private fun ShotSuccessIndicator(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     // Calculate success score based on optimal parameters
     val successScore = calculateShotSuccessScore(shot)
     val successText = when {
@@ -1091,14 +1091,14 @@ private fun ShotSuccessIndicator(
         successScore >= 40 -> "Fair"
         else -> "Needs Work"
     }
-    
+
     val successColor = when {
         successScore >= 80 -> MaterialTheme.colorScheme.primary
         successScore >= 60 -> MaterialTheme.colorScheme.tertiary
         successScore >= 40 -> MaterialTheme.colorScheme.secondary
         else -> MaterialTheme.colorScheme.error
     }
-    
+
     Text(
         text = successText,
         style = MaterialTheme.typography.labelSmall,
@@ -1110,7 +1110,7 @@ private fun ShotSuccessIndicator(
 
 private fun calculateShotSuccessScore(shot: Shot): Int {
     var score = 0
-    
+
     // Optimal extraction time (25-30s) = 40 points
     if (shot.isOptimalExtractionTime()) {
         score += 40
@@ -1123,7 +1123,7 @@ private fun calculateShotSuccessScore(shot: Shot): Int {
         }
         score += maxOf(0, 40 - (timeDiff * 4))
     }
-    
+
     // Typical brew ratio (1.5-3.0) = 40 points
     if (shot.isTypicalBrewRatio()) {
         score += 40
@@ -1136,13 +1136,13 @@ private fun calculateShotSuccessScore(shot: Shot): Int {
         }
         score += maxOf(0, 40 - (ratioDiff * 20.0).toInt())
     }
-    
+
     // Consistency bonus (reasonable input/output weights) = 20 points
-    val isReasonableWeights = shot.coffeeWeightIn in 15.0..25.0 && 
+    val isReasonableWeights = shot.coffeeWeightIn in 15.0..25.0 &&
                              shot.coffeeWeightOut in 25.0..60.0
     if (isReasonableWeights) {
         score += 20
     }
-    
+
     return score.coerceIn(0, 100)
 }

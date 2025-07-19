@@ -66,26 +66,40 @@ abstract class AppDatabase : RoomDatabase() {
              * Create database indexes for performance optimization.
              */
             private fun createIndexes(db: SupportSQLiteDatabase) {
-                // Index on shots.beanId for foreign key performance
+                // Primary indexes for foreign key performance
                 db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_id ON shots(beanId)")
                 
-                // Index on shots.timestamp for chronological queries
+                // Timestamp indexes for chronological queries and pagination
                 db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_timestamp ON shots(timestamp)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_timestamp_desc ON shots(timestamp DESC)")
                 
-                // Index on beans.isActive for filtering active beans
+                // Bean filtering indexes
                 db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_active ON beans(isActive)")
-                
-                // Index on beans.name for name-based queries and uniqueness
                 db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_name ON beans(name)")
-                
-                // Index on shots.grinderSetting for grinder setting queries
-                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_grinder_setting ON shots(grinderSetting)")
-                
-                // Composite index for shots filtered by bean and timestamp
-                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_timestamp ON shots(beanId, timestamp)")
-                
-                // Index on beans.roastDate for date-based queries
                 db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_roast_date ON beans(roastDate)")
+                
+                // Shot filtering indexes for performance
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_grinder_setting ON shots(grinderSetting)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_brew_ratio ON shots(brewRatio)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_extraction_time ON shots(extractionTimeSeconds)")
+                
+                // Composite indexes for complex queries
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_timestamp ON shots(beanId, timestamp DESC)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_ratio ON shots(beanId, brewRatio)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_time ON shots(beanId, extractionTimeSeconds)")
+                
+                // Indexes for statistics and analysis queries
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_timestamp_ratio ON shots(timestamp, brewRatio)")
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_timestamp_extraction ON shots(timestamp, extractionTimeSeconds)")
+                
+                // Covering index for shot list queries (includes most commonly accessed columns)
+                db.execSQL("""
+                    CREATE INDEX IF NOT EXISTS idx_shots_list_covering 
+                    ON shots(timestamp DESC, beanId, coffeeWeightIn, coffeeWeightOut, extractionTimeSeconds, brewRatio, grinderSetting)
+                """)
+                
+                // Index for bean statistics
+                db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_active_created ON beans(isActive, createdAt DESC)")
             }
         }
         

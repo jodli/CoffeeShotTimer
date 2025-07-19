@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
+import com.jodli.coffeeshottimer.data.model.PaginationConfig
+import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotStatisticsUseCase
@@ -31,7 +33,8 @@ import javax.inject.Inject
 class ShotHistoryViewModel @Inject constructor(
     private val getShotHistoryUseCase: GetShotHistoryUseCase,
     private val getActiveBeansUseCase: GetActiveBeansUseCase,
-    private val getShotStatisticsUseCase: GetShotStatisticsUseCase
+    private val getShotStatisticsUseCase: GetShotStatisticsUseCase,
+    private val memoryOptimizer: MemoryOptimizer
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShotHistoryUiState())
@@ -40,8 +43,22 @@ class ShotHistoryViewModel @Inject constructor(
     private val _currentFilter = MutableStateFlow(ShotHistoryFilter())
     val currentFilter: StateFlow<ShotHistoryFilter> = _currentFilter.asStateFlow()
 
+    // Pagination state
+    private var currentPaginationConfig = PaginationConfig()
+    private var isLoadingMore = false
+    private var hasMoreData = true
+
+    companion object {
+        private const val COMPONENT_ID = "ShotHistoryViewModel"
+    }
+
     init {
         loadInitialData()
+        
+        // Schedule memory cleanup
+        memoryOptimizer.scheduleMemoryCleanup(COMPONENT_ID) {
+            performMemoryCleanup()
+        }
     }
 
     private fun loadInitialData() {
@@ -74,38 +91,44 @@ class ShotHistoryViewModel @Inject constructor(
     private fun loadShotHistory() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
+            resetPagination()
 
-            val filter = _currentFilter.value
-            val shotsFlow = if (filter.hasFilters()) {
-                getShotHistoryUseCase.getFilteredShots(filter)
-            } else {
-                getShotHistoryUseCase.getAllShots()
+            try {
+                val filter = _currentFilter.value
+                val result = if (filter.hasFilters()) {
+                    getShotHistoryUseCase.getFilteredShotsPaginated(
+                        beanId = filter.beanId,
+                        startDate = filter.startDate,
+                        endDate = filter.endDate,
+                        paginationConfig = currentPaginationConfig
+                    )
+                } else {
+                    getShotHistoryUseCase.getShotsPaginated(currentPaginationConfig)
+                }
+                
+                result.fold(
+                    onSuccess = { paginatedResult ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            shots = paginatedResult.items,
+                            error = null,
+                            hasMorePages = paginatedResult.hasNextPage
+                        )
+                        hasMoreData = paginatedResult.hasNextPage
+                    },
+                    onFailure = { error ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            error = "Failed to load shot history: ${error.message}"
+                        )
+                    }
+                )
+            } catch (exception: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    error = "Failed to load shot history: ${exception.message}"
+                )
             }
-
-            shotsFlow
-                .catch { error ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = "Failed to load shot history: ${error.message}"
-                    )
-                }
-                .collect { result ->
-                    result.fold(
-                        onSuccess = { shots ->
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                shots = shots,
-                                error = null
-                            )
-                        },
-                        onFailure = { error ->
-                            _uiState.value = _uiState.value.copy(
-                                isLoading = false,
-                                error = "Failed to load shot history: ${error.message}"
-                            )
-                        }
-                    )
-                }
         }
     }
 
@@ -256,6 +279,125 @@ class ShotHistoryViewModel @Inject constructor(
             loadAnalysisData()
         }
     }
+    
+    // PERFORMANCE OPTIMIZATION METHODS
+    
+    /**
+     * Load more shots for pagination (lazy loading).
+     */
+    fun loadMoreShots() {
+        if (isLoadingMore || !hasMoreData) return
+        
+        viewModelScope.launch {
+            isLoadingMore = true
+            _uiState.value = _uiState.value.copy(isLoadingMore = true)
+            
+            try {
+                val nextPage = currentPaginationConfig.page + 1
+                val nextPaginationConfig = currentPaginationConfig.copy(page = nextPage)
+                
+                val filter = _currentFilter.value
+                val result = if (filter.hasFilters()) {
+                    getShotHistoryUseCase.getFilteredShotsPaginated(
+                        beanId = filter.beanId,
+                        startDate = filter.startDate,
+                        endDate = filter.endDate,
+                        paginationConfig = nextPaginationConfig
+                    )
+                } else {
+                    getShotHistoryUseCase.getShotsPaginated(nextPaginationConfig)
+                }
+                
+                result.fold(
+                    onSuccess = { paginatedResult ->
+                        val currentShots = _uiState.value.shots
+                        val newShots = currentShots + paginatedResult.items
+                        
+                        _uiState.value = _uiState.value.copy(
+                            shots = newShots,
+                            isLoadingMore = false,
+                            hasMorePages = paginatedResult.hasNextPage
+                        )
+                        
+                        currentPaginationConfig = nextPaginationConfig
+                        hasMoreData = paginatedResult.hasNextPage
+                    },
+                    onFailure = { error ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoadingMore = false,
+                            error = "Failed to load more shots: ${error.message}"
+                        )
+                    }
+                )
+            } catch (exception: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingMore = false,
+                    error = "Failed to load more shots: ${exception.message}"
+                )
+            } finally {
+                isLoadingMore = false
+            }
+        }
+    }
+    
+    /**
+     * Reset pagination state when filters change.
+     */
+    private fun resetPagination() {
+        currentPaginationConfig = PaginationConfig()
+        hasMoreData = true
+        isLoadingMore = false
+    }
+    
+    /**
+     * Perform memory cleanup to optimize performance.
+     */
+    private suspend fun performMemoryCleanup() {
+        // Clear analysis data if not currently showing
+        if (!_uiState.value.showAnalysis) {
+            _uiState.value = _uiState.value.copy(
+                overallStatistics = null,
+                shotTrends = null,
+                brewRatioAnalysis = null,
+                extractionTimeAnalysis = null,
+                grinderSettingAnalysis = null
+            )
+        }
+        
+        // Limit shot history size if too large
+        val currentShots = _uiState.value.shots
+        if (currentShots.size > 200) {
+            val trimmedShots = currentShots.take(100) // Keep only first 100 shots
+            _uiState.value = _uiState.value.copy(shots = trimmedShots)
+            
+            // Reset pagination to allow loading more
+            resetPagination()
+            hasMoreData = true
+        }
+        
+        // Perform general memory cleanup
+        memoryOptimizer.performMemoryCleanup()
+    }
+    
+    /**
+     * Get current memory usage for debugging.
+     */
+    fun getMemoryUsage(): String {
+        return memoryOptimizer.getMemoryUsage().getFormattedUsage()
+    }
+    
+    /**
+     * Check if memory usage is high.
+     */
+    fun isMemoryUsageHigh(): Boolean {
+        return memoryOptimizer.isMemoryUsageHigh()
+    }
+    
+    override fun onCleared() {
+        super.onCleared()
+        // Cancel memory cleanup when ViewModel is destroyed
+        memoryOptimizer.cancelMemoryCleanup(COMPONENT_ID)
+    }
 }
 
 /**
@@ -272,7 +414,10 @@ data class ShotHistoryUiState(
     val shotTrends: ShotTrends? = null,
     val brewRatioAnalysis: BrewRatioAnalysis? = null,
     val extractionTimeAnalysis: ExtractionTimeAnalysis? = null,
-    val grinderSettingAnalysis: GrinderSettingAnalysis? = null
+    val grinderSettingAnalysis: GrinderSettingAnalysis? = null,
+    // Pagination state
+    val isLoadingMore: Boolean = false,
+    val hasMorePages: Boolean = true
 ) {
     val isEmpty: Boolean
         get() = shots.isEmpty() && !isLoading
