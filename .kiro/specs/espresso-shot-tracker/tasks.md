@@ -146,7 +146,7 @@
   - Perform final security and privacy review
   - _Requirements: 6.1, 7.1_
 
-- [ ] 13. Replace refresh button with pull-to-refresh gesture
+- [x] 13. Replace refresh button with pull-to-refresh gesture
 
   - Remove the refresh button from Shot History screen toolbar
   - Implement SwipeRefresh composable around the shot history list

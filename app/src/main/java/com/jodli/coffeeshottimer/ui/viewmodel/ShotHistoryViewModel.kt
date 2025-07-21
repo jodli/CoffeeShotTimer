@@ -54,7 +54,7 @@ class ShotHistoryViewModel @Inject constructor(
 
     init {
         loadInitialData()
-        
+
         // Schedule memory cleanup
         memoryOptimizer.scheduleMemoryCleanup(COMPONENT_ID) {
             performMemoryCleanup()
@@ -105,7 +105,7 @@ class ShotHistoryViewModel @Inject constructor(
                 } else {
                     getShotHistoryUseCase.getShotsPaginated(currentPaginationConfig)
                 }
-                
+
                 result.fold(
                     onSuccess = { paginatedResult ->
                         _uiState.value = _uiState.value.copy(
@@ -153,7 +153,7 @@ class ShotHistoryViewModel @Inject constructor(
     fun setDateRangeFilter(startDate: LocalDate?, endDate: LocalDate?) {
         val startDateTime = startDate?.atStartOfDay()
         val endDateTime = endDate?.atTime(LocalTime.MAX)
-        
+
         _currentFilter.value = _currentFilter.value.copy(
             startDate = startDateTime,
             endDate = endDateTime
@@ -209,6 +209,22 @@ class ShotHistoryViewModel @Inject constructor(
         loadInitialData()
     }
 
+    fun refreshDataPullToRefresh() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isRefreshing = true, error = null)
+            try {
+                // Load fresh data
+                loadInitialData()
+                // Also refresh analysis if currently showing
+                if (_uiState.value.showAnalysis) {
+                    refreshAnalysis()
+                }
+            } finally {
+                _uiState.value = _uiState.value.copy(isRefreshing = false)
+            }
+        }
+    }
+
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
@@ -220,7 +236,7 @@ class ShotHistoryViewModel @Inject constructor(
     fun toggleAnalysisView() {
         val currentShowAnalysis = _uiState.value.showAnalysis
         _uiState.value = _uiState.value.copy(showAnalysis = !currentShowAnalysis)
-        
+
         if (!currentShowAnalysis && !_uiState.value.hasAnalysisData) {
             loadAnalysisData()
         }
@@ -229,26 +245,26 @@ class ShotHistoryViewModel @Inject constructor(
     private fun loadAnalysisData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(analysisLoading = true)
-            
+
             try {
                 val currentBeanId = _currentFilter.value.beanId
-                
+
                 // Load overall statistics (always global)
                 val overallStatsResult = getShotStatisticsUseCase.getOverallStatistics()
                 val overallStats = overallStatsResult.getOrNull()
-                
+
                 // Load shot trends (filtered by bean if selected, last 30 days)
                 val trendsResult = getShotStatisticsUseCase.getShotTrends(beanId = currentBeanId, days = 30)
                 val trends = trendsResult.getOrNull()
-                
+
                 // Load brew ratio analysis (filtered by bean if selected)
                 val brewRatioResult = getShotStatisticsUseCase.getBrewRatioAnalysis(beanId = currentBeanId)
                 val brewRatioAnalysis = brewRatioResult.getOrNull()
-                
+
                 // Load extraction time analysis (filtered by bean if selected)
                 val extractionTimeResult = getShotStatisticsUseCase.getExtractionTimeAnalysis(beanId = currentBeanId)
                 val extractionTimeAnalysis = extractionTimeResult.getOrNull()
-                
+
                 // Load grinder setting analysis (only for specific bean)
                 val grinderAnalysisResult = if (currentBeanId != null) {
                     getShotStatisticsUseCase.getGrinderSettingAnalysis(currentBeanId)
@@ -256,7 +272,7 @@ class ShotHistoryViewModel @Inject constructor(
                     Result.success(null)
                 }
                 val grinderAnalysis = grinderAnalysisResult.getOrNull()
-                
+
                 _uiState.value = _uiState.value.copy(
                     analysisLoading = false,
                     overallStatistics = overallStats,
@@ -279,23 +295,23 @@ class ShotHistoryViewModel @Inject constructor(
             loadAnalysisData()
         }
     }
-    
+
     // PERFORMANCE OPTIMIZATION METHODS
-    
+
     /**
      * Load more shots for pagination (lazy loading).
      */
     fun loadMoreShots() {
         if (isLoadingMore || !hasMoreData) return
-        
+
         viewModelScope.launch {
             isLoadingMore = true
             _uiState.value = _uiState.value.copy(isLoadingMore = true)
-            
+
             try {
                 val nextPage = currentPaginationConfig.page + 1
                 val nextPaginationConfig = currentPaginationConfig.copy(page = nextPage)
-                
+
                 val filter = _currentFilter.value
                 val result = if (filter.hasFilters()) {
                     getShotHistoryUseCase.getFilteredShotsPaginated(
@@ -307,18 +323,18 @@ class ShotHistoryViewModel @Inject constructor(
                 } else {
                     getShotHistoryUseCase.getShotsPaginated(nextPaginationConfig)
                 }
-                
+
                 result.fold(
                     onSuccess = { paginatedResult ->
                         val currentShots = _uiState.value.shots
                         val newShots = currentShots + paginatedResult.items
-                        
+
                         _uiState.value = _uiState.value.copy(
                             shots = newShots,
                             isLoadingMore = false,
                             hasMorePages = paginatedResult.hasNextPage
                         )
-                        
+
                         currentPaginationConfig = nextPaginationConfig
                         hasMoreData = paginatedResult.hasNextPage
                     },
@@ -339,7 +355,7 @@ class ShotHistoryViewModel @Inject constructor(
             }
         }
     }
-    
+
     /**
      * Reset pagination state when filters change.
      */
@@ -348,7 +364,7 @@ class ShotHistoryViewModel @Inject constructor(
         hasMoreData = true
         isLoadingMore = false
     }
-    
+
     /**
      * Perform memory cleanup to optimize performance.
      */
@@ -363,36 +379,36 @@ class ShotHistoryViewModel @Inject constructor(
                 grinderSettingAnalysis = null
             )
         }
-        
+
         // Limit shot history size if too large
         val currentShots = _uiState.value.shots
         if (currentShots.size > 200) {
             val trimmedShots = currentShots.take(100) // Keep only first 100 shots
             _uiState.value = _uiState.value.copy(shots = trimmedShots)
-            
+
             // Reset pagination to allow loading more
             resetPagination()
             hasMoreData = true
         }
-        
+
         // Perform general memory cleanup
         memoryOptimizer.performMemoryCleanup()
     }
-    
+
     /**
      * Get current memory usage for debugging.
      */
     fun getMemoryUsage(): String {
         return memoryOptimizer.getMemoryUsage().getFormattedUsage()
     }
-    
+
     /**
      * Check if memory usage is high.
      */
     fun isMemoryUsageHigh(): Boolean {
         return memoryOptimizer.isMemoryUsageHigh()
     }
-    
+
     override fun onCleared() {
         super.onCleared()
         // Cancel memory cleanup when ViewModel is destroyed
@@ -405,6 +421,7 @@ class ShotHistoryViewModel @Inject constructor(
  */
 data class ShotHistoryUiState(
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val shots: List<Shot> = emptyList(),
     val availableBeans: List<Bean> = emptyList(),
     val error: String? = null,
@@ -420,8 +437,8 @@ data class ShotHistoryUiState(
     val hasMorePages: Boolean = true
 ) {
     val isEmpty: Boolean
-        get() = shots.isEmpty() && !isLoading
-        
+        get() = shots.isEmpty() && !isLoading && !isRefreshing
+
     val hasAnalysisData: Boolean
         get() = overallStatistics != null || shotTrends != null || brewRatioAnalysis != null
 }

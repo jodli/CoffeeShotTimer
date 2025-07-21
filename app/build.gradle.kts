@@ -163,6 +163,9 @@ dependencies {
     // Material Icons Extended
     implementation("androidx.compose.material:material-icons-extended:1.5.4")
 
+    // Pull to refresh
+    implementation("androidx.compose.material:material:1.5.4")
+
     // Splash Screen API
     implementation("androidx.core:core-splashscreen:1.0.1")
 

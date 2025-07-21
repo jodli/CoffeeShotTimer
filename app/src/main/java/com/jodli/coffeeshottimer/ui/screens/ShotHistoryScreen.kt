@@ -6,11 +6,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +32,7 @@ import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun ShotHistoryScreen(
     onShotClick: (String) -> Unit = {},
@@ -40,6 +43,11 @@ fun ShotHistoryScreen(
     val currentFilter by viewModel.currentFilter.collectAsState()
 
     var showFilterDialog by remember { mutableStateOf(false) }
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = uiState.isRefreshing,
+        onRefresh = { viewModel.refreshDataPullToRefresh() }
+    )
 
     Column(
         modifier = Modifier
@@ -97,19 +105,6 @@ fun ShotHistoryScreen(
                         }
                     )
                 }
-
-                // Refresh button
-                IconButton(
-                    onClick = {
-                        viewModel.refreshData()
-                        viewModel.refreshAnalysis()
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "Refresh"
-                    )
-                }
             }
         }
 
@@ -127,7 +122,11 @@ fun ShotHistoryScreen(
         }
 
         // Content
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pullRefresh(pullRefreshState)
+        ) {
             when {
                 uiState.isLoading -> {
                     LoadingIndicator(
@@ -190,6 +189,13 @@ fun ShotHistoryScreen(
                     )
                 }
             }
+
+            // Pull refresh indicator
+            PullRefreshIndicator(
+                refreshing = uiState.isRefreshing,
+                state = pullRefreshState,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
         }
     }
 
