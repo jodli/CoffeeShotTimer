@@ -29,7 +29,7 @@ fun RecordShotScreen(
 ) {
     val spacing = LocalSpacing.current
     val scrollState = rememberScrollState()
-    
+
     // State from ViewModel
     val activeBeans by viewModel.activeBeans.collectAsStateWithLifecycle()
     val selectedBean by viewModel.selectedBean.collectAsStateWithLifecycle()
@@ -52,10 +52,10 @@ fun RecordShotScreen(
     val isDraftSaved by viewModel.isDraftSaved.collectAsStateWithLifecycle()
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
-    
+
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
-    
+
     // Convert timer state for UI
     val uiTimerState = when {
         timerState.isRunning -> TimerState.RUNNING
@@ -64,7 +64,7 @@ fun RecordShotScreen(
     }
     val currentTime = (timerState.elapsedTimeSeconds * 1000).toLong()
     val targetTime: Long? = null // Can be set for target extraction time if needed
-    
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,7 +77,7 @@ fun RecordShotScreen(
             title = "Record Shot",
             subtitle = "Track your espresso extraction"
         )
-        
+
         // Bean Selection with navigation to bean management
         BeanSelectionCard(
             selectedBean = selectedBean,
@@ -85,7 +85,7 @@ fun RecordShotScreen(
             onManageBeans = onNavigateToBeanManagement,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Timer Section
         TimerSection(
             currentTime = currentTime,
@@ -104,7 +104,7 @@ fun RecordShotScreen(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Weight Inputs with Sliders
         WeightSlidersSection(
             coffeeWeightIn = coffeeWeightIn,
@@ -115,7 +115,7 @@ fun RecordShotScreen(
             coffeeWeightOutError = coffeeWeightOutError,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Brew Ratio Display
         BrewRatioCard(
             brewRatio = brewRatio,
@@ -123,7 +123,7 @@ fun RecordShotScreen(
             isOptimal = isOptimalBrewRatio,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Grinder Setting with suggestions
         GrinderSettingSection(
             grinderSetting = grinderSetting,
@@ -136,14 +136,14 @@ fun RecordShotScreen(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Notes (Optional)
         NotesSection(
             notes = notes,
             onNotesChange = viewModel::updateNotes,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Save Button
         SaveShotButton(
             enabled = isFormValid,
@@ -153,7 +153,7 @@ fun RecordShotScreen(
             },
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Success message
         successMessage?.let { success ->
             Card(
@@ -174,7 +174,7 @@ fun RecordShotScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )
-                    
+
                     TextButton(
                         onClick = { viewModel.clearSuccessMessage() }
                     ) {
@@ -186,7 +186,7 @@ fun RecordShotScreen(
                 }
             }
         }
-        
+
         // Error message
         errorMessage?.let { error ->
             Card(
@@ -202,7 +202,7 @@ fun RecordShotScreen(
                 )
             }
         }
-        
+
         // Draft status indicator
         if (isDraftSaved) {
             Card(
@@ -218,11 +218,11 @@ fun RecordShotScreen(
                 )
             }
         }
-        
+
         // Bottom spacing for navigation bar
         Spacer(modifier = Modifier.height(spacing.large))
     }
-    
+
     // Bean Selection Bottom Sheet
     if (showBeanSelector) {
         BeanSelectorBottomSheet(
@@ -249,7 +249,7 @@ private fun BeanSelectionCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         onClick = onBeanSelect,
         modifier = modifier
@@ -265,7 +265,7 @@ private fun BeanSelectionCard(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -277,7 +277,7 @@ private fun BeanSelectionCard(
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     TextButton(
                         onClick = onManageBeans,
                         contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
@@ -289,30 +289,30 @@ private fun BeanSelectionCard(
                         )
                     }
                 }
-                
+
                 Text(
                     text = selectedBean?.name ?: "Tap to select bean",
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (selectedBean != null) 
-                        MaterialTheme.colorScheme.onSurface 
-                    else 
+                    color = if (selectedBean != null)
+                        MaterialTheme.colorScheme.onSurface
+                    else
                         MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = if (selectedBean != null) FontWeight.Medium else FontWeight.Normal
                 )
-                
+
                 selectedBean?.let { bean ->
                     val daysSinceRoast = bean.daysSinceRoast()
                     Text(
                         text = "$daysSinceRoast days since roast",
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (bean.isFresh()) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
+                        color = if (bean.isFresh())
+                            MaterialTheme.colorScheme.primary
+                        else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
-            
+
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = "Select bean",
@@ -332,33 +332,30 @@ private fun TimerSection(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.large)
+            verticalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
             Text(
                 text = "Extraction Timer",
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
-            // Large timer display
-            CircularTimer(
-                currentTime = currentTime,
-                targetTime = targetTime,
-                isRunning = timerState == TimerState.RUNNING,
-                modifier = Modifier.size(200.dp),
-                showColorCoding = true
-            )
-            
-            // Timer controls
+
+            // Enhanced clickable timer - entire timer is now the start/stop button!
+            // This dramatically improves usability with a ~200dp touch target vs 80dp
             TimerControls(
                 isRunning = timerState == TimerState.RUNNING,
                 onStartPause = onStartPause,
                 onReset = onReset,
-                showReset = currentTime > 0L
+                currentTime = currentTime,
+                targetTime = targetTime,
+                showReset = currentTime > 0L,
+                useClickableTimer = true, // Use the new clickable timer approach
+                showColorCoding = true,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
@@ -374,7 +371,7 @@ private fun BrewRatioCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -386,26 +383,26 @@ private fun BrewRatioCard(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             Text(
                 text = formattedBrewRatio ?: "--",
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = if (isOptimal) 
-                    MaterialTheme.colorScheme.primary 
-                else 
+                color = if (isOptimal)
+                    MaterialTheme.colorScheme.primary
+                else
                     MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.End
             )
         }
-        
+
         brewRatio?.let {
             val status = when {
                 it < 1.5 -> "Strong extraction"
                 it > 3.0 -> "Weak extraction"
                 else -> "Typical espresso range"
             }
-            
+
             Text(
                 text = status,
                 style = MaterialTheme.typography.bodySmall,
@@ -428,7 +425,7 @@ private fun GrinderSettingSection(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         // Show suggestion button if available and different from current setting
         if (suggestedSetting != null && suggestedSetting != grinderSetting && grinderSetting.isEmpty()) {
@@ -449,7 +446,7 @@ private fun GrinderSettingSection(
             }
             Spacer(modifier = Modifier.height(spacing.small))
         }
-        
+
         // Grinder Setting Slider
         GrinderSettingSlider(
             value = grinderSetting,
@@ -469,16 +466,16 @@ private fun NotesSection(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Text(
             text = "Notes (Optional)",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         OutlinedTextField(
             value = notes,
             onValueChange = onNotesChange,
@@ -516,7 +513,7 @@ private fun BeanSelectorBottomSheet(
 ) {
     val bottomSheetState = rememberModalBottomSheetState()
     val spacing = LocalSpacing.current
-    
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = bottomSheetState
@@ -535,7 +532,7 @@ private fun BeanSelectorBottomSheet(
                     text = "Select Bean",
                     style = MaterialTheme.typography.headlineSmall
                 )
-                
+
                 TextButton(
                     onClick = onManageBeans
                 ) {
@@ -546,9 +543,9 @@ private fun BeanSelectorBottomSheet(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             if (beans.isEmpty()) {
                 EmptyState(
                     icon = Icons.Default.Home,
@@ -568,7 +565,7 @@ private fun BeanSelectorBottomSheet(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.large))
         }
     }

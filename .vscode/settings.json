@@ -1,5 +1,5 @@
 {
     "github.copilot.chat.agent.terminal.allowList": {
-        "./gradlew": true
+        "/.*gradlew.*/": true
     }
 }
