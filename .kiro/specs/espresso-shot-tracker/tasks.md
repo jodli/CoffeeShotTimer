@@ -166,3 +166,14 @@
   - Create app store listing materials
   - Perform final security and privacy review
   - _Requirements: 6.1, 7.1_
+
+- [ ] 13. Replace refresh button with pull-to-refresh gesture
+
+
+  - Remove the refresh button from Shot History screen toolbar
+  - Implement SwipeRefresh composable around the shot history list
+  - Add pull-to-refresh functionality that reloads shot data
+  - Ensure refresh state is properly managed in ShotHistoryViewModel
+  - Add visual feedback during refresh operation
+  - Test pull-to-refresh gesture works smoothly on different devices
+  - _Requirements: 7.1, 7.4_
