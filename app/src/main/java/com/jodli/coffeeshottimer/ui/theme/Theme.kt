@@ -29,44 +29,48 @@ data class Spacing(
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }
 
-private val DarkColorScheme = darkColorScheme(
-    primary = LightCoffee,
-    onPrimary = DarkEspresso,
-    primaryContainer = RichBrown,
-    onPrimaryContainer = WarmCream,
-    secondary = WarmCream,
-    onSecondary = DeepBrown,
-    secondaryContainer = DeepBrown,
-    onSecondaryContainer = WarmCream,
-    tertiary = GoldenAccent,
-    onTertiary = DarkEspresso,
-    background = DarkEspresso,
-    onBackground = WarmCream,
-    surface = DeepBrown,
-    onSurface = WarmCream,
-    surfaceVariant = RichBrown,
-    onSurfaceVariant = LightCream,
+// Light coffee theme - warm and creamy like the launcher icon
+private val LightColorScheme = lightColorScheme(
+    primary = WarmCaramel,
+    onPrimary = Color.White,
+    primaryContainer = SoftBeige,
+    onPrimaryContainer = RichEspresso,
+    secondary = SoftTeal,
+    onSecondary = Color.White,
+    secondaryContainer = LightCream,
+    onSecondaryContainer = MediumCoffee,
+    tertiary = TealAccent,
+    onTertiary = Color.White,
+    background = CreamyBeige,     // Creamy beige background like icon
+    onBackground = RichEspresso,  // Dark brown text
+    surface = LightCream,         // Light cream cards
+    onSurface = RichEspresso,     // Dark brown text on cards
+    surfaceVariant = SoftBeige,   // Soft beige variants
+    onSurfaceVariant = MediumCoffee,
+    outline = MediumCoffee,       // Brown outlines
     error = ErrorRed,
     onError = Color.White
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = CoffeeBrown,
-    onPrimary = CreamWhite,
-    primaryContainer = LightCream,
-    onPrimaryContainer = EspressoBlack,
-    secondary = WarmBrown,
-    onSecondary = CreamWhite,
-    secondaryContainer = LightCream,
-    onSecondaryContainer = MediumBrown,
-    tertiary = GoldenAccent,
-    onTertiary = EspressoBlack,
-    background = CreamWhite,
-    onBackground = EspressoBlack,
-    surface = Color.White,
-    onSurface = EspressoBlack,
-    surfaceVariant = LightCream,
-    onSurfaceVariant = MediumBrown,
+// Dark coffee theme - rich espresso tones with warm accents
+private val DarkColorScheme = darkColorScheme(
+    primary = LightCaramel,       // Lighter caramel for visibility
+    onPrimary = DeepBrown,
+    primaryContainer = MediumCoffee,
+    onPrimaryContainer = DarkCream,
+    secondary = WarmTeal,         // Warm teal accent
+    onSecondary = DeepBrown,
+    secondaryContainer = RichEspresso,
+    onSecondaryContainer = DarkCream,
+    tertiary = TealAccent,
+    onTertiary = DeepBrown,
+    background = DeepBrown,       // Deep coffee brown background
+    onBackground = DarkCream,     // Cream text on dark background
+    surface = RichEspresso,       // Rich espresso cards
+    onSurface = DarkCream,        // Cream text on dark cards
+    surfaceVariant = MediumCoffee, // Medium coffee variants
+    onSurfaceVariant = LightCaramel,
+    outline = WarmAmber,          // Warm amber outlines
     error = ErrorRed,
     onError = Color.White
 )
@@ -74,8 +78,8 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun CoffeeShotTimerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    // Dynamic color disabled to use custom launcher-inspired colors
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

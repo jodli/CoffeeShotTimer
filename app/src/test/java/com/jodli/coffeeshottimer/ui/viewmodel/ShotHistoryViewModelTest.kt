@@ -1,6 +1,7 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotStatisticsUseCase
@@ -19,11 +20,9 @@ import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.Assert.*
 import java.time.LocalDate
 import java.time.LocalDateTime
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ShotHistoryViewModelTest {
@@ -32,6 +31,7 @@ class ShotHistoryViewModelTest {
     private val getShotHistoryUseCase = mockk<GetShotHistoryUseCase>()
     private val getActiveBeansUseCase = mockk<GetActiveBeansUseCase>()
     private val getShotStatisticsUseCase = mockk<GetShotStatisticsUseCase>()
+    private val memoryOptimizer = mockk<MemoryOptimizer>(relaxed = true)
     
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -41,13 +41,21 @@ class ShotHistoryViewModelTest {
         
         // Setup default mock responses
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(emptyList()))
-        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(emptyList()))
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
+        )
+        coEvery { getShotHistoryUseCase.getFilteredShotsPaginated(any(), any(), any(), any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
+        )
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(OverallStatistics.empty())
         coEvery { getShotStatisticsUseCase.getShotTrends(any(), any()) } returns Result.success(ShotTrends.empty())
         coEvery { getShotStatisticsUseCase.getBrewRatioAnalysis(any()) } returns Result.success(BrewRatioAnalysis.empty())
         coEvery { getShotStatisticsUseCase.getExtractionTimeAnalysis(any()) } returns Result.success(ExtractionTimeAnalysis.empty())
+        coEvery { getShotStatisticsUseCase.getGrinderSettingAnalysis(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis.empty()
+        )
         
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
     }
 
     @After
@@ -142,10 +150,10 @@ class ShotHistoryViewModelTest {
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(testBeans))
         
         // Recreate viewModel to pick up the new mock
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
         
         // Wait for initial data load
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         val beanName = viewModel.getBeanName("bean1")
         assertEquals("Ethiopian Yirgacheffe", beanName)
@@ -235,7 +243,7 @@ class ShotHistoryViewModelTest {
         viewModel.toggleAnalysisView()
         
         // Wait for async operations
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
@@ -262,7 +270,7 @@ class ShotHistoryViewModelTest {
         assertTrue(viewModel.uiState.value.analysisLoading)
         
         // Wait for completion
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         // Should not be loading anymore
         assertFalse(viewModel.uiState.value.analysisLoading)
@@ -271,13 +279,15 @@ class ShotHistoryViewModelTest {
     @Test
     fun `analysis error is handled correctly`() = runTest {
         val errorMessage = "Failed to load statistics"
-        coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.failure(Exception(errorMessage))
+        
+        // Mock the first method to throw an exception (not just return Result.failure)
+        coEvery { getShotStatisticsUseCase.getOverallStatistics() } throws Exception(errorMessage)
         
         // Toggle analysis view
         viewModel.toggleAnalysisView()
         
         // Wait for async operations
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
@@ -304,11 +314,11 @@ class ShotHistoryViewModelTest {
         
         // First show analysis
         viewModel.toggleAnalysisView()
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         // Refresh analysis
         viewModel.refreshAnalysis()
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         val uiState = viewModel.uiState.value
         assertEquals(mockStats, uiState.overallStatistics)
@@ -321,7 +331,7 @@ class ShotHistoryViewModelTest {
         
         // Refresh analysis (should do nothing)
         viewModel.refreshAnalysis()
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         val uiState = viewModel.uiState.value
         assertFalse(uiState.showAnalysis)
@@ -335,7 +345,7 @@ class ShotHistoryViewModelTest {
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockStats)
         
         viewModel.toggleAnalysisView()
-        testScheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceUntilIdle()
         
         assertTrue(viewModel.uiState.value.hasAnalysisData)
     }
