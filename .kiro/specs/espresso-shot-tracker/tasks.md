@@ -147,6 +147,7 @@
   - _Requirements: 6.1, 7.1_
 
 - [ ] 13. Replace refresh button with pull-to-refresh gesture
+
   - Remove the refresh button from Shot History screen toolbar
   - Implement SwipeRefresh composable around the shot history list
   - Add pull-to-refresh functionality that reloads shot data
@@ -156,11 +157,6 @@
   - _Requirements: 7.1, 7.4_
 
 - [x] 14. Implement slider for weight measurements
-
-
-
-
-
   - Create a custom slider component for weight inputs with whole gram increments
   - Replace text input fields with sliders for coffee weight in/out in RecordShotScreen
   - Add visual indicators for typical weight ranges
@@ -170,8 +166,15 @@
   - Test slider usability on different screen sizes
   - _Requirements: 7.1, 7.3_
 
-- [ ] 15. Implement slider for grinder settings
-  - Create a custom slider component for grinder settings with 0.5 increment steps
+- [x] 15. Implement slider for grinder settings
+
+
+
+
+
+
+
+  - Create a custom slider component for grinder settings with 0.5 increment steps (when possible refactor and reuse logic in WeightSliderComponents.kt)
   - Replace text input field with slider for grinder setting in RecordShotScreen
   - Display numeric value alongside slider
   - Add visual indicators for previous successful settings

@@ -51,6 +51,7 @@ fun RecordShotScreen(
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
     val isDraftSaved by viewModel.isDraftSaved.collectAsStateWithLifecycle()
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
+    val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
     
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
@@ -129,6 +130,7 @@ fun RecordShotScreen(
             onGrinderSettingChange = viewModel::updateGrinderSetting,
             grinderSettingError = grinderSettingError,
             suggestedSetting = suggestedGrinderSetting,
+            previousSuccessfulSettings = previousSuccessfulSettings,
             onUseSuggestion = { suggestion ->
                 viewModel.updateGrinderSetting(suggestion)
             },
@@ -421,68 +423,42 @@ private fun GrinderSettingSection(
     onGrinderSettingChange: (String) -> Unit,
     grinderSettingError: String?,
     suggestedSetting: String?,
+    previousSuccessfulSettings: List<String>,
     onUseSuggestion: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     
     CoffeeCard(modifier = modifier) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Grinder Setting",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            // Show suggestion button if available and different from current setting
-            if (suggestedSetting != null && suggestedSetting != grinderSetting && grinderSetting.isEmpty()) {
+        // Show suggestion button if available and different from current setting
+        if (suggestedSetting != null && suggestedSetting != grinderSetting && grinderSetting.isEmpty()) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
                 TextButton(
                     onClick = { onUseSuggestion(suggestedSetting) },
                     contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "Use: $suggestedSetting",
+                        text = "Use Suggested: $suggestedSetting",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(spacing.small))
         }
         
-        Spacer(modifier = Modifier.height(spacing.medium))
-        
-        OutlinedTextField(
+        // Grinder Setting Slider
+        GrinderSettingSlider(
             value = grinderSetting,
             onValueChange = onGrinderSettingChange,
-            label = { Text("Grinder Setting") },
-            placeholder = { Text(suggestedSetting ?: "e.g., 15, Fine, 2.5") },
-            isError = grinderSettingError != null,
-            singleLine = true,
+            errorMessage = grinderSettingError,
+            suggestedSetting = suggestedSetting,
+            previousSuccessfulSettings = previousSuccessfulSettings,
             modifier = Modifier.fillMaxWidth()
         )
-        
-        // Show suggestion hint if available
-        if (suggestedSetting != null && grinderSetting.isEmpty()) {
-            Text(
-                text = "Suggested based on last use with this bean: $suggestedSetting",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(start = spacing.medium, top = spacing.extraSmall)
-            )
-        }
-        
-        grinderSettingError?.let { error ->
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(start = spacing.medium, top = spacing.extraSmall)
-            )
-        }
     }
 }
 

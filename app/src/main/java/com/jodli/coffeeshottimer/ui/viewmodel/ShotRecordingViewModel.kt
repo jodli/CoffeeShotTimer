@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import android.content.Context
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.ui.validation.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,6 +43,7 @@ data class ShotDraft(
 class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
     private val beanRepository: BeanRepository,
+    private val shotRepository: ShotRepository,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
     
@@ -54,6 +56,9 @@ class ShotRecordingViewModel @Inject constructor(
     
     private val _suggestedGrinderSetting = MutableStateFlow<String?>(null)
     val suggestedGrinderSetting: StateFlow<String?> = _suggestedGrinderSetting.asStateFlow()
+    
+    private val _previousSuccessfulSettings = MutableStateFlow<List<String>>(emptyList())
+    val previousSuccessfulSettings: StateFlow<List<String>> = _previousSuccessfulSettings.asStateFlow()
     
     // Form state
     private val _coffeeWeightIn = MutableStateFlow("")
@@ -237,9 +242,39 @@ class ShotRecordingViewModel @Inject constructor(
                     _suggestedGrinderSetting.value = null
                 }
             )
+            
+            // Load previous successful grinder settings for visual indicators
+            loadPreviousSuccessfulSettings(bean.id)
         }
         
         validateForm()
+    }
+    
+    /**
+     * Load previous successful grinder settings for a bean to show as visual indicators.
+     */
+    private suspend fun loadPreviousSuccessfulSettings(beanId: String) {
+        shotRepository.getShotsByBean(beanId).collect { result ->
+            result.fold(
+                onSuccess = { shots ->
+                    // Get unique grinder settings from recent successful shots (last 10)
+                    // Consider shots with brew ratios in typical range as "successful"
+                    val successfulSettings = shots
+                        .filter { shot -> 
+                            shot.brewRatio in 1.5..3.0 // Typical espresso range
+                        }
+                        .take(10) // Last 10 shots
+                        .map { it.grinderSetting }
+                        .distinct()
+                        .take(3) // Show max 3 previous settings
+                    
+                    _previousSuccessfulSettings.value = successfulSettings
+                },
+                onFailure = {
+                    _previousSuccessfulSettings.value = emptyList()
+                }
+            )
+        }
     }
     
     /**

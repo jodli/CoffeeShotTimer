@@ -330,6 +330,283 @@ fun CoffeeWeightOutSlider(
 }
 
 /**
+ * Specialized slider for grinder settings with 0.5 increment steps.
+ */
+@Composable
+fun GrinderSettingSlider(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    errorMessage: String? = null,
+    enabled: Boolean = true,
+    suggestedSetting: String? = null,
+    previousSuccessfulSettings: List<String> = emptyList()
+) {
+    val spacing = LocalSpacing.current
+    val hapticFeedback = LocalHapticFeedback.current
+    
+    // Convert string value to float, default to 5.0 if invalid
+    val currentValue = value.toFloatOrNull()?.coerceIn(0.5f, 20.0f) ?: 5.0f
+    
+    // Ensure the value follows 0.5 increment steps
+    val displayValue = (currentValue * 2).roundToInt() / 2.0f
+    
+    // Track previous value for haptic feedback
+    var previousValue by remember { mutableStateOf(currentValue) }
+    
+    Column(modifier = modifier) {
+        // Header with label and current value
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Grinder Setting",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            
+            // Current value display
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = if (enabled) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant
+                ),
+                modifier = Modifier.padding(start = spacing.small)
+            ) {
+                Text(
+                    text = if (displayValue == displayValue.toInt().toFloat()) {
+                        "${displayValue.toInt()}"
+                    } else {
+                        "%.1f".format(displayValue)
+                    },
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(spacing.medium))
+        
+        // Grinder setting range indicators
+        GrinderSettingRangeIndicator(
+            currentValue = displayValue,
+            minSetting = 0.5f,
+            maxSetting = 20.0f,
+            suggestedSetting = suggestedSetting?.toFloatOrNull(),
+            previousSuccessfulSettings = previousSuccessfulSettings.mapNotNull { it.toFloatOrNull() },
+            enabled = enabled
+        )
+        
+        Spacer(modifier = Modifier.height(spacing.small))
+        
+        // Slider with 0.5 increments
+        Slider(
+            value = displayValue,
+            onValueChange = { newValue ->
+                // Round to nearest 0.5 increment
+                val roundedValue = (newValue * 2).roundToInt() / 2.0f
+                
+                // Provide haptic feedback when value changes
+                if (roundedValue != previousValue) {
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    previousValue = roundedValue
+                }
+                
+                // Format output based on whether it's a whole number or has decimal
+                val formattedValue = if (roundedValue == roundedValue.toInt().toFloat()) {
+                    roundedValue.toInt().toString()
+                } else {
+                    "%.1f".format(roundedValue)
+                }
+                
+                onValueChange(formattedValue)
+            },
+            valueRange = 0.5f..20.0f,
+            steps = 39, // (20.0 - 0.5) / 0.5 - 1 = 39 steps for 0.5 increments
+            enabled = enabled,
+            colors = SliderDefaults.colors(
+                thumbColor = MaterialTheme.colorScheme.primary,
+                activeTrackColor = MaterialTheme.colorScheme.primary,
+                inactiveTrackColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
+        
+        // Range labels
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "0.5",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = "20.0",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        
+        // Suggestion hint
+        if (suggestedSetting != null && value.isEmpty()) {
+            Spacer(modifier = Modifier.height(spacing.extraSmall))
+            Text(
+                text = "Suggested: $suggestedSetting (based on last use with this bean)",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = spacing.medium)
+            )
+        }
+        
+        // Error message
+        errorMessage?.let { error ->
+            Spacer(modifier = Modifier.height(spacing.extraSmall))
+            Text(
+                text = error,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = spacing.medium)
+            )
+        }
+    }
+}
+
+/**
+ * Visual indicator showing grinder setting ranges with current value position and previous successful settings.
+ */
+@Composable
+private fun GrinderSettingRangeIndicator(
+    currentValue: Float,
+    minSetting: Float,
+    maxSetting: Float,
+    suggestedSetting: Float?,
+    previousSuccessfulSettings: List<Float>,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(32.dp)
+    ) {
+        // Background track
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        
+        BoxWithConstraints {
+            val totalWidth = maxWidth
+            
+            // Previous successful settings indicators
+            previousSuccessfulSettings.take(3).forEach { setting ->
+                val settingPercent = (setting - minSetting) / (maxSetting - minSetting)
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .offset(
+                            x = (totalWidth * settingPercent) - 3.dp,
+                            y = 13.dp
+                        )
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(
+                            if (enabled) 
+                                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f)
+                            else 
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                        )
+                )
+            }
+            
+            // Suggested setting indicator
+            suggestedSetting?.let { suggestion ->
+                val suggestionPercent = (suggestion - minSetting) / (maxSetting - minSetting)
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .offset(
+                            x = (totalWidth * suggestionPercent) - 4.dp,
+                            y = 12.dp
+                        )
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(
+                            if (enabled) 
+                                MaterialTheme.colorScheme.secondary
+                            else 
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                )
+            }
+            
+            // Current value indicator
+            val currentPercent = (currentValue - minSetting) / (maxSetting - minSetting)
+            Box(
+                modifier = Modifier
+                    .size(10.dp)
+                    .offset(
+                        x = (totalWidth * currentPercent) - 5.dp,
+                        y = 11.dp
+                    )
+                    .clip(RoundedCornerShape(5.dp))
+                    .background(
+                        if (enabled) 
+                            MaterialTheme.colorScheme.primary
+                        else 
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+            )
+        }
+        
+        // Legend
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 36.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (previousSuccessfulSettings.isNotEmpty()) {
+                Text(
+                    text = "• Previous successful",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontSize = 10.sp
+                )
+            }
+            
+            if (suggestedSetting != null) {
+                Text(
+                    text = "■ Suggested",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 10.sp,
+                    textAlign = TextAlign.End
+                )
+            }
+        }
+    }
+}
+
+/**
  * Weight inputs section using sliders instead of text fields.
  */
 @Composable
