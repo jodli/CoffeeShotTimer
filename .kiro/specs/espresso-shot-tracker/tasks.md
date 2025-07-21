@@ -116,16 +116,7 @@
 
 - [x] 11. Implement error handling and data validation
 
-
-
-
 - [x] 11.1 Add comprehensive input validation
-
-
-
-
-
-
   - Implement real-time validation for all input fields
   - Add range validation for weights and extraction times
   - Create user-friendly error messages and feedback
@@ -134,16 +125,7 @@
 
 - [x] 12. Optimize performance and finalize app
 
-
-
-
-
-
-
-
 - [x] 12.1 Implement performance optimizations
-
-
   - Add lazy loading for shot history with large datasets
   - Optimize database queries with proper indexing
   - Implement efficient UI rendering and state management
@@ -151,9 +133,6 @@
   - _Requirements: 2.1, 6.3, 7.1_
 
 - [x] 12.2 Final testing and polish
-
-
-
   - Conduct end-to-end testing of all user workflows
   - Test app performance with large datasets
   - Verify offline functionality works completely
@@ -168,8 +147,6 @@
   - _Requirements: 6.1, 7.1_
 
 - [ ] 13. Replace refresh button with pull-to-refresh gesture
-
-
   - Remove the refresh button from Shot History screen toolbar
   - Implement SwipeRefresh composable around the shot history list
   - Add pull-to-refresh functionality that reloads shot data
@@ -177,3 +154,29 @@
   - Add visual feedback during refresh operation
   - Test pull-to-refresh gesture works smoothly on different devices
   - _Requirements: 7.1, 7.4_
+
+- [x] 14. Implement slider for weight measurements
+
+
+
+
+
+  - Create a custom slider component for weight inputs with whole gram increments
+  - Replace text input fields with sliders for coffee weight in/out in RecordShotScreen
+  - Add visual indicators for typical weight ranges
+  - Ensure slider values update the ViewModel state correctly
+  - Maintain validation rules for weight inputs
+  - Add haptic feedback for slider value changes
+  - Test slider usability on different screen sizes
+  - _Requirements: 7.1, 7.3_
+
+- [ ] 15. Implement slider for grinder settings
+  - Create a custom slider component for grinder settings with 0.5 increment steps
+  - Replace text input field with slider for grinder setting in RecordShotScreen
+  - Display numeric value alongside slider
+  - Add visual indicators for previous successful settings
+  - Ensure slider values update the ViewModel state correctly
+  - Maintain validation rules for grinder settings
+  - Add haptic feedback for slider value changes
+  - Test slider usability on different screen sizes
+  - _Requirements: 4.2, 7.1, 7.4_

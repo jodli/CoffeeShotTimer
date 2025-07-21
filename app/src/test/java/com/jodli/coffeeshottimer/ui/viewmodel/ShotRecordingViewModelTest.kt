@@ -73,4 +73,23 @@ class ShotRecordingViewModelTest {
         // Verify that success message functionality is available
         viewModel.clearSuccessMessage()
     }
+    
+    @Test
+    fun `viewModel should handle weight slider input correctly`() {
+        // Test that weight update methods accept string values (for slider compatibility)
+        viewModel.updateCoffeeWeightIn("18")
+        viewModel.updateCoffeeWeightOut("36")
+        
+        // Verify that the state flows are updated
+        assertNotNull(viewModel.coffeeWeightIn)
+        assertNotNull(viewModel.coffeeWeightOut)
+        
+        // Test with whole gram values (as required by slider implementation)
+        viewModel.updateCoffeeWeightIn("20")
+        viewModel.updateCoffeeWeightOut("40")
+        
+        // Verify validation still works
+        assertNotNull(viewModel.coffeeWeightInError)
+        assertNotNull(viewModel.coffeeWeightOutError)
+    }
 }

@@ -38,9 +38,9 @@ The application follows the MVVM (Model-View-ViewModel) architecture pattern wit
 - **Purpose**: Primary interface for recording new espresso shots
 - **Key Features**:
   - Bean selection dropdown with current bean highlighted
-  - Weight input fields (coffee in/out) with decimal precision
+  - Weight slider controls (coffee in/out) with whole gram precision
+  - Grinder setting slider with 0.5 increment steps and single decimal precision
   - Integrated timer with large start/stop buttons
-  - Grinder setting input (numeric or text)
   - Auto-calculated brew ratio display
   - Quick save functionality
 
@@ -87,7 +87,7 @@ Modal Screens
 
 **Shot Recording Interface**:
 - Large, prominent timer display (MM:SS format)
-- Numeric input fields with custom keyboard
+- Slider controls for weight inputs (whole grams) and grinder settings (0.5 increments)
 - Bean selector with visual indication of current selection
 - Auto-save draft functionality to prevent data loss
 - Immediate visual feedback for calculated ratios
@@ -112,7 +112,7 @@ data class Bean(
     val roastDate: LocalDate,
     val notes: String = "",
     val isActive: Boolean = true,
-    val lastGrinderSetting: String? = null,
+    val lastGrinderSetting: Double? = null,
     val createdAt: LocalDateTime = LocalDateTime.now()
 )
 ```
@@ -134,7 +134,7 @@ data class Shot(
     val coffeeWeightIn: Double, // grams
     val coffeeWeightOut: Double, // grams
     val extractionTimeSeconds: Int,
-    val grinderSetting: String,
+    val grinderSetting: Double, // 0.5 increment precision
     val brewRatio: Double, // calculated field
     val notes: String = "",
     val timestamp: LocalDateTime = LocalDateTime.now()
@@ -156,7 +156,7 @@ CREATE TABLE beans (
     roast_date TEXT NOT NULL,
     notes TEXT DEFAULT '',
     is_active INTEGER DEFAULT 1,
-    last_grinder_setting TEXT,
+    last_grinder_setting REAL,
     created_at TEXT NOT NULL
 );
 
@@ -167,7 +167,7 @@ CREATE TABLE shots (
     coffee_weight_in REAL NOT NULL,
     coffee_weight_out REAL NOT NULL,
     extraction_time_seconds INTEGER NOT NULL,
-    grinder_setting TEXT NOT NULL,
+    grinder_setting REAL NOT NULL,
     brew_ratio REAL NOT NULL,
     notes TEXT DEFAULT '',
     timestamp TEXT NOT NULL,
@@ -185,10 +185,10 @@ CREATE INDEX idx_beans_active ON beans(is_active);
 ### Validation Rules
 
 #### Shot Recording Validation
-- Coffee weight in: 0.1g - 50.0g range
-- Coffee weight out: 0.1g - 100.0g range
+- Coffee weight in: 1g - 50g range (whole grams via slider)
+- Coffee weight out: 1g - 100g range (whole grams via slider)
 - Extraction time: 5 - 120 seconds
-- Grinder setting: Required, max 50 characters
+- Grinder setting: 0.5 - 20.0 range with 0.5 increments (via slider)
 - Bean selection: Must be valid active bean
 
 #### Bean Management Validation

@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -13,7 +12,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -106,8 +104,8 @@ fun RecordShotScreen(
             modifier = Modifier.fillMaxWidth()
         )
         
-        // Weight Inputs
-        WeightInputsSection(
+        // Weight Inputs with Sliders
+        WeightSlidersSection(
             coffeeWeightIn = coffeeWeightIn,
             onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
             coffeeWeightInError = coffeeWeightInError,
@@ -364,95 +362,7 @@ private fun TimerSection(
     }
 }
 
-@Composable
-private fun WeightInputsSection(
-    coffeeWeightIn: String,
-    onCoffeeWeightInChange: (String) -> Unit,
-    coffeeWeightInError: String?,
-    coffeeWeightOut: String,
-    onCoffeeWeightOutChange: (String) -> Unit,
-    coffeeWeightOutError: String?,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    
-    CoffeeCard(modifier = modifier) {
-        Text(
-            text = "Weight Measurements",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        
-        Spacer(modifier = Modifier.height(spacing.medium))
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            // Coffee Weight In
-            Column(modifier = Modifier.weight(1f)) {
-                OutlinedTextField(
-                    value = coffeeWeightIn,
-                    onValueChange = onCoffeeWeightInChange,
-                    label = { Text("Coffee In (g)") },
-                    placeholder = { Text("18.0") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal
-                    ),
-                    isError = coffeeWeightInError != null,
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                
-                coffeeWeightInError?.let { error ->
-                    Text(
-                        text = error,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = spacing.medium, top = spacing.extraSmall)
-                    )
-                }
-            }
-            
-            // Coffee Weight Out
-            Column(modifier = Modifier.weight(1f)) {
-                OutlinedTextField(
-                    value = coffeeWeightOut,
-                    onValueChange = onCoffeeWeightOutChange,
-                    label = { Text("Coffee Out (g)") },
-                    placeholder = { Text("36.0") },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = null
-                        )
-                    },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Decimal
-                    ),
-                    isError = coffeeWeightOutError != null,
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                
-                coffeeWeightOutError?.let { error ->
-                    Text(
-                        text = error,
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(start = spacing.medium, top = spacing.extraSmall)
-                    )
-                }
-            }
-        }
-    }
-}
+
 
 @Composable
 private fun BrewRatioCard(

@@ -49,7 +49,7 @@ An Android mobile application designed for home barista enthusiasts to track and
 #### Acceptance Criteria
 
 1. WHEN the user records a shot THEN the system SHALL require grinder setting input as a mandatory field
-2. WHEN the user enters grinder settings THEN the system SHALL support both numeric and text-based grinder descriptions
+2. WHEN the user enters grinder settings THEN the system SHALL support numeric values with 0.5 increment precision via slider control
 3. WHEN the user views shot data THEN the system SHALL clearly display the grinder setting used for each shot
 4. WHEN the user switches to a previously used bean THEN the system SHALL suggest the last successful grinder setting for that bean
 
@@ -81,5 +81,6 @@ An Android mobile application designed for home barista enthusiasts to track and
 
 1. WHEN the user interacts with the app THEN the system SHALL provide large, touch-friendly input controls
 2. WHEN the user is recording a shot THEN the system SHALL minimize the number of taps required to save data
-3. WHEN the user needs to enter weights THEN the system SHALL provide numeric keypad input with decimal precision
-4. WHEN the user is timing extraction THEN the system SHALL provide prominent start/stop timer controls
+3. WHEN the user needs to enter coffee weights THEN the system SHALL provide slider controls with whole gram increments (no decimal places)
+4. WHEN the user needs to enter grinder settings THEN the system SHALL provide slider controls with 0.5 increment steps and single decimal precision
+5. WHEN the user is timing extraction THEN the system SHALL provide prominent start/stop timer controls
