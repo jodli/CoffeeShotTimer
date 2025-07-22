@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -190,7 +191,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     private fun startTimerUpdates() {
         timerUpdateJob = viewModelScope.launch {
-            while (true) {
+            while (isActive) {
                 delay(100L) // Update every 100ms for smooth display
                 if (timerState.value.isRunning) {
                     recordShotUseCase.updateTimer()
@@ -438,13 +439,13 @@ class ShotRecordingViewModel @Inject constructor(
             
             result.fold(
                 onSuccess = { shot ->
-                    // Clear draft after successful recording
-                    clearDraft()
-                    
                     // Show success feedback
                     val brewRatio = shot.getFormattedBrewRatio()
                     val extractionTime = shot.getFormattedExtractionTime()
                     _successMessage.value = "Shot recorded successfully! Brew ratio: $brewRatio, Time: $extractionTime"
+                    
+                    // Clear draft after successful recording
+                    clearDraft()
                     
                     // Clear form after successful recording
                     clearForm()
@@ -517,7 +518,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     private fun startAutoSaveDraft() {
         autoSaveDraftJob = viewModelScope.launch {
-            while (true) {
+            while (isActive) {
                 delay(30000L) // Auto-save every 30 seconds
                 saveDraftIfNeeded()
             }

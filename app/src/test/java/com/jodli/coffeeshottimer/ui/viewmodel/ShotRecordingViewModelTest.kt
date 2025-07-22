@@ -3,6 +3,7 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ class ShotRecordingViewModelTest {
     
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var beanRepository: BeanRepository
+    private lateinit var shotRepository: ShotRepository
     private lateinit var context: Context
     private lateinit var viewModel: ShotRecordingViewModel
     
@@ -39,10 +41,11 @@ class ShotRecordingViewModelTest {
         // Create mock dependencies
         recordShotUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
+        shotRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
         
         // Create ViewModel with injected dependencies
-        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository, context)
+        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository, shotRepository, context)
     }
     
     @After

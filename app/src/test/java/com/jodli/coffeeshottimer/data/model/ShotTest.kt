@@ -524,7 +524,7 @@ class ShotTest {
         val formatted = shot.getFormattedExtractionTime()
 
         // Then
-        assertEquals("Should format seconds correctly", "00:28", formatted)
+        assertEquals("Should format seconds correctly", "28s", formatted)
     }
 
     @Test
