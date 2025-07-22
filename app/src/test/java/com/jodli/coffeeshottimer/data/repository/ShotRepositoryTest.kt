@@ -24,7 +24,6 @@ import java.time.LocalDateTime
  * Tests repository operations with real database interactions.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
 class ShotRepositoryTest {
     
     @get:Rule

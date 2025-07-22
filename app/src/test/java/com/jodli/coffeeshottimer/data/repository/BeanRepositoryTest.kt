@@ -22,7 +22,6 @@ import java.time.LocalDate
  * Tests repository operations with real database interactions.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
 class BeanRepositoryTest {
     
     @get:Rule

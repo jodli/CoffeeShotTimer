@@ -24,7 +24,6 @@ import java.time.LocalDateTime
  * Tests all CRUD operations and queries for Shot entity.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class ShotDaoTest {
     
     @get:Rule
