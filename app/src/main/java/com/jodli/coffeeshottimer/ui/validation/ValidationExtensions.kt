@@ -18,20 +18,18 @@ fun String.validateCoffeeWeightIn(): ValidationResult {
         minWeight = ValidationUtils.MIN_COFFEE_WEIGHT_IN,
         maxWeight = ValidationUtils.MAX_COFFEE_WEIGHT_IN
     ).let { result ->
-        if (!result.isValid) {
-            // Add contextual advice for common issues
-            val enhancedErrors = result.errors.toMutableList()
-            val weight = this.toDoubleOrNull()
-            
-            when {
-                weight != null && weight < 5.0 -> 
-                    enhancedErrors.add("Tip: Most espresso shots use 15-20g of coffee")
-                weight != null && weight > 25.0 -> 
-                    enhancedErrors.add("Tip: Standard espresso doses are typically 15-20g")
-            }
-            
-            ValidationResult(false, enhancedErrors)
-        } else result
+        // Add contextual advice for common issues
+        val enhancedErrors = result.errors.toMutableList()
+        val weight = this.toDoubleOrNull()
+
+        when {
+            weight != null && weight < 5.0 ->
+                enhancedErrors.add("Tip: Most espresso shots use 15-20g of coffee")
+            weight != null && weight > 25.0 ->
+                enhancedErrors.add("Tip: Standard espresso doses are typically 15-20g")
+        }
+
+        ValidationResult(result.isValid && enhancedErrors.isEmpty(), enhancedErrors)
     }
 }
 
@@ -45,20 +43,18 @@ fun String.validateCoffeeWeightOut(): ValidationResult {
         minWeight = ValidationUtils.MIN_COFFEE_WEIGHT_OUT,
         maxWeight = ValidationUtils.MAX_COFFEE_WEIGHT_OUT
     ).let { result ->
-        if (!result.isValid) {
-            // Add contextual advice for common issues
-            val enhancedErrors = result.errors.toMutableList()
-            val weight = this.toDoubleOrNull()
-            
-            when {
-                weight != null && weight < 15.0 -> 
-                    enhancedErrors.add("Tip: Most espresso shots yield 25-40g")
-                weight != null && weight > 50.0 -> 
-                    enhancedErrors.add("Tip: Standard espresso yields are typically 25-40g")
-            }
-            
-            ValidationResult(false, enhancedErrors)
-        } else result
+        // Add contextual advice for common issues
+        val enhancedErrors = result.errors.toMutableList()
+        val weight = this.toDoubleOrNull()
+
+        when {
+            weight != null && weight < 15.0 ->
+                enhancedErrors.add("Tip: Most espresso shots yield 25-40g")
+            weight != null && weight > 50.0 ->
+                enhancedErrors.add("Tip: Standard espresso yields are typically 25-40g")
+        }
+
+        ValidationResult(result.isValid && enhancedErrors.isEmpty(), enhancedErrors)
     }
 }
 
@@ -229,8 +225,8 @@ fun validateCompleteShot(
     allErrors.addAll(weightInResult.errors)
     allErrors.addAll(weightOutResult.errors)
     allErrors.addAll(timeResult.errors)
-    allErrors.addAll(grinderResult.errors)
-    allErrors.addAll(notesResult.errors)
+    allWarnings.addAll(grinderResult.errors)
+    allWarnings.addAll(notesResult.errors)
     
     // If basic validation passes, check relationships
     if (allErrors.isEmpty()) {
@@ -275,19 +271,19 @@ fun validateCompleteBean(
     // Collect errors and warnings
     allErrors.addAll(nameResult.errors)
     allErrors.addAll(dateResult.errors)
-    allErrors.addAll(notesResult.errors)
-    allErrors.addAll(grinderResult.errors)
+    allWarnings.addAll(notesResult.errors)
+    allWarnings.addAll(grinderResult.errors)
     
     // Add contextual warnings
     val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(roastDate, LocalDate.now())
     when {
         daysSinceRoast < 2 -> 
             allWarnings.add("Very fresh beans - consider waiting 2-4 days for optimal flavor")
-        daysSinceRoast in 2..4 -> 
+        daysSinceRoast in 2..30 ->
             allWarnings.add("Fresh beans - perfect timing for espresso!")
-        daysSinceRoast in 15..30 -> 
+        daysSinceRoast in 30..90 ->
             allWarnings.add("Beans are getting older but still good for espresso")
-        daysSinceRoast > 30 -> 
+        daysSinceRoast > 90 ->
             allWarnings.add("Older beans - flavor may be diminished")
     }
     

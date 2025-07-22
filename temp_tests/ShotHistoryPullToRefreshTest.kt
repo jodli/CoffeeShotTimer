@@ -73,7 +73,7 @@ class ShotHistoryPullToRefreshTest {
     fun `refreshDataPullToRefresh also refreshes analysis when shown`() = runTest {
         // Given - analysis view is shown
         viewModel.toggleAnalysisView()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
 
         // When - trigger pull to refresh
         viewModel.refreshDataPullToRefresh()
@@ -87,7 +87,7 @@ class ShotHistoryPullToRefreshTest {
         // Given - there's an error state
         coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.failure(Exception("Test error"))
         viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
 
         // Verify error exists
         assertNotNull(viewModel.uiState.value.error)

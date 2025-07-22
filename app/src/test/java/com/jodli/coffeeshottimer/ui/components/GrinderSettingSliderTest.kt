@@ -6,13 +6,18 @@ import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.*
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Tests for GrinderSettingSlider component.
  * Verifies Task 15 implementation: Implement slider for grinder settings.
  * 
- * Note: These are unit tests for the logic. UI tests would require instrumented tests.
+ * Note: These are unit tests using Robolectric for Compose testing.
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [28])
 class GrinderSettingSliderTest {
 
     @get:Rule
@@ -77,9 +82,11 @@ class GrinderSettingSliderTest {
             }
         }
 
-        // Find and interact with the slider
-        composeTestRule.onNodeWithContentDescription("Grinder Setting")
-            .assertExists()
+        // Verify the slider component exists by checking for the label
+        composeTestRule.onNodeWithText("Grinder Setting").assertExists()
+        
+        // Verify the current value is displayed
+        composeTestRule.onNodeWithText("5").assertExists()
     }
 
     @Test

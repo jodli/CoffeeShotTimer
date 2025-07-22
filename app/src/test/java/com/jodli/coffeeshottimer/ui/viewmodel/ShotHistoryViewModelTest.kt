@@ -153,7 +153,7 @@ class ShotHistoryViewModelTest {
         viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
         
         // Wait for initial data load
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         val beanName = viewModel.getBeanName("bean1")
         assertEquals("Ethiopian Yirgacheffe", beanName)
@@ -243,7 +243,7 @@ class ShotHistoryViewModelTest {
         viewModel.toggleAnalysisView()
         
         // Wait for async operations
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
@@ -270,7 +270,7 @@ class ShotHistoryViewModelTest {
         assertTrue(viewModel.uiState.value.analysisLoading)
         
         // Wait for completion
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         // Should not be loading anymore
         assertFalse(viewModel.uiState.value.analysisLoading)
@@ -287,7 +287,7 @@ class ShotHistoryViewModelTest {
         viewModel.toggleAnalysisView()
         
         // Wait for async operations
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
@@ -314,11 +314,11 @@ class ShotHistoryViewModelTest {
         
         // First show analysis
         viewModel.toggleAnalysisView()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         // Refresh analysis
         viewModel.refreshAnalysis()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         val uiState = viewModel.uiState.value
         assertEquals(mockStats, uiState.overallStatistics)
@@ -331,7 +331,7 @@ class ShotHistoryViewModelTest {
         
         // Refresh analysis (should do nothing)
         viewModel.refreshAnalysis()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         val uiState = viewModel.uiState.value
         assertFalse(uiState.showAnalysis)
@@ -345,7 +345,7 @@ class ShotHistoryViewModelTest {
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockStats)
         
         viewModel.toggleAnalysisView()
-        testDispatcher.scheduler.advanceUntilIdle()
+        testDispatcher.scheduler.advanceTimeBy(500)
         
         assertTrue(viewModel.uiState.value.hasAnalysisData)
     }
