@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.util.Base64
 
 plugins {
     alias(libs.plugins.android.application)
@@ -39,11 +40,26 @@ android {
     // Signing configuration
     signingConfigs {
         create("release") {
-            if (keystoreProperties.containsKey("storeFile")) {
+            // Check for CI/CD environment variables first
+            val signingKeyBase64 = System.getenv("SIGNING_KEY_BASE64")
+            val keyAlias = System.getenv("KEY_ALIAS") ?: keystoreProperties["keyAlias"]?.toString()
+            val keyStorePassword = System.getenv("KEY_STORE_PASSWORD") ?: keystoreProperties["storePassword"]?.toString()
+            val keyPassword = System.getenv("KEY_PASSWORD") ?: keystoreProperties["keyPassword"]?.toString()
+            
+            if (signingKeyBase64 != null && keyAlias != null && keyStorePassword != null && keyPassword != null) {
+                // CI/CD signing using base64 encoded keystore
+                val keystoreFile = File.createTempFile("keystore", ".jks")
+                keystoreFile.writeBytes(Base64.getDecoder().decode(signingKeyBase64))
+                storeFile = keystoreFile
+                storePassword = keyStorePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            } else if (keystoreProperties.containsKey("storeFile")) {
+                // Local development signing using keystore.properties
                 storeFile = file(keystoreProperties["storeFile"].toString())
                 storePassword = keystoreProperties["storePassword"].toString()
-                keyAlias = keystoreProperties["keyAlias"].toString()
-                keyPassword = keystoreProperties["keyPassword"].toString()
+                this.keyAlias = keystoreProperties["keyAlias"].toString()
+                this.keyPassword = keystoreProperties["keyPassword"].toString()
             }
         }
     }
