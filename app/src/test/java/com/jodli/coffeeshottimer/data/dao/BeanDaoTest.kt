@@ -23,7 +23,6 @@ import java.time.LocalDateTime
  * Tests all CRUD operations and queries for Bean entity.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class BeanDaoTest {
     
     @get:Rule

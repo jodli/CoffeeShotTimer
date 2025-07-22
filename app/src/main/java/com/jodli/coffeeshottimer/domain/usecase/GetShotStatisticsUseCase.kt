@@ -44,12 +44,14 @@ class GetShotStatisticsUseCase @Inject constructor(
                         Result.success(analytics)
                     }
                 },
-                onFailure = { error ->
-                    Result.failure(error)
+                onFailure = { 
+                    // Return empty analytics when repository fails
+                    Result.success(BeanAnalytics.empty())
                 }
             )
         } catch (exception: Exception) {
-            Result.failure(exception)
+            // Return empty analytics when any exception occurs
+            Result.success(BeanAnalytics.empty())
         }
     }
     

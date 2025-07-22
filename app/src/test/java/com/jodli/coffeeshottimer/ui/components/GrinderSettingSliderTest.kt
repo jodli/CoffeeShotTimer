@@ -17,7 +17,6 @@ import org.robolectric.annotation.Config
  * Note: These are unit tests using Robolectric for Compose testing.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [28])
 class GrinderSettingSliderTest {
 
     @get:Rule
