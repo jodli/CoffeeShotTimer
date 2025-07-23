@@ -29,7 +29,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         composable(NavigationDestinations.ShotHistory.route) {
             ShotHistoryScreen(
                 onShotClick = { shotId ->
@@ -37,7 +37,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         composable(NavigationDestinations.BeanManagement.route) {
             BeanManagementScreen(
                 onAddBeanClick = {
@@ -51,7 +51,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         // Modal screens
         composable(
             route = NavigationDestinations.ShotDetails.route,
@@ -74,7 +74,7 @@ fun AppNavigation(
                 }
             )
         }
-        
+
         composable(
             route = NavigationDestinations.AddEditBean.route,
             arguments = listOf(

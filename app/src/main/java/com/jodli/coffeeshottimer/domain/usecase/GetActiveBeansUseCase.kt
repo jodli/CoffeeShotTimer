@@ -16,7 +16,7 @@ import javax.inject.Singleton
 class GetActiveBeansUseCase @Inject constructor(
     private val beanRepository: BeanRepository
 ) {
-    
+
     /**
      * Get all active beans ordered by creation date (newest first).
      * @return Flow of Result containing list of active beans
@@ -32,10 +32,17 @@ class GetActiveBeansUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get active beans", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get active beans",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get active beans with search filtering.
      * @param searchQuery Search query to filter bean names (case-insensitive)
@@ -52,10 +59,17 @@ class GetActiveBeansUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get filtered active beans", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get filtered active beans",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get active beans sorted by freshness (optimal brewing window first).
      * Beans are considered fresh 4-14 days after roasting.
@@ -74,23 +88,33 @@ class GetActiveBeansUseCase @Inject constructor(
                             freshnessCategory = getFreshnessCategory(bean.daysSinceRoast())
                         )
                     }
-                    
+
                     // Sort by freshness: fresh beans first, then by days since roast (ascending)
                     val sortedBeans = beansWithFreshness.sortedWith(
                         compareByDescending<BeanWithFreshness> { it.isFresh }
                             .thenBy { it.daysSinceRoast }
                     )
-                    
+
                     Result.success(sortedBeans)
                 } else {
-                    Result.failure(result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get active beans"))
+                    Result.failure(
+                        result.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to get active beans")
+                    )
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get active beans by freshness", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get active beans by freshness",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get active beans that have grinder settings saved.
      * Useful for quick shot recording with remembered settings.
@@ -108,10 +132,17 @@ class GetActiveBeansUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get active beans with grinder settings", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get active beans with grinder settings",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get count of active beans.
      * @return Result containing the count of active beans
@@ -122,13 +153,21 @@ class GetActiveBeansUseCase @Inject constructor(
             if (result.isSuccess) {
                 Result.success(result.getOrNull() ?: 0)
             } else {
-                Result.failure(result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get active bean count"))
+                Result.failure(
+                    result.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to get active bean count")
+                )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error getting active bean count", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error getting active bean count",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get the most recently added active bean.
      * Useful for auto-selecting the current bean in shot recording.
@@ -138,20 +177,25 @@ class GetActiveBeansUseCase @Inject constructor(
         return try {
             val beansFlow = beanRepository.getActiveBeans()
             var mostRecentBean: Bean? = null
-            
+
             beansFlow.collect { result ->
                 if (result.isSuccess) {
                     val beans = result.getOrNull() ?: emptyList()
                     mostRecentBean = beans.maxByOrNull { it.createdAt }
                 }
             }
-            
+
             Result.success(mostRecentBean)
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error getting most recent active bean", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error getting most recent active bean",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Check if there are any active beans available.
      * @return Result indicating if active beans exist
@@ -162,13 +206,21 @@ class GetActiveBeansUseCase @Inject constructor(
             if (countResult.isSuccess) {
                 Result.success((countResult.getOrNull() ?: 0) > 0)
             } else {
-                Result.failure(countResult.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to check for active beans"))
+                Result.failure(
+                    countResult.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to check for active beans")
+                )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error checking for active beans", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error checking for active beans",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get active beans grouped by freshness category.
      * @return Flow of Result containing map of freshness categories to beans
@@ -183,14 +235,24 @@ class GetActiveBeansUseCase @Inject constructor(
                     }
                     Result.success(groupedBeans)
                 } else {
-                    Result.failure(result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get active beans"))
+                    Result.failure(
+                        result.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to get active beans")
+                    )
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to group active beans by freshness", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to group active beans by freshness",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Determine the freshness category based on days since roast.
      * @param daysSinceRoast Number of days since the bean was roasted

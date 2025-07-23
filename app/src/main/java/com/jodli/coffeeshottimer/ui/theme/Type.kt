@@ -30,7 +30,7 @@ val Typography = Typography(
         lineHeight = 44.sp,
         letterSpacing = 0.sp
     ),
-    
+
     // Headline styles for section headers
     headlineLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -53,7 +53,7 @@ val Typography = Typography(
         lineHeight = 32.sp,
         letterSpacing = 0.sp
     ),
-    
+
     // Title styles for card headers and important text
     titleLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -76,7 +76,7 @@ val Typography = Typography(
         lineHeight = 20.sp,
         letterSpacing = 0.1.sp
     ),
-    
+
     // Body styles for main content
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
@@ -99,7 +99,7 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.4.sp
     ),
-    
+
     // Label styles for buttons and small text
     labelLarge = TextStyle(
         fontFamily = FontFamily.Default,

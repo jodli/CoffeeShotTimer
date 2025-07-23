@@ -16,7 +16,7 @@ import javax.inject.Singleton
 class AddBeanUseCase @Inject constructor(
     private val beanRepository: BeanRepository
 ) {
-    
+
     /**
      * Add a new bean with comprehensive validation.
      * @param name Bean name (required, unique, max 100 characters)
@@ -43,7 +43,7 @@ class AddBeanUseCase @Inject constructor(
                 lastGrinderSetting = lastGrinderSetting?.trim()?.takeIf { it.isNotEmpty() },
                 createdAt = LocalDateTime.now()
             )
-            
+
             // Validate bean through repository (includes uniqueness check)
             val validationResult = beanRepository.validateBean(bean)
             if (!validationResult.isValid) {
@@ -53,21 +53,27 @@ class AddBeanUseCase @Inject constructor(
                     )
                 )
             }
-            
+
             // Add bean to repository
             val addResult = beanRepository.addBean(bean)
             if (addResult.isSuccess) {
                 Result.success(bean)
             } else {
                 Result.failure(
-                    addResult.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to add bean")
+                    addResult.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to add bean")
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error adding bean", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error adding bean",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Validate bean parameters without saving.
      * @param name Bean name to validate
@@ -86,7 +92,7 @@ class AddBeanUseCase @Inject constructor(
                 roastDate = roastDate,
                 notes = notes.trim()
             )
-            
+
             beanRepository.validateBean(bean)
         } catch (exception: Exception) {
             ValidationResult(
@@ -95,7 +101,7 @@ class AddBeanUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Check if a bean name is available (not already used).
      * @param name Bean name to check
@@ -111,15 +117,21 @@ class AddBeanUseCase @Inject constructor(
                     Result.success(existingBean.getOrNull() == null)
                 } else {
                     Result.failure(
-                        existingBean.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to check bean name")
+                        existingBean.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to check bean name")
                     )
                 }
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error checking bean name", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error checking bean name",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Create a bean with default values for quick setup.
      * @param name Bean name (required)
@@ -138,7 +150,7 @@ class AddBeanUseCase @Inject constructor(
             lastGrinderSetting = null
         )
     }
-    
+
     /**
      * Get validation rules for bean creation (for UI display).
      * @return Map of field names to validation rules
@@ -156,8 +168,10 @@ class AddBeanUseCase @Inject constructor(
 /**
  * Sealed class representing different types of bean use case exceptions.
  */
-sealed class BeanUseCaseException(message: String, cause: Throwable? = null) : Exception(message, cause) {
+sealed class BeanUseCaseException(message: String, cause: Throwable? = null) :
+    Exception(message, cause) {
     class ValidationError(message: String) : BeanUseCaseException(message)
     class DuplicateNameError(message: String) : BeanUseCaseException(message)
-    class UnknownError(message: String, cause: Throwable? = null) : BeanUseCaseException(message, cause)
+    class UnknownError(message: String, cause: Throwable? = null) :
+        BeanUseCaseException(message, cause)
 }

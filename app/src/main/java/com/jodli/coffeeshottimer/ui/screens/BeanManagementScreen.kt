@@ -1,6 +1,17 @@
 package com.jodli.coffeeshottimer.ui.screens
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -9,8 +20,21 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -18,7 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jodli.coffeeshottimer.data.model.Bean
-import com.jodli.coffeeshottimer.ui.components.*
+import com.jodli.coffeeshottimer.ui.components.CoffeeCard
+import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
+import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
+import com.jodli.coffeeshottimer.ui.components.EmptyState
+import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
 
@@ -34,7 +62,7 @@ fun BeanManagementScreen(
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val showInactive by viewModel.showInactive.collectAsStateWithLifecycle()
     val spacing = LocalSpacing.current
-    
+
     var showDeleteDialog by remember { mutableStateOf<Bean?>(null) }
 
     Column(
@@ -53,7 +81,7 @@ fun BeanManagementScreen(
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
-            
+
             CoffeePrimaryButton(
                 text = "Add Bean",
                 onClick = onAddBeanClick,
@@ -61,9 +89,9 @@ fun BeanManagementScreen(
                 modifier = Modifier.widthIn(max = 140.dp)
             )
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Search and Filter Row
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -83,7 +111,7 @@ fun BeanManagementScreen(
                 } else null,
                 modifier = Modifier.weight(1f)
             )
-            
+
             // Filter Toggle
             FilterChip(
                 onClick = viewModel::toggleShowInactive,
@@ -103,9 +131,9 @@ fun BeanManagementScreen(
                 }
             )
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Content
         when {
             uiState.isLoading -> {
@@ -116,7 +144,7 @@ fun BeanManagementScreen(
                     LoadingIndicator(message = "Loading beans...")
                 }
             }
-            
+
             uiState.error != null -> {
                 Column(
                     modifier = Modifier.fillMaxSize(),
@@ -128,9 +156,9 @@ fun BeanManagementScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )
-                    
+
                     Spacer(modifier = Modifier.height(spacing.medium))
-                    
+
                     CoffeePrimaryButton(
                         text = "Retry",
                         onClick = {
@@ -141,7 +169,7 @@ fun BeanManagementScreen(
                     )
                 }
             }
-            
+
             uiState.beans.isEmpty() -> {
                 EmptyState(
                     icon = Icons.Default.Add,
@@ -155,7 +183,7 @@ fun BeanManagementScreen(
                     onActionClick = if (searchQuery.isEmpty()) onAddBeanClick else null
                 )
             }
-            
+
             else -> {
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(spacing.small),
@@ -184,7 +212,7 @@ fun BeanManagementScreen(
             }
         }
     }
-    
+
     // Delete Confirmation Dialog
     showDeleteDialog?.let { bean ->
         AlertDialog(
@@ -226,7 +254,7 @@ private fun BeanListItem(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         modifier = modifier,
         onClick = onEdit
@@ -248,12 +276,12 @@ private fun BeanListItem(
                         text = bean.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium,
-                        color = if (bean.isActive) 
-                            MaterialTheme.colorScheme.onSurface 
-                        else 
+                        color = if (bean.isActive)
+                            MaterialTheme.colorScheme.onSurface
+                        else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     if (!bean.isActive) {
                         Surface(
                             color = MaterialTheme.colorScheme.errorContainer,
@@ -263,18 +291,21 @@ private fun BeanListItem(
                                 text = "Inactive",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.padding(horizontal = spacing.small, vertical = 2.dp)
+                                modifier = Modifier.padding(
+                                    horizontal = spacing.small,
+                                    vertical = 2.dp
+                                )
                             )
                         }
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 // Days since roast with freshness indicator
                 val daysSinceRoast = bean.daysSinceRoast()
                 val isFresh = bean.isFresh()
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
@@ -282,17 +313,17 @@ private fun BeanListItem(
                     Text(
                         text = "Roasted: $daysSinceRoast days ago",
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (isFresh) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
+                        color = if (isFresh)
+                            MaterialTheme.colorScheme.primary
+                        else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     // Freshness indicator
                     Surface(
-                        color = if (isFresh) 
-                            MaterialTheme.colorScheme.primaryContainer 
-                        else 
+                        color = if (isFresh)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
                             MaterialTheme.colorScheme.secondaryContainer,
                         shape = androidx.compose.foundation.shape.CircleShape
                     ) {
@@ -304,15 +335,15 @@ private fun BeanListItem(
                                 else -> "Stale"
                             },
                             style = MaterialTheme.typography.labelSmall,
-                            color = if (isFresh) 
-                                MaterialTheme.colorScheme.onPrimaryContainer 
-                            else 
+                            color = if (isFresh)
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            else
                                 MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.padding(horizontal = spacing.small, vertical = 2.dp)
                         )
                     }
                 }
-                
+
                 // Grinder setting if available
                 if (!bean.lastGrinderSetting.isNullOrBlank()) {
                     Spacer(modifier = Modifier.height(spacing.extraSmall))
@@ -322,7 +353,7 @@ private fun BeanListItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 // Notes if available
                 if (bean.notes.isNotBlank()) {
                     Spacer(modifier = Modifier.height(spacing.extraSmall))
@@ -335,7 +366,7 @@ private fun BeanListItem(
                     )
                 }
             }
-            
+
             // Action buttons
             Column(
                 horizontalAlignment = Alignment.End,
@@ -355,7 +386,7 @@ private fun BeanListItem(
                         )
                     }
                 }
-                
+
                 if (onReactivate != null) {
                     IconButton(
                         onClick = onReactivate,
@@ -368,7 +399,7 @@ private fun BeanListItem(
                         )
                     }
                 }
-                
+
                 IconButton(
                     onClick = onDelete,
                     modifier = Modifier.size(40.dp)

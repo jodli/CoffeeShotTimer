@@ -40,7 +40,7 @@ fun formatDuration(durationMs: Long): String {
     val minutes = totalSeconds / 60
     val seconds = totalSeconds % 60
     val milliseconds = (durationMs % 1000) / 10 // Show centiseconds
-    
+
     return when {
         minutes > 0 -> String.format("%d:%02d.%02d", minutes, seconds, milliseconds)
         else -> String.format("%d.%02d", seconds, milliseconds)
@@ -61,7 +61,7 @@ fun formatTimerDisplay(timeMs: Long): String {
  * Format weight with appropriate precision
  */
 fun formatWeight(weight: Double?): String {
-    return weight?.let { 
+    return weight?.let {
         if (it % 1.0 == 0.0) {
             String.format("%.0fg", it)
         } else {
@@ -117,7 +117,7 @@ fun isTimeInRange(actualTime: Long, targetTime: Long?, toleranceSeconds: Int = 3
  */
 fun getTimeStatus(actualTime: Long, targetTime: Long?): TimeStatus {
     if (targetTime == null) return TimeStatus.UNKNOWN
-    
+
     val toleranceMs = 3000L // 3 seconds tolerance
     return when {
         actualTime < targetTime - toleranceMs -> TimeStatus.FAST

@@ -1,14 +1,40 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -30,7 +56,7 @@ fun ShotHistoryFilterDialog(
     onDismiss: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    
+
     // Filter state
     var selectedBeanId by remember { mutableStateOf(currentFilter.beanId) }
     var startDate by remember { mutableStateOf(currentFilter.startDate?.toLocalDate()) }
@@ -38,15 +64,27 @@ fun ShotHistoryFilterDialog(
     var grinderSetting by remember { mutableStateOf(currentFilter.grinderSetting ?: "") }
     var minBrewRatio by remember { mutableStateOf(currentFilter.minBrewRatio?.toString() ?: "") }
     var maxBrewRatio by remember { mutableStateOf(currentFilter.maxBrewRatio?.toString() ?: "") }
-    var minExtractionTime by remember { mutableStateOf(currentFilter.minExtractionTime?.toString() ?: "") }
-    var maxExtractionTime by remember { mutableStateOf(currentFilter.maxExtractionTime?.toString() ?: "") }
-    var onlyOptimalTime by remember { mutableStateOf(currentFilter.onlyOptimalExtractionTime ?: false) }
+    var minExtractionTime by remember {
+        mutableStateOf(
+            currentFilter.minExtractionTime?.toString() ?: ""
+        )
+    }
+    var maxExtractionTime by remember {
+        mutableStateOf(
+            currentFilter.maxExtractionTime?.toString() ?: ""
+        )
+    }
+    var onlyOptimalTime by remember {
+        mutableStateOf(
+            currentFilter.onlyOptimalExtractionTime ?: false
+        )
+    }
     var onlyTypicalRatio by remember { mutableStateOf(currentFilter.onlyTypicalBrewRatio ?: false) }
-    
+
     // Date picker states
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
-    
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -70,7 +108,7 @@ fun ShotHistoryFilterDialog(
                         style = MaterialTheme.typography.headlineSmall,
                         fontWeight = FontWeight.Bold
                     )
-                    
+
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Clear,
@@ -78,9 +116,9 @@ fun ShotHistoryFilterDialog(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(spacing.medium))
-                
+
                 // Scrollable content
                 Column(
                     modifier = Modifier
@@ -109,7 +147,7 @@ fun ShotHistoryFilterDialog(
                                 Spacer(modifier = Modifier.width(spacing.small))
                                 Text("All beans")
                             }
-                            
+
                             availableBeans.forEach { bean ->
                                 Row(
                                     modifier = Modifier
@@ -139,7 +177,7 @@ fun ShotHistoryFilterDialog(
                             }
                         }
                     }
-                    
+
                     // Date range filter
                     FilterSection(title = "Date Range") {
                         Row(
@@ -158,10 +196,11 @@ fun ShotHistoryFilterDialog(
                                 )
                                 Spacer(modifier = Modifier.width(spacing.extraSmall))
                                 Text(
-                                    text = startDate?.format(DateTimeFormatter.ofPattern("MMM dd")) ?: "Start Date"
+                                    text = startDate?.format(DateTimeFormatter.ofPattern("MMM dd"))
+                                        ?: "Start Date"
                                 )
                             }
-                            
+
                             // End date
                             OutlinedButton(
                                 onClick = { showEndDatePicker = true },
@@ -174,11 +213,12 @@ fun ShotHistoryFilterDialog(
                                 )
                                 Spacer(modifier = Modifier.width(spacing.extraSmall))
                                 Text(
-                                    text = endDate?.format(DateTimeFormatter.ofPattern("MMM dd")) ?: "End Date"
+                                    text = endDate?.format(DateTimeFormatter.ofPattern("MMM dd"))
+                                        ?: "End Date"
                                 )
                             }
                         }
-                        
+
                         if (startDate != null || endDate != null) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -194,7 +234,7 @@ fun ShotHistoryFilterDialog(
                                 } else {
                                     Spacer(modifier = Modifier.weight(1f))
                                 }
-                                
+
                                 if (endDate != null) {
                                     TextButton(
                                         onClick = { endDate = null },
@@ -208,7 +248,7 @@ fun ShotHistoryFilterDialog(
                             }
                         }
                     }
-                    
+
                     // Grinder setting filter
                     FilterSection(title = "Grinder Setting") {
                         CoffeeTextField(
@@ -218,7 +258,7 @@ fun ShotHistoryFilterDialog(
                             placeholder = "e.g., 15, Fine, Medium-Fine"
                         )
                     }
-                    
+
                     // Brew ratio filter
                     FilterSection(title = "Brew Ratio Range") {
                         Row(
@@ -232,7 +272,7 @@ fun ShotHistoryFilterDialog(
                                 placeholder = "1.5",
                                 modifier = Modifier.weight(1f)
                             )
-                            
+
                             CoffeeTextField(
                                 value = maxBrewRatio,
                                 onValueChange = { maxBrewRatio = it },
@@ -242,7 +282,7 @@ fun ShotHistoryFilterDialog(
                             )
                         }
                     }
-                    
+
                     // Extraction time filter
                     FilterSection(title = "Extraction Time Range (seconds)") {
                         Row(
@@ -256,7 +296,7 @@ fun ShotHistoryFilterDialog(
                                 placeholder = "20",
                                 modifier = Modifier.weight(1f)
                             )
-                            
+
                             CoffeeTextField(
                                 value = maxExtractionTime,
                                 onValueChange = { maxExtractionTime = it },
@@ -266,7 +306,7 @@ fun ShotHistoryFilterDialog(
                             )
                         }
                     }
-                    
+
                     // Quality filters
                     FilterSection(title = "Quality Filters") {
                         Column {
@@ -290,7 +330,7 @@ fun ShotHistoryFilterDialog(
                                     )
                                 }
                             }
-                            
+
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -314,9 +354,9 @@ fun ShotHistoryFilterDialog(
                         }
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(spacing.medium))
-                
+
                 // Action buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -338,7 +378,7 @@ fun ShotHistoryFilterDialog(
                         },
                         modifier = Modifier.weight(1f)
                     )
-                    
+
                     CoffeePrimaryButton(
                         text = "Apply Filters",
                         onClick = {
@@ -362,7 +402,7 @@ fun ShotHistoryFilterDialog(
             }
         }
     }
-    
+
     // Date pickers
     if (showStartDatePicker) {
         DatePickerDialog(
@@ -374,7 +414,7 @@ fun ShotHistoryFilterDialog(
             initialDate = startDate
         )
     }
-    
+
     if (showEndDatePicker) {
         DatePickerDialog(
             onDateSelected = { date ->
@@ -393,7 +433,7 @@ private fun FilterSection(
     content: @Composable () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column {
         Text(
             text = title,
@@ -416,7 +456,7 @@ private fun DatePickerDialog(
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialDate?.toEpochDay()?.times(24 * 60 * 60 * 1000)
     )
-    
+
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {

@@ -16,7 +16,7 @@ fun BottomNavigationBar(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    
+
     NavigationBar {
         bottomNavigationItems.forEach { item ->
             NavigationBarItem(

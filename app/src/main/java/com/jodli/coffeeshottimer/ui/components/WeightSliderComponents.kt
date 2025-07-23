@@ -1,16 +1,38 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -23,9 +45,9 @@ import kotlin.math.roundToInt
 
 /**
  * Weight Slider Components for Espresso Shot Tracker
- * 
+ *
  * This file implements Task 14: Implement slider for weight measurements
- * 
+ *
  * Features implemented:
  * - Custom slider component with whole gram increments (no decimal places)
  * - Visual indicators for typical weight ranges (15-20g for input, 25-40g for output)
@@ -33,7 +55,7 @@ import kotlin.math.roundToInt
  * - Proper validation integration with existing ViewModel methods
  * - Responsive design that works on different screen sizes using BoxWithConstraints
  * - Accessibility support with proper content descriptions and touch targets
- * 
+ *
  * The sliders replace the previous text input fields in RecordShotScreen while maintaining
  * all existing validation rules and state management functionality.
  */
@@ -58,16 +80,16 @@ fun WeightSlider(
 ) {
     val spacing = LocalSpacing.current
     val hapticFeedback = LocalHapticFeedback.current
-    
+
     // Convert string value to float, default to minWeight if invalid
     val currentValue = value.toFloatOrNull()?.coerceIn(minWeight, maxWeight) ?: minWeight
-    
+
     // Ensure the value is always a whole number for display consistency
     val displayValue = currentValue.roundToInt().toFloat()
-    
+
     // Track previous value for haptic feedback
     var previousValue by remember { mutableStateOf(currentValue) }
-    
+
     Column(modifier = modifier) {
         // Header with label and current value
         Row(
@@ -91,7 +113,7 @@ fun WeightSlider(
                     color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             // Current value display
             Card(
                 colors = CardDefaults.cardColors(
@@ -104,13 +126,16 @@ fun WeightSlider(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
+                    modifier = Modifier.padding(
+                        horizontal = spacing.medium,
+                        vertical = spacing.small
+                    )
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Weight range indicators
         WeightRangeIndicator(
             currentValue = displayValue,
@@ -120,21 +145,21 @@ fun WeightSlider(
             typicalRangeEnd = typicalRangeEnd,
             enabled = enabled
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Slider
         Slider(
             value = displayValue,
             onValueChange = { newValue ->
                 val roundedValue = newValue.roundToInt().toFloat()
-                
+
                 // Provide haptic feedback when value changes
                 if (roundedValue != previousValue) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     previousValue = roundedValue
                 }
-                
+
                 onValueChange(roundedValue.roundToInt().toString())
             },
             valueRange = minWeight..maxWeight,
@@ -147,7 +172,7 @@ fun WeightSlider(
             ),
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Range labels
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -164,7 +189,7 @@ fun WeightSlider(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        
+
         // Error message
         errorMessage?.let { error ->
             Spacer(modifier = Modifier.height(spacing.extraSmall))
@@ -192,7 +217,7 @@ private fun WeightRangeIndicator(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -205,15 +230,15 @@ private fun WeightRangeIndicator(
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        
+
         // Typical range indicator
         val typicalRangeStartPercent = (typicalRangeStart - minWeight) / (maxWeight - minWeight)
         val typicalRangeEndPercent = (typicalRangeEnd - minWeight) / (maxWeight - minWeight)
         val typicalRangeWidth = typicalRangeEndPercent - typicalRangeStartPercent
-        
+
         BoxWithConstraints {
             val totalWidth = maxWidth
-            
+
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -221,16 +246,16 @@ private fun WeightRangeIndicator(
                     .offset(x = totalWidth * typicalRangeStartPercent)
                     .clip(RoundedCornerShape(12.dp))
                     .background(
-                        if (enabled) 
+                        if (enabled)
                             MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                        else 
+                        else
                             MaterialTheme.colorScheme.surfaceVariant
                     )
             )
-            
+
             // Current value indicator
             val currentPercent = (currentValue - minWeight) / (maxWeight - minWeight)
-            
+
             Box(
                 modifier = Modifier
                     .size(8.dp)
@@ -240,14 +265,14 @@ private fun WeightRangeIndicator(
                     )
                     .clip(RoundedCornerShape(4.dp))
                     .background(
-                        if (enabled) 
+                        if (enabled)
                             MaterialTheme.colorScheme.primary
-                        else 
+                        else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
             )
         }
-        
+
         // Range labels
         Row(
             modifier = Modifier
@@ -261,7 +286,7 @@ private fun WeightRangeIndicator(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 fontSize = 10.sp
             )
-            
+
             // Show if current value is in typical range
             val isInTypicalRange = currentValue in typicalRangeStart..typicalRangeEnd
             if (isInTypicalRange) {
@@ -344,16 +369,16 @@ fun GrinderSettingSlider(
 ) {
     val spacing = LocalSpacing.current
     val hapticFeedback = LocalHapticFeedback.current
-    
+
     // Convert string value to float, default to 5.0 if invalid
     val currentValue = value.toFloatOrNull()?.coerceIn(0.5f, 20.0f) ?: 5.0f
-    
+
     // Ensure the value follows 0.5 increment steps
     val displayValue = (currentValue * 2).roundToInt() / 2.0f
-    
+
     // Track previous value for haptic feedback
     var previousValue by remember { mutableStateOf(currentValue) }
-    
+
     Column(modifier = modifier) {
         // Header with label and current value
         Row(
@@ -377,7 +402,7 @@ fun GrinderSettingSlider(
                     color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             // Current value display
             Card(
                 colors = CardDefaults.cardColors(
@@ -394,13 +419,16 @@ fun GrinderSettingSlider(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
+                    modifier = Modifier.padding(
+                        horizontal = spacing.medium,
+                        vertical = spacing.small
+                    )
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Grinder setting range indicators
         GrinderSettingRangeIndicator(
             currentValue = displayValue,
@@ -410,29 +438,29 @@ fun GrinderSettingSlider(
             previousSuccessfulSettings = previousSuccessfulSettings.mapNotNull { it.toFloatOrNull() },
             enabled = enabled
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Slider with 0.5 increments
         Slider(
             value = displayValue,
             onValueChange = { newValue ->
                 // Round to nearest 0.5 increment
                 val roundedValue = (newValue * 2).roundToInt() / 2.0f
-                
+
                 // Provide haptic feedback when value changes
                 if (roundedValue != previousValue) {
                     hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     previousValue = roundedValue
                 }
-                
+
                 // Format output based on whether it's a whole number or has decimal
                 val formattedValue = if (roundedValue == roundedValue.toInt().toFloat()) {
                     roundedValue.toInt().toString()
                 } else {
                     "%.1f".format(roundedValue)
                 }
-                
+
                 onValueChange(formattedValue)
             },
             valueRange = 0.5f..20.0f,
@@ -445,7 +473,7 @@ fun GrinderSettingSlider(
             ),
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Range labels
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -462,7 +490,7 @@ fun GrinderSettingSlider(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        
+
         // Suggestion hint
         if (suggestedSetting != null && value.isEmpty()) {
             Spacer(modifier = Modifier.height(spacing.extraSmall))
@@ -473,7 +501,7 @@ fun GrinderSettingSlider(
                 modifier = Modifier.padding(start = spacing.medium)
             )
         }
-        
+
         // Error message
         errorMessage?.let { error ->
             Spacer(modifier = Modifier.height(spacing.extraSmall))
@@ -501,7 +529,7 @@ private fun GrinderSettingRangeIndicator(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -514,10 +542,10 @@ private fun GrinderSettingRangeIndicator(
                 .clip(RoundedCornerShape(16.dp))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
-        
+
         BoxWithConstraints {
             val totalWidth = maxWidth
-            
+
             // Previous successful settings indicators
             previousSuccessfulSettings.take(3).forEach { setting ->
                 val settingPercent = (setting - minSetting) / (maxSetting - minSetting)
@@ -530,14 +558,14 @@ private fun GrinderSettingRangeIndicator(
                         )
                         .clip(RoundedCornerShape(3.dp))
                         .background(
-                            if (enabled) 
+                            if (enabled)
                                 MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f)
-                            else 
+                            else
                                 MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                         )
                 )
             }
-            
+
             // Suggested setting indicator
             suggestedSetting?.let { suggestion ->
                 val suggestionPercent = (suggestion - minSetting) / (maxSetting - minSetting)
@@ -550,14 +578,14 @@ private fun GrinderSettingRangeIndicator(
                         )
                         .clip(RoundedCornerShape(4.dp))
                         .background(
-                            if (enabled) 
+                            if (enabled)
                                 MaterialTheme.colorScheme.secondary
-                            else 
+                            else
                                 MaterialTheme.colorScheme.onSurfaceVariant
                         )
                 )
             }
-            
+
             // Current value indicator
             val currentPercent = (currentValue - minSetting) / (maxSetting - minSetting)
             Box(
@@ -569,14 +597,14 @@ private fun GrinderSettingRangeIndicator(
                     )
                     .clip(RoundedCornerShape(5.dp))
                     .background(
-                        if (enabled) 
+                        if (enabled)
                             MaterialTheme.colorScheme.primary
-                        else 
+                        else
                             MaterialTheme.colorScheme.onSurfaceVariant
                     )
             )
         }
-        
+
         // Legend
         Row(
             modifier = Modifier
@@ -592,7 +620,7 @@ private fun GrinderSettingRangeIndicator(
                     fontSize = 10.sp
                 )
             }
-            
+
             if (suggestedSetting != null) {
                 Text(
                     text = "■ Suggested",
@@ -621,16 +649,16 @@ fun WeightSlidersSection(
     enabled: Boolean = true
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Text(
             text = "Weight Measurements",
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.large))
-        
+
         // Coffee Weight In Slider
         CoffeeWeightInSlider(
             value = coffeeWeightIn,
@@ -639,9 +667,9 @@ fun WeightSlidersSection(
             enabled = enabled,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.large))
-        
+
         // Coffee Weight Out Slider
         CoffeeWeightOutSlider(
             value = coffeeWeightOut,

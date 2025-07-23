@@ -1,13 +1,26 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -17,7 +30,8 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 /**
  * Card component for displaying bean information
@@ -32,7 +46,7 @@ fun BeanCard(
     showActions: Boolean = true
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         modifier = modifier,
         onClick = onSelect
@@ -52,38 +66,38 @@ fun BeanCard(
                     Icon(
                         imageVector = Icons.Default.Home,
                         contentDescription = null,
-                        tint = if (isSelected) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
+                        tint = if (isSelected)
+                            MaterialTheme.colorScheme.primary
+                        else
                             MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.size(20.dp)
                     )
-                    
+
                     Text(
                         text = bean.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected) 
-                            MaterialTheme.colorScheme.primary 
-                        else 
+                        color = if (isSelected)
+                            MaterialTheme.colorScheme.primary
+                        else
                             MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 val daysSinceRoast = bean.daysSinceRoast()
                 Text(
                     text = "Roasted: $daysSinceRoast days ago",
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (bean.isFresh()) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
+                    color = if (bean.isFresh())
+                        MaterialTheme.colorScheme.primary
+                    else
                         MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 if (bean.notes.isNotBlank()) {
                     Spacer(modifier = Modifier.height(spacing.extraSmall))
                     Text(
@@ -95,7 +109,7 @@ fun BeanCard(
                     )
                 }
             }
-            
+
             if (showActions) {
                 IconButton(onClick = onEdit) {
                     Icon(
@@ -106,7 +120,7 @@ fun BeanCard(
                 }
             }
         }
-        
+
         if (isSelected) {
             Spacer(modifier = Modifier.height(spacing.small))
             Surface(
@@ -118,7 +132,10 @@ fun BeanCard(
                     text = "Currently Selected",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall)
+                    modifier = Modifier.padding(
+                        horizontal = spacing.small,
+                        vertical = spacing.extraSmall
+                    )
                 )
             }
         }
@@ -135,7 +152,7 @@ fun BeanSelector(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     OutlinedCard(
         onClick = onBeanSelect,
         modifier = modifier.fillMaxWidth()
@@ -152,14 +169,14 @@ fun BeanSelector(
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary
             )
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = if (selectedBean != null) "Selected Bean" else "Select Bean",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Text(
                     text = selectedBean?.name ?: "No bean selected",
                     style = MaterialTheme.typography.titleSmall,
@@ -168,7 +185,7 @@ fun BeanSelector(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            
+
             Icon(
                 imageVector = Icons.Default.MoreVert,
                 contentDescription = "Select bean",
@@ -191,7 +208,7 @@ fun ShotCard(
 ) {
     val spacing = LocalSpacing.current
     val dateFormat = remember { SimpleDateFormat("MMM dd, yyyy HH:mm", Locale.getDefault()) }
-    
+
     CoffeeCard(
         modifier = modifier,
         onClick = onClick
@@ -207,14 +224,14 @@ fun ShotCard(
                     text = shot.getFormattedExtractionTime(),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (shot.isOptimalExtractionTime()) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
+                    color = if (shot.isOptimalExtractionTime())
+                        MaterialTheme.colorScheme.primary
+                    else
                         MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 // Bean information
                 if (showBeanInfo && bean != null) {
                     Text(
@@ -225,7 +242,7 @@ fun ShotCard(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                
+
                 // Shot details
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium)
@@ -235,45 +252,53 @@ fun ShotCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    
+
                     Text(
                         text = "In: ${shot.coffeeWeightIn}g",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Text(
                     text = "Out: ${shot.coffeeWeightOut}g • ${shot.getFormattedBrewRatio()}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 // Date
                 Spacer(modifier = Modifier.height(spacing.small))
                 Text(
-                    text = dateFormat.format(Date(shot.timestamp.atZone(java.time.ZoneId.systemDefault()).toInstant().toEpochMilli())),
+                    text = dateFormat.format(
+                        Date(
+                            shot.timestamp.atZone(java.time.ZoneId.systemDefault()).toInstant()
+                                .toEpochMilli()
+                        )
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             // Brew ratio indicator
             Surface(
-                color = if (shot.isTypicalBrewRatio()) 
-                    MaterialTheme.colorScheme.primaryContainer 
-                else 
+                color = if (shot.isTypicalBrewRatio())
+                    MaterialTheme.colorScheme.primaryContainer
+                else
                     MaterialTheme.colorScheme.secondaryContainer,
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
                     text = shot.getFormattedBrewRatio(),
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (shot.isTypicalBrewRatio()) 
-                        MaterialTheme.colorScheme.onPrimaryContainer 
-                    else 
+                    color = if (shot.isTypicalBrewRatio())
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    else
                         MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall)
+                    modifier = Modifier.padding(
+                        horizontal = spacing.small,
+                        vertical = spacing.extraSmall
+                    )
                 )
             }
         }
@@ -293,16 +318,16 @@ fun BeanSummaryCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Text(
             text = bean.name,
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -311,17 +336,17 @@ fun BeanSummaryCard(
                 label = "Shots",
                 value = totalShots.toString()
             )
-            
+
             StatItem(
                 label = "Avg Time",
                 value = averageTime?.let { formatTime(it) } ?: "--"
             )
-            
+
             StatItem(
                 label = "Best Time",
                 value = bestTime?.let { formatTime(it) } ?: "--"
             )
-            
+
             if (averageRating != null) {
                 StatItem(
                     label = "Avg Rating",
@@ -338,7 +363,7 @@ private fun StatItem(
     value: String
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -348,9 +373,9 @@ private fun StatItem(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.extraSmall))
-        
+
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,

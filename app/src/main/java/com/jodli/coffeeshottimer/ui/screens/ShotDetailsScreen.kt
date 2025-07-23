@@ -1,7 +1,19 @@
 package com.jodli.coffeeshottimer.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,13 +21,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,7 +50,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
-import com.jodli.coffeeshottimer.ui.components.*
+import com.jodli.coffeeshottimer.ui.components.CoffeeCard
+import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
+import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
+import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
 import java.time.format.DateTimeFormatter
@@ -40,14 +70,14 @@ fun ShotDetailsScreen(
     val spacing = LocalSpacing.current
     val uiState by viewModel.uiState.collectAsState()
     val editNotesState by viewModel.editNotesState.collectAsState()
-    
+
     var showDeleteDialog by remember { mutableStateOf(false) }
-    
+
     // Load shot details when screen is first displayed
     LaunchedEffect(shotId) {
         viewModel.loadShotDetails(shotId)
     }
-    
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -67,7 +97,7 @@ fun ShotDetailsScreen(
                 uiState.shotDetails?.let { details ->
                     if (details.previousShot != null) {
                         IconButton(
-                            onClick = { 
+                            onClick = {
                                 viewModel.navigateToPreviousShot { shotId ->
                                     onNavigateToShot(shotId)
                                 }
@@ -79,10 +109,10 @@ fun ShotDetailsScreen(
                             )
                         }
                     }
-                    
+
                     if (details.nextShot != null) {
                         IconButton(
-                            onClick = { 
+                            onClick = {
                                 viewModel.navigateToNextShot { shotId ->
                                     onNavigateToShot(shotId)
                                 }
@@ -94,7 +124,7 @@ fun ShotDetailsScreen(
                             )
                         }
                     }
-                    
+
                     // Delete button
                     IconButton(
                         onClick = { showDeleteDialog = true }
@@ -108,7 +138,7 @@ fun ShotDetailsScreen(
                 }
             }
         )
-        
+
         // Content
         Box(
             modifier = Modifier
@@ -122,7 +152,7 @@ fun ShotDetailsScreen(
                         message = "Loading shot details..."
                     )
                 }
-                
+
                 uiState.error != null -> {
                     Column(
                         modifier = Modifier.align(Alignment.Center),
@@ -148,7 +178,7 @@ fun ShotDetailsScreen(
                         )
                     }
                 }
-                
+
                 uiState.shotDetails != null -> {
                     ShotDetailsContent(
                         shotDetails = uiState.shotDetails!!,
@@ -163,7 +193,7 @@ fun ShotDetailsScreen(
             }
         }
     }
-    
+
     // Delete confirmation dialog
     if (showDeleteDialog) {
         AlertDialog(
@@ -192,7 +222,7 @@ fun ShotDetailsScreen(
             }
         )
     }
-    
+
     // Show error snackbar if needed
     uiState.error?.let { error ->
         LaunchedEffect(error) {
@@ -201,7 +231,7 @@ fun ShotDetailsScreen(
             viewModel.clearError()
         }
     }
-    
+
     editNotesState.error?.let { error ->
         LaunchedEffect(error) {
             // Auto-clear error after showing
@@ -222,7 +252,7 @@ private fun ShotDetailsContent(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     LazyColumn(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(spacing.medium),
@@ -232,22 +262,22 @@ private fun ShotDetailsContent(
         item {
             ShotOverviewCard(shotDetails = shotDetails)
         }
-        
+
         // Bean Information Card
         item {
             BeanInformationCard(shotDetails = shotDetails)
         }
-        
+
         // Shot Parameters Card
         item {
             ShotParametersCard(shotDetails = shotDetails)
         }
-        
+
         // Analysis Card
         item {
             ShotAnalysisCard(shotDetails = shotDetails)
         }
-        
+
         // Notes Card
         item {
             ShotNotesCard(
@@ -259,7 +289,7 @@ private fun ShotDetailsContent(
                 onCancelEditingNotes = onCancelEditingNotes
             )
         }
-        
+
         // Context Card (Previous/Next shots)
         if (shotDetails.previousShot != null || shotDetails.nextShot != null) {
             item {
@@ -277,7 +307,7 @@ private fun ShotOverviewCard(
     val spacing = LocalSpacing.current
     val shot = shotDetails.shot
     val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy 'at' HH:mm")
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Row(
@@ -291,9 +321,9 @@ private fun ShotOverviewCard(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
-                    
+
                     Spacer(modifier = Modifier.height(spacing.small))
-                    
+
                     // Quality score
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -314,7 +344,7 @@ private fun ShotOverviewCard(
                         )
                     }
                 }
-                
+
                 // Large brew ratio display
                 Column(
                     horizontalAlignment = Alignment.End
@@ -336,9 +366,9 @@ private fun ShotOverviewCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Key metrics row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -372,7 +402,7 @@ private fun BeanInformationCard(
 ) {
     val spacing = LocalSpacing.current
     val bean = shotDetails.bean
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Row(
@@ -385,25 +415,25 @@ private fun BeanInformationCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Bean name
             Text(
                 text = bean.name,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Medium
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             // Roast information
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -420,7 +450,7 @@ private fun BeanInformationCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
-                
+
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "Days Since Roast",
@@ -438,7 +468,7 @@ private fun BeanInformationCard(
                     )
                 }
             }
-            
+
             // Bean notes if available
             if (bean.notes.isNotBlank()) {
                 Spacer(modifier = Modifier.height(spacing.medium))
@@ -463,7 +493,7 @@ private fun ShotParametersCard(
 ) {
     val spacing = LocalSpacing.current
     val shot = shotDetails.shot
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -471,9 +501,9 @@ private fun ShotParametersCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Parameters grid
             Column(
                 verticalArrangement = Arrangement.spacedBy(spacing.medium)
@@ -493,7 +523,7 @@ private fun ShotParametersCard(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -511,7 +541,7 @@ private fun ShotParametersCard(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                
+
                 ParameterItem(
                     label = "Grinder Setting",
                     value = shot.grinderSetting,
@@ -529,7 +559,7 @@ private fun ShotAnalysisCard(
 ) {
     val spacing = LocalSpacing.current
     val analysis = shotDetails.analysis
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -537,9 +567,9 @@ private fun ShotAnalysisCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Quality indicators
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -561,9 +591,9 @@ private fun ShotAnalysisCard(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             // Deviations from average
             if (shotDetails.relatedShotsCount > 1) {
                 Text(
@@ -571,9 +601,9 @@ private fun ShotAnalysisCard(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 Column(
                     verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
                 ) {
@@ -602,19 +632,19 @@ private fun ShotAnalysisCard(
                     )
                 }
             }
-            
+
             // Recommendations
             if (analysis.recommendations.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(spacing.medium))
-                
+
                 Text(
                     text = "Recommendations",
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 analysis.recommendations.forEach { recommendation ->
                     Text(
                         text = "• $recommendation",
@@ -638,7 +668,7 @@ private fun ShotNotesCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Row(
@@ -651,7 +681,7 @@ private fun ShotNotesCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 if (!editNotesState.isEditing) {
                     IconButton(onClick = onStartEditingNotes) {
                         Icon(
@@ -661,9 +691,9 @@ private fun ShotNotesCard(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             if (editNotesState.isEditing) {
                 // Edit mode
                 CoffeeTextField(
@@ -675,9 +705,9 @@ private fun ShotNotesCard(
                     maxLines = 5,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.medium))
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
@@ -688,7 +718,7 @@ private fun ShotNotesCard(
                         icon = Icons.Default.Close,
                         modifier = Modifier.weight(1f)
                     )
-                    
+
                     CoffeePrimaryButton(
                         text = if (editNotesState.isSaving) "Saving..." else "Save",
                         onClick = onSaveNotes,
@@ -697,11 +727,11 @@ private fun ShotNotesCard(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                
+
                 if (editNotesState.error != null) {
                     Spacer(modifier = Modifier.height(spacing.small))
                     Text(
-                        text = editNotesState.error!!,
+                        text = editNotesState.error,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.error
                     )
@@ -731,7 +761,7 @@ private fun ShotContextCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
@@ -739,24 +769,30 @@ private fun ShotContextCard(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             Text(
                 text = "This is shot ${shotDetails.relatedShotsCount} of ${shotDetails.relatedShotsCount} with ${shotDetails.bean.name}",
                 style = MaterialTheme.typography.bodyMedium
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             shotDetails.previousShot?.let { previousShot ->
                 Text(
-                    text = "Previous shot: ${previousShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))} (${previousShot.getFormattedBrewRatio()})",
+                    text = "Previous shot: ${
+                        previousShot.timestamp.format(
+                            DateTimeFormatter.ofPattern(
+                                "MMM dd, HH:mm"
+                            )
+                        )
+                    } (${previousShot.getFormattedBrewRatio()})",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             shotDetails.nextShot?.let { nextShot ->
                 Text(
                     text = "Next shot: ${nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))} (${nextShot.getFormattedBrewRatio()})",
@@ -836,7 +872,7 @@ private fun QualityIndicatorChip(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Surface(
         modifier = modifier.padding(horizontal = spacing.extraSmall),
         shape = RoundedCornerShape(16.dp),

@@ -1,8 +1,8 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
-import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.PaginatedResult
 import com.jodli.coffeeshottimer.data.model.PaginationConfig
+import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 class GetShotHistoryUseCase @Inject constructor(
     private val shotRepository: ShotRepository
 ) {
-    
+
     /**
      * Get all shots ordered by timestamp (newest first).
      * @return Flow of Result containing list of shots
@@ -27,7 +27,7 @@ class GetShotHistoryUseCase @Inject constructor(
     fun getAllShots(): Flow<Result<List<Shot>>> {
         return shotRepository.getAllShots()
     }
-    
+
     /**
      * Get shots for a specific bean ordered by timestamp.
      * @param beanId The ID of the bean to filter by
@@ -36,7 +36,7 @@ class GetShotHistoryUseCase @Inject constructor(
     fun getShotsByBean(beanId: String): Flow<Result<List<Shot>>> {
         return shotRepository.getShotsByBean(beanId)
     }
-    
+
     /**
      * Get recent shots with a specified limit.
      * @param limit Maximum number of shots to return
@@ -45,7 +45,7 @@ class GetShotHistoryUseCase @Inject constructor(
     fun getRecentShots(limit: Int = 10): Flow<Result<List<Shot>>> {
         return shotRepository.getRecentShots(limit)
     }
-    
+
     /**
      * Get shots within a specific date range.
      * @param startDate Start of the date range
@@ -58,7 +58,7 @@ class GetShotHistoryUseCase @Inject constructor(
     ): Flow<Result<List<Shot>>> {
         return shotRepository.getShotsByDateRange(startDate, endDate)
     }
-    
+
     /**
      * Get shots with comprehensive filtering options.
      * @param filter ShotHistoryFilter containing all filter criteria
@@ -73,14 +73,14 @@ class GetShotHistoryUseCase @Inject constructor(
             result.map { shots ->
                 // Apply additional client-side filtering for complex criteria
                 var filteredShots = shots
-                
+
                 // Filter by grinder setting if specified
                 filter.grinderSetting?.let { setting ->
                     filteredShots = filteredShots.filter { shot ->
                         shot.grinderSetting.equals(setting, ignoreCase = true)
                     }
                 }
-                
+
                 // Filter by brew ratio range if specified
                 if (filter.minBrewRatio != null || filter.maxBrewRatio != null) {
                     filteredShots = filteredShots.filter { shot ->
@@ -90,7 +90,7 @@ class GetShotHistoryUseCase @Inject constructor(
                         minCheck && maxCheck
                     }
                 }
-                
+
                 // Filter by extraction time range if specified
                 if (filter.minExtractionTime != null || filter.maxExtractionTime != null) {
                     filteredShots = filteredShots.filter { shot ->
@@ -100,27 +100,27 @@ class GetShotHistoryUseCase @Inject constructor(
                         minCheck && maxCheck
                     }
                 }
-                
+
                 // Filter by optimal extraction time if specified
                 if (filter.onlyOptimalExtractionTime == true) {
                     filteredShots = filteredShots.filter { it.isOptimalExtractionTime() }
                 }
-                
+
                 // Filter by typical brew ratio if specified
                 if (filter.onlyTypicalBrewRatio == true) {
                     filteredShots = filteredShots.filter { it.isTypicalBrewRatio() }
                 }
-                
+
                 // Apply limit if specified
                 filter.limit?.let { limit ->
                     filteredShots = filteredShots.take(limit)
                 }
-                
+
                 filteredShots
             }
         }
     }
-    
+
     /**
      * Get shots by grinder setting.
      * @param grinderSetting The grinder setting to filter by
@@ -129,7 +129,7 @@ class GetShotHistoryUseCase @Inject constructor(
     fun getShotsByGrinderSetting(grinderSetting: String): Flow<Result<List<Shot>>> {
         return shotRepository.getShotsByGrinderSetting(grinderSetting)
     }
-    
+
     /**
      * Get shots within a brew ratio range.
      * @param minRatio Minimum brew ratio (inclusive)
@@ -142,7 +142,7 @@ class GetShotHistoryUseCase @Inject constructor(
     ): Flow<Result<List<Shot>>> {
         return shotRepository.getShotsByBrewRatioRange(minRatio, maxRatio)
     }
-    
+
     /**
      * Get shots within an extraction time range.
      * @param minSeconds Minimum extraction time in seconds (inclusive)
@@ -155,7 +155,7 @@ class GetShotHistoryUseCase @Inject constructor(
     ): Flow<Result<List<Shot>>> {
         return shotRepository.getShotsByExtractionTimeRange(minSeconds, maxSeconds)
     }
-    
+
     /**
      * Get shots with optimal extraction time (25-30 seconds).
      * @return Flow of Result containing shots with optimal extraction time
@@ -163,7 +163,7 @@ class GetShotHistoryUseCase @Inject constructor(
     fun getOptimalExtractionTimeShots(): Flow<Result<List<Shot>>> {
         return getShotsByExtractionTimeRange(25, 30)
     }
-    
+
     /**
      * Get shots with typical brew ratio (1.5-3.0).
      * @return Flow of Result containing shots with typical brew ratio
@@ -171,7 +171,7 @@ class GetShotHistoryUseCase @Inject constructor(
     fun getTypicalBrewRatioShots(): Flow<Result<List<Shot>>> {
         return getShotsByBrewRatioRange(1.5, 3.0)
     }
-    
+
     /**
      * Search shots by notes content.
      * @param searchTerm The term to search for in shot notes
@@ -186,7 +186,7 @@ class GetShotHistoryUseCase @Inject constructor(
             }
         }
     }
-    
+
     /**
      * Get total shot count.
      * @return Result containing the total number of shots
@@ -194,9 +194,9 @@ class GetShotHistoryUseCase @Inject constructor(
     suspend fun getTotalShotCount(): Result<Int> {
         return shotRepository.getTotalShotCount()
     }
-    
+
     // PERFORMANCE OPTIMIZATION METHODS
-    
+
     /**
      * Get shots with pagination support for large datasets.
      * @param paginationConfig Configuration for pagination
@@ -205,7 +205,7 @@ class GetShotHistoryUseCase @Inject constructor(
     suspend fun getShotsPaginated(paginationConfig: PaginationConfig): Result<PaginatedResult<Shot>> {
         return shotRepository.getShotsPaginated(paginationConfig)
     }
-    
+
     /**
      * Get filtered shots with pagination support for large datasets.
      * @param beanId Optional bean ID filter
@@ -220,7 +220,12 @@ class GetShotHistoryUseCase @Inject constructor(
         endDate: LocalDateTime?,
         paginationConfig: PaginationConfig
     ): Result<PaginatedResult<Shot>> {
-        return shotRepository.getFilteredShotsPaginated(beanId, startDate, endDate, paginationConfig)
+        return shotRepository.getFilteredShotsPaginated(
+            beanId,
+            startDate,
+            endDate,
+            paginationConfig
+        )
     }
 }
 
@@ -256,7 +261,7 @@ data class ShotHistoryFilter(
                 onlyOptimalExtractionTime == true ||
                 onlyTypicalBrewRatio == true
     }
-    
+
     /**
      * Create a copy with only date range filters.
      * @return ShotHistoryFilter with only date filters
@@ -274,7 +279,7 @@ data class ShotHistoryFilter(
             limit = null
         )
     }
-    
+
     /**
      * Create a copy with only bean filter.
      * @return ShotHistoryFilter with only bean filter

@@ -19,11 +19,11 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
-    
+
     /**
      * Provides the BeanRepository instance.
      * Uses singleton scope to ensure consistent data access.
-     * 
+     *
      * @param beanDao The BeanDao dependency
      * @return BeanRepository instance
      */
@@ -32,11 +32,11 @@ object RepositoryModule {
     fun provideBeanRepository(beanDao: BeanDao): BeanRepository {
         return BeanRepository(beanDao)
     }
-    
+
     /**
      * Provides the ShotRepository instance.
      * Uses singleton scope to ensure consistent data access.
-     * 
+     *
      * @param shotDao The ShotDao dependency
      * @param beanDao The BeanDao dependency (needed for bean validation)
      * @return ShotRepository instance
@@ -49,11 +49,11 @@ object RepositoryModule {
     ): ShotRepository {
         return ShotRepository(shotDao, beanDao)
     }
-    
+
     /**
      * Provides the MemoryOptimizer instance.
      * Uses singleton scope to ensure consistent memory management across the app.
-     * 
+     *
      * @return MemoryOptimizer instance
      */
     @Provides
@@ -61,11 +61,11 @@ object RepositoryModule {
     fun provideMemoryOptimizer(): MemoryOptimizer {
         return MemoryOptimizer()
     }
-    
+
     /**
      * Provides the PerformanceMonitor instance.
      * Uses singleton scope to ensure consistent performance monitoring across the app.
-     * 
+     *
      * @return PerformanceMonitor instance
      */
     @Provides

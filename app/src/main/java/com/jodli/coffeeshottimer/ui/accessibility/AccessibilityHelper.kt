@@ -1,11 +1,21 @@
 package com.jodli.coffeeshottimer.ui.accessibility
 
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.semantics.*
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.disabled
+import androidx.compose.ui.semantics.error
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 
@@ -13,12 +23,12 @@ import androidx.compose.ui.unit.dp
  * Accessibility helper functions and extensions for improved app accessibility.
  */
 object AccessibilityHelper {
-    
+
     /**
      * Minimum touch target size for accessibility (48dp as per Material Design guidelines).
      */
     val MinTouchTargetSize = 48.dp
-    
+
     /**
      * Enhanced touch target size for better accessibility (56dp).
      */
@@ -33,7 +43,8 @@ fun Modifier.accessibleTouchTarget(): Modifier = this.size(AccessibilityHelper.M
 /**
  * Modifier extension for enhanced touch target size.
  */
-fun Modifier.enhancedTouchTarget(): Modifier = this.size(AccessibilityHelper.EnhancedTouchTargetSize)
+fun Modifier.enhancedTouchTarget(): Modifier =
+    this.size(AccessibilityHelper.EnhancedTouchTargetSize)
 
 /**
  * Modifier extension to add comprehensive accessibility semantics for form fields.
@@ -48,15 +59,15 @@ fun Modifier.accessibleFormField(
 ): Modifier = this.semantics {
     contentDescription = label
     text = AnnotatedString(value)
-    
+
     if (isError && errorMessage != null) {
         error(errorMessage)
     }
-    
+
     if (isRequired) {
         stateDescription = "Required field"
     }
-    
+
     hint?.let {
         // Note: hintText is not available in current Compose version
         // Using stateDescription as alternative
@@ -77,7 +88,7 @@ fun Modifier.accessibleButton(
 ): Modifier = this.semantics {
     contentDescription = if (action != null) "$label, $action" else label
     this.role = role
-    
+
     if (!enabled) {
         disabled()
     }
@@ -94,7 +105,7 @@ fun Modifier.accessibleNavigation(
     contentDescription = label
     selected = isSelected
     role = Role.Tab
-    
+
     position?.let {
         stateDescription = it
     }
@@ -135,7 +146,7 @@ fun Modifier.accessibleTimer(
     }
     contentDescription = description
     role = Role.Button
-    
+
     if (isRunning) {
         liveRegion = LiveRegionMode.Polite
     }
@@ -155,7 +166,7 @@ fun Modifier.accessibleListItem(
         append(title)
         subtitle?.let { append(", $it") }
         metadata?.let { append(", $it") }
-        
+
         if (position != null && totalItems != null) {
             append(", item $position of $totalItems")
         }
@@ -178,7 +189,7 @@ fun Modifier.accessibleProgress(
         else -> label
     }
     contentDescription = description
-    
+
     progress?.let {
         progressBarRangeInfo = ProgressBarRangeInfo(it, 0f..1f)
     }
@@ -243,7 +254,7 @@ fun AccessibilityAnnouncement(
 fun formatTimeForAccessibility(seconds: Int): String {
     val minutes = seconds / 60
     val remainingSeconds = seconds % 60
-    
+
     return when {
         minutes == 0 -> "$remainingSeconds seconds"
         remainingSeconds == 0 -> "$minutes minutes"

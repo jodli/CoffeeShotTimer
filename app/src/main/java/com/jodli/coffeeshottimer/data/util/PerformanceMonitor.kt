@@ -15,15 +15,15 @@ import javax.inject.Singleton
  */
 @Singleton
 class PerformanceMonitor @Inject constructor() {
-    
+
     private val operationTimes = ConcurrentHashMap<String, MutableList<Long>>()
     private val activeOperations = ConcurrentHashMap<String, Long>()
-    
+
     companion object {
         private const val TAG = "PerformanceMonitor"
         private const val MAX_SAMPLES = 100
     }
-    
+
     /**
      * Start timing an operation.
      * @param operationName Unique name for the operation
@@ -35,7 +35,7 @@ class PerformanceMonitor @Inject constructor() {
         activeOperations[operationId] = startTime
         return operationId
     }
-    
+
     /**
      * Stop timing an operation and record the duration.
      * @param operationId The operation ID returned from startOperation
@@ -48,7 +48,7 @@ class PerformanceMonitor @Inject constructor() {
             recordOperationTime(operationName, duration)
         }
     }
-    
+
     /**
      * Record a single operation time directly.
      * @param operationName Name of the operation
@@ -56,22 +56,22 @@ class PerformanceMonitor @Inject constructor() {
      */
     fun recordOperationTime(operationName: String, durationMs: Long) {
         val times = operationTimes.getOrPut(operationName) { mutableListOf() }
-        
+
         synchronized(times) {
             times.add(durationMs)
-            
+
             // Keep only the most recent samples
             if (times.size > MAX_SAMPLES) {
                 times.removeAt(0)
             }
         }
-        
+
         // Log slow operations
         if (durationMs > 1000) { // More than 1 second
             Log.w(TAG, "Slow operation detected: $operationName took ${durationMs}ms")
         }
     }
-    
+
     /**
      * Get performance statistics for an operation.
      * @param operationName Name of the operation
@@ -79,10 +79,10 @@ class PerformanceMonitor @Inject constructor() {
      */
     fun getOperationStats(operationName: String): OperationStats? {
         val times = operationTimes[operationName] ?: return null
-        
+
         synchronized(times) {
             if (times.isEmpty()) return null
-            
+
             val sortedTimes = times.sorted()
             val count = times.size
             val sum = times.sum()
@@ -94,7 +94,7 @@ class PerformanceMonitor @Inject constructor() {
             }
             val p95Index = ((count - 1) * 0.95).toInt()
             val p95 = sortedTimes[p95Index]
-            
+
             return OperationStats(
                 operationName = operationName,
                 count = count,
@@ -107,7 +107,7 @@ class PerformanceMonitor @Inject constructor() {
             )
         }
     }
-    
+
     /**
      * Get all operation statistics.
      * @return Map of operation names to their statistics
@@ -119,7 +119,7 @@ class PerformanceMonitor @Inject constructor() {
             }
         }.toMap()
     }
-    
+
     /**
      * Clear all performance data.
      */
@@ -127,29 +127,32 @@ class PerformanceMonitor @Inject constructor() {
         operationTimes.clear()
         activeOperations.clear()
     }
-    
+
     /**
      * Log performance summary for debugging.
      */
     fun logPerformanceSummary() {
         CoroutineScope(Dispatchers.IO).launch {
             val allStats = getAllOperationStats()
-            
+
             if (allStats.isEmpty()) {
                 Log.i(TAG, "No performance data available")
                 return@launch
             }
-            
+
             Log.i(TAG, "=== Performance Summary ===")
             allStats.values.sortedByDescending { it.averageMs }.forEach { stats ->
-                Log.i(TAG, "${stats.operationName}: avg=${String.format("%.1f", stats.averageMs)}ms, " +
-                        "median=${String.format("%.1f", stats.medianMs)}ms, " +
-                        "p95=${stats.p95Ms}ms, count=${stats.count}")
+                Log.i(
+                    TAG,
+                    "${stats.operationName}: avg=${String.format("%.1f", stats.averageMs)}ms, " +
+                            "median=${String.format("%.1f", stats.medianMs)}ms, " +
+                            "p95=${stats.p95Ms}ms, count=${stats.count}"
+                )
             }
             Log.i(TAG, "=========================")
         }
     }
-    
+
     /**
      * Get operations that are performing poorly.
      * @param thresholdMs Threshold in milliseconds for considering an operation slow
@@ -160,7 +163,7 @@ class PerformanceMonitor @Inject constructor() {
             stats.averageMs > thresholdMs || stats.p95Ms > thresholdMs * 2
         }.sortedByDescending { it.averageMs }
     }
-    
+
     /**
      * Check if any operations are currently running longer than expected.
      * @param thresholdMs Threshold for considering an operation stuck

@@ -1,13 +1,30 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -25,33 +42,33 @@ import java.time.LocalDate
  * Validation utilities and components for consistent form validation across the app.
  */
 object ValidationUtils {
-    
+
     // Weight validation constants
     const val MIN_COFFEE_WEIGHT_IN = 0.1
     const val MAX_COFFEE_WEIGHT_IN = 50.0
     const val MIN_COFFEE_WEIGHT_OUT = 0.1
     const val MAX_COFFEE_WEIGHT_OUT = 100.0
-    
+
     // Time validation constants
     const val MIN_EXTRACTION_TIME = 5
     const val MAX_EXTRACTION_TIME = 120
     const val OPTIMAL_EXTRACTION_TIME_MIN = 25
     const val OPTIMAL_EXTRACTION_TIME_MAX = 30
-    
+
     // Text validation constants
     const val MAX_BEAN_NAME_LENGTH = 100
     const val MIN_BEAN_NAME_LENGTH = 2
     const val MAX_NOTES_LENGTH = 500
     const val MAX_GRINDER_SETTING_LENGTH = 50
-    
+
     // Brew ratio constants
     const val MIN_TYPICAL_BREW_RATIO = 1.5
     const val MAX_TYPICAL_BREW_RATIO = 3.0
     const val OPTIMAL_BREW_RATIO_MIN = 2.0
     const val OPTIMAL_BREW_RATIO_MAX = 2.5
-    
+
     private val decimalFormat = DecimalFormat("#.#")
-    
+
     /**
      * Validates coffee weight input with range checking.
      */
@@ -63,132 +80,155 @@ object ValidationUtils {
         isRequired: Boolean = true
     ): ValidationResult {
         val errors = mutableListOf<String>()
-        
+
         if (value.isBlank()) {
             if (isRequired) {
                 errors.add("$fieldName is required")
             }
             return ValidationResult(errors.isEmpty(), errors)
         }
-        
+
         val weight = value.toDoubleOrNull()
         when {
             weight == null -> errors.add("Please enter a valid number")
-            weight < minWeight -> errors.add("$fieldName must be at least ${decimalFormat.format(minWeight)}g")
-            weight > maxWeight -> errors.add("$fieldName cannot exceed ${decimalFormat.format(maxWeight)}g")
-            value.contains('.') && value.substringAfter('.').length > 1 -> 
+            weight < minWeight -> errors.add(
+                "$fieldName must be at least ${
+                    decimalFormat.format(
+                        minWeight
+                    )
+                }g"
+            )
+
+            weight > maxWeight -> errors.add(
+                "$fieldName cannot exceed ${
+                    decimalFormat.format(
+                        maxWeight
+                    )
+                }g"
+            )
+
+            value.contains('.') && value.substringAfter('.').length > 1 ->
                 errors.add("$fieldName can have at most 1 decimal place")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Validates extraction time with range checking.
      */
     fun validateExtractionTime(timeSeconds: Int): ValidationResult {
         val errors = mutableListOf<String>()
-        
+
         when {
-            timeSeconds < MIN_EXTRACTION_TIME -> 
+            timeSeconds < MIN_EXTRACTION_TIME ->
                 errors.add("Extraction time must be at least ${MIN_EXTRACTION_TIME} seconds")
-            timeSeconds > MAX_EXTRACTION_TIME -> 
+
+            timeSeconds > MAX_EXTRACTION_TIME ->
                 errors.add("Extraction time cannot exceed ${MAX_EXTRACTION_TIME} seconds")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Validates bean name with length and character checking.
      */
-    fun validateBeanName(name: String, existingNames: List<String> = emptyList(), currentBeanId: String? = null): ValidationResult {
+    fun validateBeanName(
+        name: String,
+        existingNames: List<String> = emptyList(),
+        currentBeanId: String? = null
+    ): ValidationResult {
         val errors = mutableListOf<String>()
         val trimmedName = name.trim()
-        
+
         when {
             trimmedName.isEmpty() -> errors.add("Bean name is required")
-            trimmedName.length < MIN_BEAN_NAME_LENGTH -> 
+            trimmedName.length < MIN_BEAN_NAME_LENGTH ->
                 errors.add("Bean name must be at least $MIN_BEAN_NAME_LENGTH characters")
-            trimmedName.length > MAX_BEAN_NAME_LENGTH -> 
+
+            trimmedName.length > MAX_BEAN_NAME_LENGTH ->
                 errors.add("Bean name cannot exceed $MAX_BEAN_NAME_LENGTH characters")
-            !trimmedName.matches(Regex("^[a-zA-Z0-9\\s\\-_&.()]+$")) -> 
+
+            !trimmedName.matches(Regex("^[a-zA-Z0-9\\s\\-_&.()]+$")) ->
                 errors.add("Bean name contains invalid characters")
-            existingNames.any { it.equals(trimmedName, ignoreCase = true) } -> 
+
+            existingNames.any { it.equals(trimmedName, ignoreCase = true) } ->
                 errors.add("Bean name already exists")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Validates roast date with reasonable range checking.
      */
     fun validateRoastDate(date: LocalDate): ValidationResult {
         val errors = mutableListOf<String>()
         val today = LocalDate.now()
-        
+
         when {
             date.isAfter(today) -> errors.add("Roast date cannot be in the future")
-            date.isBefore(today.minusDays(365)) -> 
+            date.isBefore(today.minusDays(365)) ->
                 errors.add("Roast date cannot be more than 365 days ago")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Validates notes with length checking.
      */
     fun validateNotes(notes: String): ValidationResult {
         val errors = mutableListOf<String>()
-        
+
         if (notes.length > MAX_NOTES_LENGTH) {
             errors.add("Notes cannot exceed $MAX_NOTES_LENGTH characters")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Validates grinder setting with length and character checking.
      */
     fun validateGrinderSetting(setting: String, isRequired: Boolean = true): ValidationResult {
         val errors = mutableListOf<String>()
         val trimmedSetting = setting.trim()
-        
+
         when {
             trimmedSetting.isEmpty() && isRequired -> errors.add("Grinder setting is required")
-            trimmedSetting.length > MAX_GRINDER_SETTING_LENGTH -> 
+            trimmedSetting.length > MAX_GRINDER_SETTING_LENGTH ->
                 errors.add("Grinder setting cannot exceed $MAX_GRINDER_SETTING_LENGTH characters")
-            trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.#]+$")) -> 
+
+            trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.#]+$")) ->
                 errors.add("Grinder setting contains invalid characters")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Checks if extraction time is optimal for espresso.
      */
     fun isOptimalExtractionTime(timeSeconds: Int): Boolean {
         return timeSeconds in OPTIMAL_EXTRACTION_TIME_MIN..OPTIMAL_EXTRACTION_TIME_MAX
     }
-    
+
     /**
      * Checks if brew ratio is within typical espresso range.
      */
     fun isTypicalBrewRatio(ratio: Double): Boolean {
         return ratio in MIN_TYPICAL_BREW_RATIO..MAX_TYPICAL_BREW_RATIO
     }
-    
+
     /**
      * Checks if brew ratio is optimal for espresso.
      */
     fun isOptimalBrewRatio(ratio: Double): Boolean {
         return ratio in OPTIMAL_BREW_RATIO_MIN..OPTIMAL_BREW_RATIO_MAX
     }
-    
+
     /**
      * Formats a decimal number for display with appropriate precision.
      */
@@ -199,7 +239,7 @@ object ValidationUtils {
             else -> "%.${maxDecimalPlaces}f".format(value)
         }
     }
-    
+
     /**
      * Parses a string to double with validation.
      */
@@ -210,11 +250,14 @@ object ValidationUtils {
             null
         }
     }
-    
+
     /**
      * Sanitizes text input by removing invalid characters.
      */
-    fun sanitizeTextInput(input: String, allowedPattern: Regex = Regex("^[a-zA-Z0-9\\s\\-_&.()]+$")): String {
+    fun sanitizeTextInput(
+        input: String,
+        allowedPattern: Regex = Regex("^[a-zA-Z0-9\\s\\-_&.()]+$")
+    ): String {
         return input.filter { char -> char.toString().matches(allowedPattern) }
     }
 }
@@ -246,12 +289,12 @@ fun ValidatedTextField(
     val focusManager = LocalFocusManager.current
     val hasError = errorMessage != null
     val hasWarning = warningMessage != null && !hasError
-    
+
     // Notify parent of validation state changes
     LaunchedEffect(hasError) {
         onValidationChange?.invoke(!hasError)
     }
-    
+
     Column(modifier = modifier) {
         OutlinedTextField(
             value = value,
@@ -318,7 +361,7 @@ fun ValidatedTextField(
                             fontSize = 12.sp
                         )
                     }
-                    
+
                     // Character count for fields with max length
                     if (maxLength != null) {
                         Text(
@@ -361,8 +404,8 @@ fun WeightTextField(
                     // Ensure only one decimal point
                     val decimalIndex = str.indexOf('.')
                     if (decimalIndex != -1) {
-                        str.substring(0, decimalIndex + 1) + 
-                        str.substring(decimalIndex + 1).filter { it.isDigit() }.take(1)
+                        str.substring(0, decimalIndex + 1) +
+                                str.substring(decimalIndex + 1).filter { it.isDigit() }.take(1)
                     } else {
                         str
                     }
@@ -376,7 +419,11 @@ fun WeightTextField(
         keyboardType = KeyboardType.Decimal,
         enabled = enabled,
         placeholder = placeholder,
-        supportingText = "Range: ${ValidationUtils.formatDecimal(minWeight)}g - ${ValidationUtils.formatDecimal(maxWeight)}g",
+        supportingText = "Range: ${ValidationUtils.formatDecimal(minWeight)}g - ${
+            ValidationUtils.formatDecimal(
+                maxWeight
+            )
+        }g",
         trailingIcon = {
             Text(
                 text = "g",
@@ -429,7 +476,7 @@ fun ValidationErrorDisplay(
                         color = MaterialTheme.colorScheme.error
                     )
                 }
-                
+
                 errors.take(maxErrorsToShow).forEach { error ->
                     Text(
                         text = "• $error",
@@ -438,7 +485,7 @@ fun ValidationErrorDisplay(
                         modifier = Modifier.padding(start = 24.dp, bottom = 2.dp)
                     )
                 }
-                
+
                 if (errors.size > maxErrorsToShow) {
                     Text(
                         text = "... and ${errors.size - maxErrorsToShow} more",
@@ -493,7 +540,7 @@ fun ValidationWarningDisplay(
                         color = MaterialTheme.colorScheme.tertiary
                     )
                 }
-                
+
                 warnings.take(maxWarningsToShow).forEach { warning ->
                     Text(
                         text = "• $warning",
@@ -502,7 +549,7 @@ fun ValidationWarningDisplay(
                         modifier = Modifier.padding(start = 24.dp, bottom = 2.dp)
                     )
                 }
-                
+
                 if (warnings.size > maxWarningsToShow) {
                     Text(
                         text = "... and ${warnings.size - maxWarningsToShow} more",
@@ -528,49 +575,49 @@ class FormValidationState {
     private val _fieldValidationStates = mutableStateMapOf<String, Boolean>()
     private val _fieldErrors = mutableStateMapOf<String, String?>()
     private val _fieldWarnings = mutableStateMapOf<String, String?>()
-    
+
     val isFormValid: Boolean by derivedStateOf {
         _fieldValidationStates.values.all { it }
     }
-    
+
     val allErrors: List<String>
         get() = _fieldErrors.values.filterNotNull()
-    
+
     val allWarnings: List<String>
         get() = _fieldWarnings.values.filterNotNull()
-    
+
     fun setFieldValidation(fieldName: String, isValid: Boolean) {
         _fieldValidationStates[fieldName] = isValid
     }
-    
+
     fun setFieldError(fieldName: String, error: String?) {
         _fieldErrors[fieldName] = error
         _fieldValidationStates[fieldName] = error == null
     }
-    
+
     fun setFieldWarning(fieldName: String, warning: String?) {
         _fieldWarnings[fieldName] = warning
     }
-    
+
     fun getFieldError(fieldName: String): String? = _fieldErrors[fieldName]
-    
+
     fun getFieldWarning(fieldName: String): String? = _fieldWarnings[fieldName]
-    
+
     fun clearField(fieldName: String) {
         _fieldValidationStates.remove(fieldName)
         _fieldErrors.remove(fieldName)
         _fieldWarnings.remove(fieldName)
     }
-    
+
     fun clearAllErrors() {
         _fieldErrors.clear()
         _fieldValidationStates.replaceAll { _, _ -> true }
     }
-    
+
     fun clearAllWarnings() {
         _fieldWarnings.clear()
     }
-    
+
     fun reset() {
         _fieldValidationStates.clear()
         _fieldErrors.clear()

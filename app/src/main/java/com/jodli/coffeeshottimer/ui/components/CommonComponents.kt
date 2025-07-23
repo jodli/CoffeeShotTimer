@@ -1,8 +1,26 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,7 +39,7 @@ fun CoffeeCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     val spacing = LocalSpacing.current
-    
+
     if (onClick != null) {
         Card(
             onClick = onClick,
@@ -60,7 +78,7 @@ fun CoffeePrimaryButton(
     icon: ImageVector? = null
 ) {
     val spacing = LocalSpacing.current
-    
+
     Button(
         onClick = onClick,
         modifier = modifier
@@ -96,7 +114,7 @@ fun CoffeeSecondaryButton(
     icon: ImageVector? = null
 ) {
     val spacing = LocalSpacing.current
-    
+
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
@@ -139,14 +157,14 @@ fun CoffeeTextField(
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(modifier = modifier) {
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             label = { Text(label) },
             placeholder = placeholder?.let { { Text(it) } },
-            leadingIcon = leadingIcon?.let { 
+            leadingIcon = leadingIcon?.let {
                 { Icon(imageVector = it, contentDescription = null) }
             },
             trailingIcon = trailingIcon?.let { icon ->
@@ -166,7 +184,7 @@ fun CoffeeTextField(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         )
-        
+
         if (isError && errorMessage != null) {
             Text(
                 text = errorMessage,
@@ -188,7 +206,7 @@ fun SectionHeader(
     subtitle: String? = null
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -197,7 +215,7 @@ fun SectionHeader(
             style = MaterialTheme.typography.headlineSmall,
             color = MaterialTheme.colorScheme.onBackground
         )
-        
+
         if (subtitle != null) {
             Spacer(modifier = Modifier.height(spacing.extraSmall))
             Text(
@@ -222,7 +240,7 @@ fun EmptyState(
     onActionClick: (() -> Unit)? = null
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -236,25 +254,25 @@ fun EmptyState(
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
-        
+
         if (actionText != null && onActionClick != null) {
             Spacer(modifier = Modifier.height(spacing.large))
             CoffeePrimaryButton(
@@ -275,7 +293,7 @@ fun LoadingIndicator(
     message: String? = null
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -284,7 +302,7 @@ fun LoadingIndicator(
         CircularProgressIndicator(
             color = MaterialTheme.colorScheme.primary
         )
-        
+
         if (message != null) {
             Spacer(modifier = Modifier.height(spacing.medium))
             Text(

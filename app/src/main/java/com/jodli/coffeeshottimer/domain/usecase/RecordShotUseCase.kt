@@ -18,15 +18,15 @@ import javax.inject.Singleton
 class RecordShotUseCase @Inject constructor(
     private val shotRepository: ShotRepository
 ) {
-    
+
     // Timer state management
     private val _timerState = MutableStateFlow(TimerState())
     val timerState: StateFlow<TimerState> = _timerState.asStateFlow()
-    
+
     // Shot recording state
     private val _recordingState = MutableStateFlow(ShotRecordingState())
     val recordingState: StateFlow<ShotRecordingState> = _recordingState.asStateFlow()
-    
+
     /**
      * Start the extraction timer.
      */
@@ -39,7 +39,7 @@ class RecordShotUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Pause the extraction timer and return the elapsed time.
      * @return Elapsed time in seconds
@@ -64,14 +64,14 @@ class RecordShotUseCase @Inject constructor(
     fun stopTimer(): Int {
         return pauseTimer() // Stop is the same as pause for now
     }
-    
+
     /**
      * Reset the timer to initial state.
      */
     fun resetTimer() {
         _timerState.value = TimerState()
     }
-    
+
     /**
      * Update the timer state (called periodically while timer is running).
      */
@@ -82,7 +82,7 @@ class RecordShotUseCase @Inject constructor(
             _timerState.value = currentState.copy(elapsedTimeSeconds = elapsedTime)
         }
     }
-    
+
     /**
      * Calculate brew ratio from input and output weights.
      * @param coffeeWeightIn Input coffee weight in grams
@@ -96,7 +96,7 @@ class RecordShotUseCase @Inject constructor(
             null
         }
     }
-    
+
     /**
      * Validate shot parameters before recording.
      * @param beanId Selected bean ID
@@ -123,10 +123,10 @@ class RecordShotUseCase @Inject constructor(
             grinderSetting = grinderSetting,
             notes = notes
         )
-        
+
         return shotRepository.validateShot(shot)
     }
-    
+
     /**
      * Record a new espresso shot with full validation and business rules.
      * @param beanId Selected bean ID
@@ -151,7 +151,7 @@ class RecordShotUseCase @Inject constructor(
                 isRecording = true,
                 error = null
             )
-            
+
             // Create shot with current timestamp
             val shot = Shot(
                 beanId = beanId,
@@ -162,10 +162,10 @@ class RecordShotUseCase @Inject constructor(
                 notes = notes,
                 timestamp = LocalDateTime.now()
             )
-            
+
             // Record the shot through repository
             val result = shotRepository.recordShot(shot)
-            
+
             if (result.isSuccess) {
                 // Update recording state to indicate success
                 _recordingState.value = _recordingState.value.copy(
@@ -173,10 +173,10 @@ class RecordShotUseCase @Inject constructor(
                     lastRecordedShot = shot,
                     error = null
                 )
-                
+
                 // Reset timer after successful recording
                 resetTimer()
-                
+
                 Result.success(shot)
             } else {
                 // Update recording state with error
@@ -185,7 +185,7 @@ class RecordShotUseCase @Inject constructor(
                     isRecording = false,
                     error = error
                 )
-                
+
                 Result.failure(result.exceptionOrNull() ?: Exception(error))
             }
         } catch (exception: Exception) {
@@ -194,11 +194,11 @@ class RecordShotUseCase @Inject constructor(
                 isRecording = false,
                 error = exception.message ?: "Unknown error occurred"
             )
-            
+
             Result.failure(exception)
         }
     }
-    
+
     /**
      * Record a shot using the current timer state.
      * Convenience method that uses the current timer's elapsed time.
@@ -221,7 +221,7 @@ class RecordShotUseCase @Inject constructor(
         } else {
             _timerState.value.elapsedTimeSeconds
         }
-        
+
         return recordShot(
             beanId = beanId,
             coffeeWeightIn = coffeeWeightIn,
@@ -231,7 +231,7 @@ class RecordShotUseCase @Inject constructor(
             notes = notes
         )
     }
-    
+
     /**
      * Get suggested grinder setting for a bean.
      * @param beanId Bean ID to get suggestion for
@@ -240,14 +240,14 @@ class RecordShotUseCase @Inject constructor(
     suspend fun getSuggestedGrinderSetting(beanId: String): Result<String?> {
         return shotRepository.getSuggestedGrinderSetting(beanId)
     }
-    
+
     /**
      * Clear any recording errors.
      */
     fun clearError() {
         _recordingState.value = _recordingState.value.copy(error = null)
     }
-    
+
     /**
      * Check if extraction time is within optimal range (25-30 seconds).
      * @param extractionTimeSeconds Extraction time to check
@@ -256,7 +256,7 @@ class RecordShotUseCase @Inject constructor(
     fun isOptimalExtractionTime(extractionTimeSeconds: Int): Boolean {
         return extractionTimeSeconds in 25..30
     }
-    
+
     /**
      * Check if brew ratio is within typical espresso range (1:1.5 to 1:3.0).
      * @param brewRatio Brew ratio to check
@@ -265,7 +265,7 @@ class RecordShotUseCase @Inject constructor(
     fun isTypicalBrewRatio(brewRatio: Double): Boolean {
         return brewRatio in 1.5..3.0
     }
-    
+
     /**
      * Format brew ratio as a string (e.g., "1:2.5").
      * @param brewRatio Brew ratio to format
@@ -274,7 +274,7 @@ class RecordShotUseCase @Inject constructor(
     fun formatBrewRatio(brewRatio: Double): String {
         return "1:${String.format("%.1f", brewRatio)}"
     }
-    
+
     /**
      * Format extraction time as MM:SS.
      * @param extractionTimeSeconds Extraction time in seconds

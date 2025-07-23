@@ -46,6 +46,7 @@ fun EspressoShotTrackerApp() {
         NavigationDestinations.RecordShot.route,
         NavigationDestinations.ShotHistory.route,
         NavigationDestinations.BeanManagement.route -> true
+
         else -> false
     }
 

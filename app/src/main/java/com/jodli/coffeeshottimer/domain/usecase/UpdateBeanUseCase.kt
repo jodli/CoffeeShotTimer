@@ -15,7 +15,7 @@ import javax.inject.Singleton
 class UpdateBeanUseCase @Inject constructor(
     private val beanRepository: BeanRepository
 ) {
-    
+
     /**
      * Update an existing bean with comprehensive validation.
      * @param beanId ID of the bean to update
@@ -39,20 +39,21 @@ class UpdateBeanUseCase @Inject constructor(
             if (beanId.trim().isEmpty()) {
                 return Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
             }
-            
+
             // Get existing bean to preserve creation timestamp
             val existingBeanResult = beanRepository.getBeanById(beanId.trim())
             if (existingBeanResult.isFailure) {
                 return Result.failure(
-                    existingBeanResult.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get existing bean")
+                    existingBeanResult.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to get existing bean")
                 )
             }
-            
+
             val existingBean = existingBeanResult.getOrNull()
             if (existingBean == null) {
                 return Result.failure(BeanUseCaseException.ValidationError("Bean not found"))
             }
-            
+
             // Create updated bean instance
             val updatedBean = existingBean.copy(
                 name = name.trim(),
@@ -61,7 +62,7 @@ class UpdateBeanUseCase @Inject constructor(
                 isActive = isActive,
                 lastGrinderSetting = lastGrinderSetting?.trim()?.takeIf { it.isNotEmpty() }
             )
-            
+
             // Validate updated bean through repository (includes uniqueness check)
             val validationResult = beanRepository.validateBean(updatedBean)
             if (!validationResult.isValid) {
@@ -71,21 +72,27 @@ class UpdateBeanUseCase @Inject constructor(
                     )
                 )
             }
-            
+
             // Update bean in repository
             val updateResult = beanRepository.updateBean(updatedBean)
             if (updateResult.isSuccess) {
                 Result.success(updatedBean)
             } else {
                 Result.failure(
-                    updateResult.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to update bean")
+                    updateResult.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to update bean")
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error updating bean", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error updating bean",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Update only the grinder setting for a bean (grinder setting memory functionality).
      * @param beanId ID of the bean to update
@@ -100,24 +107,31 @@ class UpdateBeanUseCase @Inject constructor(
             if (beanId.trim().isEmpty()) {
                 return Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
             }
-            
+
             if (grinderSetting.trim().isEmpty()) {
                 return Result.failure(BeanUseCaseException.ValidationError("Grinder setting cannot be empty"))
             }
-            
-            val result = beanRepository.updateLastGrinderSetting(beanId.trim(), grinderSetting.trim())
+
+            val result =
+                beanRepository.updateLastGrinderSetting(beanId.trim(), grinderSetting.trim())
             if (result.isSuccess) {
                 Result.success(Unit)
             } else {
                 Result.failure(
-                    result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to update grinder setting")
+                    result.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to update grinder setting")
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error updating grinder setting", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error updating grinder setting",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Update only the active status of a bean.
      * @param beanId ID of the bean to update
@@ -132,20 +146,26 @@ class UpdateBeanUseCase @Inject constructor(
             if (beanId.trim().isEmpty()) {
                 return Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
             }
-            
+
             val result = beanRepository.updateBeanActiveStatus(beanId.trim(), isActive)
             if (result.isSuccess) {
                 Result.success(Unit)
             } else {
                 Result.failure(
-                    result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to update active status")
+                    result.exceptionOrNull()
+                        ?: BeanUseCaseException.UnknownError("Failed to update active status")
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error updating active status", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error updating active status",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Validate bean update parameters without saving.
      * @param beanId ID of the bean being updated
@@ -167,7 +187,7 @@ class UpdateBeanUseCase @Inject constructor(
                     errors = listOf("Bean ID cannot be empty")
                 )
             }
-            
+
             // Get existing bean to preserve creation timestamp
             val existingBeanResult = beanRepository.getBeanById(beanId.trim())
             if (existingBeanResult.isFailure) {
@@ -176,7 +196,7 @@ class UpdateBeanUseCase @Inject constructor(
                     errors = listOf("Bean not found")
                 )
             }
-            
+
             val existingBean = existingBeanResult.getOrNull()
             if (existingBean == null) {
                 return ValidationResult(
@@ -184,13 +204,13 @@ class UpdateBeanUseCase @Inject constructor(
                     errors = listOf("Bean not found")
                 )
             }
-            
+
             val updatedBean = existingBean.copy(
                 name = name.trim(),
                 roastDate = roastDate,
                 notes = notes.trim()
             )
-            
+
             beanRepository.validateBean(updatedBean)
         } catch (exception: Exception) {
             ValidationResult(
@@ -199,7 +219,7 @@ class UpdateBeanUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Check if a bean name is available for update (not used by other beans).
      * @param beanId ID of the bean being updated (excluded from check)
@@ -220,15 +240,21 @@ class UpdateBeanUseCase @Inject constructor(
                     Result.success(bean == null || bean.id == beanId.trim())
                 } else {
                     Result.failure(
-                        existingBean.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to check bean name")
+                        existingBean.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to check bean name")
                     )
                 }
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error checking bean name", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error checking bean name",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get the current bean data for editing.
      * @param beanId ID of the bean to get
@@ -249,15 +275,21 @@ class UpdateBeanUseCase @Inject constructor(
                     }
                 } else {
                     Result.failure(
-                        result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get bean")
+                        result.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to get bean")
                     )
                 }
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error getting bean", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error getting bean",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Bulk update active status for multiple beans.
      * @param beanIds List of bean IDs to update
@@ -271,7 +303,7 @@ class UpdateBeanUseCase @Inject constructor(
         return try {
             var successCount = 0
             val errors = mutableListOf<String>()
-            
+
             for (beanId in beanIds) {
                 val result = updateActiveStatus(beanId, isActive)
                 if (result.isSuccess) {
@@ -280,7 +312,7 @@ class UpdateBeanUseCase @Inject constructor(
                     errors.add("Failed to update bean $beanId: ${result.exceptionOrNull()?.message}")
                 }
             }
-            
+
             if (errors.isEmpty()) {
                 Result.success(successCount)
             } else {
@@ -291,7 +323,12 @@ class UpdateBeanUseCase @Inject constructor(
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error in bulk update", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error in bulk update",
+                    exception
+                )
+            )
         }
     }
 }

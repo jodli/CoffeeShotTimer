@@ -3,10 +3,10 @@ package com.jodli.coffeeshottimer.data.repository
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.dao.ShotStatistics
-import com.jodli.coffeeshottimer.data.model.Shot
-import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.model.PaginatedResult
 import com.jodli.coffeeshottimer.data.model.PaginationConfig
+import com.jodli.coffeeshottimer.data.model.Shot
+import com.jodli.coffeeshottimer.data.model.ValidationResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -24,7 +24,7 @@ class ShotRepository @Inject constructor(
     private val shotDao: ShotDao,
     private val beanDao: BeanDao
 ) {
-    
+
     /**
      * Get all shots ordered by timestamp.
      * @return Flow of list of shots with error handling
@@ -34,9 +34,16 @@ class ShotRepository @Inject constructor(
             emit(Result.success(shots))
         }
     }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get all shots", exception)))
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get all shots",
+                    exception
+                )
+            )
+        )
     }
-    
+
     /**
      * Get shots for a specific bean ordered by timestamp.
      * @param beanId The ID of the bean
@@ -47,14 +54,21 @@ class ShotRepository @Inject constructor(
             emit(Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty")))
             return@flow
         }
-        
+
         shotDao.getShotsByBean(beanId).collect { shots ->
             emit(Result.success(shots))
         }
     }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get shots by bean", exception)))
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get shots by bean",
+                    exception
+                )
+            )
+        )
     }
-    
+
     /**
      * Get a specific shot by ID.
      * @param shotId The ID of the shot to retrieve
@@ -72,7 +86,7 @@ class ShotRepository @Inject constructor(
             Result.failure(RepositoryException.DatabaseError("Failed to get shot by ID", exception))
         }
     }
-    
+
     /**
      * Get recent shots (last N shots).
      * @param limit Maximum number of shots to return
@@ -83,33 +97,50 @@ class ShotRepository @Inject constructor(
             emit(Result.failure(RepositoryException.ValidationError("Limit must be greater than 0")))
             return@flow
         }
-        
+
         shotDao.getRecentShots(limit).collect { shots ->
             emit(Result.success(shots))
         }
     }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get recent shots", exception)))
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get recent shots",
+                    exception
+                )
+            )
+        )
     }
-    
+
     /**
      * Get shots within a date range.
      * @param startDate Start of the date range
      * @param endDate End of the date range
      * @return Flow of shots in date range with error handling
      */
-    fun getShotsByDateRange(startDate: LocalDateTime, endDate: LocalDateTime): Flow<Result<List<Shot>>> = flow {
+    fun getShotsByDateRange(
+        startDate: LocalDateTime,
+        endDate: LocalDateTime
+    ): Flow<Result<List<Shot>>> = flow {
         if (startDate.isAfter(endDate)) {
             emit(Result.failure(RepositoryException.ValidationError("Start date cannot be after end date")))
             return@flow
         }
-        
+
         shotDao.getShotsByDateRange(startDate, endDate).collect { shots ->
             emit(Result.success(shots))
         }
     }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get shots by date range", exception)))
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get shots by date range",
+                    exception
+                )
+            )
+        )
     }
-    
+
     /**
      * Get shots filtered by bean and date range.
      * @param beanId Optional bean ID filter
@@ -127,14 +158,21 @@ class ShotRepository @Inject constructor(
             emit(Result.failure(RepositoryException.ValidationError("Start date cannot be after end date")))
             return@flow
         }
-        
+
         shotDao.getFilteredShots(beanId, startDate, endDate).collect { shots ->
             emit(Result.success(shots))
         }
     }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get filtered shots", exception)))
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get filtered shots",
+                    exception
+                )
+            )
+        )
     }
-    
+
     /**
      * Get shots by grinder setting.
      * @param grinderSetting The grinder setting to filter by
@@ -145,14 +183,21 @@ class ShotRepository @Inject constructor(
             emit(Result.failure(RepositoryException.ValidationError("Grinder setting cannot be empty")))
             return@flow
         }
-        
+
         shotDao.getShotsByGrinderSetting(grinderSetting).collect { shots ->
             emit(Result.success(shots))
         }
     }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get shots by grinder setting", exception)))
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get shots by grinder setting",
+                    exception
+                )
+            )
+        )
     }
-    
+
     /**
      * Record a new shot with validation and business logic.
      * @param shot The shot to record
@@ -163,29 +208,31 @@ class ShotRepository @Inject constructor(
             // Validate shot data
             val validationResult = shot.validate()
             if (!validationResult.isValid) {
-                return Result.failure(RepositoryException.ValidationError(
-                    "Shot validation failed: ${validationResult.errors.joinToString(", ")}"
-                ))
+                return Result.failure(
+                    RepositoryException.ValidationError(
+                        "Shot validation failed: ${validationResult.errors.joinToString(", ")}"
+                    )
+                )
             }
-            
+
             // Verify that the bean exists
             val bean = beanDao.getBeanById(shot.beanId)
             if (bean == null) {
                 return Result.failure(RepositoryException.ValidationError("Selected bean does not exist"))
             }
-            
+
             // Record the shot
             shotDao.insertShot(shot)
-            
+
             // Update the bean's last grinder setting
             beanDao.updateLastGrinderSetting(shot.beanId, shot.grinderSetting)
-            
+
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(RepositoryException.DatabaseError("Failed to record shot", exception))
         }
     }
-    
+
     /**
      * Update an existing shot with validation.
      * @param shot The shot to update
@@ -196,30 +243,32 @@ class ShotRepository @Inject constructor(
             // Validate shot data
             val validationResult = shot.validate()
             if (!validationResult.isValid) {
-                return Result.failure(RepositoryException.ValidationError(
-                    "Shot validation failed: ${validationResult.errors.joinToString(", ")}"
-                ))
+                return Result.failure(
+                    RepositoryException.ValidationError(
+                        "Shot validation failed: ${validationResult.errors.joinToString(", ")}"
+                    )
+                )
             }
-            
+
             // Check if shot exists
             val existingShot = shotDao.getShotById(shot.id)
             if (existingShot == null) {
                 return Result.failure(RepositoryException.NotFoundError("Shot not found"))
             }
-            
+
             // Verify that the bean exists
             val bean = beanDao.getBeanById(shot.beanId)
             if (bean == null) {
                 return Result.failure(RepositoryException.ValidationError("Selected bean does not exist"))
             }
-            
+
             shotDao.updateShot(shot)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(RepositoryException.DatabaseError("Failed to update shot", exception))
         }
     }
-    
+
     /**
      * Delete a shot.
      * @param shot The shot to delete
@@ -232,14 +281,14 @@ class ShotRepository @Inject constructor(
             if (existingShot == null) {
                 return Result.failure(RepositoryException.NotFoundError("Shot not found"))
             }
-            
+
             shotDao.deleteShot(shot)
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(RepositoryException.DatabaseError("Failed to delete shot", exception))
         }
     }
-    
+
     /**
      * Delete all shots for a specific bean.
      * @param beanId The ID of the bean
@@ -250,14 +299,19 @@ class ShotRepository @Inject constructor(
             if (beanId.isBlank()) {
                 return Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
             }
-            
+
             shotDao.deleteShotsByBean(beanId)
             Result.success(Unit)
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to delete shots by bean", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to delete shots by bean",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get shot statistics for a specific bean.
      * @param beanId The ID of the bean
@@ -272,10 +326,15 @@ class ShotRepository @Inject constructor(
                 Result.success(statistics)
             }
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get shot statistics", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get shot statistics",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get the last shot for a specific bean (for grinder setting memory).
      * @param beanId The ID of the bean
@@ -290,10 +349,15 @@ class ShotRepository @Inject constructor(
                 Result.success(lastShot)
             }
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get last shot for bean", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get last shot for bean",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get total shot count.
      * @return Result containing the total number of shots
@@ -303,56 +367,77 @@ class ShotRepository @Inject constructor(
             val count = shotDao.getTotalShotCount()
             Result.success(count)
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get total shot count", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get total shot count",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get shots with brew ratio in a specific range.
      * @param minRatio Minimum brew ratio
      * @param maxRatio Maximum brew ratio
      * @return Flow of shots within the brew ratio range
      */
-    fun getShotsByBrewRatioRange(minRatio: Double, maxRatio: Double): Flow<Result<List<Shot>>> = flow {
-        if (minRatio < 0 || maxRatio < 0) {
-            emit(Result.failure(RepositoryException.ValidationError("Brew ratios cannot be negative")))
-            return@flow
+    fun getShotsByBrewRatioRange(minRatio: Double, maxRatio: Double): Flow<Result<List<Shot>>> =
+        flow {
+            if (minRatio < 0 || maxRatio < 0) {
+                emit(Result.failure(RepositoryException.ValidationError("Brew ratios cannot be negative")))
+                return@flow
+            }
+            if (minRatio > maxRatio) {
+                emit(Result.failure(RepositoryException.ValidationError("Minimum ratio cannot be greater than maximum ratio")))
+                return@flow
+            }
+
+            shotDao.getShotsByBrewRatioRange(minRatio, maxRatio).collect { shots ->
+                emit(Result.success(shots))
+            }
+        }.catch { exception ->
+            emit(
+                Result.failure(
+                    RepositoryException.DatabaseError(
+                        "Failed to get shots by brew ratio range",
+                        exception
+                    )
+                )
+            )
         }
-        if (minRatio > maxRatio) {
-            emit(Result.failure(RepositoryException.ValidationError("Minimum ratio cannot be greater than maximum ratio")))
-            return@flow
-        }
-        
-        shotDao.getShotsByBrewRatioRange(minRatio, maxRatio).collect { shots ->
-            emit(Result.success(shots))
-        }
-    }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get shots by brew ratio range", exception)))
-    }
-    
+
     /**
      * Get shots with extraction time in a specific range.
      * @param minSeconds Minimum extraction time in seconds
      * @param maxSeconds Maximum extraction time in seconds
      * @return Flow of shots within the extraction time range
      */
-    fun getShotsByExtractionTimeRange(minSeconds: Int, maxSeconds: Int): Flow<Result<List<Shot>>> = flow {
-        if (minSeconds < 0 || maxSeconds < 0) {
-            emit(Result.failure(RepositoryException.ValidationError("Extraction times cannot be negative")))
-            return@flow
+    fun getShotsByExtractionTimeRange(minSeconds: Int, maxSeconds: Int): Flow<Result<List<Shot>>> =
+        flow {
+            if (minSeconds < 0 || maxSeconds < 0) {
+                emit(Result.failure(RepositoryException.ValidationError("Extraction times cannot be negative")))
+                return@flow
+            }
+            if (minSeconds > maxSeconds) {
+                emit(Result.failure(RepositoryException.ValidationError("Minimum time cannot be greater than maximum time")))
+                return@flow
+            }
+
+            shotDao.getShotsByExtractionTimeRange(minSeconds, maxSeconds).collect { shots ->
+                emit(Result.success(shots))
+            }
+        }.catch { exception ->
+            emit(
+                Result.failure(
+                    RepositoryException.DatabaseError(
+                        "Failed to get shots by extraction time range",
+                        exception
+                    )
+                )
+            )
         }
-        if (minSeconds > maxSeconds) {
-            emit(Result.failure(RepositoryException.ValidationError("Minimum time cannot be greater than maximum time")))
-            return@flow
-        }
-        
-        shotDao.getShotsByExtractionTimeRange(minSeconds, maxSeconds).collect { shots ->
-            emit(Result.success(shots))
-        }
-    }.catch { exception ->
-        emit(Result.failure(RepositoryException.DatabaseError("Failed to get shots by extraction time range", exception)))
-    }
-    
+
     /**
      * Validate shot data without saving.
      * @param shot The shot to validate
@@ -360,7 +445,7 @@ class ShotRepository @Inject constructor(
      */
     suspend fun validateShot(shot: Shot): ValidationResult {
         val validationResult = shot.validate()
-        
+
         // Additional repository-level validation
         if (validationResult.isValid) {
             try {
@@ -379,10 +464,10 @@ class ShotRepository @Inject constructor(
                 )
             }
         }
-        
+
         return validationResult
     }
-    
+
     /**
      * Get suggested grinder setting for a bean based on last successful shot.
      * @param beanId The ID of the bean
@@ -398,18 +483,23 @@ class ShotRepository @Inject constructor(
                 if (bean?.lastGrinderSetting != null) {
                     return Result.success(bean.lastGrinderSetting)
                 }
-                
+
                 // If no saved setting, get from last shot
                 val lastShot = shotDao.getLastShotForBean(beanId)
                 Result.success(lastShot?.grinderSetting)
             }
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get suggested grinder setting", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get suggested grinder setting",
+                    exception
+                )
+            )
         }
     }
-    
+
     // PERFORMANCE OPTIMIZATION METHODS
-    
+
     /**
      * Get shots with pagination support for large datasets.
      * @param paginationConfig Configuration for pagination
@@ -417,9 +507,10 @@ class ShotRepository @Inject constructor(
      */
     suspend fun getShotsPaginated(paginationConfig: PaginationConfig): Result<PaginatedResult<Shot>> {
         return try {
-            val shots = shotDao.getShotsPaginated(paginationConfig.pageSize, paginationConfig.offset)
+            val shots =
+                shotDao.getShotsPaginated(paginationConfig.pageSize, paginationConfig.offset)
             val totalCount = shotDao.getTotalShotCount()
-            
+
             val paginatedResult = PaginatedResult(
                 items = shots,
                 totalCount = totalCount,
@@ -428,13 +519,18 @@ class ShotRepository @Inject constructor(
                 hasNextPage = (paginationConfig.offset + paginationConfig.pageSize) < totalCount,
                 hasPreviousPage = paginationConfig.page > 0
             )
-            
+
             Result.success(paginatedResult)
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get paginated shots", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get paginated shots",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get filtered shots with pagination support for large datasets.
      * @param beanId Optional bean ID filter
@@ -454,13 +550,13 @@ class ShotRepository @Inject constructor(
             if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
                 return Result.failure(RepositoryException.ValidationError("Start date cannot be after end date"))
             }
-            
+
             val shots = shotDao.getFilteredShotsPaginated(
-                beanId, startDate, endDate, 
+                beanId, startDate, endDate,
                 paginationConfig.pageSize, paginationConfig.offset
             )
             val totalCount = shotDao.getFilteredShotsCount(beanId, startDate, endDate)
-            
+
             val paginatedResult = PaginatedResult(
                 items = shots,
                 totalCount = totalCount,
@@ -469,10 +565,15 @@ class ShotRepository @Inject constructor(
                 hasNextPage = (paginationConfig.offset + paginationConfig.pageSize) < totalCount,
                 hasPreviousPage = paginationConfig.page > 0
             )
-            
+
             Result.success(paginatedResult)
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get paginated filtered shots", exception))
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get paginated filtered shots",
+                    exception
+                )
+            )
         }
     }
 }

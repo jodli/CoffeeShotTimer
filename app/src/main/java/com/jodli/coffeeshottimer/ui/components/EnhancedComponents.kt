@@ -1,10 +1,29 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.EaseInOutCubic
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -12,15 +31,24 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -78,18 +106,21 @@ fun EnhancedSuccessIndicator(
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(24.dp)
                 )
-                
+
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 onDismiss?.let {
                     TextButton(
                         onClick = it,
-                        modifier = Modifier.accessibleButton("Dismiss", action = "dismiss success message")
+                        modifier = Modifier.accessibleButton(
+                            "Dismiss",
+                            action = "dismiss success message"
+                        )
                     ) {
                         Text(
                             text = "Dismiss",
@@ -149,7 +180,7 @@ fun EnhancedErrorIndicator(
                         tint = MaterialTheme.colorScheme.onErrorContainer,
                         modifier = Modifier.size(24.dp)
                     )
-                    
+
                     Text(
                         text = message,
                         style = MaterialTheme.typography.bodyMedium,
@@ -157,17 +188,20 @@ fun EnhancedErrorIndicator(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                
+
                 if (onRetry != null || onDismiss != null) {
                     Spacer(modifier = Modifier.height(LocalSpacing.current.small))
-                    
+
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
                     ) {
                         onRetry?.let {
                             TextButton(
                                 onClick = it,
-                                modifier = Modifier.accessibleButton("Retry", action = "retry failed operation")
+                                modifier = Modifier.accessibleButton(
+                                    "Retry",
+                                    action = "retry failed operation"
+                                )
                             ) {
                                 Text(
                                     text = "Retry",
@@ -175,11 +209,14 @@ fun EnhancedErrorIndicator(
                                 )
                             }
                         }
-                        
+
                         onDismiss?.let {
                             TextButton(
                                 onClick = it,
-                                modifier = Modifier.accessibleButton("Dismiss", action = "dismiss error message")
+                                modifier = Modifier.accessibleButton(
+                                    "Dismiss",
+                                    action = "dismiss error message"
+                                )
                             ) {
                                 Text(
                                     text = "Dismiss",
@@ -217,14 +254,14 @@ fun EnhancedLoadingIndicator(
             ),
             label = "scale"
         )
-        
+
         CircularProgressIndicator(
             modifier = Modifier
                 .size(48.dp)
                 .scale(scale),
             strokeWidth = 4.dp
         )
-        
+
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
@@ -251,19 +288,24 @@ fun EnhancedMetricDisplay(
         false -> MaterialTheme.colorScheme.errorContainer
         null -> MaterialTheme.colorScheme.surfaceVariant
     }
-    
+
     val contentColor = when (isGood) {
         true -> MaterialTheme.colorScheme.onPrimaryContainer
         false -> MaterialTheme.colorScheme.onErrorContainer
         null -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    
+
     val fullValue = if (unit != null) "$value $unit" else value
-    
+
     Surface(
         modifier = modifier
             .accessibleDataDisplay(label, fullValue)
-            .then(if (onClick != null) Modifier.accessibleButton(label, action = "view details") else Modifier),
+            .then(
+                if (onClick != null) Modifier.accessibleButton(
+                    label,
+                    action = "view details"
+                ) else Modifier
+            ),
         shape = RoundedCornerShape(16.dp),
         color = backgroundColor,
         onClick = onClick ?: {}
@@ -278,9 +320,9 @@ fun EnhancedMetricDisplay(
                 color = contentColor,
                 textAlign = TextAlign.Center
             )
-            
+
             Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
-            
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(LocalSpacing.current.extraSmall)
@@ -291,7 +333,7 @@ fun EnhancedMetricDisplay(
                     fontWeight = FontWeight.Bold,
                     color = contentColor
                 )
-                
+
                 unit?.let {
                     Text(
                         text = it,
@@ -300,11 +342,11 @@ fun EnhancedMetricDisplay(
                     )
                 }
             }
-            
+
             // Quality indicator
             isGood?.let { good ->
                 Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
-                
+
                 Box(
                     modifier = Modifier
                         .size(8.dp)
@@ -334,33 +376,36 @@ fun EnhancedStatusBadge(
             MaterialTheme.colorScheme.primaryContainer,
             MaterialTheme.colorScheme.onPrimaryContainer
         )
+
         StatusType.Warning -> Pair(
             MaterialTheme.colorScheme.tertiaryContainer,
             MaterialTheme.colorScheme.onTertiaryContainer
         )
+
         StatusType.Error -> Pair(
             MaterialTheme.colorScheme.errorContainer,
             MaterialTheme.colorScheme.onErrorContainer
         )
+
         StatusType.Info -> Pair(
             MaterialTheme.colorScheme.surfaceVariant,
             MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
-    
+
     val icon = when (type) {
         StatusType.Success -> Icons.Default.Check
         StatusType.Warning -> Icons.Default.Warning
         StatusType.Error -> Icons.Default.Error
         StatusType.Info -> Icons.Default.Info
     }
-    
+
     val scale by animateFloatAsState(
         targetValue = if (isAnimated) 1.1f else 1f,
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "badge_scale"
     )
-    
+
     Surface(
         modifier = modifier
             .scale(scale)
@@ -382,7 +427,7 @@ fun EnhancedStatusBadge(
                 tint = colors.second,
                 modifier = Modifier.size(16.dp)
             )
-            
+
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelSmall,
@@ -410,7 +455,7 @@ fun EnhancedFloatingActionButton(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
         label = "fab_scale"
     )
-    
+
     if (isExtended && text != null) {
         ExtendedFloatingActionButton(
             onClick = onClick,
@@ -469,7 +514,7 @@ fun EnhancedProgressIndicator(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             if (showPercentage) {
                 Text(
                     text = "${(progress * 100).toInt()}%",
@@ -478,15 +523,15 @@ fun EnhancedProgressIndicator(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(LocalSpacing.current.extraSmall))
-        
+
         LinearProgressIndicator(
-            progress = progress,
+            progress = { progress },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(8.dp)
-                .clip(RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(4.dp)),
         )
     }
 }

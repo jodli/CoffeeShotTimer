@@ -17,7 +17,7 @@ import javax.inject.Singleton
 class GetBeanHistoryUseCase @Inject constructor(
     private val beanRepository: BeanRepository
 ) {
-    
+
     /**
      * Get all beans (active and inactive) ordered by creation date (newest first).
      * @return Flow of Result containing list of all beans
@@ -33,10 +33,17 @@ class GetBeanHistoryUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get bean history", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get bean history",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get bean history with search filtering.
      * @param searchQuery Search query to filter bean names (case-insensitive)
@@ -57,10 +64,17 @@ class GetBeanHistoryUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get filtered bean history", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get filtered bean history",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get beans grouped by active status.
      * @return Flow of Result containing map of active status to beans
@@ -75,14 +89,24 @@ class GetBeanHistoryUseCase @Inject constructor(
                         .groupBy { it.isActive }
                     Result.success(groupedBeans)
                 } else {
-                    Result.failure(result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get beans"))
+                    Result.failure(
+                        result.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to get beans")
+                    )
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to group beans by status", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to group beans by status",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get beans filtered by roast date range.
      * @param startDate Start date for filtering (inclusive)
@@ -106,10 +130,17 @@ class GetBeanHistoryUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get beans by date range", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get beans by date range",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get beans grouped by roast month for historical analysis.
      * @return Flow of Result containing map of year-month to beans
@@ -120,32 +151,44 @@ class GetBeanHistoryUseCase @Inject constructor(
                 if (result.isSuccess) {
                     val beans = result.getOrNull() ?: emptyList()
                     val groupedBeans = beans.groupBy { bean ->
-                        "${bean.roastDate.year}-${bean.roastDate.monthValue.toString().padStart(2, '0')}"
+                        "${bean.roastDate.year}-${
+                            bean.roastDate.monthValue.toString().padStart(2, '0')
+                        }"
                     }
                     Result.success(groupedBeans)
                 } else {
-                    Result.failure(result.exceptionOrNull() ?: BeanUseCaseException.UnknownError("Failed to get beans"))
+                    Result.failure(
+                        result.exceptionOrNull()
+                            ?: BeanUseCaseException.UnknownError("Failed to get beans")
+                    )
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to group beans by roast month", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to group beans by roast month",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get recently added beans (within the last 30 days).
      * @return Flow of Result containing list of recently added beans
      */
     fun getRecentlyAddedBeans(): Flow<Result<List<Bean>>> {
         val thirtyDaysAgo = LocalDate.now().minusDays(30)
-        
+
         return beanRepository.getAllBeans()
             .map { result ->
                 if (result.isSuccess) {
                     val beans = result.getOrNull() ?: emptyList()
                     val recentBeans = beans.filter { bean ->
-                        bean.createdAt.toLocalDate().isAfter(thirtyDaysAgo) || 
-                        bean.createdAt.toLocalDate().isEqual(thirtyDaysAgo)
+                        bean.createdAt.toLocalDate().isAfter(thirtyDaysAgo) ||
+                                bean.createdAt.toLocalDate().isEqual(thirtyDaysAgo)
                     }
                     Result.success(recentBeans.sortedByDescending { it.createdAt })
                 } else {
@@ -153,10 +196,17 @@ class GetBeanHistoryUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get recently added beans", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get recently added beans",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get beans with grinder settings history.
      * Useful for analyzing grinder setting patterns across different beans.
@@ -174,10 +224,17 @@ class GetBeanHistoryUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get beans with grinder settings", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get beans with grinder settings",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Get bean statistics for historical analysis.
      * @return Result containing BeanHistoryStats
@@ -186,26 +243,27 @@ class GetBeanHistoryUseCase @Inject constructor(
         return try {
             val beansFlow = beanRepository.getAllBeans()
             var stats: BeanHistoryStats? = null
-            
+
             beansFlow.collect { result ->
                 if (result.isSuccess) {
                     val beans = result.getOrNull() ?: emptyList()
-                    
+
                     val totalBeans = beans.size
                     val activeBeans = beans.count { it.isActive }
                     val inactiveBeans = totalBeans - activeBeans
-                    val beansWithGrinderSettings = beans.count { !it.lastGrinderSetting.isNullOrBlank() }
-                    
+                    val beansWithGrinderSettings =
+                        beans.count { !it.lastGrinderSetting.isNullOrBlank() }
+
                     val freshBeans = beans.count { it.isFresh() }
                     val averageDaysSinceRoast = if (beans.isNotEmpty()) {
                         beans.map { it.daysSinceRoast() }.average()
                     } else {
                         0.0
                     }
-                    
+
                     val oldestBean = beans.minByOrNull { it.roastDate }
                     val newestBean = beans.maxByOrNull { it.roastDate }
-                    
+
                     stats = BeanHistoryStats(
                         totalBeans = totalBeans,
                         activeBeans = activeBeans,
@@ -218,13 +276,18 @@ class GetBeanHistoryUseCase @Inject constructor(
                     )
                 }
             }
-            
+
             Result.success(stats ?: BeanHistoryStats())
         } catch (exception: Exception) {
-            Result.failure(BeanUseCaseException.UnknownError("Unexpected error getting bean history stats", exception))
+            Result.failure(
+                BeanUseCaseException.UnknownError(
+                    "Unexpected error getting bean history stats",
+                    exception
+                )
+            )
         }
     }
-    
+
     /**
      * Get inactive beans (for potential reactivation).
      * @return Flow of Result containing list of inactive beans
@@ -241,10 +304,17 @@ class GetBeanHistoryUseCase @Inject constructor(
                 }
             }
             .catch { exception ->
-                emit(Result.failure(BeanUseCaseException.UnknownError("Failed to get inactive beans", exception)))
+                emit(
+                    Result.failure(
+                        BeanUseCaseException.UnknownError(
+                            "Failed to get inactive beans",
+                            exception
+                        )
+                    )
+                )
             }
     }
-    
+
     /**
      * Search beans by partial name match (case-insensitive).
      * @param query Search query

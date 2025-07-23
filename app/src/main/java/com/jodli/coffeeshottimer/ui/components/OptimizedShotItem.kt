@@ -1,11 +1,22 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,25 +42,25 @@ fun OptimizedShotItem(
     val formattedDate = remember(shot.timestamp) {
         shot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))
     }
-    
+
     val formattedBrewRatio = remember(shot.brewRatio) {
         shot.getFormattedBrewRatio()
     }
-    
+
     val formattedExtractionTime = remember(shot.extractionTimeSeconds) {
         shot.getFormattedExtractionTime()
     }
-    
+
     val isOptimalTime = remember(shot.extractionTimeSeconds) {
         shot.isOptimalExtractionTime()
     }
-    
+
     val isTypicalRatio = remember(shot.brewRatio) {
         shot.isTypicalBrewRatio()
     }
-    
+
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         onClick = onClick,
         modifier = modifier
@@ -71,15 +82,15 @@ fun OptimizedShotItem(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                
+
                 Text(
                     text = formattedDate,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 // Key metrics row
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium)
@@ -89,13 +100,13 @@ fun OptimizedShotItem(
                         value = formattedBrewRatio,
                         isGood = isTypicalRatio
                     )
-                    
+
                     OptimizedMetricChip(
                         label = "Time",
                         value = formattedExtractionTime,
                         isGood = isOptimalTime
                     )
-                    
+
                     OptimizedMetricChip(
                         label = "Grinder",
                         value = shot.grinderSetting,
@@ -103,7 +114,7 @@ fun OptimizedShotItem(
                     )
                 }
             }
-            
+
             // Right side - weights and quality
             Column(
                 horizontalAlignment = Alignment.End
@@ -113,9 +124,9 @@ fun OptimizedShotItem(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 // Quality indicators
                 OptimizedQualityIndicator(
                     isOptimalTime = isOptimalTime,
@@ -146,7 +157,7 @@ private fun OptimizedMetricChip(
             else -> null // Will use MaterialTheme.colorScheme.errorContainer
         }
     }
-    
+
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(12.dp),
@@ -194,7 +205,7 @@ private fun OptimizedQualityIndicator(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
@@ -212,7 +223,7 @@ private fun OptimizedQualityIndicator(
                     }
                 )
         )
-        
+
         // Ratio indicator
         Box(
             modifier = Modifier

@@ -3,18 +3,18 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.model.Bean
-import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.PaginationConfig
+import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
+import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
+import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotStatisticsUseCase
-import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
-import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
-import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
-import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
-import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis
+import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
+import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
+import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -254,15 +254,18 @@ class ShotHistoryViewModel @Inject constructor(
                 val overallStats = overallStatsResult.getOrNull()
 
                 // Load shot trends (filtered by bean if selected, last 30 days)
-                val trendsResult = getShotStatisticsUseCase.getShotTrends(beanId = currentBeanId, days = 30)
+                val trendsResult =
+                    getShotStatisticsUseCase.getShotTrends(beanId = currentBeanId, days = 30)
                 val trends = trendsResult.getOrNull()
 
                 // Load brew ratio analysis (filtered by bean if selected)
-                val brewRatioResult = getShotStatisticsUseCase.getBrewRatioAnalysis(beanId = currentBeanId)
+                val brewRatioResult =
+                    getShotStatisticsUseCase.getBrewRatioAnalysis(beanId = currentBeanId)
                 val brewRatioAnalysis = brewRatioResult.getOrNull()
 
                 // Load extraction time analysis (filtered by bean if selected)
-                val extractionTimeResult = getShotStatisticsUseCase.getExtractionTimeAnalysis(beanId = currentBeanId)
+                val extractionTimeResult =
+                    getShotStatisticsUseCase.getExtractionTimeAnalysis(beanId = currentBeanId)
                 val extractionTimeAnalysis = extractionTimeResult.getOrNull()
 
                 // Load grinder setting analysis (only for specific bean)

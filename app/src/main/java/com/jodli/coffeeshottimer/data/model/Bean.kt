@@ -35,14 +35,14 @@ data class Bean(
      */
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()
-        
+
         // Validate bean name
         if (name.isBlank()) {
             errors.add("Bean name cannot be empty")
         } else if (name.length > 100) {
             errors.add("Bean name cannot exceed 100 characters")
         }
-        
+
         // Validate roast date
         val today = LocalDate.now()
         if (roastDate.isAfter(today)) {
@@ -50,15 +50,15 @@ data class Bean(
         } else if (roastDate.isBefore(today.minusDays(365))) {
             errors.add("Roast date cannot be more than 365 days ago")
         }
-        
+
         // Validate notes
         if (notes.length > 500) {
             errors.add("Notes cannot exceed 500 characters")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Calculates the number of days since the bean was roasted.
      * @return Number of days since roast date
@@ -66,7 +66,7 @@ data class Bean(
     fun daysSinceRoast(): Long {
         return java.time.temporal.ChronoUnit.DAYS.between(roastDate, LocalDate.now())
     }
-    
+
     /**
      * Checks if the bean is considered fresh (within optimal brewing window).
      * Generally, espresso beans are considered optimal 4-14 days after roasting.

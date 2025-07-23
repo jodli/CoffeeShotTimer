@@ -9,7 +9,13 @@ import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -54,7 +60,7 @@ class BeanManagementViewModel @Inject constructor(
     private fun loadBeans() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
+
             getActiveBeansUseCase.execute()
                 .catch { exception ->
                     _uiState.value = _uiState.value.copy(
@@ -83,7 +89,7 @@ class BeanManagementViewModel @Inject constructor(
     private fun loadFilteredBeans(query: String, showInactive: Boolean) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
+
             val useCase = if (showInactive) {
                 getBeanHistoryUseCase.getBeanHistoryWithSearch(query, activeOnly = false)
             } else {
@@ -93,7 +99,7 @@ class BeanManagementViewModel @Inject constructor(
                     getActiveBeansUseCase.getActiveBeansWithSearch(query)
                 }
             }
-            
+
             useCase
                 .catch { exception ->
                     _uiState.value = _uiState.value.copy(
@@ -130,7 +136,7 @@ class BeanManagementViewModel @Inject constructor(
     fun deleteBean(beanId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            
+
             val result = updateBeanUseCase.updateActiveStatus(beanId, false)
             if (result.isSuccess) {
                 // Refresh the bean list
@@ -147,7 +153,7 @@ class BeanManagementViewModel @Inject constructor(
     fun reactivateBean(beanId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            
+
             val result = updateBeanUseCase.updateActiveStatus(beanId, true)
             if (result.isSuccess) {
                 // Refresh the bean list
@@ -177,18 +183,18 @@ class BeanManagementViewModel @Inject constructor(
     fun setCurrentBean(beanId: String, grinderSetting: String? = null) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            
+
             // Update grinder setting if provided
             val grinderResult = if (!grinderSetting.isNullOrBlank()) {
                 updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
             } else {
                 Result.success(Unit)
             }
-            
+
             if (grinderResult.isSuccess) {
                 // Set the bean as current in the repository
                 val result = beanRepository.setCurrentBean(beanId)
-                
+
                 if (result.isSuccess) {
                     // Update UI state to reflect the current bean selection
                     _uiState.value = _uiState.value.copy(
@@ -206,7 +212,8 @@ class BeanManagementViewModel @Inject constructor(
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = grinderResult.exceptionOrNull()?.message ?: "Failed to update grinder setting"
+                    error = grinderResult.exceptionOrNull()?.message
+                        ?: "Failed to update grinder setting"
                 )
             }
         }
@@ -250,7 +257,7 @@ class BeanManagementViewModel @Inject constructor(
     fun bulkDeleteBeans(beanIds: List<String>) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-            
+
             val result = updateBeanUseCase.bulkUpdateActiveStatus(beanIds, false)
             if (result.isSuccess) {
                 // Refresh the bean list
@@ -284,7 +291,7 @@ class BeanManagementViewModel @Inject constructor(
     fun loadBeansByFreshness() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-            
+
             getActiveBeansUseCase.getActiveBeansByFreshness()
                 .catch { exception ->
                     _uiState.value = _uiState.value.copy(
@@ -305,7 +312,8 @@ class BeanManagementViewModel @Inject constructor(
                     } else {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = result.exceptionOrNull()?.message ?: "Failed to load beans by freshness"
+                            error = result.exceptionOrNull()?.message
+                                ?: "Failed to load beans by freshness"
                         )
                     }
                 }

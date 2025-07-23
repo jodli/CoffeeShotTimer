@@ -2,9 +2,9 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
-import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,13 +21,13 @@ class ShotDetailsViewModel @Inject constructor(
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
     private val shotRepository: ShotRepository
 ) : ViewModel() {
-    
+
     private val _uiState = MutableStateFlow(ShotDetailsUiState())
     val uiState: StateFlow<ShotDetailsUiState> = _uiState.asStateFlow()
-    
+
     private val _editNotesState = MutableStateFlow(EditNotesState())
     val editNotesState: StateFlow<EditNotesState> = _editNotesState.asStateFlow()
-    
+
     /**
      * Load shot details by ID
      */
@@ -39,9 +39,9 @@ class ShotDetailsViewModel @Inject constructor(
             )
             return
         }
-        
+
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        
+
         viewModelScope.launch {
             getShotDetailsUseCase.getShotDetails(shotId).fold(
                 onSuccess = { shotDetails ->
@@ -65,7 +65,7 @@ class ShotDetailsViewModel @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Refresh shot details
      */
@@ -74,7 +74,7 @@ class ShotDetailsViewModel @Inject constructor(
             loadShotDetails(details.shot.id)
         }
     }
-    
+
     /**
      * Start editing notes
      */
@@ -85,7 +85,7 @@ class ShotDetailsViewModel @Inject constructor(
             originalNotes = _uiState.value.shotDetails?.shot?.notes ?: ""
         )
     }
-    
+
     /**
      * Update notes text
      */
@@ -95,16 +95,16 @@ class ShotDetailsViewModel @Inject constructor(
             hasChanges = notes != _editNotesState.value.originalNotes
         )
     }
-    
+
     /**
      * Save notes changes
      */
     fun saveNotes() {
         val currentShot = _uiState.value.shotDetails?.shot ?: return
         val newNotes = _editNotesState.value.notes
-        
+
         _editNotesState.value = _editNotesState.value.copy(isSaving = true)
-        
+
         viewModelScope.launch {
             val updatedShot = currentShot.copy(notes = newNotes)
             shotRepository.updateShot(updatedShot).fold(
@@ -127,7 +127,7 @@ class ShotDetailsViewModel @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Cancel notes editing
      */
@@ -139,15 +139,15 @@ class ShotDetailsViewModel @Inject constructor(
             error = null
         )
     }
-    
+
     /**
      * Delete the current shot
      */
     fun deleteShot(onDeleted: () -> Unit) {
         val currentShot = _uiState.value.shotDetails?.shot ?: return
-        
+
         _uiState.value = _uiState.value.copy(isDeletingShot = true)
-        
+
         viewModelScope.launch {
             shotRepository.deleteShot(currentShot).fold(
                 onSuccess = {
@@ -163,7 +163,7 @@ class ShotDetailsViewModel @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Clear any error messages
      */
@@ -171,7 +171,7 @@ class ShotDetailsViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(error = null)
         _editNotesState.value = _editNotesState.value.copy(error = null)
     }
-    
+
     /**
      * Navigate to previous shot
      */
@@ -180,7 +180,7 @@ class ShotDetailsViewModel @Inject constructor(
             onNavigate(previousShot.id)
         }
     }
-    
+
     /**
      * Navigate to next shot
      */
