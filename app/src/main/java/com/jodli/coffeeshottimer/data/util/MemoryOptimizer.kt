@@ -22,8 +22,6 @@ class MemoryOptimizer @Inject constructor() {
 
     companion object {
         private const val MEMORY_CLEANUP_DELAY = 30_000L // 30 seconds
-        private const val CACHE_CLEANUP_DELAY = 60_000L // 1 minute
-        private const val MAX_CACHE_SIZE = 100
     }
 
     /**
@@ -61,30 +59,6 @@ class MemoryOptimizer @Inject constructor() {
     }
 
     /**
-     * Store a weak reference to an object for memory management.
-     * @param key Unique key for the reference
-     * @param obj Object to store weakly
-     */
-    fun storeWeakReference(key: String, obj: Any) {
-        weakReferences[key] = WeakReference(obj)
-
-        // Clean up null references periodically
-        if (weakReferences.size > MAX_CACHE_SIZE) {
-            cleanupWeakReferences()
-        }
-    }
-
-    /**
-     * Retrieve a weakly referenced object.
-     * @param key Unique key for the reference
-     * @return The referenced object or null if garbage collected
-     */
-    fun <T> getWeakReference(key: String): T? {
-        @Suppress("UNCHECKED_CAST")
-        return weakReferences[key]?.get() as? T
-    }
-
-    /**
      * Clean up null weak references.
      */
     private fun cleanupWeakReferences() {
@@ -104,7 +78,7 @@ class MemoryOptimizer @Inject constructor() {
     /**
      * Force garbage collection (use sparingly).
      */
-    fun forceGarbageCollection() {
+    private fun forceGarbageCollection() {
         System.gc()
     }
 
@@ -112,7 +86,7 @@ class MemoryOptimizer @Inject constructor() {
      * Get current memory usage information.
      * @return Memory usage statistics
      */
-    fun getMemoryUsage(): MemoryUsage {
+    private fun getMemoryUsage(): MemoryUsage {
         val runtime = Runtime.getRuntime()
         val totalMemory = runtime.totalMemory()
         val freeMemory = runtime.freeMemory()
@@ -132,14 +106,14 @@ class MemoryOptimizer @Inject constructor() {
      * Check if memory usage is high and cleanup is recommended.
      * @return True if memory usage is above 80%
      */
-    fun isMemoryUsageHigh(): Boolean {
+    private fun isMemoryUsageHigh(): Boolean {
         return getMemoryUsage().usagePercentage > 80.0
     }
 
     /**
      * Perform comprehensive memory cleanup.
      */
-    suspend fun performMemoryCleanup() {
+    fun performMemoryCleanup() {
         // Clean up weak references
         cleanupWeakReferences()
 
@@ -155,14 +129,6 @@ class MemoryOptimizer @Inject constructor() {
         }
     }
 
-    /**
-     * Clean up all resources when the optimizer is no longer needed.
-     */
-    fun cleanup() {
-        memoryCleanupJobs.values.forEach { it.cancel() }
-        memoryCleanupJobs.clear()
-        weakReferences.clear()
-    }
 }
 
 /**
@@ -175,9 +141,4 @@ data class MemoryUsage(
     val maxMemory: Long,
     val usagePercentage: Double
 ) {
-    fun getFormattedUsage(): String {
-        val usedMB = usedMemory / (1024 * 1024)
-        val maxMB = maxMemory / (1024 * 1024)
-        return "${usedMB}MB / ${maxMB}MB (${String.format("%.1f", usagePercentage)}%)"
-    }
 }

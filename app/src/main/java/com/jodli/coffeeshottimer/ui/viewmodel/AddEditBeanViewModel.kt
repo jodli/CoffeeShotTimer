@@ -104,7 +104,7 @@ class AddEditBeanViewModel @Inject constructor(
                 // For now, we'll do basic validation and handle uniqueness in the use case
                 emptyList<String>()
             } catch (e: Exception) {
-                emptyList<String>()
+                emptyList()
             }
 
             // Use enhanced validation with contextual tips
@@ -223,24 +223,6 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     /**
-     * Validate all fields at once (useful for form submission).
-     */
-    fun validateAllFields(): Boolean {
-        val currentState = _uiState.value
-
-        validateName(currentState.name)
-        validateRoastDate(currentState.roastDate)
-        validateNotes(currentState.notes)
-        updateAndValidateGrinderSetting(currentState.lastGrinderSetting)
-
-        // Wait for validation to complete and check for errors
-        return currentState.nameError == null &&
-                currentState.roastDateError == null &&
-                currentState.notesError == null &&
-                currentState.grinderSettingError == null
-    }
-
-    /**
      * Reset form to default values.
      */
     fun resetForm() {
@@ -269,70 +251,6 @@ class AddEditBeanViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Get validation summary for display.
-     */
-    fun getValidationSummary(): List<String> {
-        val currentState = _uiState.value
-        val errors = mutableListOf<String>()
-
-        currentState.nameError?.let { errors.add("Name: $it") }
-        currentState.roastDateError?.let { errors.add("Roast Date: $it") }
-        currentState.notesError?.let { errors.add("Notes: $it") }
-        currentState.grinderSettingError?.let { errors.add("Grinder Setting: $it") }
-
-        return errors
-    }
-
-    /**
-     * Quick save with minimal validation (for draft functionality).
-     */
-    fun quickSave() {
-        val currentState = _uiState.value
-
-        // Only validate required fields for quick save
-        if (currentState.name.trim().isEmpty()) {
-            _uiState.value = _uiState.value.copy(error = "Bean name is required for saving")
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isSaving = true, error = null)
-
-            val result = if (editingBeanId != null) {
-                updateBeanUseCase.execute(
-                    beanId = editingBeanId!!,
-                    name = currentState.name.trim(),
-                    roastDate = currentState.roastDate,
-                    notes = currentState.notes.trim(),
-                    isActive = currentState.isActive,
-                    lastGrinderSetting = currentState.lastGrinderSetting.trim()
-                        .takeIf { it.isNotEmpty() }
-                )
-            } else {
-                addBeanUseCase.execute(
-                    name = currentState.name.trim(),
-                    roastDate = currentState.roastDate,
-                    notes = currentState.notes.trim(),
-                    isActive = currentState.isActive,
-                    lastGrinderSetting = currentState.lastGrinderSetting.trim()
-                        .takeIf { it.isNotEmpty() }
-                )
-            }
-
-            if (result.isSuccess) {
-                _uiState.value = _uiState.value.copy(
-                    isSaving = false,
-                    saveSuccess = true
-                )
-            } else {
-                _uiState.value = _uiState.value.copy(
-                    isSaving = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to save bean"
-                )
-            }
-        }
-    }
 }
 
 /**

@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import io.mockk.mockk
@@ -13,7 +12,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,9 +26,6 @@ import java.time.LocalDate
  */
 @ExperimentalCoroutinesApi
 class AddEditBeanViewModelTest {
-
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     private val addBeanUseCase: AddBeanUseCase = mockk(relaxed = true)
     private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)

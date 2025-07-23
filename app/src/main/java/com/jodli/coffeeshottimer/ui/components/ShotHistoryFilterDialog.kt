@@ -47,7 +47,6 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ShotHistoryFilterDialog(
     currentFilter: ShotHistoryFilter,

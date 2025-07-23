@@ -18,18 +18,10 @@ val SoftBeige = Color(0xFFE8DDD0)           // Soft beige for containers
 
 // Dark theme adaptations
 val LightCaramel = Color(0xFFE6B577)        // Lighter caramel for dark theme
-val DarkEspresso = Color(0xFF0F0A06)        // Even darker for dark backgrounds
 val WarmTeal = Color(0xFF9BC5C3)            // Warmer teal for dark theme
 val DarkCream = Color(0xFFD4C4B0)           // Darker cream for dark theme text
 
 // Accent colors
 val TealAccent = Color(0xFF6B9B99)          // Primary teal accent
-val AmberAccent = Color(0xFFCC8F52)         // Amber accent for highlights
 val ErrorRed = Color(0xFFD32F2F)            // Error state
-val SuccessGreen = Color(0xFF4CAF50)        // Success state
-val WarningAmber = Color(0xFFFF9800)        // Warning state (amber-based)
 
-// Neutral colors
-val NeutralGray = Color(0xFF8D7B6B)         // Warm gray
-val LightGray = Color(0xFFE5DDD5)           // Light warm gray
-val DarkGray = Color(0xFF4A3D32)            // Dark warm gray

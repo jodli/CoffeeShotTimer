@@ -154,9 +154,7 @@ class BeanRepository @Inject constructor(
 
             // Check if bean exists
             val existingBean = beanDao.getBeanById(bean.id)
-            if (existingBean == null) {
-                return Result.failure(RepositoryException.NotFoundError("Bean not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
 
             // Check for name uniqueness (excluding current bean)
             val beanWithSameName = beanDao.getBeanByName(bean.name)
@@ -184,9 +182,7 @@ class BeanRepository @Inject constructor(
         return try {
             // Check if bean exists
             val existingBean = beanDao.getBeanById(bean.id)
-            if (existingBean == null) {
-                return Result.failure(RepositoryException.NotFoundError("Bean not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
 
             beanDao.deleteBean(bean)
             Result.success(Unit)
@@ -215,9 +211,7 @@ class BeanRepository @Inject constructor(
 
             // Check if bean exists
             val existingBean = beanDao.getBeanById(beanId)
-            if (existingBean == null) {
-                return Result.failure(RepositoryException.NotFoundError("Bean not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
 
             beanDao.updateLastGrinderSetting(beanId, grinderSetting)
             Result.success(Unit)
@@ -245,9 +239,7 @@ class BeanRepository @Inject constructor(
 
             // Check if bean exists
             val existingBean = beanDao.getBeanById(beanId)
-            if (existingBean == null) {
-                return Result.failure(RepositoryException.NotFoundError("Bean not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
 
             beanDao.updateBeanActiveStatus(beanId, isActive)
             Result.success(Unit)
@@ -345,9 +337,7 @@ class BeanRepository @Inject constructor(
 
             // Check if bean exists and is active
             val bean = beanDao.getBeanById(beanId)
-            if (bean == null) {
-                return Result.failure(RepositoryException.NotFoundError("Bean not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
             if (!bean.isActive) {
                 return Result.failure(RepositoryException.ValidationError("Cannot select inactive bean"))
             }
@@ -419,8 +409,4 @@ sealed class RepositoryException(message: String, cause: Throwable? = null) :
 
     class ValidationError(message: String) : RepositoryException(message)
     class NotFoundError(message: String) : RepositoryException(message)
-    class NetworkError(message: String, cause: Throwable? = null) :
-        RepositoryException(message, cause)
-
-    class PermissionError(message: String) : RepositoryException(message)
 }

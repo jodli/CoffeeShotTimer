@@ -50,7 +50,6 @@ import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BeanManagementScreen(
     onAddBeanClick: () -> Unit = {},

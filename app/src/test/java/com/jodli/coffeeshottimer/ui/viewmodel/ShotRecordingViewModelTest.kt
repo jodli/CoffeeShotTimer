@@ -1,7 +1,6 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import android.content.Context
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
@@ -13,7 +12,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.assertNotNull
 
@@ -22,10 +20,7 @@ import org.junit.Assert.assertNotNull
  */
 @ExperimentalCoroutinesApi
 class ShotRecordingViewModelTest {
-    
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-    
+
     private val testDispatcher = StandardTestDispatcher()
     
     private lateinit var recordShotUseCase: RecordShotUseCase

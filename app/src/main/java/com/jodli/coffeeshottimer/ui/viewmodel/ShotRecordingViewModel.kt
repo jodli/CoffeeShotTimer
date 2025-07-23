@@ -8,7 +8,6 @@ import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
-import com.jodli.coffeeshottimer.ui.validation.getExtractionTimeWarnings
 import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightIn
 import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightOut
 import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
@@ -101,10 +100,6 @@ class ShotRecordingViewModel @Inject constructor(
 
     // Enhanced validation warnings
     private val _brewRatioWarnings = MutableStateFlow<List<String>>(emptyList())
-    val brewRatioWarnings: StateFlow<List<String>> = _brewRatioWarnings.asStateFlow()
-
-    private val _extractionTimeWarnings = MutableStateFlow<List<String>>(emptyList())
-    val extractionTimeWarnings: StateFlow<List<String>> = _extractionTimeWarnings.asStateFlow()
 
     // Timer state (delegated to use case)
     val timerState = recordShotUseCase.timerState
@@ -266,13 +261,15 @@ class ShotRecordingViewModel @Inject constructor(
                     // Get unique grinder settings from recent successful shots (last 10)
                     // Consider shots with brew ratios in typical range as "successful"
                     val successfulSettings = shots
+                        .asSequence()
                         .filter { shot ->
                             shot.brewRatio in 1.5..3.0 // Typical espresso range
                         }
                         .take(10) // Last 10 shots
                         .map { it.grinderSetting }
                         .distinct()
-                        .take(3) // Show max 3 previous settings
+                        .take(3)
+                        .toList() // Show max 3 previous settings
 
                     _previousSuccessfulSettings.value = successfulSettings
                 },
@@ -387,14 +384,6 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Stop the extraction timer.
-     */
-    fun stopTimer() {
-        recordShotUseCase.stopTimer()
-        validateForm()
-    }
-
-    /**
      * Reset the extraction timer.
      */
     fun resetTimer() {
@@ -488,37 +477,6 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Clear error message.
-     */
-    fun clearError() {
-        _errorMessage.value = null
-        recordShotUseCase.clearError()
-    }
-
-    /**
-     * Get formatted extraction time.
-     */
-    fun getFormattedExtractionTime(): String {
-        return recordShotUseCase.formatExtractionTime(timerState.value.elapsedTimeSeconds)
-    }
-
-    /**
-     * Check if extraction time is optimal.
-     */
-    fun isOptimalExtractionTime(): Boolean {
-        return recordShotUseCase.isOptimalExtractionTime(timerState.value.elapsedTimeSeconds)
-    }
-
-    /**
-     * Update extraction time warnings based on current timer state.
-     * Should be called when timer state changes.
-     */
-    fun updateExtractionTimeWarnings() {
-        val currentTime = timerState.value.elapsedTimeSeconds
-        _extractionTimeWarnings.value = currentTime.getExtractionTimeWarnings()
-    }
-
-    /**
      * Start auto-save draft functionality.
      * Saves form data every 30 seconds to prevent data loss.
      */
@@ -549,7 +507,7 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Save current form state as draft.
      */
-    private suspend fun saveDraft() {
+    private fun saveDraft() {
         try {
             val draft = ShotDraft(
                 selectedBeanId = _selectedBean.value?.id,
@@ -634,7 +592,7 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Clear saved draft.
      */
-    private suspend fun clearDraft() {
+    private fun clearDraft() {
         try {
             val sharedPrefs = context.getSharedPreferences("shot_drafts", Context.MODE_PRIVATE)
             sharedPrefs.edit()
@@ -675,29 +633,4 @@ class ShotRecordingViewModel @Inject constructor(
         }
     }
 
-    // Validation helper functions
-    private fun validateWeight(
-        value: String,
-        fieldName: String,
-        min: Double,
-        max: Double
-    ): String? {
-        if (value.isBlank()) return "$fieldName is required"
-
-        val weight = value.toDoubleOrNull()
-        return when {
-            weight == null -> "Please enter a valid number"
-            weight < min -> "$fieldName must be at least ${min}g"
-            weight > max -> "$fieldName cannot exceed ${max}g"
-            else -> null
-        }
-    }
-
-    private fun validateGrinderSetting(value: String): String? {
-        return when {
-            value.isBlank() -> "Grinder setting is required"
-            value.length > 50 -> "Grinder setting cannot exceed 50 characters"
-            else -> null
-        }
-    }
 }

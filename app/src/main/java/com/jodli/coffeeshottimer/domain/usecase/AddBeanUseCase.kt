@@ -171,7 +171,6 @@ class AddBeanUseCase @Inject constructor(
 sealed class BeanUseCaseException(message: String, cause: Throwable? = null) :
     Exception(message, cause) {
     class ValidationError(message: String) : BeanUseCaseException(message)
-    class DuplicateNameError(message: String) : BeanUseCaseException(message)
     class UnknownError(message: String, cause: Throwable? = null) :
         BeanUseCaseException(message, cause)
 }

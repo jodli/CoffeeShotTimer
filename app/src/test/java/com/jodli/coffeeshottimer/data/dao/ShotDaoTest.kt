@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.data.dao
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.jodli.coffeeshottimer.data.database.AppDatabase
@@ -11,11 +10,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -25,10 +22,7 @@ import java.time.LocalDateTime
  */
 @RunWith(RobolectricTestRunner::class)
 class ShotDaoTest {
-    
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-    
+
     private lateinit var database: AppDatabase
     private lateinit var shotDao: ShotDao
     private lateinit var beanDao: BeanDao

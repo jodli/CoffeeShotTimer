@@ -5,10 +5,8 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import org.junit.Rule
 import org.junit.Test
-import org.junit.Assert.*
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 /**
  * Tests for GrinderSettingSlider component.

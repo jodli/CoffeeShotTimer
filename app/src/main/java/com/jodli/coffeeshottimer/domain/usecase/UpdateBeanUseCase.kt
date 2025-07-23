@@ -50,9 +50,7 @@ class UpdateBeanUseCase @Inject constructor(
             }
 
             val existingBean = existingBeanResult.getOrNull()
-            if (existingBean == null) {
-                return Result.failure(BeanUseCaseException.ValidationError("Bean not found"))
-            }
+                ?: return Result.failure(BeanUseCaseException.ValidationError("Bean not found"))
 
             // Create updated bean instance
             val updatedBean = existingBean.copy(
@@ -198,12 +196,10 @@ class UpdateBeanUseCase @Inject constructor(
             }
 
             val existingBean = existingBeanResult.getOrNull()
-            if (existingBean == null) {
-                return ValidationResult(
+                ?: return ValidationResult(
                     isValid = false,
                     errors = listOf("Bean not found")
                 )
-            }
 
             val updatedBean = existingBean.copy(
                 name = name.trim(),

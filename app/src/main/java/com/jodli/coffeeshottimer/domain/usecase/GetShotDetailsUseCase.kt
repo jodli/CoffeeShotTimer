@@ -143,10 +143,7 @@ class GetShotDetailsUseCase @Inject constructor(
                 )
             }
 
-            val lastShot = lastShotResult.getOrNull()
-            if (lastShot == null) {
-                return Result.success(null)
-            }
+            val lastShot = lastShotResult.getOrNull() ?: return Result.success(null)
 
             getShotDetails(lastShot.id)
         } catch (exception: Exception) {

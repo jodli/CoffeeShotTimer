@@ -217,9 +217,7 @@ class ShotRepository @Inject constructor(
 
             // Verify that the bean exists
             val bean = beanDao.getBeanById(shot.beanId)
-            if (bean == null) {
-                return Result.failure(RepositoryException.ValidationError("Selected bean does not exist"))
-            }
+                ?: return Result.failure(RepositoryException.ValidationError("Selected bean does not exist"))
 
             // Record the shot
             shotDao.insertShot(shot)
@@ -252,15 +250,11 @@ class ShotRepository @Inject constructor(
 
             // Check if shot exists
             val existingShot = shotDao.getShotById(shot.id)
-            if (existingShot == null) {
-                return Result.failure(RepositoryException.NotFoundError("Shot not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))
 
             // Verify that the bean exists
             val bean = beanDao.getBeanById(shot.beanId)
-            if (bean == null) {
-                return Result.failure(RepositoryException.ValidationError("Selected bean does not exist"))
-            }
+                ?: return Result.failure(RepositoryException.ValidationError("Selected bean does not exist"))
 
             shotDao.updateShot(shot)
             Result.success(Unit)
@@ -278,9 +272,7 @@ class ShotRepository @Inject constructor(
         return try {
             // Check if shot exists
             val existingShot = shotDao.getShotById(shot.id)
-            if (existingShot == null) {
-                return Result.failure(RepositoryException.NotFoundError("Shot not found"))
-            }
+                ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))
 
             shotDao.deleteShot(shot)
             Result.success(Unit)
@@ -451,12 +443,10 @@ class ShotRepository @Inject constructor(
             try {
                 // Verify that the bean exists
                 val bean = beanDao.getBeanById(shot.beanId)
-                if (bean == null) {
-                    return ValidationResult(
+                    ?: return ValidationResult(
                         isValid = false,
                         errors = listOf("Selected bean does not exist")
                     )
-                }
             } catch (exception: Exception) {
                 return ValidationResult(
                     isValid = false,

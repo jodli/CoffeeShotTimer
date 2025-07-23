@@ -50,7 +50,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -410,8 +409,7 @@ fun EnhancedTimerControls(
         // Enhanced prominent timer button
         EnhancedTimerButton(
             isRunning = isRunning,
-            onStartStop = onStartStop,
-            enabled = enabled
+            onStartStop = onStartStop
         )
 
         // Reset button (optional) - styled to complement the enhanced timer button
@@ -439,134 +437,6 @@ fun EnhancedTimerControls(
             }
         }
     }
-}
-
-/**
- * Compact timer display for cards and lists
- */
-@Composable
-fun CompactTimer(
-    currentTime: Long,
-    isRunning: Boolean,
-    modifier: Modifier = Modifier,
-    showStatus: Boolean = true,
-    showColorCoding: Boolean = true
-) {
-    val spacing = LocalSpacing.current
-
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(spacing.small)
-    ) {
-        if (showStatus) {
-            // Status indicator
-            Box(
-                modifier = Modifier
-                    .size(8.dp)
-                    .clip(CircleShape)
-                    .then(
-                        if (isRunning) {
-                            Modifier.background(MaterialTheme.colorScheme.primary)
-                        } else {
-                            Modifier.background(MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    )
-            )
-        }
-
-        Text(
-            text = formatExtractionTime(currentTime),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium,
-            color = if (showColorCoding)
-                getTimerColor(currentTime, isRunning)
-            else if (isRunning)
-                MaterialTheme.colorScheme.primary
-            else
-                MaterialTheme.colorScheme.onSurface
-        )
-    }
-}
-
-/**
- * Timer statistics display
- */
-@Composable
-fun TimerStats(
-    averageTime: Long?,
-    bestTime: Long?,
-    totalShots: Int,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(modifier = modifier) {
-        Text(
-            text = "Statistics",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatItem(
-                label = "Total Shots",
-                value = totalShots.toString()
-            )
-
-            StatItem(
-                label = "Average",
-                value = averageTime?.let { formatTime(it) } ?: "--"
-            )
-
-            StatItem(
-                label = "Best Time",
-                value = bestTime?.let { formatTime(it) } ?: "--"
-            )
-        }
-    }
-}
-
-@Composable
-private fun StatItem(
-    label: String,
-    value: String
-) {
-    val spacing = LocalSpacing.current
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(spacing.extraSmall))
-
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-/**
- * Format time in milliseconds to MM:SS format
- */
-private fun formatTime(timeMs: Long): String {
-    val totalSeconds = timeMs / 1000
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return String.format("%02d:%02d", minutes, seconds)
 }
 
 /**
@@ -688,7 +558,6 @@ fun triggerHapticFeedback(context: Context, isStartAction: Boolean) {
             vib.vibrate(effect)
         } else {
             // Fallback for older Android versions
-            @Suppress("DEPRECATION")
             val duration = if (isStartAction) 10L else 25L
             vib.vibrate(duration)
         }
@@ -712,7 +581,6 @@ fun EnhancedTimerButton(
     isRunning: Boolean,
     onStartStop: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
     debounceDelayMs: Long = 300L // Configurable debounce delay
 ) {
     val context = LocalContext.current

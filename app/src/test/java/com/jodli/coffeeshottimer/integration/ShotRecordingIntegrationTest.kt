@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.integration
 
 import android.content.Context
 import android.content.SharedPreferences
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.ValidationResult
@@ -24,7 +23,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Ignore
@@ -35,10 +33,7 @@ import java.time.LocalDate
  */
 @ExperimentalCoroutinesApi
 class ShotRecordingIntegrationTest {
-    
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-    
+
     private val testDispatcher = StandardTestDispatcher()
     
     private lateinit var recordShotUseCase: RecordShotUseCase

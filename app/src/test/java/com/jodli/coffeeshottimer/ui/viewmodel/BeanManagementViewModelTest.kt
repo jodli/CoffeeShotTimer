@@ -1,9 +1,6 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
-import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
@@ -19,12 +16,10 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import java.time.LocalDate
 
 /**
  * Test class for BeanManagementViewModel.
@@ -33,12 +28,8 @@ import java.time.LocalDate
 @ExperimentalCoroutinesApi
 class BeanManagementViewModelTest {
 
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-
     private val getActiveBeansUseCase: GetActiveBeansUseCase = mockk()
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase = mockk()
-    private val addBeanUseCase: AddBeanUseCase = mockk(relaxed = true)
     private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
     private val beanRepository: BeanRepository = mockk(relaxed = true)
 
@@ -57,7 +48,6 @@ class BeanManagementViewModelTest {
         viewModel = BeanManagementViewModel(
             getActiveBeansUseCase,
             getBeanHistoryUseCase,
-            addBeanUseCase,
             updateBeanUseCase,
             beanRepository
         )

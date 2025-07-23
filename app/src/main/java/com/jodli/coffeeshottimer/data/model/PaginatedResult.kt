@@ -11,9 +11,6 @@ data class PaginatedResult<T>(
     val hasNextPage: Boolean,
     val hasPreviousPage: Boolean
 ) {
-    val totalPages: Int = if (totalCount == 0) 0 else (totalCount + pageSize - 1) / pageSize
-    val isFirstPage: Boolean = currentPage == 0
-    val isLastPage: Boolean = currentPage >= totalPages - 1
 }
 
 /**

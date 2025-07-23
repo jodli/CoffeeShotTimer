@@ -166,29 +166,6 @@ class ShotHistoryViewModel @Inject constructor(
         loadShotHistory()
     }
 
-    fun setGrinderSettingFilter(grinderSetting: String?) {
-        _currentFilter.value = _currentFilter.value.copy(
-            grinderSetting = if (grinderSetting.isNullOrBlank()) null else grinderSetting
-        )
-        loadShotHistory()
-    }
-
-    fun setBrewRatioFilter(minRatio: Double?, maxRatio: Double?) {
-        _currentFilter.value = _currentFilter.value.copy(
-            minBrewRatio = minRatio,
-            maxBrewRatio = maxRatio
-        )
-        loadShotHistory()
-    }
-
-    fun setExtractionTimeFilter(minTime: Int?, maxTime: Int?) {
-        _currentFilter.value = _currentFilter.value.copy(
-            minExtractionTime = minTime,
-            maxExtractionTime = maxTime
-        )
-        loadShotHistory()
-    }
-
     fun toggleOptimalExtractionTimeFilter() {
         val current = _currentFilter.value.onlyOptimalExtractionTime
         _currentFilter.value = _currentFilter.value.copy(
@@ -223,10 +200,6 @@ class ShotHistoryViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(isRefreshing = false)
             }
         }
-    }
-
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
     }
 
     fun getBeanName(beanId: String): String {
@@ -302,64 +275,6 @@ class ShotHistoryViewModel @Inject constructor(
     // PERFORMANCE OPTIMIZATION METHODS
 
     /**
-     * Load more shots for pagination (lazy loading).
-     */
-    fun loadMoreShots() {
-        if (isLoadingMore || !hasMoreData) return
-
-        viewModelScope.launch {
-            isLoadingMore = true
-            _uiState.value = _uiState.value.copy(isLoadingMore = true)
-
-            try {
-                val nextPage = currentPaginationConfig.page + 1
-                val nextPaginationConfig = currentPaginationConfig.copy(page = nextPage)
-
-                val filter = _currentFilter.value
-                val result = if (filter.hasFilters()) {
-                    getShotHistoryUseCase.getFilteredShotsPaginated(
-                        beanId = filter.beanId,
-                        startDate = filter.startDate,
-                        endDate = filter.endDate,
-                        paginationConfig = nextPaginationConfig
-                    )
-                } else {
-                    getShotHistoryUseCase.getShotsPaginated(nextPaginationConfig)
-                }
-
-                result.fold(
-                    onSuccess = { paginatedResult ->
-                        val currentShots = _uiState.value.shots
-                        val newShots = currentShots + paginatedResult.items
-
-                        _uiState.value = _uiState.value.copy(
-                            shots = newShots,
-                            isLoadingMore = false,
-                            hasMorePages = paginatedResult.hasNextPage
-                        )
-
-                        currentPaginationConfig = nextPaginationConfig
-                        hasMoreData = paginatedResult.hasNextPage
-                    },
-                    onFailure = { error ->
-                        _uiState.value = _uiState.value.copy(
-                            isLoadingMore = false,
-                            error = "Failed to load more shots: ${error.message}"
-                        )
-                    }
-                )
-            } catch (exception: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoadingMore = false,
-                    error = "Failed to load more shots: ${exception.message}"
-                )
-            } finally {
-                isLoadingMore = false
-            }
-        }
-    }
-
-    /**
      * Reset pagination state when filters change.
      */
     private fun resetPagination() {
@@ -396,20 +311,6 @@ class ShotHistoryViewModel @Inject constructor(
 
         // Perform general memory cleanup
         memoryOptimizer.performMemoryCleanup()
-    }
-
-    /**
-     * Get current memory usage for debugging.
-     */
-    fun getMemoryUsage(): String {
-        return memoryOptimizer.getMemoryUsage().getFormattedUsage()
-    }
-
-    /**
-     * Check if memory usage is high.
-     */
-    fun isMemoryUsageHigh(): Boolean {
-        return memoryOptimizer.isMemoryUsageHigh()
     }
 
     override fun onCleared() {

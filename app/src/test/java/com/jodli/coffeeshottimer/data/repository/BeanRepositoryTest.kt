@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.data.repository
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.jodli.coffeeshottimer.data.database.AppDatabase
@@ -10,9 +9,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.robolectric.annotation.Config
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import java.time.LocalDate
@@ -23,10 +20,7 @@ import java.time.LocalDate
  */
 @RunWith(RobolectricTestRunner::class)
 class BeanRepositoryTest {
-    
-    @get:Rule
-    val instantTaskExecutorRule = InstantTaskExecutorRule()
-    
+
     private lateinit var database: AppDatabase
     private lateinit var repository: BeanRepository
     

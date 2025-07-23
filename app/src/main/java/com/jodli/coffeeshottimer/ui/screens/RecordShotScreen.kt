@@ -49,7 +49,6 @@ import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecordShotScreen(
     onNavigateToBeanManagement: () -> Unit = {},

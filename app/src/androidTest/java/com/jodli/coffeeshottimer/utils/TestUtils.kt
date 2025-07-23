@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.utils
 
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
-import androidx.test.platform.app.InstrumentationRegistry
 import com.jodli.coffeeshottimer.data.database.AppDatabase
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
@@ -19,7 +18,7 @@ object TestUtils {
     /**
      * Wait for a condition to be true with timeout.
      */
-    fun ComposeContentTestRule.waitForCondition(
+    private fun ComposeContentTestRule.waitForCondition(
         timeoutMillis: Long = 5000,
         condition: () -> Boolean
     ) {
@@ -39,23 +38,11 @@ object TestUtils {
             onAllNodesWithText(text).fetchSemanticsNodes().isNotEmpty()
         }
     }
-    
-    /**
-     * Wait for text to disappear from screen.
-     */
-    fun ComposeContentTestRule.waitForTextToDisappear(
-        text: String,
-        timeoutMillis: Long = 5000
-    ) {
-        waitForCondition(timeoutMillis) {
-            onAllNodesWithText(text).fetchSemanticsNodes().isEmpty()
-        }
-    }
-    
+
     /**
      * Perform text input with clearing existing text first.
      */
-    fun SemanticsNodeInteraction.performTextInputWithClear(text: String) {
+    private fun SemanticsNodeInteraction.performTextInputWithClear(text: String) {
         performTextClearance()
         performTextInput(text)
     }
@@ -240,7 +227,7 @@ object TestUtils {
     /**
      * Simulate memory pressure by creating and releasing objects.
      */
-    fun simulateMemoryPressure() {
+    private fun simulateMemoryPressure() {
         repeat(10) {
             val largeArray = ByteArray(1024 * 1024) // 1MB
             // Let it go out of scope
@@ -251,7 +238,7 @@ object TestUtils {
     /**
      * Get current memory usage in MB.
      */
-    fun getCurrentMemoryUsageMB(): Long {
+    private fun getCurrentMemoryUsageMB(): Long {
         val runtime = Runtime.getRuntime()
         val usedMemory = runtime.totalMemory() - runtime.freeMemory()
         return usedMemory / (1024 * 1024)
