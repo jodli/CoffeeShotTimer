@@ -11,6 +11,7 @@ import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
 import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -353,4 +354,73 @@ class ShotHistoryViewModelTest {
     @Test
     fun `hasAnalysisData returns false when no analysis data is present`() {
         assertFalse(viewModel.uiState.value.hasAnalysisData)
-    }}
+    }
+
+    @Test
+    fun `refreshDataPullToRefresh sets isRefreshing state correctly`() = runTest {
+        // Given - initial state
+        assertFalse(viewModel.uiState.value.isRefreshing)
+
+        // When - trigger pull to refresh
+        viewModel.refreshDataPullToRefresh()
+
+        // Then - should have called loadInitialData and cleared refresh state
+        assertFalse(viewModel.uiState.value.isRefreshing)
+        coVerify { getShotHistoryUseCase.getShotsPaginated(any()) }
+    }
+
+    @Test
+    fun `refreshDataPullToRefresh also refreshes analysis when shown`() = runTest {
+        // Given - analysis view is shown
+        viewModel.toggleAnalysisView()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // When - trigger pull to refresh
+        viewModel.refreshDataPullToRefresh()
+
+        // Then - should have refreshed analysis data
+        coVerify { getShotStatisticsUseCase.getOverallStatistics() }
+    }
+
+    @Test
+    fun `refreshDataPullToRefresh clears error state`() = runTest {
+        // Given - there's an error state
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.failure(Exception("Test error"))
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Verify error exists
+        assertNotNull(viewModel.uiState.value.error)
+
+        // Reset mock to succeed
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
+        )
+
+        // When - trigger pull to refresh
+        viewModel.refreshDataPullToRefresh()
+
+        // Then - error should be cleared
+        assertNull(viewModel.uiState.value.error)
+        assertFalse(viewModel.uiState.value.isRefreshing)
+    }
+
+    @Test
+    fun `isEmpty property considers isRefreshing state`() = runTest {
+        // Given - empty shots but refreshing
+        val uiState = ShotHistoryUiState(
+            isRefreshing = true,
+            shots = emptyList(),
+            isLoading = false
+        )
+
+        // Then - should not be empty while refreshing
+        assertFalse(uiState.isEmpty)
+
+        // Given - empty shots and not refreshing
+        val uiStateNotRefreshing = uiState.copy(isRefreshing = false)
+
+        // Then - should be empty
+        assertTrue(uiStateNotRefreshing.isEmpty)
+    }
+}

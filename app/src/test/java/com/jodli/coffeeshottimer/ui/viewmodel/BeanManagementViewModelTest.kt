@@ -1,24 +1,30 @@
-package com.example.coffeeshottimer.ui.viewmodel
+package com.jodli.coffeeshottimer.ui.viewmodel
 
-import com.example.coffeeshottimer.data.model.Bean
-import com.example.coffeeshottimer.domain.usecase.AddBeanUseCase
-import com.example.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
-import com.example.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
-import com.example.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
+import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import io.mockk.every
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.whenever
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import java.time.LocalDate
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
 
 /**
  * Test class for BeanManagementViewModel.
@@ -27,36 +33,39 @@ import kotlin.test.assertTrue
 @ExperimentalCoroutinesApi
 class BeanManagementViewModelTest {
 
-    @Mock
-    private lateinit var getActiveBeansUseCase: GetActiveBeansUseCase
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private lateinit var getBeanHistoryUseCase: GetBeanHistoryUseCase
-
-    @Mock
-    private lateinit var addBeanUseCase: AddBeanUseCase
-
-    @Mock
-    private lateinit var updateBeanUseCase: UpdateBeanUseCase
+    private val getActiveBeansUseCase: GetActiveBeansUseCase = mockk()
+    private val getBeanHistoryUseCase: GetBeanHistoryUseCase = mockk()
+    private val addBeanUseCase: AddBeanUseCase = mockk(relaxed = true)
+    private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
+    private val beanRepository: BeanRepository = mockk(relaxed = true)
 
     private lateinit var viewModel: BeanManagementViewModel
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
+        Dispatchers.setMain(testDispatcher)
         
         // Setup default mock responses
-        whenever(getActiveBeansUseCase.execute()).thenReturn(
-            flowOf(Result.success(emptyList()))
-        )
+        every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(emptyList()))
+        every { getActiveBeansUseCase.getActiveBeansWithSearch(any()) } returns flowOf(Result.success(emptyList()))
+        every { getBeanHistoryUseCase.getBeanHistoryWithSearch(any(), any()) } returns flowOf(Result.success(emptyList()))
         
         viewModel = BeanManagementViewModel(
             getActiveBeansUseCase,
             getBeanHistoryUseCase,
             addBeanUseCase,
-            updateBeanUseCase
+            updateBeanUseCase,
+            beanRepository
         )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test

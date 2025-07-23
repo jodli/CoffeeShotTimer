@@ -1,21 +1,26 @@
-package com.example.coffeeshottimer.ui.viewmodel
+package com.jodli.coffeeshottimer.ui.viewmodel
 
-import com.example.coffeeshottimer.domain.usecase.AddBeanUseCase
-import com.example.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import java.time.LocalDate
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 /**
  * Test class for AddEditBeanViewModel.
@@ -24,23 +29,28 @@ import kotlin.test.assertTrue
 @ExperimentalCoroutinesApi
 class AddEditBeanViewModelTest {
 
-    @Mock
-    private lateinit var addBeanUseCase: AddBeanUseCase
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
 
-    @Mock
-    private lateinit var updateBeanUseCase: UpdateBeanUseCase
+    private val addBeanUseCase: AddBeanUseCase = mockk(relaxed = true)
+    private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
 
     private lateinit var viewModel: AddEditBeanViewModel
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
+        Dispatchers.setMain(testDispatcher)
         
         viewModel = AddEditBeanViewModel(
             addBeanUseCase,
             updateBeanUseCase
         )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
