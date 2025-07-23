@@ -65,6 +65,13 @@ class ShotRecordingViewModel @Inject constructor(
     val previousSuccessfulSettings: StateFlow<List<String>> =
         _previousSuccessfulSettings.asStateFlow()
 
+    // Bean-specific suggested values for coffee weights
+    private val _suggestedCoffeeWeightIn = MutableStateFlow<String?>(null)
+    val suggestedCoffeeWeightIn: StateFlow<String?> = _suggestedCoffeeWeightIn.asStateFlow()
+
+    private val _suggestedCoffeeWeightOut = MutableStateFlow<String?>(null)
+    val suggestedCoffeeWeightOut: StateFlow<String?> = _suggestedCoffeeWeightOut.asStateFlow()
+
     // Form state
     private val _coffeeWeightIn = MutableStateFlow("")
     val coffeeWeightIn: StateFlow<String> = _coffeeWeightIn.asStateFlow()
@@ -215,40 +222,76 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Select a bean and load its suggested grinder setting.
-     * Implements requirements 3.3 and 4.4 for remembering grinder settings per bean.
+     * Select a bean and load its suggested settings.
+     * Implements requirements 3.3 and 4.4 for remembering settings per bean.
      */
     fun selectBean(bean: Bean) {
         val previousBean = _selectedBean.value
         _selectedBean.value = bean
 
-        // Load suggested grinder setting from last successful shot with this bean
+        // Load suggested settings from last successful shot with this bean
         viewModelScope.launch {
-            val result = recordShotUseCase.getSuggestedGrinderSetting(bean.id)
-            result.fold(
-                onSuccess = { suggestion ->
-                    _suggestedGrinderSetting.value = suggestion
-
-                    // Auto-fill grinder setting if:
-                    // 1. Current setting is empty, OR
-                    // 2. We're switching from a different bean and have a suggestion
-                    val shouldAutoFill = _grinderSetting.value.isEmpty() ||
-                            (previousBean != null && previousBean.id != bean.id && suggestion != null)
-
-                    if (shouldAutoFill && suggestion != null) {
-                        updateGrinderSetting(suggestion)
-                    }
-                },
-                onFailure = {
-                    _suggestedGrinderSetting.value = null
-                }
-            )
-
+            loadSuggestedSettingsForBean(bean.id, previousBean)
             // Load previous successful grinder settings for visual indicators
             loadPreviousSuccessfulSettings(bean.id)
         }
 
         validateForm()
+    }
+
+    /**
+     * Load suggested settings for a bean from the last successful shot.
+     */
+    private suspend fun loadSuggestedSettingsForBean(beanId: String, previousBean: Bean?) {
+        // Load suggested grinder setting
+        val grinderResult = recordShotUseCase.getSuggestedGrinderSetting(beanId)
+        grinderResult.fold(
+            onSuccess = { suggestion ->
+                _suggestedGrinderSetting.value = suggestion
+
+                // Auto-fill grinder setting if:
+                // 1. Current setting is empty, OR
+                // 2. We're switching from a different bean and have a suggestion
+                val shouldAutoFillGrinder = _grinderSetting.value.isEmpty() ||
+                        (previousBean != null && previousBean.id != beanId && suggestion != null)
+
+                if (shouldAutoFillGrinder && suggestion != null) {
+                    updateGrinderSetting(suggestion)
+                }
+            },
+            onFailure = {
+                _suggestedGrinderSetting.value = null
+            }
+        )
+
+        // Load suggested coffee weights from last shot
+        val lastShotResult = shotRepository.getLastShotForBean(beanId)
+        lastShotResult.fold(
+            onSuccess = { lastShot ->
+                if (lastShot != null) {
+                    _suggestedCoffeeWeightIn.value = lastShot.coffeeWeightIn.toString()
+                    _suggestedCoffeeWeightOut.value = lastShot.coffeeWeightOut.toString()
+
+                    // Auto-fill coffee weights if:
+                    // 1. Current values are empty, OR
+                    // 2. We're switching from a different bean
+                    val shouldAutoFillWeights = (_coffeeWeightIn.value.isEmpty() && _coffeeWeightOut.value.isEmpty()) ||
+                            (previousBean != null && previousBean.id != beanId)
+
+                    if (shouldAutoFillWeights) {
+                        updateCoffeeWeightIn(lastShot.coffeeWeightIn.toString())
+                        updateCoffeeWeightOut(lastShot.coffeeWeightOut.toString())
+                    }
+                } else {
+                    _suggestedCoffeeWeightIn.value = null
+                    _suggestedCoffeeWeightOut.value = null
+                }
+            },
+            onFailure = {
+                _suggestedCoffeeWeightIn.value = null
+                _suggestedCoffeeWeightOut.value = null
+            }
+        )
     }
 
     /**
@@ -460,11 +503,12 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Clear the form after successful recording.
+     * Clear the form after successful recording, but restore bean-specific suggested values.
      */
     private fun clearForm() {
-        _coffeeWeightIn.value = ""
-        _coffeeWeightOut.value = ""
+        // Restore suggested values for the current bean instead of clearing everything
+        _coffeeWeightIn.value = _suggestedCoffeeWeightIn.value ?: ""
+        _coffeeWeightOut.value = _suggestedCoffeeWeightOut.value ?: ""
         _grinderSetting.value = _suggestedGrinderSetting.value ?: ""
         _notes.value = ""
         _coffeeWeightInError.value = null
@@ -473,6 +517,9 @@ class ShotRecordingViewModel @Inject constructor(
         _brewRatio.value = null
         _formattedBrewRatio.value = null
         _isOptimalBrewRatio.value = false
+        
+        // Recalculate brew ratio with restored values
+        calculateBrewRatio()
         validateForm()
     }
 

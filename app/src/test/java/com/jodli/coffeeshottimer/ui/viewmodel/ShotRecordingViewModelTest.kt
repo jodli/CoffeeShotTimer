@@ -90,4 +90,15 @@ class ShotRecordingViewModelTest {
         assertNotNull(viewModel.coffeeWeightInError)
         assertNotNull(viewModel.coffeeWeightOutError)
     }
+    
+    @Test
+    fun `viewModel should have bean-specific suggested values`() {
+        // Verify that suggested values state flows are available
+        assertNotNull(viewModel.suggestedGrinderSetting)
+        assertNotNull(viewModel.suggestedCoffeeWeightIn)
+        assertNotNull(viewModel.suggestedCoffeeWeightOut)
+        
+        // Verify that previous successful settings are available
+        assertNotNull(viewModel.previousSuccessfulSettings)
+    }
 }
