@@ -69,12 +69,12 @@ data class Bean(
 
     /**
      * Checks if the bean is considered fresh (within optimal brewing window).
-     * Generally, espresso beans are considered optimal 4-14 days after roasting.
+     * Generally, espresso beans are considered optimal 4-21 days after roasting.
      * @return true if the bean is within the fresh window
      */
     fun isFresh(): Boolean {
         val daysSinceRoast = daysSinceRoast()
-        return daysSinceRoast in 4..14
+        return daysSinceRoast in 4..21
     }
 }
 

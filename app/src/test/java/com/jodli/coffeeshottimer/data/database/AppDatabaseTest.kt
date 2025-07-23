@@ -65,12 +65,12 @@ class AppDatabaseTest {
         )
         assertFalse("2-day old bean should not be fresh", tooFreshBean.isFresh())
         
-        // Old bean (20 days old)
+        // Old bean (25 days old)
         val oldBean = Bean(
             name = "Old Bean",
-            roastDate = LocalDate.now().minusDays(20)
+            roastDate = LocalDate.now().minusDays(25)
         )
-        assertFalse("20-day old bean should not be fresh", oldBean.isFresh())
+        assertFalse("25-day old bean should not be fresh", oldBean.isFresh())
     }
     
     @Test

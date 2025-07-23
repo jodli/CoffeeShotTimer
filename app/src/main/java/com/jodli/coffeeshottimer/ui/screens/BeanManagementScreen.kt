@@ -329,8 +329,8 @@ private fun BeanListItem(
                         Text(
                             text = if (isFresh) "Fresh" else when {
                                 daysSinceRoast < 4 -> "Too Fresh"
-                                daysSinceRoast <= 30 -> "Good"
-                                daysSinceRoast <= 60 -> "OK"
+                                daysSinceRoast <= 45 -> "Good"
+                                daysSinceRoast <= 90 -> "OK"
                                 else -> "Stale"
                             },
                             style = MaterialTheme.typography.labelSmall,

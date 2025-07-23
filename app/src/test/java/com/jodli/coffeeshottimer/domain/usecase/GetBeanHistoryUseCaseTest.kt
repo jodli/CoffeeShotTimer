@@ -323,7 +323,7 @@ class GetBeanHistoryUseCaseTest {
         assertEquals(2, stats?.activeBeans) // bean1, bean3
         assertEquals(2, stats?.inactiveBeans) // bean2, bean4
         assertEquals(3, stats?.beansWithGrinderSettings) // All except bean3
-        assertEquals(1, stats?.freshBeans) // Only bean1 (7 days) is fresh
+        assertEquals(2, stats?.freshBeans) // bean1 (7 days) and bean3 (20 days) are fresh
         
         // Average days since roast: (7 + 3 + 20 + 45) / 4 = 18.75
         assertEquals(18.75, stats?.averageDaysSinceRoast ?: 0.0, 0.01)

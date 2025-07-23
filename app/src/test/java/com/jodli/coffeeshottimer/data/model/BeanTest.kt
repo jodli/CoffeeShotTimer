@@ -261,18 +261,18 @@ class BeanTest {
     }
 
     @Test
-    fun `isFresh returns true for bean roasted 14 days ago`() {
+    fun `isFresh returns true for bean roasted 21 days ago`() {
         // Given
         val bean = Bean(
             name = "Fresh Bean",
-            roastDate = LocalDate.now().minusDays(14)
+            roastDate = LocalDate.now().minusDays(21)
         )
 
         // When
         val result = bean.isFresh()
 
         // Then
-        assertTrue("Bean roasted 14 days ago should be fresh", result)
+        assertTrue("Bean roasted 21 days ago should be fresh", result)
     }
 
     @Test
@@ -291,18 +291,18 @@ class BeanTest {
     }
 
     @Test
-    fun `isFresh returns false for bean roasted 15 days ago`() {
+    fun `isFresh returns false for bean roasted 22 days ago`() {
         // Given
         val bean = Bean(
             name = "Old Bean",
-            roastDate = LocalDate.now().minusDays(15)
+            roastDate = LocalDate.now().minusDays(22)
         )
 
         // When
         val result = bean.isFresh()
 
         // Then
-        assertFalse("Bean roasted 15 days ago should not be fresh (too old)", result)
+        assertFalse("Bean roasted 22 days ago should not be fresh (too old)", result)
     }
 
     @Test
