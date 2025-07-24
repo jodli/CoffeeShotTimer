@@ -272,6 +272,70 @@ class ShotHistoryViewModel @Inject constructor(
         }
     }
 
+    fun loadMore() {
+        if (isLoadingMore || !hasMoreData) return
+
+        viewModelScope.launch {
+            isLoadingMore = true
+            _uiState.value = _uiState.value.copy(isLoadingMore = true)
+
+            try {
+                // Increment page for next request
+                currentPaginationConfig = currentPaginationConfig.copy(
+                    page = currentPaginationConfig.page + 1
+                )
+
+                val filter = _currentFilter.value
+                val result = if (filter.hasFilters()) {
+                    getShotHistoryUseCase.getFilteredShotsPaginated(
+                        beanId = filter.beanId,
+                        startDate = filter.startDate,
+                        endDate = filter.endDate,
+                        paginationConfig = currentPaginationConfig
+                    )
+                } else {
+                    getShotHistoryUseCase.getShotsPaginated(currentPaginationConfig)
+                }
+
+                result.fold(
+                    onSuccess = { paginatedResult ->
+                        val currentShots = _uiState.value.shots
+                        val newShots = currentShots + paginatedResult.items
+
+                        _uiState.value = _uiState.value.copy(
+                            shots = newShots,
+                            hasMorePages = paginatedResult.hasNextPage,
+                            isLoadingMore = false,
+                            error = null
+                        )
+                        hasMoreData = paginatedResult.hasNextPage
+                    },
+                    onFailure = { error ->
+                        _uiState.value = _uiState.value.copy(
+                            isLoadingMore = false,
+                            error = "Failed to load more shots: ${error.message}"
+                        )
+                        // Revert page increment on failure
+                        currentPaginationConfig = currentPaginationConfig.copy(
+                            page = currentPaginationConfig.page - 1
+                        )
+                    }
+                )
+            } catch (exception: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoadingMore = false,
+                    error = "Failed to load more shots: ${exception.message}"
+                )
+                // Revert page increment on failure
+                currentPaginationConfig = currentPaginationConfig.copy(
+                    page = currentPaginationConfig.page - 1
+                )
+            } finally {
+                isLoadingMore = false
+            }
+        }
+    }
+
     // PERFORMANCE OPTIMIZATION METHODS
 
     /**

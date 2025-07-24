@@ -37,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -214,6 +215,9 @@ fun ShotHistoryScreen(
                         shots = uiState.shots,
                         getBeanName = { beanId -> viewModel.getBeanName(beanId) },
                         onShotClick = onShotClick,
+                        isLoadingMore = uiState.isLoadingMore,
+                        hasMorePages = uiState.hasMorePages,
+                        onLoadMore = { viewModel.loadMore() },
                         modifier = Modifier.fillMaxSize()
                     )
                 }
@@ -332,11 +336,16 @@ private fun ShotHistoryList(
     shots: List<Shot>,
     getBeanName: (String) -> String,
     onShotClick: (String) -> Unit,
+    isLoadingMore: Boolean,
+    hasMorePages: Boolean,
+    onLoadMore: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalSpacing.current
+
     LazyColumn(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(LocalSpacing.current.small)
+        verticalArrangement = Arrangement.spacedBy(spacing.small)
     ) {
         items(shots) { shot ->
             ShotHistoryItem(
@@ -344,6 +353,17 @@ private fun ShotHistoryList(
                 beanName = getBeanName(shot.beanId),
                 onClick = { onShotClick(shot.id) }
             )
+        }
+
+        // Load more indicator and trigger
+        if (hasMorePages) {
+            item {
+                LoadMoreItem(
+                    isLoading = isLoadingMore,
+                    onLoadMore = onLoadMore,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
@@ -1128,6 +1148,36 @@ private fun TrendItem(
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+    }
+}
+
+@Composable
+private fun LoadMoreItem(
+    isLoading: Boolean,
+    onLoadMore: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    LaunchedEffect(Unit) {
+        if (!isLoading) {
+            onLoadMore()
+        }
+    }
+
+    Box(
+        modifier = modifier.padding(spacing.medium),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isLoading) {
+            LoadingIndicator(message = "Loading more shots...")
+        } else {
+            Text(
+                text = "Loading more...",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
 }
 
