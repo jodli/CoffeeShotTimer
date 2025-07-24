@@ -35,7 +35,10 @@
   - Add conditional compilation to only include in debug builds
   - _Requirements: 1.1, 1.2, 1.3, 4.1, 4.2, 4.3, 4.4_
 
-- [-] 4. Create DebugDialog composable
+- [x] 4. Create DebugDialog composable
+
+
+
 
 
   - Create DebugDialog.kt in ui/components package with Material3 dialog design
