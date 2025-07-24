@@ -615,19 +615,19 @@ private fun ShotAnalysisCard(
                     DeviationItem(
                         label = "Extraction Time",
                         deviation = analysis.extractionTimeDeviation,
-                        format = "%.0fs",
+                        format = "%.0f",
                         suffix = "s"
                     )
                     DeviationItem(
                         label = "Weight In",
                         deviation = analysis.weightInDeviation,
-                        format = "%.1fg",
+                        format = "%.1f",
                         suffix = "g"
                     )
                     DeviationItem(
                         label = "Weight Out",
                         deviation = analysis.weightOutDeviation,
-                        format = "%.1fg",
+                        format = "%.1f",
                         suffix = "g"
                     )
                 }
