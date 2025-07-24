@@ -67,7 +67,11 @@
   - Add conditional injection based on build variant
   - _Requirements: 4.1, 4.2, 4.3_
 
-- [-] 7. Write unit tests for debug functionality
+- [x] 7. Write unit tests for debug functionality
+
+
+
+
 
 
   - Create DatabasePopulatorTest.kt to test data generation and database operations
