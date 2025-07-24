@@ -18,7 +18,7 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class DebugViewModel @Inject constructor(
-    private val databasePopulator: DatabasePopulator
+    private val databasePopulator: DatabasePopulator?
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DebugUiState())
@@ -69,7 +69,7 @@ class DebugViewModel @Inject constructor(
      * Coordinates the operation through DatabasePopulator and manages UI state.
      */
     fun fillDatabase() {
-        if (!BuildConfig.DEBUG) return
+        if (!BuildConfig.DEBUG || databasePopulator == null) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -98,7 +98,7 @@ class DebugViewModel @Inject constructor(
      * @param count Number of additional shots to create (default: 10)
      */
     fun addMoreShots(count: Int = 10) {
-        if (!BuildConfig.DEBUG) return
+        if (!BuildConfig.DEBUG || databasePopulator == null) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -126,7 +126,7 @@ class DebugViewModel @Inject constructor(
      * Coordinates the operation through DatabasePopulator and manages UI state.
      */
     fun clearDatabase() {
-        if (!BuildConfig.DEBUG) return
+        if (!BuildConfig.DEBUG || databasePopulator == null) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(

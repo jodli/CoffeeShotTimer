@@ -3,9 +3,11 @@ package com.jodli.coffeeshottimer.di
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.database.AppDatabase
+import com.jodli.coffeeshottimer.data.util.DatabasePopulator
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -107,5 +109,30 @@ object DatabaseModule {
     @Provides
     fun provideShotDao(database: AppDatabase): ShotDao {
         return database.shotDao()
+    }
+
+    /**
+     * Provides the DatabasePopulator instance for debug builds only.
+     * This utility is used for populating the database with test data
+     * and clearing database content during development and testing.
+     * 
+     * The provider is conditionally compiled - it only exists in debug builds
+     * to ensure no debug code is included in release builds.
+     *
+     * @param beanDao The BeanDao instance for database operations
+     * @param shotDao The ShotDao instance for database operations
+     * @return DatabasePopulator instance (debug builds only)
+     */
+    @Provides
+    @Singleton
+    fun provideDatabasePopulator(
+        beanDao: BeanDao,
+        shotDao: ShotDao
+    ): DatabasePopulator? {
+        return if (BuildConfig.DEBUG) {
+            DatabasePopulator(beanDao, shotDao)
+        } else {
+            null
+        }
     }
 }
