@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
@@ -49,6 +50,7 @@ import kotlinx.coroutines.delay
  * @param isVisible Whether the dialog should be displayed
  * @param onDismiss Callback invoked when dialog should be dismissed
  * @param onFillDatabase Callback invoked when fill database button is tapped
+ * @param onAddMoreShots Callback invoked when add more shots button is tapped
  * @param onClearDatabase Callback invoked when clear database button is tapped
  * @param isLoading Whether a database operation is currently in progress
  * @param operationResult Result message from the last operation (success or error)
@@ -61,6 +63,7 @@ fun DebugDialog(
     isVisible: Boolean,
     onDismiss: () -> Unit,
     onFillDatabase: () -> Unit,
+    onAddMoreShots: () -> Unit,
     onClearDatabase: () -> Unit,
     isLoading: Boolean,
     operationResult: String?,
@@ -190,6 +193,23 @@ fun DebugDialog(
 
                         Text(
                             text = "Populates database with realistic coffee beans and shot records for testing and screenshots",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = spacing.small)
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
+                        // Add More Shots button
+                        CoffeeSecondaryButton(
+                            text = "Add More Shots",
+                            onClick = onAddMoreShots,
+                            icon = Icons.Default.Add,
+                            enabled = !isLoading
+                        )
+
+                        Text(
+                            text = "Adds 10 additional shot records to existing beans for extended testing data",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)

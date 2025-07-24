@@ -275,6 +275,7 @@ fun RecordShotScreen(
             isVisible = debugUiState.isDialogVisible,
             onDismiss = { debugViewModel.hideDialog() },
             onFillDatabase = { debugViewModel.fillDatabase() },
+            onAddMoreShots = { debugViewModel.addMoreShots() },
             onClearDatabase = { debugViewModel.clearDatabase() },
             isLoading = debugUiState.isLoading,
             operationResult = debugUiState.operationResult,
