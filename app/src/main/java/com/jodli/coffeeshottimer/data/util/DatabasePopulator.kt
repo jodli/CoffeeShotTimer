@@ -28,7 +28,7 @@ class DatabasePopulator @Inject constructor(
     /**
      * Populates the database with realistic test data for screenshots and testing.
      * Creates a variety of coffee beans and associated shots with realistic parameters.
-     * 
+     *
      * @throws IllegalStateException if called in a release build
      * @throws Exception if database operations fail
      */
@@ -40,7 +40,7 @@ class DatabasePopulator @Inject constructor(
         try {
             // Create realistic coffee beans
             val beans = createRealisticBeans()
-            
+
             // Insert beans first
             beans.forEach { bean ->
                 beanDao.insertBean(bean)
@@ -61,7 +61,7 @@ class DatabasePopulator @Inject constructor(
 
     /**
      * Adds additional shots to existing beans for testing purposes.
-     * 
+     *
      * @param count Number of additional shots to create (default: 10)
      * @throws IllegalStateException if called in a release build
      * @throws Exception if database operations fail
@@ -74,7 +74,7 @@ class DatabasePopulator @Inject constructor(
         try {
             // Get existing active beans
             val existingBeans = beanDao.getActiveBeans()
-            
+
             // If no beans exist, create some first
             if (existingBeans.first().isEmpty()) {
                 populateForScreenshots()
@@ -96,7 +96,7 @@ class DatabasePopulator @Inject constructor(
     /**
      * Clears all data from the database.
      * Removes all shots and beans from the database.
-     * 
+     *
      * @throws IllegalStateException if called in a release build
      * @throws Exception if database operations fail
      */
@@ -131,27 +131,27 @@ class DatabasePopulator @Inject constructor(
     private fun createRealisticBeans(): List<Bean> {
         val beanProfiles = listOf(
             BeanProfile(
-                "Ethiopian Yirgacheffe", 
+                "Ethiopian Yirgacheffe",
                 "Bright and floral with citrus notes. Light roast brings out the natural acidity.",
                 "2.8"
             ),
             BeanProfile(
-                "Colombian Supremo", 
+                "Colombian Supremo",
                 "Well-balanced with chocolate and caramel notes. Medium roast, very consistent.",
                 "3.0"
             ),
             BeanProfile(
-                "Brazilian Santos", 
+                "Brazilian Santos",
                 "Nutty and smooth with low acidity. Great for espresso blends.",
                 "2.5"
             ),
             BeanProfile(
-                "Guatemalan Antigua", 
+                "Guatemalan Antigua",
                 "Full-bodied with spicy and smoky undertones. Complex flavor profile.",
                 "3.2"
             ),
             BeanProfile(
-                "Costa Rican Tarrazú", 
+                "Costa Rican Tarrazú",
                 "Bright acidity with wine-like characteristics. Clean finish.",
                 "2.9"
             )
@@ -172,38 +172,62 @@ class DatabasePopulator @Inject constructor(
 
     /**
      * Creates realistic shots for a given bean with varied parameters.
+     * Simulates a progression from beginner to expert barista over time.
      */
     private fun createRealisticShotsForBean(bean: Bean): List<Shot> {
-        val shotCount = (3..8).random() // 3-8 shots per bean
+        val shotCount = (5..12).random() // 5-12 shots per bean for more variety
         val shots = mutableListOf<Shot>()
 
         repeat(shotCount) { index ->
-            shots.add(createRandomShotForBean(bean, index))
+            // Simulate skill progression over time - early shots are more beginner-like
+            val skillLevel = when {
+                index < 2 -> BaristaSkillLevel.BEGINNER
+                index < 4 -> BaristaSkillLevel.INTERMEDIATE
+                index < 7 -> BaristaSkillLevel.ADVANCED
+                else -> if (Random.nextFloat() < 0.7f) BaristaSkillLevel.EXPERT else BaristaSkillLevel.ADVANCED
+            }
+
+            shots.add(createShotForSkillLevel(bean, skillLevel, index))
         }
 
         return shots
     }
 
     /**
-     * Creates a single realistic shot for a given bean.
+     * Creates a single realistic shot for a given bean with random skill level.
      */
     private fun createRandomShotForBean(bean: Bean, dayOffset: Int = 0): Shot {
-        val shotProfiles = getRealisticShotProfiles()
-        val profile = shotProfiles.random()
+        val skillLevels = BaristaSkillLevel.values()
+        val randomSkillLevel = skillLevels.random()
+        return createShotForSkillLevel(bean, randomSkillLevel, dayOffset)
+    }
 
-        // Add some variation to the base profile
-        val weightInVariation = Random.nextDouble(-1.0, 1.0)
-        val timeVariation = Random.nextInt(-3, 4)
-        val grinderVariation = Random.nextDouble(-0.2, 0.2)
+    /**
+     * Creates a shot based on barista skill level, simulating realistic mistakes and improvements.
+     */
+    private fun createShotForSkillLevel(bean: Bean, skillLevel: BaristaSkillLevel, dayOffset: Int = 0): Shot {
+        val profiles = getShotProfilesForSkillLevel(skillLevel)
+        val profile = profiles.random()
 
-        val coffeeWeightIn = (profile.coffeeWeightIn + weightInVariation).coerceIn(16.0, 24.0)
-        val extractionTime = (profile.extractionTimeSeconds + timeVariation).coerceIn(20, 40)
+        // Apply skill-based variations
+        val skillVariations = getSkillVariations(skillLevel)
+
+        // Base parameters with skill-level appropriate variations
+        val weightInVariation = Random.nextDouble(-skillVariations.weightVariance, skillVariations.weightVariance)
+        val timeVariation = Random.nextInt(-skillVariations.timeVariance, skillVariations.timeVariance + 1)
+        val ratioVariation = Random.nextDouble(-skillVariations.ratioVariance, skillVariations.ratioVariance)
+
+        val coffeeWeightIn = (profile.coffeeWeightIn + weightInVariation).coerceIn(14.0, 25.0)
+        val extractionTime = (profile.extractionTimeSeconds + timeVariation).coerceIn(15, 50)
+
+        // Calculate grinder setting with skill-level consistency
         val baseGrinderSetting = bean.lastGrinderSetting?.toDoubleOrNull() ?: 3.0
+        val grinderVariation = Random.nextDouble(-skillVariations.grinderVariance, skillVariations.grinderVariance)
         val grinderSetting = String.format("%.1f", (baseGrinderSetting + grinderVariation).coerceIn(1.0, 5.0))
 
-        // Calculate output weight based on target ratio with some variation
-        val targetRatio = profile.targetRatio + Random.nextDouble(-0.2, 0.2)
-        val coffeeWeightOut = (coffeeWeightIn * targetRatio).coerceIn(25.0, 60.0)
+        // Calculate output weight with skill-level appropriate ratio control
+        val targetRatio = profile.targetRatio + ratioVariation
+        val coffeeWeightOut = (coffeeWeightIn * targetRatio).coerceIn(20.0, 70.0)
 
         return Shot(
             id = UUID.randomUUID().toString(),
@@ -218,62 +242,287 @@ class DatabasePopulator @Inject constructor(
     }
 
     /**
-     * Returns a list of realistic shot profiles with different characteristics.
+     * Returns shot profiles based on barista skill level.
      */
-    private fun getRealisticShotProfiles(): List<ShotProfile> {
+    private fun getShotProfilesForSkillLevel(skillLevel: BaristaSkillLevel): List<ShotProfile> {
+        return when (skillLevel) {
+            BaristaSkillLevel.BEGINNER -> getBeginnerShotProfiles()
+            BaristaSkillLevel.INTERMEDIATE -> getIntermediateShotProfiles()
+            BaristaSkillLevel.ADVANCED -> getAdvancedShotProfiles()
+            BaristaSkillLevel.EXPERT -> getExpertShotProfiles()
+        }
+    }
+
+    /**
+     * Returns skill-based variation parameters.
+     */
+    private fun getSkillVariations(skillLevel: BaristaSkillLevel): SkillVariations {
+        return when (skillLevel) {
+            BaristaSkillLevel.BEGINNER -> SkillVariations(
+                weightVariance = 3.0,
+                timeVariance = 8,
+                ratioVariance = 0.8,
+                grinderVariance = 0.5
+            )
+            BaristaSkillLevel.INTERMEDIATE -> SkillVariations(
+                weightVariance = 1.5,
+                timeVariance = 5,
+                ratioVariance = 0.4,
+                grinderVariance = 0.3
+            )
+            BaristaSkillLevel.ADVANCED -> SkillVariations(
+                weightVariance = 0.8,
+                timeVariance = 3,
+                ratioVariance = 0.2,
+                grinderVariance = 0.2
+            )
+            BaristaSkillLevel.EXPERT -> SkillVariations(
+                weightVariance = 0.3,
+                timeVariance = 2,
+                ratioVariance = 0.1,
+                grinderVariance = 0.1
+            )
+        }
+    }
+
+    /**
+     * Beginner barista shot profiles - lots of mistakes and inconsistency.
+     */
+    private fun getBeginnerShotProfiles(): List<ShotProfile> {
+        return listOf(
+            ShotProfile(
+                coffeeWeightIn = 15.0,
+                targetRatio = 1.5,
+                extractionTimeSeconds = 15,
+                notes = listOf(
+                    "Too fast! Grind was way too coarse",
+                    "Sour and thin, need to adjust everything",
+                    "First shot attempt, not sure what I'm doing",
+                    "Watched a YouTube video, still confused"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 22.0,
+                targetRatio = 3.2,
+                extractionTimeSeconds = 45,
+                notes = listOf(
+                    "This took forever! Grind too fine",
+                    "Really bitter, over-extracted for sure",
+                    "Scale ran out of coffee, had to stop early",
+                    "Forgot to time it properly"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 16.5,
+                targetRatio = 2.8,
+                extractionTimeSeconds = 35,
+                notes = listOf(
+                    "Getting better but still not great",
+                    "Tastes okay I think?",
+                    "Not sure if this is right",
+                    "At least it's drinkable this time"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 20.5,
+                targetRatio = 1.8,
+                extractionTimeSeconds = 22,
+                notes = listOf(
+                    "Stopped the shot too early",
+                    "Very concentrated, probably under-extracted",
+                    "Learning is hard",
+                    "Why is espresso so complicated?"
+                )
+            )
+        )
+    }
+
+    /**
+     * Intermediate barista shot profiles - some consistency, still learning.
+     */
+    private fun getIntermediateShotProfiles(): List<ShotProfile> {
+        return listOf(
+            ShotProfile(
+                coffeeWeightIn = 18.0,
+                targetRatio = 2.1,
+                extractionTimeSeconds = 26,
+                notes = listOf(
+                    "Getting closer to a good shot",
+                    "Decent flavor, could be better",
+                    "Starting to understand extraction",
+                    "Progress! Still room for improvement"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 19.0,
+                targetRatio = 2.3,
+                extractionTimeSeconds = 31,
+                notes = listOf(
+                    "A bit slow, might adjust grind next time",
+                    "Good body, slight bitterness",
+                    "Learning to taste the difference",
+                    "Better than my early attempts"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 17.5,
+                targetRatio = 2.0,
+                extractionTimeSeconds = 24,
+                notes = listOf(
+                    "Fast extraction, need finer grind",
+                    "Some sourness, under-extracted",
+                    "At least the ratio was good",
+                    "Timing is getting more consistent"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 18.5,
+                targetRatio = 2.4,
+                extractionTimeSeconds = 29,
+                notes = listOf(
+                    "Pretty good shot actually!",
+                    "Nice crema, balanced flavor",
+                    "This setting might work again",
+                    "Starting to dial in properly"
+                )
+            )
+        )
+    }
+
+    /**
+     * Advanced barista shot profiles - good consistency, fine-tuning.
+     */
+    private fun getAdvancedShotProfiles(): List<ShotProfile> {
         return listOf(
             ShotProfile(
                 coffeeWeightIn = 18.0,
                 targetRatio = 2.0,
                 extractionTimeSeconds = 28,
                 notes = listOf(
-                    "Perfect crema, balanced flavor",
-                    "Great extraction, smooth finish",
-                    "Excellent shot, will repeat this setting"
-                )
-            ),
-            ShotProfile(
-                coffeeWeightIn = 20.0,
-                targetRatio = 2.2,
-                extractionTimeSeconds = 30,
-                notes = listOf(
-                    "Slightly over-extracted, reduce grind",
-                    "Good body, maybe a bit bitter",
-                    "Decent shot, could be better"
+                    "Solid shot, good extraction",
+                    "Nice balance of sweet and acidic",
+                    "Crema looks great",
+                    "Consistent results with this setting"
                 )
             ),
             ShotProfile(
                 coffeeWeightIn = 19.0,
-                targetRatio = 1.8,
-                extractionTimeSeconds = 25,
+                targetRatio = 2.2,
+                extractionTimeSeconds = 30,
                 notes = listOf(
-                    "Fast extraction, increase grind fineness",
-                    "Sour notes, need longer extraction",
-                    "Under-extracted, adjust grinder"
+                    "Slight adjustment needed on grind",
+                    "Good shot, could be a touch faster",
+                    "Flavor profile is developing nicely",
+                    "Small tweaks make big differences"
                 )
             ),
             ShotProfile(
-                coffeeWeightIn = 21.0,
-                targetRatio = 2.5,
+                coffeeWeightIn = 17.0,
+                targetRatio = 1.9,
+                extractionTimeSeconds = 26,
+                notes = listOf(
+                    "Ristretto style, very intense",
+                    "Concentrated flavors, good extraction",
+                    "Perfect for milk drinks",
+                    "Nail the timing on these shorter shots"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 20.0,
+                targetRatio = 2.3,
                 extractionTimeSeconds = 32,
                 notes = listOf(
-                    "Long shot, nice for milk drinks",
-                    "Good volume, mild flavor",
-                    "Perfect for cappuccino"
-                )
-            ),
-            ShotProfile(
-                coffeeWeightIn = 17.5,
-                targetRatio = 2.1,
-                extractionTimeSeconds = 27,
-                notes = listOf(
-                    "Concentrated shot, intense flavor",
-                    "Strong and bold, great crema",
-                    "Ristretto style, very tasty"
+                    "Longer shot, good for this bean",
+                    "Well-extracted, smooth finish",
+                    "Finding the sweet spot",
+                    "Reproducible results"
                 )
             )
         )
     }
+
+    /**
+     * Expert barista shot profiles - very consistent, perfect technique.
+     */
+    private fun getExpertShotProfiles(): List<ShotProfile> {
+        return listOf(
+            ShotProfile(
+                coffeeWeightIn = 18.0,
+                targetRatio = 2.0,
+                extractionTimeSeconds = 28,
+                notes = listOf(
+                    "Perfect extraction, textbook shot",
+                    "Beautiful tiger striping, ideal timing",
+                    "Exceptional clarity and balance",
+                    "This is why I love espresso"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 18.5,
+                targetRatio = 2.1,
+                extractionTimeSeconds = 29,
+                notes = listOf(
+                    "Slight grind adjustment paid off",
+                    "Complex flavor notes coming through",
+                    "Optimal extraction for this bean",
+                    "Peak performance achieved"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 17.5,
+                targetRatio = 1.95,
+                extractionTimeSeconds = 27,
+                notes = listOf(
+                    "Precision ristretto, intense and sweet",
+                    "Perfect crema texture and color",
+                    "Highlighting bean's best qualities",
+                    "Masterful extraction technique"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 19.0,
+                targetRatio = 2.15,
+                extractionTimeSeconds = 30,
+                notes = listOf(
+                    "Dialed in perfectly for this roast",
+                    "Exceptional balance and mouthfeel",
+                    "Every variable optimized",
+                    "Coffee perfection achieved"
+                )
+            ),
+            ShotProfile(
+                coffeeWeightIn = 18.2,
+                targetRatio = 2.05,
+                extractionTimeSeconds = 28,
+                notes = listOf(
+                    "Competition-level shot quality",
+                    "Flawless execution from start to finish",
+                    "Years of practice showing",
+                    "This is what espresso should taste like"
+                )
+            )
+        )
+    }
+
+    /**
+     * Enum representing different barista skill levels.
+     */
+    private enum class BaristaSkillLevel {
+        BEGINNER,
+        INTERMEDIATE,
+        ADVANCED,
+        EXPERT
+    }
+
+    /**
+     * Data class representing skill-based variation parameters.
+     */
+    private data class SkillVariations(
+        val weightVariance: Double,
+        val timeVariance: Int,
+        val ratioVariance: Double,
+        val grinderVariance: Double
+    )
 
     /**
      * Data class representing a coffee bean profile for test data generation.

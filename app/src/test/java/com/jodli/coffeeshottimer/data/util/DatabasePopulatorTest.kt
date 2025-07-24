@@ -34,7 +34,7 @@ class DatabasePopulatorTest {
     fun setup() {
         // Skip all tests in this class if not in debug build
         assumeTrue("DatabasePopulator tests only run in debug builds", BuildConfig.DEBUG)
-        
+
         beanDao = mockk(relaxed = true)
         shotDao = mockk(relaxed = true)
         databasePopulator = DatabasePopulator(beanDao, shotDao)
@@ -54,10 +54,10 @@ class DatabasePopulatorTest {
         // Then
         // Verify that beans were inserted (should be 5 beans based on implementation)
         coVerify(exactly = 5) { beanDao.insertBean(any()) }
-        
-        // Verify that shots were inserted (3-8 shots per bean, so 15-40 total)
-        coVerify(atLeast = 15) { shotDao.insertShot(any()) }
-        coVerify(atMost = 40) { shotDao.insertShot(any()) }
+
+        // Verify that shots were inserted (5-12 shots per bean, so 25-60 total)
+        coVerify(atLeast = 25) { shotDao.insertShot(any()) }
+        coVerify(atMost = 60) { shotDao.insertShot(any()) }
     }
 
     @Test
@@ -111,7 +111,7 @@ class DatabasePopulatorTest {
         // Then
         // Should call populateForScreenshots which inserts beans and shots
         coVerify(exactly = 5) { beanDao.insertBean(any()) }
-        coVerify(atLeast = 15) { shotDao.insertShot(any()) }
+        coVerify(atLeast = 25) { shotDao.insertShot(any()) }
     }
 
     @Test
@@ -220,11 +220,11 @@ class DatabasePopulatorTest {
 
         // Then
         assertEquals(5, capturedBeans.size)
-        
+
         // Verify bean names are realistic
         val expectedNames = setOf(
             "Ethiopian Yirgacheffe",
-            "Colombian Supremo", 
+            "Colombian Supremo",
             "Brazilian Santos",
             "Guatemalan Antigua",
             "Costa Rican Tarrazú"
@@ -234,7 +234,7 @@ class DatabasePopulatorTest {
             assertTrue("Bean should be active", bean.isActive)
             assertTrue("Bean should have notes", bean.notes.isNotBlank())
             assertTrue("Bean should have grinder setting", bean.lastGrinderSetting?.isNotBlank() == true)
-            
+
             // Verify roast date is within reasonable range (3-20 days ago)
             val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now())
             assertTrue("Roast date should be 3-20 days ago", daysSinceRoast in 3..20)
@@ -252,22 +252,22 @@ class DatabasePopulatorTest {
         databasePopulator.populateForScreenshots()
 
         // Then
-        assertTrue("Should generate multiple shots", capturedShots.size >= 15)
-        
+        assertTrue("Should generate multiple shots", capturedShots.size >= 25)
+
         capturedShots.forEach { shot ->
-            // Verify realistic weight ranges
-            assertTrue("Coffee weight in should be realistic", shot.coffeeWeightIn in 16.0..24.0)
-            assertTrue("Coffee weight out should be realistic", shot.coffeeWeightOut in 25.0..60.0)
-            
-            // Verify realistic extraction time
-            assertTrue("Extraction time should be realistic", shot.extractionTimeSeconds in 20..40)
-            
+            // Verify realistic weight ranges (expanded for beginner mistakes)
+            assertTrue("Coffee weight in should be realistic", shot.coffeeWeightIn in 14.0..25.0)
+            assertTrue("Coffee weight out should be realistic", shot.coffeeWeightOut in 20.0..70.0)
+
+            // Verify realistic extraction time (expanded for beginner/expert range)
+            assertTrue("Extraction time should be realistic", shot.extractionTimeSeconds in 15..50)
+
             // Verify grinder setting format
             assertTrue("Grinder setting should not be blank", shot.grinderSetting.isNotBlank())
-            
+
             // Verify notes are present
             assertTrue("Shot should have notes", shot.notes.isNotBlank())
-            
+
             // Verify brew ratio is reasonable
             assertTrue("Brew ratio should be reasonable", shot.brewRatio in 1.0..4.0)
         }
