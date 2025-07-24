@@ -47,7 +47,9 @@
   - _Requirements: 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 
-- [-] 5. Integrate debug functionality into RecordShotScreen
+- [x] 5. Integrate debug functionality into RecordShotScreen
+
+
 
 
   - Modify RecordShotScreen.kt to wrap header text with DebugTapDetector

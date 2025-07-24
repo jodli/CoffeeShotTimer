@@ -37,22 +37,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.components.BeanCard
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
+import com.jodli.coffeeshottimer.ui.components.DebugDialog
+import com.jodli.coffeeshottimer.ui.components.DebugTapDetector
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
 import com.jodli.coffeeshottimer.ui.components.SectionHeader
 import com.jodli.coffeeshottimer.ui.components.TimerControls
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 
 @Composable
 fun RecordShotScreen(
     onNavigateToBeanManagement: () -> Unit = {},
-    viewModel: ShotRecordingViewModel = hiltViewModel()
+    viewModel: ShotRecordingViewModel = hiltViewModel(),
+    debugViewModel: DebugViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
     val scrollState = rememberScrollState()
@@ -80,6 +85,9 @@ fun RecordShotScreen(
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
 
+    // Debug state (only in debug builds)
+    val debugUiState by debugViewModel.uiState.collectAsStateWithLifecycle()
+
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
 
@@ -99,11 +107,22 @@ fun RecordShotScreen(
             .padding(spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.large)
     ) {
-        // Header
-        SectionHeader(
-            title = "Record Shot",
-            subtitle = "Track your espresso extraction"
-        )
+        // Header with debug tap detection (only in debug builds)
+        if (BuildConfig.DEBUG) {
+            DebugTapDetector(
+                onDebugActivated = { debugViewModel.showDialog() }
+            ) {
+                SectionHeader(
+                    title = "Record Shot",
+                    subtitle = "Track your espresso extraction"
+                )
+            }
+        } else {
+            SectionHeader(
+                title = "Record Shot",
+                subtitle = "Track your espresso extraction"
+            )
+        }
 
         // Bean Selection with navigation to bean management
         BeanSelectionCard(
@@ -248,6 +267,21 @@ fun RecordShotScreen(
 
         // Bottom spacing for navigation bar
         Spacer(modifier = Modifier.height(spacing.large))
+    }
+
+    // Debug Dialog (only in debug builds)
+    if (BuildConfig.DEBUG) {
+        DebugDialog(
+            isVisible = debugUiState.isDialogVisible,
+            onDismiss = { debugViewModel.hideDialog() },
+            onFillDatabase = { debugViewModel.fillDatabase() },
+            onClearDatabase = { debugViewModel.clearDatabase() },
+            isLoading = debugUiState.isLoading,
+            operationResult = debugUiState.operationResult,
+            showConfirmation = debugUiState.showConfirmation,
+            onShowConfirmation = { debugViewModel.showConfirmation() },
+            onHideConfirmation = { debugViewModel.hideConfirmation() }
+        )
     }
 
     // Bean Selection Bottom Sheet
