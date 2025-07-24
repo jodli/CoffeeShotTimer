@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coffee Shot Timer - Privacy Policy</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
+        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; }
+        .language-toggle { text-align: center; margin: 20px 0; }
+        .language-toggle button { background: #3498db; color: white; border: none; padding: 10px 20px; margin: 0 5px; border-radius: 5px; cursor: pointer; }
+        .language-toggle button:hover { background: #2980b9; }
+        .language-toggle button.active { background: #2c3e50; }
+        .language-section { display: none; }
+        .language-section.active { display: block; }
+        .highlight { background: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="language-toggle">
+        <button onclick="showLanguage('en')" id="btn-en" class="active">English</button>
+        <button onclick="showLanguage('de')" id="btn-de">Deutsch</button>
+    </div>
+
+    <div id="content-en" class="language-section active">
+        <h1>Privacy Policy for Coffee Shot Timer</h1>
+        <p><strong>Effective Date:</strong> 2025/07/24</p>
+        
+        <div class="highlight">
+            <h2>Information We Do NOT Collect</h2>
+            <p>Coffee Shot Timer is completely offline. We do NOT:</p>
+            <ul>
+                <li>Collect personal data (name, email, location)</li>
+                <li>Track usage or analytics</li>
+                <li>Require account creation</li>
+                <li>Connect to the internet</li>
+            </ul>
+        </div>
+
+        <h2>Local Data Storage</h2>
+        <p>Only stores settings locally on your device. Never transmitted anywhere.</p>
+
+        <h2>Contact</h2>
+        <p>Questions? Email: <strong>jobst87@gmail.com</strong></p>
+    </div>
+
+    <div id="content-de" class="language-section">
+        <h1>Datenschutzerklärung für Coffee Shot Timer</h1>
+        <p><strong>Gültigkeitsdatum:</strong> 24.07.2025</p>
+        
+        <div class="highlight">
+            <h2>Informationen, die wir NICHT sammeln</h2>
+            <p>Coffee Shot Timer ist vollständig offline. Wir sammeln NICHT:</p>
+            <ul>
+                <li>Persönliche Daten (Name, E-Mail, Standort)</li>
+                <li>Nutzungsanalysen</li>
+                <li>Kontodaten</li>
+                <li>Internetverbindungen</li>
+            </ul>
+        </div>
+
+        <h2>Lokale Datenspeicherung</h2>
+        <p>Speichert nur Einstellungen lokal auf Ihrem Gerät. Wird niemals übertragen.</p>
+
+        <h2>Kontakt</h2>
+        <p>Fragen? E-Mail: <strong>jobst87@gmail.com</strong></p>
+    </div>
+
+    <script>
+        function showLanguage(lang) {
+            document.querySelectorAll('.language-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.language-toggle button').forEach(b => b.classList.remove('active'));
+            document.getElementById('content-' + lang).classList.add('active');
+            document.getElementById('btn-' + lang).classList.add('active');
+        }
+    </script>
+</body>
+</html>
