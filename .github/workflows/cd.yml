@@ -1,6 +1,9 @@
 name: CD Pipeline
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
     types: [published]
   workflow_dispatch:
@@ -10,14 +13,39 @@ on:
         required: false
         default: 'manual-build'
 
+permissions:
+  contents: write
+
 jobs:
-  build-release-apk:
-    name: Build Release APK
+  build-and-release:
+    name: Build and Release
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            VERSION_NAME="${{ github.ref_name }}"
+            VERSION_NAME="${VERSION_NAME#v}"  # Remove 'v' prefix
+          else
+            VERSION_NAME="${{ github.event.inputs.version_name || 'manual-build' }}"
+          fi
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+
+
+
+      - name: Set Version
+        uses: chkfung/android-version-actions@v1.2.1
+        with:
+          gradlePath: app/build.gradle.kts
+          versionCode: ${{ github.run_number }}
+          versionName: ${{ steps.version.outputs.version_name }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -38,79 +66,35 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build and sign release APK
-        run: ./gradlew assembleRelease
+      - name: Build and sign release APK and AAB
+        run: |
+          ./gradlew assembleRelease
+          ./gradlew bundleRelease
         env:
           SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload signed APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: coffee-shot-timer-release-apk
           path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Upload to release (if triggered by release)
-        if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: app/build/outputs/apk/release/app-release.apk
-          asset_name: coffee-shot-timer-${{ github.event.release.tag_name }}.apk
-          asset_content_type: application/vnd.android.package-archive
-
-  build-release-aab:
-    name: Build Release AAB
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Build and sign release AAB
-        run: ./gradlew bundleRelease
-        env:
-          SIGNING_KEY_BASE64: ${{ secrets.SIGNING_KEY }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-      - name: Upload signed AAB
+      - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: coffee-shot-timer-release-aab
           path: app/build/outputs/bundle/release/app-release.aab
 
-      - name: Upload to release (if triggered by release)
-        if: github.event_name == 'release'
-        uses: actions/upload-release-asset@v1
+      - name: Create GitHub Release (if triggered by tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          gh release create ${{ github.ref_name }} \
+            --title "Release ${{ steps.version.outputs.version_name }}" \
+            --generate-notes \
+            'app/build/outputs/apk/release/app-release.apk#Coffee Shot Timer APK' \
+            'app/build/outputs/bundle/release/app-release.aab#Coffee Shot Timer AAB (Play Store)'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: app/build/outputs/bundle/release/app-release.aab
-          asset_name: coffee-shot-timer-${{ github.event.release.tag_name }}.aab
-          asset_content_type: application/octet-stream
