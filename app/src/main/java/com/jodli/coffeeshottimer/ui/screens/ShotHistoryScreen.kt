@@ -18,15 +18,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -62,7 +58,6 @@ import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryViewModel
 import java.time.format.DateTimeFormatter
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ShotHistoryScreen(
     onShotClick: (String) -> Unit = {},
@@ -74,10 +69,10 @@ fun ShotHistoryScreen(
 
     var showFilterDialog by remember { mutableStateOf(false) }
 
-    val pullRefreshState = rememberPullRefreshState(
-        refreshing = uiState.isRefreshing,
-        onRefresh = { viewModel.refreshDataPullToRefresh() }
-    )
+    // Auto-refresh when screen becomes visible
+    LaunchedEffect(Unit) {
+        viewModel.refreshOnResume()
+    }
 
     Column(
         modifier = Modifier
@@ -153,9 +148,7 @@ fun ShotHistoryScreen(
 
         // Content
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .pullRefresh(pullRefreshState)
+            modifier = Modifier.fillMaxSize()
         ) {
             when {
                 uiState.isLoading -> {
@@ -223,12 +216,7 @@ fun ShotHistoryScreen(
                 }
             }
 
-            // Pull refresh indicator
-            PullRefreshIndicator(
-                refreshing = uiState.isRefreshing,
-                state = pullRefreshState,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+
         }
     }
 
