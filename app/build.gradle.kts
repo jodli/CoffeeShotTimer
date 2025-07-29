@@ -154,6 +154,60 @@ android {
             }
         }
     }
+
+    applicationVariants.all {
+        val flavor = this.flavorName
+        val versionName = this.versionName
+        
+        this.outputs.all {
+            val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
+
+            // Clean version name by removing flavor suffixes
+            val cleanVersion = versionName?.replace("-$flavor", "") ?: "0.0.0"
+
+            when (flavor) {
+                "dev" -> {
+                    output.outputFileName = "coffee-shot-timer-dev-${cleanVersion}.apk"
+                }
+                "prod" -> {
+                    output.outputFileName = "coffee-shot-timer-${cleanVersion}.apk"
+                }
+            }
+        }
+    }
+
+    // Configure AAB naming for bundle tasks
+    tasks.whenTaskAdded {
+        if (name.startsWith("bundle") && name.contains("Release")) {
+            doLast {
+                val flavor = when {
+                    name.contains("Dev") -> "dev"
+                    name.contains("Prod") -> "prod"
+                    else -> "unknown"
+                }
+                val bundleDir = layout.buildDirectory.dir("outputs/bundle/${flavor}Release").get().getAsFile()
+                if (bundleDir.exists()) {
+                    bundleDir.listFiles()?.forEach { file ->
+                        if (file.name.endsWith(".aab")) {
+                            // Get version from defaultConfig, clean it up
+                            val versionName = android.defaultConfig.versionName ?: "0.0.0"
+                            val cleanVersion = versionName.replace("-$flavor", "")
+                            
+                            val newName = when (flavor) {
+                                "dev" -> "coffee-shot-timer-dev-${cleanVersion}.aab"
+                                "prod" -> "coffee-shot-timer-${cleanVersion}.aab"
+                                else -> file.name
+                            }
+                            val newFile = File(bundleDir, newName)
+                            if (file.renameTo(newFile)) {
+                                println("Renamed AAB: ${file.name} -> $newName")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 dependencies {
