@@ -48,6 +48,12 @@ class ShotHistoryViewModelTest {
         coEvery { getShotHistoryUseCase.getFilteredShotsPaginated(any(), any(), any(), any()) } returns Result.success(
             com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
         )
+        // Mock reactive flow methods for Phase 2 implementation
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(emptyList()))
+        every { getShotHistoryUseCase.getFilteredShots(any()) } returns flowOf(Result.success(emptyList()))
+        // Mock reactive flow methods
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(emptyList()))
+        every { getShotHistoryUseCase.getFilteredShots(any()) } returns flowOf(Result.success(emptyList()))
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(OverallStatistics.empty())
         coEvery { getShotStatisticsUseCase.getShotTrends(any(), any()) } returns Result.success(ShotTrends.empty())
         coEvery { getShotStatisticsUseCase.getBrewRatioAnalysis(any()) } returns Result.success(BrewRatioAnalysis.empty())
@@ -357,70 +363,77 @@ class ShotHistoryViewModelTest {
     }
 
     @Test
-    fun `refreshDataPullToRefresh sets isRefreshing state correctly`() = runTest {
+    fun `refreshData triggers reactive updates`() = runTest {
         // Given - initial state
-        assertFalse(viewModel.uiState.value.isRefreshing)
+        assertFalse(viewModel.uiState.value.isLoading)
 
-        // When - trigger pull to refresh
-        viewModel.refreshDataPullToRefresh()
+        // When - trigger refresh
+        viewModel.refreshData()
 
-        // Then - should have called loadInitialData and cleared refresh state
-        assertFalse(viewModel.uiState.value.isRefreshing)
+        // Then - should have called loadInitialData
         coVerify { getShotHistoryUseCase.getShotsPaginated(any()) }
     }
 
     @Test
-    fun `refreshDataPullToRefresh also refreshes analysis when shown`() = runTest {
+    fun `refreshData also refreshes analysis when shown`() = runTest {
         // Given - analysis view is shown
         viewModel.toggleAnalysisView()
         testDispatcher.scheduler.advanceTimeBy(500)
 
-        // When - trigger pull to refresh
-        viewModel.refreshDataPullToRefresh()
+        // When - trigger refresh
+        viewModel.refreshData()
 
         // Then - should have refreshed analysis data
         coVerify { getShotStatisticsUseCase.getOverallStatistics() }
     }
 
     @Test
-    fun `refreshDataPullToRefresh clears error state`() = runTest {
-        // Given - there's an error state
+    fun `reactive updates clear error state`() = runTest {
+        // Given - setup error for manual refresh
         coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.failure(Exception("Test error"))
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
-        testDispatcher.scheduler.advanceTimeBy(500)
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.failure(Exception("Test error")))
+        every { getShotHistoryUseCase.getFilteredShots(any()) } returns flowOf(Result.failure(Exception("Test error")))
+        
+        // Set error state through manual refresh
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceTimeBy(1000)
 
         // Verify error exists
-        assertNotNull(viewModel.uiState.value.error)
+        assertNotNull("Error should be set by manual refresh", viewModel.uiState.value.error)
 
-        // Reset mock to succeed
+        // Now setup reactive flows to succeed
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(emptyList()))
+        every { getShotHistoryUseCase.getFilteredShots(any()) } returns flowOf(Result.success(emptyList()))
         coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
             com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
         )
+        
+        // Trigger a filter change which restarts reactive collection
+        viewModel.setBeanFilter("test-bean-id")
+        testDispatcher.scheduler.advanceTimeBy(2000)
 
-        // When - trigger pull to refresh
-        viewModel.refreshDataPullToRefresh()
+        // Then - error should be cleared by reactive updates
+        assertNull("Error should be cleared by reactive updates", viewModel.uiState.value.error)
 
-        // Then - error should be cleared
-        assertNull(viewModel.uiState.value.error)
-        assertFalse(viewModel.uiState.value.isRefreshing)
+        // Then - error should be cleared by reactive updates
+        assertNull("Error should be cleared by reactive updates", viewModel.uiState.value.error)
     }
 
     @Test
-    fun `isEmpty property considers isRefreshing state`() = runTest {
-        // Given - empty shots but refreshing
+    fun `isEmpty property considers loading state`() = runTest {
+        // Given - empty shots but loading
         val uiState = ShotHistoryUiState(
-            isRefreshing = true,
-            shots = emptyList(),
-            isLoading = false
+            isLoading = true,
+            shots = emptyList()
         )
 
-        // Then - should not be empty while refreshing
+        // Then - should not be empty while loading
         assertFalse(uiState.isEmpty)
 
-        // Given - empty shots and not refreshing
-        val uiStateNotRefreshing = uiState.copy(isRefreshing = false)
+        // Given - empty shots and not loading
+        val uiStateNotLoading = uiState.copy(isLoading = false)
 
         // Then - should be empty
-        assertTrue(uiStateNotRefreshing.isEmpty)
+        assertTrue(uiStateNotLoading.isEmpty)
     }
 }

@@ -53,7 +53,8 @@ class ShotHistoryViewModel @Inject constructor(
     }
 
     init {
-        loadInitialData()
+        // Load beans for filtering (this doesn't set loading state)
+        loadAvailableBeans()
 
         // Schedule memory cleanup
         memoryOptimizer.scheduleMemoryCleanup(COMPONENT_ID) {
@@ -61,7 +62,7 @@ class ShotHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialData() {
+    private fun loadAvailableBeans() {
         viewModelScope.launch {
             // Load beans for filtering
             getActiveBeansUseCase.execute()
@@ -83,9 +84,12 @@ class ShotHistoryViewModel @Inject constructor(
                     )
                 }
         }
+    }
 
-        // Load initial shot history
-        loadShotHistory()
+    private fun loadInitialData() {
+        loadAvailableBeans()
+        // Start reactive shot history collection
+        startReactiveShotHistoryCollection()
     }
 
     private fun loadShotHistory() {
@@ -132,9 +136,63 @@ class ShotHistoryViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Start reactive collection of shot history updates for real-time updates
+     */
+    private fun startReactiveShotHistoryCollection() {
+        viewModelScope.launch {
+            try {
+                val filter = _currentFilter.value
+                val flow = if (filter.hasFilters()) {
+                    getShotHistoryUseCase.getFilteredShots(filter)
+                } else {
+                    getShotHistoryUseCase.getAllShots()
+                }
+
+                flow.collect { result ->
+                    result.fold(
+                        onSuccess = { shots ->
+                            // Only update if we're not in a loading state (to avoid conflicts with manual refresh)
+                            if (!_uiState.value.isLoading) {
+                                // Apply current pagination to the reactive results
+                                val currentPageSize = (currentPaginationConfig.page + 1) * currentPaginationConfig.pageSize
+                                val paginatedShots = shots.take(currentPageSize)
+                                val hasMore = shots.size > paginatedShots.size
+
+                                _uiState.value = _uiState.value.copy(
+                                    shots = paginatedShots,
+                                    hasMorePages = hasMore,
+                                    error = null
+                                )
+                                hasMoreData = hasMore
+                            }
+                        },
+                        onFailure = { error ->
+                            // Only update error if we're not in a loading state
+                            if (!_uiState.value.isLoading) {
+                                _uiState.value = _uiState.value.copy(
+                                    error = "Failed to load shot history: ${error.message}"
+                                )
+                            }
+                        }
+                    )
+                }
+            } catch (exception: Exception) {
+                // Only update error if we're not in a loading state
+                if (!_uiState.value.isLoading) {
+                    _uiState.value = _uiState.value.copy(
+                        error = "Failed to load shot history: ${exception.message}"
+                    )
+                }
+            }
+        }
+    }
+
     fun applyFilter(filter: ShotHistoryFilter) {
         _currentFilter.value = filter
         loadShotHistory()
+        // Restart reactive collection with new filter
+        startReactiveShotHistoryCollection()
         // Refresh analysis if currently showing to reflect new filter
         if (_uiState.value.showAnalysis) {
             loadAnalysisData()
@@ -144,6 +202,8 @@ class ShotHistoryViewModel @Inject constructor(
     fun clearFilters() {
         _currentFilter.value = ShotHistoryFilter()
         loadShotHistory()
+        // Restart reactive collection without filters
+        startReactiveShotHistoryCollection()
         // Refresh analysis if currently showing to reflect cleared filters
         if (_uiState.value.showAnalysis) {
             loadAnalysisData()
@@ -159,11 +219,13 @@ class ShotHistoryViewModel @Inject constructor(
             endDate = endDateTime
         )
         loadShotHistory()
+        startReactiveShotHistoryCollection()
     }
 
     fun setBeanFilter(beanId: String?) {
         _currentFilter.value = _currentFilter.value.copy(beanId = beanId)
         loadShotHistory()
+        startReactiveShotHistoryCollection()
     }
 
     fun toggleOptimalExtractionTimeFilter() {
@@ -172,6 +234,7 @@ class ShotHistoryViewModel @Inject constructor(
             onlyOptimalExtractionTime = if (current == true) null else true
         )
         loadShotHistory()
+        startReactiveShotHistoryCollection()
     }
 
     fun toggleTypicalBrewRatioFilter() {
@@ -180,27 +243,25 @@ class ShotHistoryViewModel @Inject constructor(
             onlyTypicalBrewRatio = if (current == true) null else true
         )
         loadShotHistory()
+        startReactiveShotHistoryCollection()
     }
 
     fun refreshData() {
-        loadInitialData()
+        loadShotHistory()
+        startReactiveShotHistoryCollection()
     }
 
-    fun refreshDataPullToRefresh() {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isRefreshing = true, error = null)
-            try {
-                // Load fresh data
-                loadInitialData()
-                // Also refresh analysis if currently showing
-                if (_uiState.value.showAnalysis) {
-                    refreshAnalysis()
-                }
-            } finally {
-                _uiState.value = _uiState.value.copy(isRefreshing = false)
-            }
+    /**
+     * Refresh data when screen resumes - optimized for reactive updates
+     */
+    fun refreshOnResume() {
+        // Start reactive collection if not already started
+        if (_uiState.value.shots.isEmpty() && _uiState.value.error == null && !_uiState.value.isLoading) {
+            startReactiveShotHistoryCollection()
         }
     }
+
+
 
     fun getBeanName(beanId: String): String {
         return _uiState.value.availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
@@ -389,7 +450,6 @@ class ShotHistoryViewModel @Inject constructor(
  */
 data class ShotHistoryUiState(
     val isLoading: Boolean = false,
-    val isRefreshing: Boolean = false,
     val shots: List<Shot> = emptyList(),
     val availableBeans: List<Bean> = emptyList(),
     val error: String? = null,
@@ -405,7 +465,7 @@ data class ShotHistoryUiState(
     val hasMorePages: Boolean = true
 ) {
     val isEmpty: Boolean
-        get() = shots.isEmpty() && !isLoading && !isRefreshing
+        get() = shots.isEmpty() && !isLoading
 
     val hasAnalysisData: Boolean
         get() = overallStatistics != null || shotTrends != null || brewRatioAnalysis != null
