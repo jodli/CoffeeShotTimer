@@ -32,7 +32,7 @@ jobs:
           if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
             VERSION_NAME="${{ github.ref_name }}"
             VERSION_NAME="${VERSION_NAME#v}"  # Remove 'v' prefix
-            DEPLOY_TARGET="closed"
+            DEPLOY_TARGET="alpha"
             IS_TAG_BUILD="true"
             echo "Tag build detected: $VERSION_NAME -> closed testing"
           elif [[ "${{ github.ref }}" == refs/heads/main ]]; then
@@ -162,5 +162,4 @@ jobs:
           packageName: com.jodli.coffeeshottimer
           releaseFiles: ${{ steps.artifacts.outputs.aab_path }}
           track: ${{ steps.version.outputs.deploy_target }}
-          status: completed
           inAppUpdatePriority: 2
