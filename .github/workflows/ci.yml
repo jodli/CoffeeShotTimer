@@ -35,14 +35,16 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run lint check
-        run: ./gradlew lintDebug
+        run: ./gradlew lintDevDebug lintProdDebug
 
-      - name: Upload lint report
+      - name: Upload lint reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: lint-report
-          path: app/build/reports/lint-results-debug.html
+          name: lint-reports
+          path: |
+            app/build/reports/lint-results-devDebug.html
+            app/build/reports/lint-results-prodDebug.html
 
   unit-tests:
     name: Unit Tests
@@ -73,21 +75,25 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run unit tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew testDevDebugUnitTest testProdDebugUnitTest
 
       - name: Upload test reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: unit-test-reports
-          path: app/build/reports/tests/testDebugUnitTest/
+          path: |
+            app/build/reports/tests/testDevDebugUnitTest/
+            app/build/reports/tests/testProdDebugUnitTest/
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: unit-test-results
-          path: app/build/test-results/testDebugUnitTest/
+          path: |
+            app/build/test-results/testDevDebugUnitTest/
+            app/build/test-results/testProdDebugUnitTest/
 
   build-debug-apk:
     name: Build Debug APK
@@ -117,11 +123,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug
+      - name: Build debug APKs
+        run: ./gradlew assembleDevDebug assembleProdDebug
 
-      - name: Upload debug APK
+      - name: Upload debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: coffee-shot-timer-debug
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: coffee-shot-timer-debug-apks
+          path: |
+            app/build/outputs/apk/dev/debug/*.apk
+            app/build/outputs/apk/prod/debug/*.apk
