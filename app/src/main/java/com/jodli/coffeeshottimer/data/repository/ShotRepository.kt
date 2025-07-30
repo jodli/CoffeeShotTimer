@@ -222,7 +222,7 @@ class ShotRepository @Inject constructor(
             // Record the shot
             shotDao.insertShot(shot)
 
-            // Update the bean's last grinder setting
+            // Update the bean's last grinder setting with the successful settings
             beanDao.updateLastGrinderSetting(shot.beanId, shot.grinderSetting)
 
             Result.success(Unit)

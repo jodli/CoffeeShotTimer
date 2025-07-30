@@ -241,6 +241,7 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Load suggested settings for a bean from the last successful shot.
+     * Prioritizes most recent successful settings over historical data.
      */
     private suspend fun loadSuggestedSettingsForBean(beanId: String, previousBean: Bean?) {
         // Load suggested grinder setting
@@ -264,7 +265,7 @@ class ShotRecordingViewModel @Inject constructor(
             }
         )
 
-        // Load suggested coffee weights from last shot
+        // Load suggested coffee weights from last successful shot
         val lastShotResult = shotRepository.getLastShotForBean(beanId)
         lastShotResult.fold(
             onSuccess = { lastShot ->
@@ -283,6 +284,7 @@ class ShotRecordingViewModel @Inject constructor(
                         updateCoffeeWeightOut(lastShot.coffeeWeightOut.toString())
                     }
                 } else {
+                    // No previous shots, clear suggestions
                     _suggestedCoffeeWeightIn.value = null
                     _suggestedCoffeeWeightOut.value = null
                 }
@@ -503,13 +505,25 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Clear the form after successful recording, but restore bean-specific suggested values.
+     * Clear the form after successful recording, keeping current successful settings as new defaults.
      */
     private fun clearForm() {
-        // Restore suggested values for the current bean instead of clearing everything
-        _coffeeWeightIn.value = _suggestedCoffeeWeightIn.value ?: ""
-        _coffeeWeightOut.value = _suggestedCoffeeWeightOut.value ?: ""
-        _grinderSetting.value = _suggestedGrinderSetting.value ?: ""
+        // Keep current successful values as new defaults
+        val currentWeightIn = _coffeeWeightIn.value
+        val currentWeightOut = _coffeeWeightOut.value  
+        val currentGrinder = _grinderSetting.value
+        
+        // Update suggestions with current successful values
+        _suggestedCoffeeWeightIn.value = currentWeightIn
+        _suggestedCoffeeWeightOut.value = currentWeightOut
+        _suggestedGrinderSetting.value = currentGrinder
+        
+        // Keep the successful values
+        _coffeeWeightIn.value = currentWeightIn
+        _coffeeWeightOut.value = currentWeightOut
+        _grinderSetting.value = currentGrinder
+        
+        // Only clear non-persistent fields
         _notes.value = ""
         _coffeeWeightInError.value = null
         _coffeeWeightOutError.value = null
@@ -518,7 +532,7 @@ class ShotRecordingViewModel @Inject constructor(
         _formattedBrewRatio.value = null
         _isOptimalBrewRatio.value = false
         
-        // Recalculate brew ratio with restored values
+        // Recalculate brew ratio with kept values
         calculateBrewRatio()
         validateForm()
     }
