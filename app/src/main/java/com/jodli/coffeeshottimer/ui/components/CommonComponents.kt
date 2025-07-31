@@ -3,6 +3,7 @@ package com.jodli.coffeeshottimer.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -25,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -36,6 +39,7 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 fun CoffeeCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
+    colors: androidx.compose.material3.CardColors = CardDefaults.cardColors(),
     content: @Composable ColumnScope.() -> Unit
 ) {
     val spacing = LocalSpacing.current
@@ -45,7 +49,8 @@ fun CoffeeCard(
             onClick = onClick,
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = colors
         ) {
             Column(
                 modifier = Modifier.padding(spacing.cardPadding),
@@ -56,7 +61,8 @@ fun CoffeeCard(
         Card(
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = colors
         ) {
             Column(
                 modifier = Modifier.padding(spacing.cardPadding),
@@ -312,5 +318,45 @@ fun LoadingIndicator(
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+/**
+ * Standardized card header with icon + title + optional actions
+ */
+@Composable
+fun CardHeader(
+    icon: ImageVector,
+    title: String,
+    modifier: Modifier = Modifier,
+    actions: @Composable (() -> Unit)? = null
+) {
+    val spacing = LocalSpacing.current
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp)
+            )
+            
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        actions?.invoke()
     }
 }

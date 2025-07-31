@@ -20,9 +20,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
@@ -57,7 +60,7 @@ fun BeanCard(
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Home,
+                        imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
                         contentDescription = null,
                         tint = if (isSelected)
                             MaterialTheme.colorScheme.primary

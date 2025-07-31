@@ -28,14 +28,20 @@ $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 
 ### Development
 ```bash
-# Build the project
+# Quickly build the project for development
+./gradlew buildDevDebug
+
+# Build the project with all targets
 ./gradlew build
 
 # Install debug build (choose flavor)
 ./gradlew installDevDebug      # Development flavor
 ./gradlew installProdDebug     # Production flavor
 
-# Run unit tests
+# Quickly build the project for development
+./gradlew testDevDebug
+
+# Run tests with all targets
 ./gradlew test
 
 # Run instrumentation tests
