@@ -22,7 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -122,7 +122,7 @@ fun ShotHistoryScreen(
                     onClick = { showFilterDialog = true }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Settings,
+                        imageVector = Icons.Default.FilterList,
                         contentDescription = "Filter shots",
                         tint = if (currentFilter.hasFilters()) {
                             MaterialTheme.colorScheme.primary
@@ -251,7 +251,7 @@ private fun ActiveFiltersDisplay(
         )
     ) {
         CardHeader(
-            icon = Icons.Default.Settings,
+            icon = Icons.Default.FilterList,
             title = "Active Filters",
             actions = {
                 TextButton(onClick = onClearFilters) {

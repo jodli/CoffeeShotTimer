@@ -34,12 +34,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material3.ButtonDefaults
+
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
+
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -373,12 +373,11 @@ fun TimerControls(
 
             // Reset button (optional)
             if (showReset) {
-                OutlinedButton(
+                CoffeeSecondaryButton(
+                    text = "Reset",
                     onClick = onReset,
-                    modifier = Modifier.height(48.dp)
-                ) {
-                    Text("Reset")
-                }
+                    modifier = Modifier.height(spacing.touchTarget)
+                )
             }
         }
     }
@@ -414,27 +413,18 @@ fun EnhancedTimerControls(
 
         // Reset button (optional) - styled to complement the enhanced timer button
         if (showReset) {
-            OutlinedButton(
+            CoffeeSecondaryButton(
+                text = "Reset",
                 onClick = {
                     // Light haptic feedback for reset
                     triggerHapticFeedback(context, false)
                     onReset()
                 },
                 modifier = Modifier
-                    .height(48.dp)
+                    .height(spacing.touchTarget)
                     .widthIn(min = 80.dp),
-                enabled = enabled,
-                shape = CircleShape,
-                border = ButtonDefaults.outlinedButtonBorder.copy(
-                    width = 2.dp
-                )
-            ) {
-                Text(
-                    text = "Reset",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+                enabled = enabled
+            )
         }
     }
 }

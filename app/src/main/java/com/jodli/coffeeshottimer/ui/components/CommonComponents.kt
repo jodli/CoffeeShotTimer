@@ -81,15 +81,20 @@ fun CoffeePrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    fillMaxWidth: Boolean = true
 ) {
     val spacing = LocalSpacing.current
 
     Button(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(spacing.touchTarget),
+        modifier = if (fillMaxWidth) {
+            modifier
+                .fillMaxWidth()
+                .height(spacing.touchTarget)
+        } else {
+            modifier.height(spacing.touchTarget)
+        },
         enabled = enabled,
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -117,15 +122,20 @@ fun CoffeeSecondaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    icon: ImageVector? = null
+    icon: ImageVector? = null,
+    fillMaxWidth: Boolean = true
 ) {
     val spacing = LocalSpacing.current
 
     OutlinedButton(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(spacing.touchTarget),
+        modifier = if (fillMaxWidth) {
+            modifier
+                .fillMaxWidth()
+                .height(spacing.touchTarget)
+        } else {
+            modifier.height(spacing.touchTarget)
+        },
         enabled = enabled,
         shape = RoundedCornerShape(8.dp)
     ) {

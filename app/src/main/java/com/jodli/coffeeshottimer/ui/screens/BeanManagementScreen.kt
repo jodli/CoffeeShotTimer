@@ -25,7 +25,7 @@ import androidx.compose.ui.res.vectorResource
 import com.jodli.coffeeshottimer.R
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
+
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -48,6 +48,7 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
+import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
@@ -288,17 +289,12 @@ private fun BeanListItem(
                     
                     // Action buttons
                     if (bean.isActive) {
-                        FilledTonalButton(
+                        CoffeeSecondaryButton(
+                            text = "Use for Shot",
                             onClick = onUseForShot,
                             modifier = Modifier.height(32.dp),
-                            contentPadding = PaddingValues(horizontal = spacing.small, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = "Use for Shot",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer
-                            )
-                        }
+                            fillMaxWidth = false
+                        )
                     }
 
                     if (onReactivate != null) {
