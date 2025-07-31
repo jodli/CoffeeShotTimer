@@ -3,36 +3,30 @@
 ## Phase 1: Card Standardization and Button Consistency
 
 - [x] 1. Audit existing card implementations across all screens
-
-
-
-
-
   - Identify all screens using raw Material 3 Card components
   - Document current card patterns and inconsistencies
   - Create inventory of card usage patterns
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
 - [x] 2. Standardize card implementations with CoffeeCard component
-
-
-
-
-
-
   - Replace all raw Card components with CoffeeCard
   - Apply consistent spacing.cardPadding to all card content
   - Ensure all cards use fillMaxWidth() modifier
   - Implement consistent card header patterns with icon + title + optional actions
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 3. Audit existing button implementations across all screens
+- [x] 3. Audit existing button implementations across all screens
+
+
+
+
+
   - Identify all buttons not using CoffeePrimaryButton or CoffeeSecondaryButton
   - Document current button styling inconsistencies
   - Map button hierarchy and usage patterns
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 4. Standardize button implementations
+- [x] 4. Standardize button implementations
   - Replace all buttons with CoffeePrimaryButton or CoffeeSecondaryButton
   - Implement consistent icon sizing (18.dp) and spacing (8.dp from text)
   - Ensure all buttons meet minimum touch target height (spacing.touchTarget)
