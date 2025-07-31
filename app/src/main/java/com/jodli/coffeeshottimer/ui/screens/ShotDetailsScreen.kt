@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
+import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
@@ -404,84 +406,69 @@ private fun BeanInformationCard(
     val bean = shotDetails.bean
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = "Bean Information"
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Bean name
+        Text(
+            text = bean.name,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        // Roast information
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
                 Text(
-                    text = "Bean Information",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Bean name
-            Text(
-                text = bean.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            // Roast information
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = "Roast Date",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = bean.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = "Days Since Roast",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = "${shotDetails.daysSinceRoast} days",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = if (bean.isFresh()) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        }
-                    )
-                }
-            }
-
-            // Bean notes if available
-            if (bean.notes.isNotBlank()) {
-                Spacer(modifier = Modifier.height(spacing.medium))
-                Text(
-                    text = "Bean Notes",
+                    text = "Roast Date",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = bean.notes,
+                    text = bean.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "Days Since Roast",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${shotDetails.daysSinceRoast} days",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (bean.isFresh()) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    }
+                )
+            }
+        }
+
+        // Bean notes if available
+        if (bean.notes.isNotBlank()) {
+            Spacer(modifier = Modifier.height(spacing.medium))
+            Text(
+                text = "Bean Notes",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = bean.notes,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }
@@ -495,59 +482,56 @@ private fun ShotParametersCard(
     val shot = shotDetails.shot
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Text(
-                text = "Shot Parameters",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+        CardHeader(
+            icon = Icons.Default.Settings,
+            title = "Shot Parameters"
+        )
 
-            Spacer(modifier = Modifier.height(spacing.medium))
+        Spacer(modifier = Modifier.height(spacing.medium))
 
-            // Parameters grid
-            Column(
-                verticalArrangement = Arrangement.spacedBy(spacing.medium)
+        // Parameters grid
+        Column(
+            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    ParameterItem(
-                        label = "Coffee Weight In",
-                        value = "${shot.coffeeWeightIn}g",
-                        modifier = Modifier.weight(1f)
-                    )
-                    ParameterItem(
-                        label = "Coffee Weight Out",
-                        value = "${shot.coffeeWeightOut}g",
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    ParameterItem(
-                        label = "Extraction Time",
-                        value = shot.getFormattedExtractionTime(),
-                        isOptimal = shot.isOptimalExtractionTime(),
-                        modifier = Modifier.weight(1f)
-                    )
-                    ParameterItem(
-                        label = "Brew Ratio",
-                        value = shot.getFormattedBrewRatio(),
-                        isOptimal = shot.isTypicalBrewRatio(),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
                 ParameterItem(
-                    label = "Grinder Setting",
-                    value = shot.grinderSetting,
-                    modifier = Modifier.fillMaxWidth()
+                    label = "Coffee Weight In",
+                    value = "${shot.coffeeWeightIn}g",
+                    modifier = Modifier.weight(1f)
+                )
+                ParameterItem(
+                    label = "Coffee Weight Out",
+                    value = "${shot.coffeeWeightOut}g",
+                    modifier = Modifier.weight(1f)
                 )
             }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ParameterItem(
+                    label = "Extraction Time",
+                    value = shot.getFormattedExtractionTime(),
+                    isOptimal = shot.isOptimalExtractionTime(),
+                    modifier = Modifier.weight(1f)
+                )
+                ParameterItem(
+                    label = "Brew Ratio",
+                    value = shot.getFormattedBrewRatio(),
+                    isOptimal = shot.isTypicalBrewRatio(),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            ParameterItem(
+                label = "Grinder Setting",
+                value = shot.grinderSetting,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -561,97 +545,94 @@ private fun ShotAnalysisCard(
     val analysis = shotDetails.analysis
 
     CoffeeCard(modifier = modifier) {
-        Column {
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = "Shot Analysis"
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Quality indicators
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            QualityIndicatorChip(
+                label = "Extraction Time",
+                isGood = analysis.isOptimalExtraction,
+                modifier = Modifier.weight(1f)
+            )
+            QualityIndicatorChip(
+                label = "Brew Ratio",
+                isGood = analysis.isTypicalRatio,
+                modifier = Modifier.weight(1f)
+            )
+            QualityIndicatorChip(
+                label = "Consistency",
+                isGood = analysis.isConsistentWithHistory,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Deviations from average
+        if (shotDetails.relatedShotsCount > 1) {
             Text(
-                text = "Shot Analysis",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                text = "Compared to your average for this bean:",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
             )
 
-            Spacer(modifier = Modifier.height(spacing.medium))
+            Spacer(modifier = Modifier.height(spacing.small))
 
-            // Quality indicators
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            Column(
+                verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
             ) {
-                QualityIndicatorChip(
-                    label = "Extraction Time",
-                    isGood = analysis.isOptimalExtraction,
-                    modifier = Modifier.weight(1f)
-                )
-                QualityIndicatorChip(
+                DeviationItem(
                     label = "Brew Ratio",
-                    isGood = analysis.isTypicalRatio,
-                    modifier = Modifier.weight(1f)
+                    deviation = analysis.brewRatioDeviation,
+                    format = "%.2f"
                 )
-                QualityIndicatorChip(
-                    label = "Consistency",
-                    isGood = analysis.isConsistentWithHistory,
-                    modifier = Modifier.weight(1f)
+                DeviationItem(
+                    label = "Extraction Time",
+                    deviation = analysis.extractionTimeDeviation,
+                    format = "%.0f",
+                    suffix = "s"
+                )
+                DeviationItem(
+                    label = "Weight In",
+                    deviation = analysis.weightInDeviation,
+                    format = "%.1f",
+                    suffix = "g"
+                )
+                DeviationItem(
+                    label = "Weight Out",
+                    deviation = analysis.weightOutDeviation,
+                    format = "%.1f",
+                    suffix = "g"
                 )
             }
+        }
 
+        // Recommendations
+        if (analysis.recommendations.isNotEmpty()) {
             Spacer(modifier = Modifier.height(spacing.medium))
 
-            // Deviations from average
-            if (shotDetails.relatedShotsCount > 1) {
+            Text(
+                text = "Recommendations",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
+            )
+
+            Spacer(modifier = Modifier.height(spacing.small))
+
+            analysis.recommendations.forEach { recommendation ->
                 Text(
-                    text = "Compared to your average for this bean:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
+                    text = "• $recommendation",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-                ) {
-                    DeviationItem(
-                        label = "Brew Ratio",
-                        deviation = analysis.brewRatioDeviation,
-                        format = "%.2f"
-                    )
-                    DeviationItem(
-                        label = "Extraction Time",
-                        deviation = analysis.extractionTimeDeviation,
-                        format = "%.0f",
-                        suffix = "s"
-                    )
-                    DeviationItem(
-                        label = "Weight In",
-                        deviation = analysis.weightInDeviation,
-                        format = "%.1f",
-                        suffix = "g"
-                    )
-                    DeviationItem(
-                        label = "Weight Out",
-                        deviation = analysis.weightOutDeviation,
-                        format = "%.1f",
-                        suffix = "g"
-                    )
-                }
-            }
-
-            // Recommendations
-            if (analysis.recommendations.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(spacing.medium))
-
-                Text(
-                    text = "Recommendations",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                analysis.recommendations.forEach { recommendation ->
-                    Text(
-                        text = "• $recommendation",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
             }
         }
     }
@@ -670,18 +651,10 @@ private fun ShotNotesCard(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Notes",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-
+        CardHeader(
+            icon = Icons.Default.Edit,
+            title = "Notes",
+            actions = {
                 if (!editNotesState.isEditing) {
                     IconButton(onClick = onStartEditingNotes) {
                         Icon(
@@ -691,65 +664,65 @@ private fun ShotNotesCard(
                     }
                 }
             }
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        if (editNotesState.isEditing) {
+            // Edit mode
+            CoffeeTextField(
+                value = editNotesState.notes,
+                onValueChange = onUpdateNotes,
+                label = "Shot Notes",
+                placeholder = "Add notes about this shot...",
+                singleLine = false,
+                maxLines = 5,
+                modifier = Modifier.fillMaxWidth()
+            )
 
             Spacer(modifier = Modifier.height(spacing.medium))
 
-            if (editNotesState.isEditing) {
-                // Edit mode
-                CoffeeTextField(
-                    value = editNotesState.notes,
-                    onValueChange = onUpdateNotes,
-                    label = "Shot Notes",
-                    placeholder = "Add notes about this shot...",
-                    singleLine = false,
-                    maxLines = 5,
-                    modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                CoffeeSecondaryButton(
+                    text = "Cancel",
+                    onClick = onCancelEditingNotes,
+                    icon = Icons.Default.Close,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Spacer(modifier = Modifier.height(spacing.medium))
+                CoffeePrimaryButton(
+                    text = if (editNotesState.isSaving) "Saving..." else "Save",
+                    onClick = onSaveNotes,
+                    enabled = !editNotesState.isSaving && editNotesState.hasChanges,
+                    icon = Icons.Default.Check,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(spacing.small)
-                ) {
-                    CoffeeSecondaryButton(
-                        text = "Cancel",
-                        onClick = onCancelEditingNotes,
-                        icon = Icons.Default.Close,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    CoffeePrimaryButton(
-                        text = if (editNotesState.isSaving) "Saving..." else "Save",
-                        onClick = onSaveNotes,
-                        enabled = !editNotesState.isSaving && editNotesState.hasChanges,
-                        icon = Icons.Default.Check,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                if (editNotesState.error != null) {
-                    Spacer(modifier = Modifier.height(spacing.small))
-                    Text(
-                        text = editNotesState.error,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
+            if (editNotesState.error != null) {
+                Spacer(modifier = Modifier.height(spacing.small))
+                Text(
+                    text = editNotesState.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+        } else {
+            // Display mode
+            if (shotDetails.shot.notes.isNotBlank()) {
+                Text(
+                    text = shotDetails.shot.notes,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             } else {
-                // Display mode
-                if (shotDetails.shot.notes.isNotBlank()) {
-                    Text(
-                        text = shotDetails.shot.notes,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                } else {
-                    Text(
-                        text = "No notes for this shot",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = "No notes for this shot",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
@@ -763,43 +736,40 @@ private fun ShotContextCard(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Column {
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = "Shot Context"
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        Text(
+            text = "This is shot ${shotDetails.relatedShotsCount} of ${shotDetails.relatedShotsCount} with ${shotDetails.bean.name}",
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        shotDetails.previousShot?.let { previousShot ->
             Text(
-                text = "Shot Context",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            Text(
-                text = "This is shot ${shotDetails.relatedShotsCount} of ${shotDetails.relatedShotsCount} with ${shotDetails.bean.name}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            shotDetails.previousShot?.let { previousShot ->
-                Text(
-                    text = "Previous shot: ${
-                        previousShot.timestamp.format(
-                            DateTimeFormatter.ofPattern(
-                                "MMM dd, HH:mm"
-                            )
+                text = "Previous shot: ${
+                    previousShot.timestamp.format(
+                        DateTimeFormatter.ofPattern(
+                            "MMM dd, HH:mm"
                         )
-                    } (${previousShot.getFormattedBrewRatio()})",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+                    )
+                } (${previousShot.getFormattedBrewRatio()})",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
 
-            shotDetails.nextShot?.let { nextShot ->
-                Text(
-                    text = "Next shot: ${nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))} (${nextShot.getFormattedBrewRatio()})",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+        shotDetails.nextShot?.let { nextShot ->
+            Text(
+                text = "Next shot: ${nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))} (${nextShot.getFormattedBrewRatio()})",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }

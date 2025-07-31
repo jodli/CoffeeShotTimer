@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
+import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.EmptyState
@@ -243,78 +244,69 @@ private fun ActiveFiltersDisplay(
 ) {
     val spacing = LocalSpacing.current
 
-    Card(
+    CoffeeCard(
         modifier = modifier,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         )
     ) {
-        Column(
-            modifier = Modifier.padding(spacing.medium)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Active Filters",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
+        CardHeader(
+            icon = Icons.Default.Settings,
+            title = "Active Filters",
+            actions = {
                 TextButton(onClick = onClearFilters) {
                     Text("Clear All")
                 }
             }
+        )
 
-            Spacer(modifier = Modifier.height(spacing.small))
+        Spacer(modifier = Modifier.height(spacing.small))
 
-            // Display active filters
-            val filterTexts = mutableListOf<String>()
+        // Display active filters
+        val filterTexts = mutableListOf<String>()
 
-            filter.beanId?.let { beanId ->
-                val beanName = availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
-                filterTexts.add("Bean: $beanName")
-            }
+        filter.beanId?.let { beanId ->
+            val beanName = availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
+            filterTexts.add("Bean: $beanName")
+        }
 
-            if (filter.startDate != null || filter.endDate != null) {
-                val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
-                val startText = filter.startDate?.format(dateFormatter) ?: "Start"
-                val endText = filter.endDate?.format(dateFormatter) ?: "End"
-                filterTexts.add("Date: $startText - $endText")
-            }
+        if (filter.startDate != null || filter.endDate != null) {
+            val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
+            val startText = filter.startDate?.format(dateFormatter) ?: "Start"
+            val endText = filter.endDate?.format(dateFormatter) ?: "End"
+            filterTexts.add("Date: $startText - $endText")
+        }
 
-            filter.grinderSetting?.let { setting ->
-                filterTexts.add("Grinder: $setting")
-            }
+        filter.grinderSetting?.let { setting ->
+            filterTexts.add("Grinder: $setting")
+        }
 
-            if (filter.minBrewRatio != null || filter.maxBrewRatio != null) {
-                val min = filter.minBrewRatio?.let { "%.1f".format(it) } ?: "0"
-                val max = filter.maxBrewRatio?.let { "%.1f".format(it) } ?: "∞"
-                filterTexts.add("Brew Ratio: 1:$min - 1:$max")
-            }
+        if (filter.minBrewRatio != null || filter.maxBrewRatio != null) {
+            val min = filter.minBrewRatio?.let { "%.1f".format(it) } ?: "0"
+            val max = filter.maxBrewRatio?.let { "%.1f".format(it) } ?: "∞"
+            filterTexts.add("Brew Ratio: 1:$min - 1:$max")
+        }
 
-            if (filter.minExtractionTime != null || filter.maxExtractionTime != null) {
-                val min = filter.minExtractionTime ?: 0
-                val max = filter.maxExtractionTime ?: 999
-                filterTexts.add("Time: ${min}s - ${max}s")
-            }
+        if (filter.minExtractionTime != null || filter.maxExtractionTime != null) {
+            val min = filter.minExtractionTime ?: 0
+            val max = filter.maxExtractionTime ?: 999
+            filterTexts.add("Time: ${min}s - ${max}s")
+        }
 
-            if (filter.onlyOptimalExtractionTime == true) {
-                filterTexts.add("Optimal extraction time only")
-            }
+        if (filter.onlyOptimalExtractionTime == true) {
+            filterTexts.add("Optimal extraction time only")
+        }
 
-            if (filter.onlyTypicalBrewRatio == true) {
-                filterTexts.add("Typical brew ratio only")
-            }
+        if (filter.onlyTypicalBrewRatio == true) {
+            filterTexts.add("Typical brew ratio only")
+        }
 
-            filterTexts.forEach { text ->
-                Text(
-                    text = "• $text",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+        filterTexts.forEach { text ->
+            Text(
+                text = "• $text",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         }
     }
 }
@@ -613,70 +605,67 @@ private fun OverallStatisticsCard(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Text(
-                text = "Overall Statistics",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = "Overall Statistics"
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Key metrics grid
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = "Total Shots",
+                value = statistics.totalShots.toString(),
+                modifier = Modifier.weight(1f)
             )
+            StatisticItem(
+                label = "Beans Used",
+                value = statistics.uniqueBeans.toString(),
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = "Avg Ratio",
+                value = "1:${String.format("%.1f", statistics.avgBrewRatio)}",
+                modifier = Modifier.weight(1f)
+            )
+        }
 
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = "Avg Time",
+                value = "${statistics.avgExtractionTime.toInt()}s",
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = "Optimal Time",
+                value = "${String.format("%.0f", statistics.optimalExtractionPercentage)}%",
+                isGood = statistics.optimalExtractionPercentage > 50,
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = "Good Ratio",
+                value = "${String.format("%.0f", statistics.typicalRatioPercentage)}%",
+                isGood = statistics.typicalRatioPercentage > 50,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        statistics.mostUsedGrinderSetting?.let { setting ->
             Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Key metrics grid
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = "Total Shots",
-                    value = statistics.totalShots.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Beans Used",
-                    value = statistics.uniqueBeans.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Avg Ratio",
-                    value = "1:${String.format("%.1f", statistics.avgBrewRatio)}",
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = "Avg Time",
-                    value = "${statistics.avgExtractionTime.toInt()}s",
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Optimal Time",
-                    value = "${String.format("%.0f", statistics.optimalExtractionPercentage)}%",
-                    isGood = statistics.optimalExtractionPercentage > 50,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Good Ratio",
-                    value = "${String.format("%.0f", statistics.typicalRatioPercentage)}%",
-                    isGood = statistics.typicalRatioPercentage > 50,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            statistics.mostUsedGrinderSetting?.let { setting ->
-                Spacer(modifier = Modifier.height(spacing.medium))
-                Text(
-                    text = "Most used grinder setting: $setting",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            Text(
+                text = "Most used grinder setting: $setting",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -689,78 +678,75 @@ private fun ShotTrendsCard(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Text(
-                text = "Shot Trends (${trends.daysAnalyzed} days)",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+        CardHeader(
+            icon = Icons.AutoMirrored.Filled.List,
+            title = "Shot Trends (${trends.daysAnalyzed} days)"
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Trend indicators
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            TrendItem(
+                label = "Shots/Day",
+                value = String.format("%.1f", trends.shotsPerDay),
+                modifier = Modifier.weight(1f)
             )
+            TrendItem(
+                label = "Ratio Trend",
+                value = if (trends.brewRatioTrend >= 0) "+${
+                    String.format(
+                        "%.2f",
+                        trends.brewRatioTrend
+                    )
+                }" else String.format("%.2f", trends.brewRatioTrend),
+                isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
+                modifier = Modifier.weight(1f)
+            )
+            TrendItem(
+                label = "Time Trend",
+                value = if (trends.extractionTimeTrend >= 0) "+${
+                    String.format(
+                        "%.1f",
+                        trends.extractionTimeTrend
+                    )
+                }s" else "${String.format("%.1f", trends.extractionTimeTrend)}s",
+                isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
-            Spacer(modifier = Modifier.height(spacing.medium))
+        Spacer(modifier = Modifier.height(spacing.medium))
 
-            // Trend indicators
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                TrendItem(
-                    label = "Shots/Day",
-                    value = String.format("%.1f", trends.shotsPerDay),
-                    modifier = Modifier.weight(1f)
-                )
-                TrendItem(
-                    label = "Ratio Trend",
-                    value = if (trends.brewRatioTrend >= 0) "+${
-                        String.format(
-                            "%.2f",
-                            trends.brewRatioTrend
-                        )
-                    }" else String.format("%.2f", trends.brewRatioTrend),
-                    isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
-                    modifier = Modifier.weight(1f)
-                )
-                TrendItem(
-                    label = "Time Trend",
-                    value = if (trends.extractionTimeTrend >= 0) "+${
-                        String.format(
-                            "%.1f",
-                            trends.extractionTimeTrend
-                        )
-                    }s" else "${String.format("%.1f", trends.extractionTimeTrend)}s",
-                    isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Overall improvement indicator
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(
-                            if (trends.isImproving) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.outline
-                            }
-                        )
-                )
-                Spacer(modifier = Modifier.width(spacing.small))
-                Text(
-                    text = if (trends.isImproving) "Improving consistency" else "Room for improvement",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (trends.isImproving) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                )
-            }
+        // Overall improvement indicator
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(12.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (trends.isImproving) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline
+                        }
+                    )
+            )
+            Spacer(modifier = Modifier.width(spacing.small))
+            Text(
+                text = if (trends.isImproving) "Improving consistency" else "Room for improvement",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (trends.isImproving) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+            )
         }
     }
 }
@@ -773,90 +759,87 @@ private fun BrewRatioAnalysisCard(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Text(
-                text = "Brew Ratio Analysis",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = "Brew Ratio Analysis"
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Key statistics
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = "Average",
+                value = "1:${String.format("%.1f", analysis.avgRatio)}",
+                modifier = Modifier.weight(1f)
             )
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Key statistics
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = "Average",
-                    value = "1:${String.format("%.1f", analysis.avgRatio)}",
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Range",
-                    value = "1:${
-                        String.format(
-                            "%.1f",
-                            analysis.minRatio
-                        )
-                    } - 1:${String.format("%.1f", analysis.maxRatio)}",
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Quality breakdown
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = "Typical Range",
-                    value = "${String.format("%.0f", analysis.typicalRatioPercentage)}%",
-                    isGood = analysis.typicalRatioPercentage > 70,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Under-extracted",
-                    value = "${String.format("%.0f", analysis.underExtractedPercentage)}%",
-                    isGood = analysis.underExtractedPercentage < 20,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = "Over-extracted",
-                    value = "${String.format("%.0f", analysis.overExtractedPercentage)}%",
-                    isGood = analysis.overExtractedPercentage < 20,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Distribution
-            Text(
-                text = "Distribution",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
+            StatisticItem(
+                label = "Range",
+                value = "1:${
+                    String.format(
+                        "%.1f",
+                        analysis.minRatio
+                    )
+                } - 1:${String.format("%.1f", analysis.maxRatio)}",
+                modifier = Modifier.weight(1f)
             )
-            Spacer(modifier = Modifier.height(spacing.small))
+        }
 
-            analysis.distribution.forEach { (range, count) ->
-                if (count > 0) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = range,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = "$count shots",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Quality breakdown
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = "Typical Range",
+                value = "${String.format("%.0f", analysis.typicalRatioPercentage)}%",
+                isGood = analysis.typicalRatioPercentage > 70,
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = "Under-extracted",
+                value = "${String.format("%.0f", analysis.underExtractedPercentage)}%",
+                isGood = analysis.underExtractedPercentage < 20,
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = "Over-extracted",
+                value = "${String.format("%.0f", analysis.overExtractedPercentage)}%",
+                isGood = analysis.overExtractedPercentage < 20,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Distribution
+        Text(
+            text = "Distribution",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Medium
+        )
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        analysis.distribution.forEach { (range, count) ->
+            if (count > 0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = range,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "$count shots",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
         }

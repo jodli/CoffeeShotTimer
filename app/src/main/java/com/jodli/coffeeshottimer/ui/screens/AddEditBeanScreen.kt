@@ -15,8 +15,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Engineering
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.jodli.coffeeshottimer.R
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
@@ -36,12 +41,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.jodli.coffeeshottimer.ui.components.CardHeader
+import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
@@ -120,7 +128,7 @@ fun AddEditBeanScreen(
                     onValueChange = viewModel::updateName,
                     label = "Bean Name *",
                     placeholder = "Enter bean name",
-                    leadingIcon = Icons.Default.Home,
+                    leadingIcon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
                     isError = uiState.nameError != null,
                     errorMessage = uiState.nameError
                 )
@@ -158,68 +166,61 @@ fun AddEditBeanScreen(
                     onValueChange = viewModel::updateLastGrinderSetting,
                     label = "Grinder Setting",
                     placeholder = "Optional initial grinder setting",
-                    leadingIcon = Icons.Default.Settings
+                    leadingIcon = Icons.Filled.Engineering
                 )
 
                 // Active Status (only show in edit mode)
                 if (uiState.isEditMode) {
-                    Card(
+                    CoffeeCard(
                         modifier = Modifier.fillMaxWidth()
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(spacing.medium),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = "Bean Status",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Medium
-                                )
-                                Text(
-                                    text = if (uiState.isActive) "Active - visible in bean lists" else "Inactive - hidden from active lists",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                        CardHeader(
+                            icon = Icons.Default.Settings,
+                            title = "Bean Status",
+                            actions = {
+                                Switch(
+                                    checked = uiState.isActive,
+                                    onCheckedChange = viewModel::updateIsActive
                                 )
                             }
+                        )
 
-                            Switch(
-                                checked = uiState.isActive,
-                                onCheckedChange = viewModel::updateIsActive
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(spacing.small))
+                        
+                        Text(
+                            text = if (uiState.isActive) "Active - visible in bean lists" else "Inactive - hidden from active lists",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
                 // Error Message
                 if (uiState.error != null) {
-                    Card(
+                    CoffeeCard(
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.errorContainer
                         )
                     ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(spacing.medium),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = uiState.error ?: "",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            TextButton(
-                                onClick = viewModel::clearError
-                            ) {
-                                Text("Dismiss")
+                        CardHeader(
+                            icon = Icons.Default.Error,
+                            title = "Error",
+                            actions = {
+                                TextButton(
+                                    onClick = viewModel::clearError
+                                ) {
+                                    Text("Dismiss")
+                                }
                             }
-                        }
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+                        
+                        Text(
+                            text = uiState.error ?: "",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
+                        )
                     }
                 }
 
@@ -234,36 +235,31 @@ fun AddEditBeanScreen(
                 )
 
                 // Validation Info
-                Card(
+                CoffeeCard(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 ) {
-                    Column(
-                        modifier = Modifier.padding(spacing.medium)
-                    ) {
+                    CardHeader(
+                        icon = Icons.Default.Info,
+                        title = "Validation Rules"
+                    )
+
+                    Spacer(modifier = Modifier.height(spacing.small))
+
+                    val rules = listOf(
+                        "Bean name: Required, unique, max 100 characters",
+                        "Roast date: Cannot be future date, max 365 days ago",
+                        "Notes: Optional, max 500 characters",
+                        "Grinder setting: Optional, max 50 characters"
+                    )
+
+                    rules.forEach { rule ->
                         Text(
-                            text = "Validation Rules",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
+                            text = "• $rule",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-
-                        Spacer(modifier = Modifier.height(spacing.small))
-
-                        val rules = listOf(
-                            "Bean name: Required, unique, max 100 characters",
-                            "Roast date: Cannot be future date, max 365 days ago",
-                            "Notes: Optional, max 500 characters",
-                            "Grinder setting: Optional, max 50 characters"
-                        )
-
-                        rules.forEach { rule ->
-                            Text(
-                                text = "• $rule",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
                     }
                 }
 
