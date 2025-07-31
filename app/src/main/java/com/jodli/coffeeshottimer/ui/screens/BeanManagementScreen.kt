@@ -20,6 +20,9 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.jodli.coffeeshottimer.R
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -42,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
@@ -258,29 +262,13 @@ private fun BeanListItem(
         modifier = modifier,
         onClick = onEdit
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                // Bean name and status
+        CardHeader(
+            icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+            title = bean.name,
+            actions = {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(spacing.small)
+                    horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
                 ) {
-                    Text(
-                        text = bean.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = if (bean.isActive)
-                            MaterialTheme.colorScheme.onSurface
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
                     if (!bean.isActive) {
                         Surface(
                             color = MaterialTheme.colorScheme.errorContainer,
@@ -297,118 +285,117 @@ private fun BeanListItem(
                             )
                         }
                     }
-                }
+                    
+                    // Action buttons
+                    if (bean.isActive) {
+                        FilledTonalButton(
+                            onClick = onUseForShot,
+                            modifier = Modifier.height(32.dp),
+                            contentPadding = PaddingValues(horizontal = spacing.small, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Use for Shot",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
 
-                Spacer(modifier = Modifier.height(spacing.small))
+                    if (onReactivate != null) {
+                        IconButton(
+                            onClick = onReactivate,
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Reactivate bean",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
 
-                // Days since roast with freshness indicator
-                val daysSinceRoast = bean.daysSinceRoast()
-                val isFresh = bean.isFresh()
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(spacing.small)
-                ) {
-                    Text(
-                        text = "Roasted: $daysSinceRoast days ago",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (isFresh)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    // Freshness indicator
-                    Surface(
-                        color = if (isFresh)
-                            MaterialTheme.colorScheme.primaryContainer
-                        else
-                            MaterialTheme.colorScheme.secondaryContainer,
-                        shape = androidx.compose.foundation.shape.CircleShape
+                    IconButton(
+                        onClick = onDelete,
+                        modifier = Modifier.size(32.dp)
                     ) {
-                        Text(
-                            text = if (isFresh) "Fresh" else when {
-                                daysSinceRoast < 4 -> "Too Fresh"
-                                daysSinceRoast <= 45 -> "Good"
-                                daysSinceRoast <= 90 -> "OK"
-                                else -> "Stale"
-                            },
-                            style = MaterialTheme.typography.labelSmall,
-                            color = if (isFresh)
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            else
-                                MaterialTheme.colorScheme.onSecondaryContainer,
-                            modifier = Modifier.padding(horizontal = spacing.small, vertical = 2.dp)
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = if (bean.isActive) "Delete bean" else "Permanently delete bean",
+                            tint = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
+            }
+        )
 
-                // Grinder setting if available
-                if (!bean.lastGrinderSetting.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(spacing.extraSmall))
-                    Text(
-                        text = "Last grind: ${bean.lastGrinderSetting}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+        Spacer(modifier = Modifier.height(spacing.medium))
 
-                // Notes if available
-                if (bean.notes.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(spacing.extraSmall))
+        Column {
+
+            // Days since roast with freshness indicator
+            val daysSinceRoast = bean.daysSinceRoast()
+            val isFresh = bean.isFresh()
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                Text(
+                    text = "Roasted: $daysSinceRoast days ago",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isFresh)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                // Freshness indicator
+                Surface(
+                    color = if (isFresh)
+                        MaterialTheme.colorScheme.primaryContainer
+                    else
+                        MaterialTheme.colorScheme.secondaryContainer,
+                    shape = androidx.compose.foundation.shape.CircleShape
+                ) {
                     Text(
-                        text = bean.notes,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
-                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        text = if (isFresh) "Fresh" else when {
+                            daysSinceRoast < 4 -> "Too Fresh"
+                            daysSinceRoast <= 45 -> "Good"
+                            daysSinceRoast <= 90 -> "OK"
+                            else -> "Stale"
+                        },
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isFresh)
+                            MaterialTheme.colorScheme.onPrimaryContainer
+                        else
+                            MaterialTheme.colorScheme.onSecondaryContainer,
+                        modifier = Modifier.padding(horizontal = spacing.small, vertical = 2.dp)
                     )
                 }
             }
 
-            // Action buttons
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-            ) {
-                // Use for Shot button (only for active beans)
-                if (bean.isActive) {
-                    FilledTonalButton(
-                        onClick = onUseForShot,
-                        modifier = Modifier.height(32.dp),
-                        contentPadding = PaddingValues(horizontal = spacing.small, vertical = 4.dp)
-                    ) {
-                        Text(
-                            text = "Use for Shot",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
+            // Grinder setting if available
+            if (!bean.lastGrinderSetting.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(spacing.extraSmall))
+                Text(
+                    text = "Last grind: ${bean.lastGrinderSetting}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
-                if (onReactivate != null) {
-                    IconButton(
-                        onClick = onReactivate,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Reactivate bean",
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-
-                IconButton(
-                    onClick = onDelete,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = if (bean.isActive) "Delete bean" else "Permanently delete bean",
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                }
+            // Notes if available
+            if (bean.notes.isNotBlank()) {
+                Spacer(modifier = Modifier.height(spacing.extraSmall))
+                Text(
+                    text = bean.notes,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
             }
         }
     }

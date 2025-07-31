@@ -17,7 +17,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Input
+import androidx.compose.material.icons.filled.Output
+import androidx.compose.material.icons.filled.Engineering
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -74,7 +77,7 @@ fun WeightSlider(
     maxWeight: Float = 50f,
     typicalRangeStart: Float = 15f,
     typicalRangeEnd: Float = 20f,
-    icon: ImageVector = Icons.Default.Add,
+    icon: ImageVector,
     errorMessage: String? = null,
     enabled: Boolean = true
 ) {
@@ -322,7 +325,7 @@ fun CoffeeWeightInSlider(
         maxWeight = 35f,
         typicalRangeStart = 15f,
         typicalRangeEnd = 20f,
-        icon = Icons.Default.Add,
+        icon = Icons.Default.Input,
         errorMessage = errorMessage,
         enabled = enabled
     )
@@ -348,7 +351,7 @@ fun CoffeeWeightOutSlider(
         maxWeight = 80f,
         typicalRangeStart = 25f,
         typicalRangeEnd = 40f,
-        icon = Icons.Default.Add,
+        icon = Icons.Default.Output,
         errorMessage = errorMessage,
         enabled = enabled
     )
@@ -391,7 +394,7 @@ fun GrinderSettingSlider(
                 horizontalArrangement = Arrangement.spacedBy(spacing.small)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Add,
+                    imageVector = Icons.Filled.Engineering,
                     contentDescription = null,
                     tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
@@ -651,10 +654,9 @@ fun WeightSlidersSection(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Text(
-            text = "Weight Measurements",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+        CardHeader(
+            icon = Icons.Default.Scale,
+            title = "Weight Measurements"
         )
 
         Spacer(modifier = Modifier.height(spacing.large))

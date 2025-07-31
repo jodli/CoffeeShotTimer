@@ -13,8 +13,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.jodli.coffeeshottimer.R
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.components.BeanCard
+import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.DebugDialog
@@ -202,15 +209,13 @@ fun RecordShotScreen(
 
         // Success message
         successMessage?.let { success ->
-            Card(
+            CoffeeCard(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 )
             ) {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(spacing.medium),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -235,7 +240,7 @@ fun RecordShotScreen(
 
         // Error message
         errorMessage?.let { error ->
-            Card(
+            CoffeeCard(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer
                 )
@@ -243,15 +248,14 @@ fun RecordShotScreen(
                 Text(
                     text = error,
                     color = MaterialTheme.colorScheme.onErrorContainer,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(spacing.medium)
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
 
         // Draft status indicator
         if (isDraftSaved) {
-            Card(
+            CoffeeCard(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 )
@@ -259,8 +263,7 @@ fun RecordShotScreen(
                 Text(
                     text = "Draft saved automatically",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.padding(spacing.small)
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
@@ -316,42 +319,31 @@ private fun BeanSelectionCard(
         onClick = onBeanSelect,
         modifier = modifier
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Home,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
-            )
-
-            Column(modifier = Modifier.weight(1f)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+        CardHeader(
+            icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+            title = "Selected Bean",
+            actions = {
+                TextButton(
+                    onClick = onManageBeans,
+                    contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "Selected Bean",
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = "Manage",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary
                     )
-
-                    TextButton(
-                        onClick = onManageBeans,
-                        contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
-                    ) {
-                        Text(
-                            text = "Manage",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
                 }
+            }
+        )
 
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = selectedBean?.name ?: "Tap to select bean",
                     style = MaterialTheme.typography.titleMedium,
@@ -396,30 +388,26 @@ private fun TimerSection(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            Text(
-                text = "Extraction Timer",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+        CardHeader(
+            icon = Icons.Default.Settings,
+            title = "Extraction Timer"
+        )
 
-            // Enhanced clickable timer - entire timer is now the start/stop button!
-            // This dramatically improves usability with a ~200dp touch target vs 80dp
-            TimerControls(
-                isRunning = timerState == TimerState.RUNNING,
-                onStartPause = onStartPause,
-                onReset = onReset,
-                currentTime = currentTime,
-                targetTime = targetTime,
-                showReset = currentTime > 0L,
-                useClickableTimer = true, // Use the new clickable timer approach
-                showColorCoding = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Enhanced clickable timer - entire timer is now the start/stop button!
+        // This dramatically improves usability with a ~200dp touch target vs 80dp
+        TimerControls(
+            isRunning = timerState == TimerState.RUNNING,
+            onStartPause = onStartPause,
+            onReset = onReset,
+            currentTime = currentTime,
+            targetTime = targetTime,
+            showReset = currentTime > 0L,
+            useClickableTimer = true, // Use the new clickable timer approach
+            showColorCoding = true,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
@@ -434,28 +422,21 @@ private fun BrewRatioCard(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Brew Ratio",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Text(
-                text = formattedBrewRatio ?: "--",
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = if (isOptimal)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.End
-            )
-        }
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = "Brew Ratio",
+            actions = {
+                Text(
+                    text = formattedBrewRatio ?: "--",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isOptimal)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        )
 
         brewRatio?.let {
             val status = when {
@@ -464,6 +445,7 @@ private fun BrewRatioCard(
                 else -> "Typical espresso range"
             }
 
+            Spacer(modifier = Modifier.height(spacing.small))
             Text(
                 text = status,
                 style = MaterialTheme.typography.bodySmall,
@@ -529,10 +511,9 @@ private fun NotesSection(
     val spacing = LocalSpacing.current
 
     CoffeeCard(modifier = modifier) {
-        Text(
-            text = "Notes (Optional)",
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface
+        CardHeader(
+            icon = Icons.Default.Edit,
+            title = "Notes (Optional)"
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -609,7 +590,7 @@ private fun BeanSelectorBottomSheet(
 
             if (beans.isEmpty()) {
                 EmptyState(
-                    icon = Icons.Default.Home,
+                    icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
                     title = "No Beans Available",
                     description = "Add some beans in Bean Management to get started",
                     modifier = Modifier.padding(spacing.large)
