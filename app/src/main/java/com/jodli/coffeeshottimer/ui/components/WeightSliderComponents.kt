@@ -285,9 +285,8 @@ private fun WeightRangeIndicator(
         ) {
             Text(
                 text = "Typical: ${typicalRangeStart.roundToInt()}-${typicalRangeEnd.roundToInt()}g",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                fontSize = 10.sp
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             // Show if current value is in typical range
@@ -295,9 +294,8 @@ private fun WeightRangeIndicator(
             if (isInTypicalRange) {
                 Text(
                     text = "✓ Typical",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.primary,
-                    fontSize = 10.sp,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -618,18 +616,16 @@ private fun GrinderSettingRangeIndicator(
             if (previousSuccessfulSettings.isNotEmpty()) {
                 Text(
                     text = "• Previous successful",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.tertiary,
-                    fontSize = 10.sp
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.tertiary
                 )
             }
 
             if (suggestedSetting != null) {
                 Text(
                     text = "■ Suggested",
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.secondary,
-                    fontSize = 10.sp,
                     textAlign = TextAlign.End
                 )
             }

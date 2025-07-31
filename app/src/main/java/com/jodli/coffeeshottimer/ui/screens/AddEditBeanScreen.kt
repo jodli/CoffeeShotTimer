@@ -93,6 +93,7 @@ fun AddEditBeanScreen(
             title = {
                 Text(
                     text = if (uiState.isEditMode) "Edit Bean" else "Add Bean",
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
             },

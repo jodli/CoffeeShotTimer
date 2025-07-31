@@ -1044,11 +1044,13 @@ private fun GrinderSettingItem(
             ) {
                 Text(
                     text = "Avg Ratio: 1:${String.format("%.1f", setting.avgBrewRatio)}",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "Avg Time: ${setting.avgExtractionTime.toInt()}s",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "Optimal: ${
@@ -1057,7 +1059,8 @@ private fun GrinderSettingItem(
                             setting.optimalExtractionPercentage
                         )
                     }%",
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

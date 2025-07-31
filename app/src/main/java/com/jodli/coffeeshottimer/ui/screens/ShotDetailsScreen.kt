@@ -896,7 +896,8 @@ private fun DeviationItem(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
             text = "${if (deviation >= 0) "+" else ""}${format.format(deviation)}$suffix",

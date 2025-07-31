@@ -41,13 +41,13 @@
 
 ## Phase 2: Typography and Spacing Normalization
 
-- [ ] 6. Audit typography usage across all screens
+- [x] 6. Audit typography usage across all screens
   - Identify hardcoded text styles and inconsistent typography
   - Document current text hierarchy patterns
   - Map screen titles, card titles, and secondary text usage
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 7. Implement consistent typography hierarchy
+- [x] 7. Implement consistent typography hierarchy
   - Replace hardcoded text styles with Material 3 theme typography
   - Apply headlineMedium with FontWeight.Bold for screen titles
   - Use titleMedium with FontWeight.Medium for card titles

@@ -2,9 +2,11 @@ package com.jodli.coffeeshottimer.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Coffee
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import com.jodli.coffeeshottimer.R
 
 /**
  * Bottom navigation items configuration
@@ -15,11 +17,12 @@ data class BottomNavigationItem(
     val label: String
 )
 
-val bottomNavigationItems = listOf(
+@Composable
+fun getBottomNavigationItems(): List<BottomNavigationItem> = listOf(
     BottomNavigationItem(
         route = NavigationDestinations.RecordShot.route,
-        icon = Icons.Default.PlayArrow,
-        label = "Record Shot"
+        icon = Icons.Default.Coffee,
+        label = "New Shot"
     ),
     BottomNavigationItem(
         route = NavigationDestinations.ShotHistory.route,
@@ -28,7 +31,7 @@ val bottomNavigationItems = listOf(
     ),
     BottomNavigationItem(
         route = NavigationDestinations.BeanManagement.route,
-        icon = Icons.Default.Settings,
+        icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
         label = "Beans"
     )
 )
