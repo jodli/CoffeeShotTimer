@@ -66,7 +66,7 @@ fun BeanCard(
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                     )
 
                     Text(
@@ -122,7 +122,7 @@ fun BeanCard(
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(spacing.cornerSmall)
             ) {
                 Text(
                     text = "Currently Selected",

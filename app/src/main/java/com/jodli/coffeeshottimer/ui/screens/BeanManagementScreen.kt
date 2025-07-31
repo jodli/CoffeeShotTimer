@@ -90,7 +90,7 @@ fun BeanManagementScreen(
                 text = "Add Bean",
                 onClick = onAddBeanClick,
                 icon = Icons.Default.Add,
-                modifier = Modifier.widthIn(max = 140.dp)
+                modifier = Modifier.widthIn(max = spacing.buttonMaxWidth - 60.dp)
             )
         }
 
@@ -130,7 +130,7 @@ fun BeanManagementScreen(
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(spacing.iconSmall)
                     )
                 }
             )
@@ -169,7 +169,7 @@ fun BeanManagementScreen(
                             viewModel.clearError()
                             viewModel.refresh()
                         },
-                        modifier = Modifier.widthIn(max = 120.dp)
+                        modifier = Modifier.widthIn(max = spacing.buttonMaxWidth - 80.dp)
                     )
                 }
             }
@@ -273,7 +273,7 @@ private fun BeanListItem(
                     if (!bean.isActive) {
                         Surface(
                             color = MaterialTheme.colorScheme.errorContainer,
-                            shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp)
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(spacing.cornerSmall)
                         ) {
                             Text(
                                 text = "Inactive",
@@ -281,7 +281,7 @@ private fun BeanListItem(
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(
                                     horizontal = spacing.small,
-                                    vertical = 2.dp
+                                    vertical = spacing.extraSmall / 2
                                 )
                             )
                         }
@@ -292,7 +292,7 @@ private fun BeanListItem(
                         CoffeeSecondaryButton(
                             text = "Use for Shot",
                             onClick = onUseForShot,
-                            modifier = Modifier.height(32.dp),
+                            modifier = Modifier.height(spacing.iconButtonSize),
                             fillMaxWidth = false
                         )
                     }
@@ -300,26 +300,26 @@ private fun BeanListItem(
                     if (onReactivate != null) {
                         IconButton(
                             onClick = onReactivate,
-                            modifier = Modifier.size(32.dp)
+                            modifier = Modifier.size(spacing.iconButtonSize)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Reactivate bean",
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(spacing.iconSmall)
                             )
                         }
                     }
 
                     IconButton(
                         onClick = onDelete,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(spacing.iconButtonSize)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = if (bean.isActive) "Delete bean" else "Permanently delete bean",
                             tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(spacing.iconSmall)
                         )
                     }
                 }
@@ -367,7 +367,7 @@ private fun BeanListItem(
                             MaterialTheme.colorScheme.onPrimaryContainer
                         else
                             MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(horizontal = spacing.small, vertical = 2.dp)
+                        modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
                     )
                 }
             }

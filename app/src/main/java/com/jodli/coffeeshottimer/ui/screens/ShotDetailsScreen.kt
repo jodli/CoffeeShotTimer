@@ -176,7 +176,7 @@ fun ShotDetailsScreen(
                         CoffeePrimaryButton(
                             text = "Retry",
                             onClick = { viewModel.refreshShotDetails() },
-                            modifier = Modifier.widthIn(max = 200.dp)
+                            modifier = Modifier.widthIn(max = spacing.buttonMaxWidth)
                         )
                     }
                 }
@@ -808,6 +808,7 @@ private fun ParameterItem(
     isOptimal: Boolean = true,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalSpacing.current
     Column(modifier = modifier) {
         Text(
             text = label,
@@ -823,10 +824,10 @@ private fun ParameterItem(
                 fontWeight = FontWeight.Medium
             )
             if (!isOptimal) {
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(spacing.extraSmall))
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
+                        .size(spacing.qualityIndicator - 2.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.error)
                 )
@@ -845,7 +846,7 @@ private fun QualityIndicatorChip(
 
     Surface(
         modifier = modifier.padding(horizontal = spacing.extraSmall),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(spacing.cornerLarge),
         color = if (isGood) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
@@ -858,7 +859,7 @@ private fun QualityIndicatorChip(
         ) {
             Box(
                 modifier = Modifier
-                    .size(8.dp)
+                    .size(spacing.qualityIndicator)
                     .clip(CircleShape)
                     .background(
                         if (isGood) {

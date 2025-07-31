@@ -90,7 +90,7 @@ fun ShotHistoryFilterDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .heightIn(max = 600.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationDialog)
         ) {
             Column(
                 modifier = Modifier
@@ -186,7 +186,7 @@ fun ShotHistoryFilterDialog(
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(spacing.iconSmall)
                                 )
                                 Spacer(modifier = Modifier.width(spacing.extraSmall))
                                 Text(
@@ -203,7 +203,7 @@ fun ShotHistoryFilterDialog(
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
                                     contentDescription = null,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(spacing.iconSmall)
                                 )
                                 Spacer(modifier = Modifier.width(spacing.extraSmall))
                                 Text(
