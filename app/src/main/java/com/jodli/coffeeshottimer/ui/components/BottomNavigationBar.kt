@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.jodli.coffeeshottimer.ui.navigation.bottomNavigationItems
+import com.jodli.coffeeshottimer.ui.navigation.getBottomNavigationItems
 
 @Composable
 fun BottomNavigationBar(
@@ -18,7 +18,7 @@ fun BottomNavigationBar(
     val currentRoute = navBackStackEntry?.destination?.route
 
     NavigationBar {
-        bottomNavigationItems.forEach { item ->
+        getBottomNavigationItems().forEach { item ->
             NavigationBarItem(
                 icon = {
                     Icon(

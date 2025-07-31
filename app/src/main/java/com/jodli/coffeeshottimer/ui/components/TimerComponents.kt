@@ -214,7 +214,7 @@ fun CircularTimer(
             // Timer text with enhanced formatting
             Text(
                 text = formatExtractionTime(currentTime),
-                fontSize = 28.sp, // Slightly larger for better visibility
+                style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
@@ -232,7 +232,7 @@ fun CircularTimer(
                 if (qualityText.isNotEmpty()) {
                     Text(
                         text = qualityText,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = animatedColor,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Medium
@@ -253,7 +253,7 @@ fun CircularTimer(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = if (isRunning) "Tap to stop" else "Tap to start",
-                        fontSize = 11.sp,
+                        style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center
                     )
@@ -262,7 +262,7 @@ fun CircularTimer(
                 // Show target time for non-color-coded timers
                 Text(
                     text = "/ ${formatExtractionTime(targetTime)}",
-                    fontSize = 14.sp,
+                    style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )

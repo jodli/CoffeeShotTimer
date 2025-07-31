@@ -119,15 +119,17 @@ fun RecordShotScreen(
             DebugTapDetector(
                 onDebugActivated = { debugViewModel.showDialog() }
             ) {
-                SectionHeader(
-                    title = "Record Shot",
-                    subtitle = "Track your espresso extraction"
+                Text(
+                    text = "New Shot",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
                 )
             }
         } else {
-            SectionHeader(
-                title = "Record Shot",
-                subtitle = "Track your espresso extraction"
+            Text(
+                text = "New Shot",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
             )
         }
 

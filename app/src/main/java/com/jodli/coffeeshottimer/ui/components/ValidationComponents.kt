@@ -257,7 +257,7 @@ fun ValidatedTextField(
                         Text(
                             text = " *",
                             color = MaterialTheme.colorScheme.error,
-                            fontSize = 14.sp
+                            style = MaterialTheme.typography.labelMedium
                         )
                     }
                 }
@@ -291,18 +291,19 @@ fun ValidatedTextField(
                         Text(
                             text = errorMessage!!,
                             color = MaterialTheme.colorScheme.error,
-                            fontSize = 12.sp
+                            style = MaterialTheme.typography.bodySmall
                         )
                     } else if (hasWarning) {
                         Text(
                             text = warningMessage!!,
                             color = MaterialTheme.colorScheme.tertiary,
-                            fontSize = 12.sp
+                            style = MaterialTheme.typography.bodySmall
                         )
                     } else if (supportingText != null) {
                         Text(
                             text = supportingText,
-                            fontSize = 12.sp
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
 
@@ -310,7 +311,7 @@ fun ValidatedTextField(
                     if (maxLength != null) {
                         Text(
                             text = "${value.length}/$maxLength",
-                            fontSize = 10.sp,
+                            style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth()
                         )
