@@ -24,7 +24,29 @@ data class Spacing(
     val extraLarge: Dp = 32.dp,
     val touchTarget: Dp = 44.dp, // Minimum touch target size for accessibility
     val cardPadding: Dp = 16.dp,
-    val screenPadding: Dp = 16.dp
+    val screenPadding: Dp = 16.dp,
+    // Icon sizes
+    val iconSmall: Dp = 16.dp,
+    val iconMedium: Dp = 24.dp,
+    val iconLarge: Dp = 32.dp,
+    val iconEmptyState: Dp = 64.dp,
+    // Corner radius values
+    val cornerSmall: Dp = 4.dp,
+    val cornerMedium: Dp = 8.dp,
+    val cornerLarge: Dp = 16.dp,
+    // Elevation values
+    val elevationCard: Dp = 4.dp,
+    val elevationDialog: Dp = 8.dp,
+    // Component-specific sizes
+    val timerSize: Dp = 200.dp,
+    val buttonMaxWidth: Dp = 200.dp,
+    val sliderHeight: Dp = 32.dp,
+    val qualityIndicator: Dp = 8.dp,
+    val fabSize: Dp = 56.dp,
+    val fabSizeSmall: Dp = 40.dp,
+    val timerButtonSize: Dp = 80.dp,
+    val iconButtonSize: Dp = 32.dp,
+    val sliderHeightSmall: Dp = 24.dp
 )
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }

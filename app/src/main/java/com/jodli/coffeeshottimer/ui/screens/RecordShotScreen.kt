@@ -327,7 +327,7 @@ private fun BeanSelectionCard(
             actions = {
                 TextButton(
                     onClick = onManageBeans,
-                    contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
+                    contentPadding = PaddingValues(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
                 ) {
                     Text(
                         text = "Manage",
@@ -480,7 +480,7 @@ private fun GrinderSettingSection(
             ) {
                 TextButton(
                     onClick = { onUseSuggestion(suggestedSetting) },
-                    contentPadding = PaddingValues(horizontal = spacing.small, vertical = 2.dp)
+                    contentPadding = PaddingValues(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
                 ) {
                     Text(
                         text = "Use Suggested: $suggestedSetting",

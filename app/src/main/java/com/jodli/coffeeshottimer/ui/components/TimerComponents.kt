@@ -159,13 +159,13 @@ fun CircularTimer(
 
     Box(
         modifier = modifier
-            .size(200.dp)
+            .size(spacing.timerSize)
             .graphicsLayer(scaleX = scale, scaleY = scale)
             .then(
                 if (handleTimerClick != null) {
                     Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = ripple(bounded = false, radius = 100.dp),
+                        indication = ripple(bounded = false, radius = spacing.timerSize / 2),
                         onClick = handleTimerClick
                     )
                 } else Modifier
@@ -174,7 +174,7 @@ fun CircularTimer(
     ) {
         // Background circle
         Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokeWidth = 8.dp.toPx()
+            val strokeWidth = spacing.small.toPx()
             val radius = (size.minDimension - strokeWidth) / 2
             val center = androidx.compose.ui.geometry.Offset(
                 size.width / 2,
@@ -247,10 +247,10 @@ fun CircularTimer(
                     Icon(
                         imageVector = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(spacing.iconSmall),
                         tint = animatedColor.copy(alpha = 0.7f)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(spacing.extraSmall))
                     Text(
                         text = if (isRunning) "Tap to stop" else "Tap to start",
                         style = MaterialTheme.typography.labelSmall,
@@ -350,7 +350,7 @@ fun TimerControls(
             // Start/Pause button (legacy style)
             FloatingActionButton(
                 onClick = onStartPause,
-                modifier = Modifier.size(56.dp),
+                modifier = Modifier.size(spacing.fabSize),
                 containerColor = if (isRunning)
                     MaterialTheme.colorScheme.secondary
                 else
@@ -360,13 +360,13 @@ fun TimerControls(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_pause),
                         contentDescription = "Pause",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(spacing.iconMedium)
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
                         contentDescription = "Start",
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(spacing.iconMedium)
                     )
                 }
             }
@@ -422,7 +422,7 @@ fun EnhancedTimerControls(
                 },
                 modifier = Modifier
                     .height(spacing.touchTarget)
-                    .widthIn(min = 80.dp),
+                    .widthIn(min = spacing.timerButtonSize),
                 enabled = enabled
             )
         }
@@ -573,6 +573,7 @@ fun EnhancedTimerButton(
     modifier: Modifier = Modifier,
     debounceDelayMs: Long = 300L // Configurable debounce delay
 ) {
+    val spacing = LocalSpacing.current
     val context = LocalContext.current
     val buttonState = rememberTimerButtonState(isRunning)
 
@@ -636,22 +637,22 @@ fun EnhancedTimerButton(
     FloatingActionButton(
         onClick = handleClick,
         modifier = modifier
-            .size(80.dp) // Minimum 80dp diameter as specified
+            .size(spacing.timerButtonSize) // Minimum 80dp diameter as specified
             .graphicsLayer(scaleX = scale, scaleY = scale),
         containerColor = animatedButtonColor,
         contentColor = animatedIconColor,
         elevation = FloatingActionButtonDefaults.elevation(
-            defaultElevation = 8.dp, // Material Design elevation as specified
-            pressedElevation = 12.dp,
-            focusedElevation = 8.dp,
-            hoveredElevation = 10.dp
+            defaultElevation = spacing.elevationDialog, // Material Design elevation as specified
+            pressedElevation = spacing.elevationDialog + spacing.extraSmall,
+            focusedElevation = spacing.elevationDialog,
+            hoveredElevation = spacing.elevationDialog + 2.dp
         ),
         shape = CircleShape
     ) {
         Icon(
             imageVector = buttonState.icon,
             contentDescription = buttonState.contentDescription,
-            modifier = Modifier.size(32.dp), // Large icon for visibility
+            modifier = Modifier.size(spacing.iconLarge), // Large icon for visibility
             tint = animatedIconColor
         )
     }
@@ -690,7 +691,7 @@ fun ClickableTimerControls(
             isRunning = isRunning,
             showColorCoding = showColorCoding,
             onStartStop = onStartStop,
-            modifier = Modifier.size(200.dp)
+            modifier = Modifier.size(spacing.timerSize)
         )
 
         // Reset button positioned elegantly in the top-right area
@@ -707,19 +708,19 @@ fun ClickableTimerControls(
                         onReset()
                     },
                     modifier = Modifier
-                        .size(40.dp)
-                        .offset(x = 8.dp, y = (-8).dp), // Slightly outside the timer boundary
+                        .size(spacing.fabSizeSmall)
+                        .offset(x = spacing.small, y = -spacing.small), // Slightly outside the timer boundary
                     containerColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
                     elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = 4.dp,
-                        pressedElevation = 6.dp
+                        defaultElevation = spacing.elevationCard,
+                        pressedElevation = spacing.elevationCard + 2.dp
                     )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = "Reset timer",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                     )
                 }
             }

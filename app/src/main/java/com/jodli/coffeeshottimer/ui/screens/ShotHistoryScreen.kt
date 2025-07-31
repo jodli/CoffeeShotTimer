@@ -179,7 +179,7 @@ fun ShotHistoryScreen(
                         CoffeePrimaryButton(
                             text = "Retry",
                             onClick = { viewModel.refreshData() },
-                            modifier = Modifier.widthIn(max = 200.dp)
+                            modifier = Modifier.widthIn(max = spacing.buttonMaxWidth)
                         )
                     }
                 }
@@ -446,6 +446,7 @@ private fun MetricChip(
     isNeutral: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalSpacing.current
     val backgroundColor = when {
         isNeutral -> MaterialTheme.colorScheme.surfaceVariant
         isGood -> MaterialTheme.colorScheme.primaryContainer
@@ -460,11 +461,11 @@ private fun MetricChip(
 
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(spacing.cornerLarge - spacing.extraSmall),
         color = backgroundColor
     ) {
         Column(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
@@ -497,7 +498,7 @@ private fun QualityIndicator(
         // Time indicator
         Box(
             modifier = Modifier
-                .size(8.dp)
+                .size(spacing.qualityIndicator)
                 .clip(CircleShape)
                 .background(
                     if (isOptimalTime) {
@@ -511,7 +512,7 @@ private fun QualityIndicator(
         // Ratio indicator
         Box(
             modifier = Modifier
-                .size(8.dp)
+                .size(spacing.qualityIndicator)
                 .clip(CircleShape)
                 .background(
                     if (isTypicalRatio) {
@@ -727,7 +728,7 @@ private fun ShotTrendsCard(
         ) {
             Box(
                 modifier = Modifier
-                    .size(12.dp)
+                    .size(spacing.qualityIndicator + spacing.extraSmall)
                     .clip(CircleShape)
                     .background(
                         if (trends.isImproving) {

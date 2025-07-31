@@ -79,8 +79,8 @@ fun DebugDialog(
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+            shape = RoundedCornerShape(spacing.cornerLarge),
+            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationDialog),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             )
@@ -102,7 +102,7 @@ fun DebugDialog(
                         Icon(
                             imageVector = Icons.Default.BugReport,
                             contentDescription = null,
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(spacing.iconMedium),
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(spacing.small))
@@ -249,7 +249,7 @@ fun DebugDialog(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(spacing.iconMedium)
                     )
                     Spacer(modifier = Modifier.width(spacing.small))
                     Text(

@@ -108,7 +108,7 @@ fun WeightSlider(
                     imageVector = icon,
                     contentDescription = null,
                     tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                 )
                 Text(
                     text = label,
@@ -224,13 +224,13 @@ private fun WeightRangeIndicator(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(24.dp)
+            .height(spacing.sliderHeightSmall)
     ) {
         // Background track
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(spacing.cornerLarge - spacing.extraSmall))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
 
@@ -247,7 +247,7 @@ private fun WeightRangeIndicator(
                     .fillMaxHeight()
                     .width(totalWidth * typicalRangeWidth)
                     .offset(x = totalWidth * typicalRangeStartPercent)
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(spacing.cornerLarge - spacing.extraSmall))
                     .background(
                         if (enabled)
                             MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
@@ -261,12 +261,12 @@ private fun WeightRangeIndicator(
 
             Box(
                 modifier = Modifier
-                    .size(8.dp)
+                    .size(spacing.qualityIndicator)
                     .offset(
-                        x = (totalWidth * currentPercent) - 4.dp, // Center the indicator
-                        y = 8.dp
+                        x = (totalWidth * currentPercent) - spacing.extraSmall, // Center the indicator
+                        y = spacing.qualityIndicator
                     )
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(RoundedCornerShape(spacing.cornerSmall))
                     .background(
                         if (enabled)
                             MaterialTheme.colorScheme.primary
@@ -280,7 +280,7 @@ private fun WeightRangeIndicator(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 28.dp),
+                .padding(top = spacing.large + spacing.extraSmall),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
@@ -395,7 +395,7 @@ fun GrinderSettingSlider(
                     imageVector = Icons.Filled.Engineering,
                     contentDescription = null,
                     tint = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                 )
                 Text(
                     text = "Grinder Setting",
@@ -534,13 +534,13 @@ private fun GrinderSettingRangeIndicator(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(32.dp)
+            .height(spacing.sliderHeight)
     ) {
         // Background track
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(RoundedCornerShape(spacing.cornerLarge))
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         )
 
@@ -552,12 +552,12 @@ private fun GrinderSettingRangeIndicator(
                 val settingPercent = (setting - minSetting) / (maxSetting - minSetting)
                 Box(
                     modifier = Modifier
-                        .size(6.dp)
+                        .size(spacing.qualityIndicator - 2.dp)
                         .offset(
-                            x = (totalWidth * settingPercent) - 3.dp,
-                            y = 13.dp
+                            x = (totalWidth * settingPercent) - (spacing.qualityIndicator - 2.dp) / 2,
+                            y = spacing.medium - 3.dp
                         )
-                        .clip(RoundedCornerShape(3.dp))
+                        .clip(RoundedCornerShape(spacing.cornerSmall - 1.dp))
                         .background(
                             if (enabled)
                                 MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f)
@@ -572,12 +572,12 @@ private fun GrinderSettingRangeIndicator(
                 val suggestionPercent = (suggestion - minSetting) / (maxSetting - minSetting)
                 Box(
                     modifier = Modifier
-                        .size(8.dp)
+                        .size(spacing.qualityIndicator)
                         .offset(
-                            x = (totalWidth * suggestionPercent) - 4.dp,
-                            y = 12.dp
+                            x = (totalWidth * suggestionPercent) - spacing.extraSmall,
+                            y = spacing.medium - spacing.extraSmall
                         )
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(RoundedCornerShape(spacing.cornerSmall))
                         .background(
                             if (enabled)
                                 MaterialTheme.colorScheme.secondary
@@ -591,12 +591,12 @@ private fun GrinderSettingRangeIndicator(
             val currentPercent = (currentValue - minSetting) / (maxSetting - minSetting)
             Box(
                 modifier = Modifier
-                    .size(10.dp)
+                    .size(spacing.qualityIndicator + 2.dp)
                     .offset(
-                        x = (totalWidth * currentPercent) - 5.dp,
-                        y = 11.dp
+                        x = (totalWidth * currentPercent) - (spacing.qualityIndicator + 2.dp) / 2,
+                        y = spacing.medium - 5.dp
                     )
-                    .clip(RoundedCornerShape(5.dp))
+                    .clip(RoundedCornerShape(spacing.cornerSmall + 1.dp))
                     .background(
                         if (enabled)
                             MaterialTheme.colorScheme.primary
@@ -610,7 +610,7 @@ private fun GrinderSettingRangeIndicator(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 36.dp),
+                .padding(top = spacing.extraLarge + spacing.extraSmall),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             if (previousSuccessfulSettings.isNotEmpty()) {

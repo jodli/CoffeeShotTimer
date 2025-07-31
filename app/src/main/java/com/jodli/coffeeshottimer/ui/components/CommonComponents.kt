@@ -48,8 +48,8 @@ fun CoffeeCard(
         Card(
             onClick = onClick,
             modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = RoundedCornerShape(spacing.cornerLarge),
+            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard),
             colors = colors
         ) {
             Column(
@@ -60,8 +60,8 @@ fun CoffeeCard(
     } else {
         Card(
             modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            shape = RoundedCornerShape(spacing.cornerLarge),
+            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard),
             colors = colors
         ) {
             Column(
@@ -96,13 +96,13 @@ fun CoffeePrimaryButton(
             modifier.height(spacing.touchTarget)
         },
         enabled = enabled,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(spacing.cornerMedium)
     ) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(spacing.iconSmall)
             )
             Spacer(modifier = Modifier.width(spacing.small))
         }
@@ -137,13 +137,13 @@ fun CoffeeSecondaryButton(
             modifier.height(spacing.touchTarget)
         },
         enabled = enabled,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(spacing.cornerMedium)
     ) {
         if (icon != null) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(spacing.iconSmall)
             )
             Spacer(modifier = Modifier.width(spacing.small))
         }
@@ -198,7 +198,7 @@ fun CoffeeTextField(
             singleLine = singleLine,
             maxLines = maxLines,
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(spacing.cornerMedium)
         )
 
         if (isError && errorMessage != null) {
@@ -267,7 +267,7 @@ fun EmptyState(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(64.dp),
+            modifier = Modifier.size(spacing.iconEmptyState),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
@@ -294,7 +294,7 @@ fun EmptyState(
             CoffeePrimaryButton(
                 text = actionText,
                 onClick = onActionClick,
-                modifier = Modifier.widthIn(max = 200.dp)
+                modifier = Modifier.widthIn(max = spacing.buttonMaxWidth)
             )
         }
     }
@@ -356,7 +356,7 @@ fun CardHeader(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(spacing.iconMedium)
             )
             
             Text(

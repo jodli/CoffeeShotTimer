@@ -290,6 +290,7 @@ private fun DatePickerDialog(
     onDateSelected: (LocalDate) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val spacing = LocalSpacing.current
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = selectedDate.toEpochDay() * 24 * 60 * 60 * 1000
     )
@@ -319,7 +320,7 @@ private fun DatePickerDialog(
             title = {
                 Text(
                     text = "Select Roast Date",
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(spacing.medium)
                 )
             }
         )
