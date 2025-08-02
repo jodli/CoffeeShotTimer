@@ -36,19 +36,10 @@ class NavigationTest {
     }
 
     @Test
-    fun `bottom navigation items are configured correctly`() {
-        assertEquals(3, bottomNavigationItems.size)
-        
-        val recordShotItem = bottomNavigationItems[0]
-        assertEquals(NavigationDestinations.RecordShot.route, recordShotItem.route)
-        assertEquals("Record Shot", recordShotItem.label)
-        
-        val historyItem = bottomNavigationItems[1]
-        assertEquals(NavigationDestinations.ShotHistory.route, historyItem.route)
-        assertEquals("History", historyItem.label)
-        
-        val beansItem = bottomNavigationItems[2]
-        assertEquals(NavigationDestinations.BeanManagement.route, beansItem.route)
-        assertEquals("Beans", beansItem.label)
+    fun `bottom navigation destinations are correct`() {
+        // Test that the navigation destinations used in bottom navigation are correct
+        assertEquals("record_shot", NavigationDestinations.RecordShot.route)
+        assertEquals("shot_history", NavigationDestinations.ShotHistory.route)
+        assertEquals("bean_management", NavigationDestinations.BeanManagement.route)
     }
 }

@@ -215,9 +215,9 @@ fun validateCompleteShot(
 
     // If basic validation passes, check relationships
     if (allErrors.isEmpty()) {
-        val weightIn = coffeeWeightIn.toDoubleOrNull()
-        val weightOut = coffeeWeightOut.toDoubleOrNull()
-
+    val weightIn = coffeeWeightIn.toDoubleOrNull()
+    val weightOut = coffeeWeightOut.toDoubleOrNull()
+    
         if (weightIn != null && weightOut != null) {
             val brewRatio = weightOut / weightIn
             allWarnings.addAll(brewRatio.getBrewRatioWarnings())
