@@ -48,10 +48,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
+import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
@@ -113,7 +115,7 @@ fun AddEditBeanScreen(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                LoadingIndicator(message = "Loading bean details...")
+                LoadingIndicator(message = stringResource(R.string.loading_bean_details))
             }
         } else {
             Column(
@@ -198,31 +200,12 @@ fun AddEditBeanScreen(
 
                 // Error Message
                 if (uiState.error != null) {
-                    CoffeeCard(
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
-                        )
-                    ) {
-                        CardHeader(
-                            icon = Icons.Default.Error,
-                            title = "Error",
-                            actions = {
-                                TextButton(
-                                    onClick = viewModel::clearError
-                                ) {
-                                    Text("Dismiss")
-                                }
-                            }
-                        )
-
-                        Spacer(modifier = Modifier.height(spacing.small))
-                        
-                        Text(
-                            text = uiState.error ?: "",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
-                        )
-                    }
+                    ErrorCard(
+                        title = "Error",
+                        message = uiState.error ?: "Unknown error occurred",
+                        onDismiss = viewModel::clearError,
+                        onRetry = { viewModel.saveBean() }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(spacing.medium))

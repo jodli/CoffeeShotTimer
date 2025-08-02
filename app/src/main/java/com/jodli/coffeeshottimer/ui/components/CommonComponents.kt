@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
@@ -23,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -328,6 +331,151 @@ fun LoadingIndicator(
                 textAlign = TextAlign.Center
             )
         }
+    }
+}
+
+/**
+ * Standardized error state component with consistent styling and retry functionality
+ */
+@Composable
+fun ErrorState(
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
+    retryText: String = "Retry",
+    dismissText: String = "Dismiss"
+) {
+    val spacing = LocalSpacing.current
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(spacing.large),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Error icon
+        Icon(
+            imageVector = Icons.Default.Error,
+            contentDescription = null,
+            modifier = Modifier.size(spacing.iconEmptyState),
+            tint = MaterialTheme.colorScheme.error
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Error title
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.error,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        // Error message
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+
+        // Action buttons
+        if (onRetry != null || onDismiss != null) {
+            Spacer(modifier = Modifier.height(spacing.medium))
+            
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (onDismiss != null) {
+                    CoffeeSecondaryButton(
+                        text = dismissText,
+                        onClick = onDismiss,
+                        modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
+                        fillMaxWidth = false
+                    )
+                }
+                
+                if (onRetry != null) {
+                    CoffeePrimaryButton(
+                        text = retryText,
+                        onClick = onRetry,
+                        modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
+                        fillMaxWidth = false
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Error card component for inline error displays with consistent styling
+ */
+@Composable
+fun ErrorCard(
+    title: String,
+    message: String,
+    modifier: Modifier = Modifier,
+    onRetry: (() -> Unit)? = null,
+    onDismiss: (() -> Unit)? = null,
+    retryText: String = "Retry",
+    dismissText: String = "Dismiss"
+) {
+    val spacing = LocalSpacing.current
+
+    CoffeeCard(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer
+        )
+    ) {
+        CardHeader(
+            icon = Icons.Default.Error,
+            title = title,
+            actions = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
+                ) {
+                    if (onDismiss != null) {
+                        TextButton(
+                            onClick = onDismiss
+                        ) {
+                            Text(
+                                text = dismissText,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    }
+                    
+                    if (onRetry != null) {
+                        TextButton(
+                            onClick = onRetry
+                        ) {
+                            Text(
+                                text = retryText,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            }
+        )
+
+        Spacer(modifier = Modifier.height(spacing.small))
+        
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onErrorContainer
+        )
     }
 }
 

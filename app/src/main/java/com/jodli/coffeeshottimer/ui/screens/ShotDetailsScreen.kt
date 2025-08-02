@@ -50,12 +50,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jodli.coffeeshottimer.R
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
+import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
@@ -151,34 +154,17 @@ fun ShotDetailsScreen(
                 uiState.isLoading -> {
                     LoadingIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        message = "Loading shot details..."
+                        message = stringResource(R.string.loading_shot_details)
                     )
                 }
 
                 uiState.error != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Error loading shot details",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(spacing.small))
-                        Text(
-                            text = uiState.error ?: "Unknown error",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
-                        )
-                        Spacer(modifier = Modifier.height(spacing.medium))
-                        CoffeePrimaryButton(
-                            text = "Retry",
-                            onClick = { viewModel.refreshShotDetails() },
-                            modifier = Modifier.widthIn(max = spacing.buttonMaxWidth)
-                        )
-                    }
+                    ErrorState(
+                        title = "Error loading shot details",
+                        message = uiState.error ?: "Unknown error occurred",
+                        onRetry = { viewModel.refreshShotDetails() },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 uiState.shotDetails != null -> {

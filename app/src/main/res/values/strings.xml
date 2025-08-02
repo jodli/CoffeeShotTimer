@@ -18,4 +18,13 @@
     <string name="record_shot_long">Record new espresso shot</string>
     <string name="view_history_short">History</string>
     <string name="view_history_long">View shot history</string>
+
+    <!-- Loading messages -->
+    <string name="loading_bean_details">Loading bean details…</string>
+    <string name="loading_beans">Loading beans…</string>
+    <string name="loading_shot_details">Loading shot details…</string>
+    <string name="loading_shot_history">Loading shot history…</string>
+    <string name="loading_analysis">Loading analysis…</string>
+    <string name="loading_more_shots">Loading more shots…</string>
+    <string name="processing_database_operation">Processing database operation…</string>
 </resources>

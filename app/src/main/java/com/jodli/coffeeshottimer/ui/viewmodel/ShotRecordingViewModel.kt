@@ -675,6 +675,13 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
+     * Clear error message.
+     */
+    fun clearErrorMessage() {
+        _errorMessage.value = null
+    }
+
+    /**
      * Manually save draft (called when user navigates away or app goes to background).
      */
     fun saveDraftManually() {

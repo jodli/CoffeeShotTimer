@@ -52,6 +52,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.DebugDialog
 import com.jodli.coffeeshottimer.ui.components.DebugTapDetector
 import com.jodli.coffeeshottimer.ui.components.EmptyState
+import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
 import com.jodli.coffeeshottimer.ui.components.SectionHeader
 import com.jodli.coffeeshottimer.ui.components.TimerControls
@@ -242,17 +243,12 @@ fun RecordShotScreen(
 
         // Error message
         errorMessage?.let { error ->
-            CoffeeCard(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
-            ) {
-                Text(
-                    text = error,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
+            ErrorCard(
+                title = "Recording Error",
+                message = error,
+                onDismiss = { viewModel.clearErrorMessage() },
+                onRetry = { viewModel.recordShot() }
+            )
         }
 
         // Draft status indicator
