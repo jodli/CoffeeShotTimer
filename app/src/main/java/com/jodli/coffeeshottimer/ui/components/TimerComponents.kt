@@ -99,11 +99,14 @@ fun CircularTimer(
     // Cache elapsed seconds calculation for performance
     val elapsedSeconds = remember(currentTime) { (currentTime / 1000).toInt() }
 
-    // Get color based on extraction time quality
-    val timerColor = if (showColorCoding) {
-        getExtractionTimeColor(elapsedSeconds, isRunning)
-    } else {
-        if (isRunning) Color(0xFF4CAF50) else Color(0xFFFF9800)
+    // Get color based on extraction time quality and validation state
+    val timerColor = when {
+        // Red when running but below minimum save threshold
+        isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> Color(0xFFF44336)
+        // Normal color coding when above minimum or not running
+        showColorCoding -> getExtractionTimeColor(elapsedSeconds, isRunning)
+        // Fallback colors
+        else -> if (isRunning) Color(0xFF4CAF50) else Color(0xFFFF9800)
     }
 
     // Animation for the progress indicator
@@ -125,9 +128,15 @@ fun CircularTimer(
     var lastClickTime by remember { mutableLongStateOf(0L) }
     val debounceDelayMs = 300L
 
-    // Scale animation for entire timer when pressed
+    // Scale animation for entire timer when pressed or showing validation
+    val targetScale = when {
+        isPressed && onStartStop != null -> 0.98f
+        isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> 1.02f // Slightly larger when below minimum
+        else -> 1f
+    }
+    
     val scale by animateFloatAsState(
-        targetValue = if (isPressed && onStartStop != null) 0.98f else 1f,
+        targetValue = targetScale,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessHigh
@@ -220,52 +229,68 @@ fun CircularTimer(
                 textAlign = TextAlign.Center
             )
 
-            // Show extraction quality indicator or play/stop hint
-            if (showColorCoding && isRunning) {
-                val qualityText = when (getExtractionQuality(elapsedSeconds, isRunning)) {
-                    ExtractionQuality.UNDER_EXTRACTED -> "Under-extracted"
-                    ExtractionQuality.OPTIMAL -> "Optimal range"
-                    ExtractionQuality.OVER_EXTRACTED -> "Over-extracted"
-                    ExtractionQuality.NEUTRAL -> ""
-                }
-
-                if (qualityText.isNotEmpty()) {
+            // Show status message based on timer state
+            when {
+                // Timer is running but below minimum save threshold
+                isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> {
                     Text(
-                        text = qualityText,
+                        text = "Minimum 5s required",
                         style = MaterialTheme.typography.bodySmall,
                         color = animatedColor,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Medium
                     )
                 }
-            } else if (onStartStop != null) {
-                // Show interaction hint for clickable timer
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
-                        contentDescription = null,
-                        modifier = Modifier.size(spacing.iconSmall),
-                        tint = animatedColor.copy(alpha = 0.7f)
-                    )
-                    Spacer(modifier = Modifier.width(spacing.extraSmall))
+                // Timer is running and above minimum - show extraction quality
+                showColorCoding && isRunning && elapsedSeconds >= ValidationUtils.MIN_EXTRACTION_TIME -> {
+                    val qualityText = when (getExtractionQuality(elapsedSeconds, isRunning)) {
+                        ExtractionQuality.UNDER_EXTRACTED -> "Under-extracted"
+                        ExtractionQuality.OPTIMAL -> "Optimal range"
+                        ExtractionQuality.OVER_EXTRACTED -> "Over-extracted"
+                        ExtractionQuality.NEUTRAL -> ""
+                    }
+
+                    if (qualityText.isNotEmpty()) {
+                        Text(
+                            text = qualityText,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = animatedColor,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                // Timer is stopped - show interaction hint
+                onStartStop != null -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
+                            contentDescription = null,
+                            modifier = Modifier.size(spacing.iconSmall),
+                            tint = animatedColor.copy(alpha = 0.7f)
+                        )
+                        Spacer(modifier = Modifier.width(spacing.extraSmall))
+                        Text(
+                            text = if (isRunning) "Tap to stop" else "Tap to start",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                // Fallback for non-clickable timers with target time
+                targetTime != null -> {
+                    // Show target time for non-color-coded timers
                     Text(
-                        text = if (isRunning) "Tap to stop" else "Tap to start",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                        text = "/ ${formatExtractionTime(targetTime)}",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
                 }
-            } else if (targetTime != null) {
-                // Show target time for non-color-coded timers
-                Text(
-                    text = "/ ${formatExtractionTime(targetTime)}",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
             }
         }
 
@@ -665,6 +690,7 @@ fun EnhancedTimerButton(
  * - Entire timer component is clickable (200dp vs 80dp touch target)
  * - Reset button elegantly positioned as a small floating action button
  * - Maintains all existing functionality with improved UX
+ * - Shows validation feedback when timer is below minimum save threshold
  */
 @Composable
 fun ClickableTimerControls(
@@ -675,7 +701,9 @@ fun ClickableTimerControls(
     onReset: () -> Unit,
     modifier: Modifier = Modifier,
     showReset: Boolean = true,
-    showColorCoding: Boolean = true
+    showColorCoding: Boolean = true,
+    showValidationState: Boolean = false,
+    isValidForSave: Boolean = true
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current

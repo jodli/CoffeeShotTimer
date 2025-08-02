@@ -56,6 +56,7 @@ import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
 import com.jodli.coffeeshottimer.ui.components.SectionHeader
 import com.jodli.coffeeshottimer.ui.components.TimerControls
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
@@ -89,7 +90,8 @@ fun RecordShotScreen(
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
-    val isDraftSaved by viewModel.isDraftSaved.collectAsStateWithLifecycle()
+    val showTimerValidation by viewModel.showTimerValidation.collectAsStateWithLifecycle()
+
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
 
@@ -147,6 +149,7 @@ fun RecordShotScreen(
             currentTime = currentTime,
             targetTime = targetTime,
             timerState = uiTimerState,
+            showTimerValidation = showTimerValidation,
             onStartPause = {
                 if (timerState.isRunning) {
                     viewModel.pauseTimer()
@@ -154,7 +157,6 @@ fun RecordShotScreen(
                     viewModel.startTimer()
                 }
             },
-
             onReset = {
                 viewModel.resetTimer()
             },
@@ -251,20 +253,7 @@ fun RecordShotScreen(
             )
         }
 
-        // Draft status indicator
-        if (isDraftSaved) {
-            CoffeeCard(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                )
-            ) {
-                Text(
-                    text = "Draft saved automatically",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
+
 
         // Bottom spacing for navigation bar
         Spacer(modifier = Modifier.height(spacing.large))
@@ -379,6 +368,7 @@ private fun TimerSection(
     currentTime: Long,
     targetTime: Long?,
     timerState: TimerState,
+    showTimerValidation: Boolean,
     onStartPause: () -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier
