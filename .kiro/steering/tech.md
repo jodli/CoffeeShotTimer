@@ -23,10 +23,36 @@
 ## Common Commands
 ```bash
 # Always set the JAVA_HOME env var when in a new terminal session.
+# ONLY NECESSARY WHEN ON WINDOWS
 $env:JAVA_HOME = "C:\Program Files\Android\Android Studio\jbr"
 ```
 
-### Development
+### Development ON LINUX (current)
+```bash
+# Quickly build the project for development
+gradle buildDevDebug
+
+# Build the project with all targets
+gradle build
+
+# Install debug build (choose flavor)
+gradle installDevDebug      # Development flavor
+gradle installProdDebug     # Production flavor
+
+# Quickly build the project for development
+gradle testDevDebug
+
+# Run tests with all targets
+gradle test
+
+# Run instrumentation tests
+gradle connectedAndroidTest
+
+# Clean build
+gradle clean
+```
+
+### Development ON WINDOWS
 ```bash
 # Quickly build the project for development
 ./gradlew buildDevDebug

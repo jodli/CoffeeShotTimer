@@ -7,6 +7,7 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
 import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightIn
 import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightOut
@@ -125,6 +126,10 @@ class ShotRecordingViewModel @Inject constructor(
     // Success feedback state
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
+
+    // Timer validation feedback state
+    private val _showTimerValidation = MutableStateFlow(false)
+    val showTimerValidation: StateFlow<Boolean> = _showTimerValidation.asStateFlow()
 
     // Draft auto-save state
     private val _isDraftSaved = MutableStateFlow(false)
@@ -400,16 +405,28 @@ class ShotRecordingViewModel @Inject constructor(
      * Validate the entire form.
      */
     private fun validateForm() {
-        val isValid = _selectedBean.value != null &&
-                _coffeeWeightIn.value.isNotBlank() &&
+        val hasValidBean = _selectedBean.value != null
+        val hasValidWeights = _coffeeWeightIn.value.isNotBlank() && 
                 _coffeeWeightOut.value.isNotBlank() &&
-                _grinderSetting.value.isNotBlank() &&
                 _coffeeWeightInError.value == null &&
-                _coffeeWeightOutError.value == null &&
-                _grinderSettingError.value == null &&
-                timerState.value.elapsedTimeSeconds > 0
+                _coffeeWeightOutError.value == null
+        val hasValidGrinder = _grinderSetting.value.isNotBlank() && 
+                _grinderSettingError.value == null
+        val hasValidTimer = timerState.value.elapsedTimeSeconds >= ValidationUtils.MIN_EXTRACTION_TIME
+
+        val isValid = hasValidBean && hasValidWeights && hasValidGrinder && hasValidTimer
 
         _isFormValid.value = isValid
+
+        // Show timer validation feedback if everything else is valid but timer is insufficient
+        val shouldShowTimerValidation = hasValidBean && hasValidWeights && hasValidGrinder && 
+                !hasValidTimer && timerState.value.elapsedTimeSeconds > 0
+        
+        if (shouldShowTimerValidation && !_showTimerValidation.value) {
+            _showTimerValidation.value = true
+        } else if (!shouldShowTimerValidation && _showTimerValidation.value) {
+            _showTimerValidation.value = false
+        }
     }
 
     /**
@@ -417,6 +434,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun startTimer() {
         recordShotUseCase.startTimer()
+        _showTimerValidation.value = false // Clear validation feedback when timer starts
         validateForm() // Revalidate as timer state affects form validity
     }
 
@@ -425,6 +443,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun pauseTimer() {
         recordShotUseCase.pauseTimer()
+        _showTimerValidation.value = false // Clear validation feedback when timer stops
         validateForm()
     }
 
@@ -433,6 +452,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun resetTimer() {
         recordShotUseCase.resetTimer()
+        _showTimerValidation.value = false // Clear validation feedback when timer resets
         validateForm()
     }
 
@@ -448,6 +468,19 @@ class ShotRecordingViewModel @Inject constructor(
 
         if (bean == null || weightIn == null || weightOut == null || grinder.isBlank()) {
             _errorMessage.value = "Please fill in all required fields"
+            return
+        }
+
+        // Check minimum extraction time and show visual feedback
+        if (timerState.value.elapsedTimeSeconds < ValidationUtils.MIN_EXTRACTION_TIME) {
+            _showTimerValidation.value = true
+            _errorMessage.value = "Extraction time must be at least ${ValidationUtils.MIN_EXTRACTION_TIME} seconds"
+            
+            // Auto-hide validation feedback after 3 seconds
+            viewModelScope.launch {
+                delay(3000L)
+                _showTimerValidation.value = false
+            }
             return
         }
 
@@ -679,6 +712,28 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun clearErrorMessage() {
         _errorMessage.value = null
+    }
+
+    /**
+     * Clear timer validation feedback.
+     */
+    fun clearTimerValidation() {
+        _showTimerValidation.value = false
+    }
+
+    /**
+     * Trigger timer validation feedback (useful for testing or manual validation).
+     */
+    fun triggerTimerValidation() {
+        if (timerState.value.elapsedTimeSeconds < ValidationUtils.MIN_EXTRACTION_TIME) {
+            _showTimerValidation.value = true
+            
+            // Auto-hide validation feedback after 3 seconds
+            viewModelScope.launch {
+                delay(3000L)
+                _showTimerValidation.value = false
+            }
+        }
     }
 
     /**
