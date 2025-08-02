@@ -47,6 +47,16 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlin.math.roundToInt
 
 /**
+ * Constants for weight slider bounds
+ */
+object WeightSliderConstants {
+    const val COFFEE_IN_MIN_WEIGHT = 15f
+    const val COFFEE_IN_MAX_WEIGHT = 20f
+    const val COFFEE_OUT_MIN_WEIGHT = 25f
+    const val COFFEE_OUT_MAX_WEIGHT = 55f
+}
+
+/**
  * Weight Slider Components for Espresso Shot Tracker
  *
  * This file implements Task 14: Implement slider for weight measurements
@@ -75,8 +85,6 @@ fun WeightSlider(
     modifier: Modifier = Modifier,
     minWeight: Float = 1f,
     maxWeight: Float = 50f,
-    typicalRangeStart: Float = 15f,
-    typicalRangeEnd: Float = 20f,
     icon: ImageVector,
     errorMessage: String? = null,
     enabled: Boolean = true
@@ -139,18 +147,6 @@ fun WeightSlider(
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        // Weight range indicators
-        WeightRangeIndicator(
-            currentValue = displayValue,
-            minWeight = minWeight,
-            maxWeight = maxWeight,
-            typicalRangeStart = typicalRangeStart,
-            typicalRangeEnd = typicalRangeEnd,
-            enabled = enabled
-        )
-
-        Spacer(modifier = Modifier.height(spacing.small))
-
         // Slider
         Slider(
             value = displayValue,
@@ -206,102 +202,7 @@ fun WeightSlider(
     }
 }
 
-/**
- * Visual indicator showing typical weight ranges with current value position.
- */
-@Composable
-private fun WeightRangeIndicator(
-    currentValue: Float,
-    minWeight: Float,
-    maxWeight: Float,
-    typicalRangeStart: Float,
-    typicalRangeEnd: Float,
-    enabled: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(spacing.sliderHeightSmall)
-    ) {
-        // Background track
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(RoundedCornerShape(spacing.cornerLarge - spacing.extraSmall))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-        )
-
-        // Typical range indicator
-        val typicalRangeStartPercent = (typicalRangeStart - minWeight) / (maxWeight - minWeight)
-        val typicalRangeEndPercent = (typicalRangeEnd - minWeight) / (maxWeight - minWeight)
-        val typicalRangeWidth = typicalRangeEndPercent - typicalRangeStartPercent
-
-        BoxWithConstraints {
-            val totalWidth = maxWidth
-
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .width(totalWidth * typicalRangeWidth)
-                    .offset(x = totalWidth * typicalRangeStartPercent)
-                    .clip(RoundedCornerShape(spacing.cornerLarge - spacing.extraSmall))
-                    .background(
-                        if (enabled)
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.6f)
-                        else
-                            MaterialTheme.colorScheme.surfaceVariant
-                    )
-            )
-
-            // Current value indicator
-            val currentPercent = (currentValue - minWeight) / (maxWeight - minWeight)
-
-            Box(
-                modifier = Modifier
-                    .size(spacing.qualityIndicator)
-                    .offset(
-                        x = (totalWidth * currentPercent) - spacing.extraSmall, // Center the indicator
-                        y = spacing.qualityIndicator
-                    )
-                    .clip(RoundedCornerShape(spacing.cornerSmall))
-                    .background(
-                        if (enabled)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-            )
-        }
-
-        // Range labels
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = spacing.large + spacing.extraSmall),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Typical: ${typicalRangeStart.roundToInt()}-${typicalRangeEnd.roundToInt()}g",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            // Show if current value is in typical range
-            val isInTypicalRange = currentValue in typicalRangeStart..typicalRangeEnd
-            if (isInTypicalRange) {
-                Text(
-                    text = "✓ Typical",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-}
 
 /**
  * Specialized weight slider for coffee input weight.
@@ -319,10 +220,8 @@ fun CoffeeWeightInSlider(
         onValueChange = onValueChange,
         label = "Coffee In",
         modifier = modifier,
-        minWeight = 8f,
-        maxWeight = 35f,
-        typicalRangeStart = 15f,
-        typicalRangeEnd = 20f,
+        minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
+        maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
         icon = Icons.Default.Input,
         errorMessage = errorMessage,
         enabled = enabled
@@ -345,10 +244,8 @@ fun CoffeeWeightOutSlider(
         onValueChange = onValueChange,
         label = "Coffee Out",
         modifier = modifier,
-        minWeight = 10f,
-        maxWeight = 80f,
-        typicalRangeStart = 25f,
-        typicalRangeEnd = 40f,
+        minWeight = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
+        maxWeight = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT,
         icon = Icons.Default.Output,
         errorMessage = errorMessage,
         enabled = enabled

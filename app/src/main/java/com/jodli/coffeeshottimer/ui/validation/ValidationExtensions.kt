@@ -2,6 +2,7 @@ package com.jodli.coffeeshottimer.ui.validation
 
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
+import com.jodli.coffeeshottimer.ui.components.WeightSliderConstants
 import java.time.LocalDate
 
 /**
@@ -15,23 +16,9 @@ fun String.validateCoffeeWeightIn(): ValidationResult {
     return ValidationUtils.validateCoffeeWeight(
         value = this,
         fieldName = "Coffee input weight",
-        minWeight = ValidationUtils.MIN_COFFEE_WEIGHT_IN,
-        maxWeight = ValidationUtils.MAX_COFFEE_WEIGHT_IN
-    ).let { result ->
-        // Add contextual advice for common issues
-        val enhancedErrors = result.errors.toMutableList()
-        val weight = this.toDoubleOrNull()
-
-        when {
-            weight != null && weight < 5.0 ->
-                enhancedErrors.add("Tip: Most espresso shots use 15-20g of coffee")
-
-            weight != null && weight > 25.0 ->
-                enhancedErrors.add("Tip: Standard espresso doses are typically 15-20g")
-        }
-
-        ValidationResult(result.isValid && enhancedErrors.isEmpty(), enhancedErrors)
-    }
+        minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT.toDouble(),
+        maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT.toDouble()
+    )
 }
 
 /**
@@ -41,23 +28,9 @@ fun String.validateCoffeeWeightOut(): ValidationResult {
     return ValidationUtils.validateCoffeeWeight(
         value = this,
         fieldName = "Coffee output weight",
-        minWeight = ValidationUtils.MIN_COFFEE_WEIGHT_OUT,
-        maxWeight = ValidationUtils.MAX_COFFEE_WEIGHT_OUT
-    ).let { result ->
-        // Add contextual advice for common issues
-        val enhancedErrors = result.errors.toMutableList()
-        val weight = this.toDoubleOrNull()
-
-        when {
-            weight != null && weight < 15.0 ->
-                enhancedErrors.add("Tip: Most espresso shots yield 25-40g")
-
-            weight != null && weight > 50.0 ->
-                enhancedErrors.add("Tip: Standard espresso yields are typically 25-40g")
-        }
-
-        ValidationResult(result.isValid && enhancedErrors.isEmpty(), enhancedErrors)
-    }
+        minWeight = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT.toDouble(),
+        maxWeight = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT.toDouble()
+    )
 }
 
 /**
