@@ -166,10 +166,12 @@ fun AddEditBeanScreen(
                 // Grinder Setting
                 CoffeeTextField(
                     value = uiState.lastGrinderSetting,
-                    onValueChange = viewModel::updateLastGrinderSetting,
+                    onValueChange = viewModel::updateAndValidateGrinderSetting,
                     label = "Grinder Setting",
                     placeholder = "Optional initial grinder setting",
-                    leadingIcon = Icons.Filled.Engineering
+                    leadingIcon = Icons.Filled.Engineering,
+                    isError = uiState.grinderSettingError != null,
+                    errorMessage = uiState.grinderSettingError
                 )
 
                 // Active Status (only show in edit mode)
@@ -218,34 +220,7 @@ fun AddEditBeanScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Validation Info
-                CoffeeCard(
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
-                ) {
-                    CardHeader(
-                        icon = Icons.Default.Info,
-                        title = "Validation Rules"
-                    )
 
-                    Spacer(modifier = Modifier.height(spacing.small))
-
-                    val rules = listOf(
-                        "Bean name: Required, unique, max 100 characters",
-                        "Roast date: Cannot be future date, max 365 days ago",
-                        "Notes: Optional, max 500 characters",
-                        "Grinder setting: Optional, max 50 characters"
-                    )
-
-                    rules.forEach { rule ->
-                        Text(
-                            text = "• $rule",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
 
                 // Bottom padding for scrolling
                 Spacer(modifier = Modifier.height(spacing.large))
