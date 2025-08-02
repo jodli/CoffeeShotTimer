@@ -46,12 +46,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jodli.coffeeshottimer.R
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.EmptyState
+import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.ShotHistoryFilterDialog
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -155,33 +158,17 @@ fun ShotHistoryScreen(
                 uiState.isLoading -> {
                     LoadingIndicator(
                         modifier = Modifier.align(Alignment.Center),
-                        message = "Loading shot history..."
+                        message = stringResource(R.string.loading_shot_history)
                     )
                 }
 
                 uiState.error != null -> {
-                    Column(
-                        modifier = Modifier.align(Alignment.Center),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = "Error loading shots",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.error
-                        )
-                        Spacer(modifier = Modifier.height(spacing.small))
-                        Text(
-                            text = uiState.error ?: "Unknown error",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(spacing.medium))
-                        CoffeePrimaryButton(
-                            text = "Retry",
-                            onClick = { viewModel.refreshData() },
-                            modifier = Modifier.widthIn(max = spacing.buttonMaxWidth)
-                        )
-                    }
+                    ErrorState(
+                        title = "Error loading shots",
+                        message = uiState.error ?: "Unknown error occurred",
+                        onRetry = { viewModel.refreshData() },
+                        modifier = Modifier.align(Alignment.Center)
+                    )
                 }
 
                 uiState.isEmpty -> {
@@ -537,7 +524,7 @@ private fun ShotAnalysisView(
             modifier = modifier,
             contentAlignment = Alignment.Center
         ) {
-            LoadingIndicator(message = "Loading analysis...")
+            LoadingIndicator(message = stringResource(R.string.loading_analysis))
         }
         return
     }
@@ -1145,7 +1132,7 @@ private fun LoadMoreItem(
         contentAlignment = Alignment.Center
     ) {
         if (isLoading) {
-            LoadingIndicator(message = "Loading more shots...")
+            LoadingIndicator(message = stringResource(R.string.loading_more_shots))
         } else {
             Text(
                 text = "Loading more...",

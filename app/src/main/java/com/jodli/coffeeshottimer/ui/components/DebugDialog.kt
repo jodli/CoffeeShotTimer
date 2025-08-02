@@ -33,7 +33,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.BuildConfig
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlinx.coroutines.delay
 
@@ -138,29 +140,30 @@ fun DebugDialog(
                 // Operation result feedback
                 operationResult?.let { result ->
                     val isError = result.contains("Failed") || result.contains("Error")
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = if (isError) {
-                                MaterialTheme.colorScheme.errorContainer
-                            } else {
-                                MaterialTheme.colorScheme.primaryContainer
-                            }
+                    if (isError) {
+                        ErrorCard(
+                            title = "Operation Failed",
+                            message = result,
+                            onDismiss = onDismiss,
+                            modifier = Modifier.fillMaxWidth()
                         )
-                    ) {
-                        Text(
-                            text = result,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (isError) {
-                                MaterialTheme.colorScheme.onErrorContainer
-                            } else {
-                                MaterialTheme.colorScheme.onPrimaryContainer
-                            },
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(spacing.medium)
-                        )
+                    } else {
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer
+                            )
+                        ) {
+                            Text(
+                                text = result,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(spacing.medium)
+                            )
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(spacing.medium))
@@ -175,7 +178,7 @@ fun DebugDialog(
                 // Loading indicator
                 if (isLoading) {
                     LoadingIndicator(
-                        message = "Processing database operation...",
+                        message = stringResource(R.string.processing_database_operation),
                         modifier = Modifier.padding(vertical = spacing.large)
                     )
                 } else {

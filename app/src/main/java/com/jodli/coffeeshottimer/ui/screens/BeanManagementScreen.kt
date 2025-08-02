@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
@@ -51,6 +52,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.EmptyState
+import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
@@ -145,33 +147,20 @@ fun BeanManagementScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    LoadingIndicator(message = "Loading beans...")
+                    LoadingIndicator(message = stringResource(R.string.loading_beans))
                 }
             }
 
             uiState.error != null -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Error: ${uiState.error}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-
-                    Spacer(modifier = Modifier.height(spacing.medium))
-
-                    CoffeePrimaryButton(
-                        text = "Retry",
-                        onClick = {
-                            viewModel.clearError()
-                            viewModel.refresh()
-                        },
-                        modifier = Modifier.widthIn(max = spacing.buttonMaxWidth - 80.dp)
-                    )
-                }
+                ErrorState(
+                    title = "Error loading beans",
+                    message = uiState.error ?: "Unknown error occurred",
+                    onRetry = {
+                        viewModel.clearError()
+                        viewModel.refresh()
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             uiState.beans.isEmpty() -> {
