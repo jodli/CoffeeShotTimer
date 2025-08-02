@@ -221,18 +221,19 @@ class GetBeanHistoryUseCaseTest {
     
     @Test
     fun `getBeansGroupedByRoastMonth should group beans by year-month`() = runTest {
-        // Given
-        val currentDate = LocalDate.now()
-        val currentMonth = "${currentDate.year}-${currentDate.monthValue.toString().padStart(2, '0')}"
-        val lastMonth = currentDate.minusMonths(1)
-        val lastMonthKey = "${lastMonth.year}-${lastMonth.monthValue.toString().padStart(2, '0')}"
+        // Given - Use fixed dates to avoid month boundary issues
+        val currentMonthDate = LocalDate.of(2024, 8, 15) // August 15, 2024
+        val lastMonthDate = LocalDate.of(2024, 7, 15) // July 15, 2024
+        
+        val currentMonth = "2024-08"
+        val lastMonthKey = "2024-07"
         
         // Create beans with different roast months
         val beansWithDifferentMonths = listOf(
-            testBeans[0].copy(roastDate = currentDate.minusDays(7)), // Current month
-            testBeans[1].copy(roastDate = currentDate.minusDays(3)), // Current month
-            testBeans[2].copy(roastDate = lastMonth.minusDays(5)), // Last month
-            testBeans[3].copy(roastDate = lastMonth.minusDays(10)) // Last month
+            testBeans[0].copy(roastDate = currentMonthDate), // Current month
+            testBeans[1].copy(roastDate = currentMonthDate.minusDays(3)), // Current month
+            testBeans[2].copy(roastDate = lastMonthDate), // Last month
+            testBeans[3].copy(roastDate = lastMonthDate.minusDays(5)) // Last month
         )
         
         coEvery { beanRepository.getAllBeans() } returns flowOf(Result.success(beansWithDifferentMonths))
@@ -249,8 +250,8 @@ class GetBeanHistoryUseCaseTest {
         assertNotNull(groupedBeans)
         
         // Should have groups for current month and last month
-        assertTrue(groupedBeans?.containsKey(currentMonth) == true)
-        assertTrue(groupedBeans?.containsKey(lastMonthKey) == true)
+        assertTrue("Should contain current month key: $currentMonth", groupedBeans?.containsKey(currentMonth) == true)
+        assertTrue("Should contain last month key: $lastMonthKey", groupedBeans?.containsKey(lastMonthKey) == true)
         
         assertEquals(2, groupedBeans?.get(currentMonth)?.size)
         assertEquals(2, groupedBeans?.get(lastMonthKey)?.size)
