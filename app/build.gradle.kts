@@ -34,7 +34,7 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         // Localization support
-        androidResources.localeFilters.addAll(listOf("en"))
+        androidResources.localeFilters.addAll(listOf("en", "de"))
     }
 
     // Signing configuration
