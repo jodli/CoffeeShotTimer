@@ -91,13 +91,13 @@ fun ShotHistoryScreen(
         ) {
             Column {
                 Text(
-                    text = "Shot History",
+                    text = stringResource(R.string.title_shot_history),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
                 if (currentFilter.hasFilters()) {
                     Text(
-                        text = "Filtered results",
+                        text = stringResource(R.string.text_filtered_results),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -111,7 +111,7 @@ fun ShotHistoryScreen(
                 ) {
                     Icon(
                         imageVector = if (uiState.showAnalysis) Icons.AutoMirrored.Filled.List else Icons.Default.Info,
-                        contentDescription = if (uiState.showAnalysis) "Show shot list" else "Show analysis",
+                        contentDescription = if (uiState.showAnalysis) stringResource(R.string.cd_shot_list) else stringResource(R.string.cd_analysis),
                         tint = if (uiState.showAnalysis) {
                             MaterialTheme.colorScheme.primary
                         } else {
@@ -126,7 +126,7 @@ fun ShotHistoryScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.FilterList,
-                        contentDescription = "Filter shots",
+                        contentDescription = stringResource(R.string.cd_filter_shots),
                         tint = if (currentFilter.hasFilters()) {
                             MaterialTheme.colorScheme.primary
                         } else {
@@ -164,7 +164,7 @@ fun ShotHistoryScreen(
 
                 uiState.error != null -> {
                     ErrorState(
-                        title = "Error loading shots",
+                        title = stringResource(R.string.error_loading_shots),
                         message = uiState.error ?: "Unknown error occurred",
                         onRetry = { viewModel.refreshData() },
                         modifier = Modifier.align(Alignment.Center)
@@ -174,11 +174,11 @@ fun ShotHistoryScreen(
                 uiState.isEmpty -> {
                     EmptyState(
                         icon = Icons.Default.Home,
-                        title = if (currentFilter.hasFilters()) "No shots found" else "No shots recorded yet",
+                        title = if (currentFilter.hasFilters()) stringResource(R.string.cd_no_shots) else stringResource(R.string.cd_no_shots_recorded),
                         description = if (currentFilter.hasFilters()) {
-                            "Try adjusting your filters to see more results"
+                            stringResource(R.string.text_search_beans_hint)
                         } else {
-                            "Start recording your espresso shots to see them here"
+                            stringResource(R.string.text_record_shots_analysis)
                         },
                         modifier = Modifier.align(Alignment.Center)
                     )
@@ -239,10 +239,10 @@ private fun ActiveFiltersDisplay(
     ) {
         CardHeader(
             icon = Icons.Default.FilterList,
-            title = "Active Filters",
+            title = stringResource(R.string.text_active_filters),
             actions = {
                 TextButton(onClick = onClearFilters) {
-                    Text("Clear All")
+                    Text(stringResource(R.string.button_clear_all))
                 }
             }
         )
@@ -253,44 +253,44 @@ private fun ActiveFiltersDisplay(
         val filterTexts = mutableListOf<String>()
 
         filter.beanId?.let { beanId ->
-            val beanName = availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
-            filterTexts.add("Bean: $beanName")
+            val beanName = availableBeans.find { it.id == beanId }?.name ?: stringResource(R.string.text_unknown_bean)
+            filterTexts.add(stringResource(R.string.format_bean, beanName))
         }
 
         if (filter.startDate != null || filter.endDate != null) {
             val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
             val startText = filter.startDate?.format(dateFormatter) ?: "Start"
             val endText = filter.endDate?.format(dateFormatter) ?: "End"
-            filterTexts.add("Date: $startText - $endText")
+            filterTexts.add(stringResource(R.string.text_date_range_format, startText, endText))
         }
 
         filter.grinderSetting?.let { setting ->
-            filterTexts.add("Grinder: $setting")
+            filterTexts.add(stringResource(R.string.format_grinder, setting))
         }
 
         if (filter.minBrewRatio != null || filter.maxBrewRatio != null) {
             val min = filter.minBrewRatio?.let { "%.1f".format(it) } ?: "0"
             val max = filter.maxBrewRatio?.let { "%.1f".format(it) } ?: "∞"
-            filterTexts.add("Brew Ratio: 1:$min - 1:$max")
+            filterTexts.add(stringResource(R.string.format_brew_ratio_range_long, min, max))
         }
 
         if (filter.minExtractionTime != null || filter.maxExtractionTime != null) {
             val min = filter.minExtractionTime ?: 0
             val max = filter.maxExtractionTime ?: 999
-            filterTexts.add("Time: ${min}s - ${max}s")
+            filterTexts.add(stringResource(R.string.format_time_filter_display, min, max))
         }
 
         if (filter.onlyOptimalExtractionTime == true) {
-            filterTexts.add("Optimal extraction time only")
+            filterTexts.add(stringResource(R.string.text_optimal_extraction_only))
         }
 
         if (filter.onlyTypicalBrewRatio == true) {
-            filterTexts.add("Typical brew ratio only")
+            filterTexts.add(stringResource(R.string.text_typical_ratio_range))
         }
 
         filterTexts.forEach { text ->
             Text(
-                text = "• $text",
+                text = stringResource(R.string.symbol_bullet, text),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
@@ -380,19 +380,19 @@ private fun ShotHistoryItem(
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium)
                 ) {
                     MetricChip(
-                        label = "Ratio",
+                        label = stringResource(R.string.label_ratio),
                         value = shot.getFormattedBrewRatio(),
                         isGood = shot.isTypicalBrewRatio()
                     )
 
                     MetricChip(
-                        label = "Time",
+                        label = stringResource(R.string.label_time),
                         value = shot.getFormattedExtractionTime(),
                         isGood = shot.isOptimalExtractionTime()
                     )
 
                     MetricChip(
-                        label = "Grinder",
+                        label = stringResource(R.string.label_grinder),
                         value = shot.grinderSetting,
                         isNeutral = true
                     )
@@ -404,7 +404,7 @@ private fun ShotHistoryItem(
                 horizontalAlignment = Alignment.End
             ) {
                 Text(
-                    text = "${shot.coffeeWeightIn}g → ${shot.coffeeWeightOut}g",
+                    text = stringResource(R.string.format_weight_in_out, shot.coffeeWeightIn.toInt(), shot.coffeeWeightOut.toInt()),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -536,8 +536,8 @@ private fun ShotAnalysisView(
         ) {
             EmptyState(
                 icon = Icons.Default.Info,
-                title = "No analysis data available",
-                description = "Record some shots to see analysis and insights"
+                title = stringResource(R.string.text_no_analysis_data),
+                description = stringResource(R.string.text_record_shots_analysis)
             )
         }
         return
@@ -595,7 +595,7 @@ private fun OverallStatisticsCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Info,
-            title = "Overall Statistics"
+            title = stringResource(R.string.text_overall_statistics)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -606,18 +606,18 @@ private fun OverallStatisticsCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatisticItem(
-                label = "Total Shots",
+                label = stringResource(R.string.label_total_shots),
                 value = statistics.totalShots.toString(),
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Beans Used",
+                label = stringResource(R.string.label_beans_used),
                 value = statistics.uniqueBeans.toString(),
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Avg Ratio",
-                value = "1:${String.format("%.1f", statistics.avgBrewRatio)}",
+                label = stringResource(R.string.label_avg_ratio),
+                value = stringResource(R.string.format_avg_brew_ratio_display, statistics.avgBrewRatio),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -629,19 +629,19 @@ private fun OverallStatisticsCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatisticItem(
-                label = "Avg Time",
-                value = "${statistics.avgExtractionTime.toInt()}s",
+                label = stringResource(R.string.label_avg_time),
+                value = stringResource(R.string.format_avg_extraction_time_display, statistics.avgExtractionTime.toInt()),
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Optimal Time",
-                value = "${String.format("%.0f", statistics.optimalExtractionPercentage)}%",
+                label = stringResource(R.string.label_optimal_time),
+                value = stringResource(R.string.format_optimal_extraction_percentage, statistics.optimalExtractionPercentage),
                 isGood = statistics.optimalExtractionPercentage > 50,
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Good Ratio",
-                value = "${String.format("%.0f", statistics.typicalRatioPercentage)}%",
+                label = stringResource(R.string.label_good_ratio),
+                value = stringResource(R.string.format_typical_ratio_percentage, statistics.typicalRatioPercentage),
                 isGood = statistics.typicalRatioPercentage > 50,
                 modifier = Modifier.weight(1f)
             )
@@ -650,7 +650,7 @@ private fun OverallStatisticsCard(
         statistics.mostUsedGrinderSetting?.let { setting ->
             Spacer(modifier = Modifier.height(spacing.medium))
             Text(
-                text = "Most used grinder setting: $setting",
+                text = stringResource(R.string.format_most_used_grinder_setting, setting),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -668,7 +668,7 @@ private fun ShotTrendsCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.AutoMirrored.Filled.List,
-            title = "Shot Trends (${trends.daysAnalyzed} days)"
+            title = stringResource(R.string.format_shot_trends, trends.daysAnalyzed)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -679,12 +679,12 @@ private fun ShotTrendsCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TrendItem(
-                label = "Shots/Day",
+                label = stringResource(R.string.label_shots_per_day),
                 value = String.format("%.1f", trends.shotsPerDay),
                 modifier = Modifier.weight(1f)
             )
             TrendItem(
-                label = "Ratio Trend",
+                label = stringResource(R.string.label_ratio_trend),
                 value = if (trends.brewRatioTrend >= 0) "+${
                     String.format(
                         "%.2f",
@@ -695,13 +695,13 @@ private fun ShotTrendsCard(
                 modifier = Modifier.weight(1f)
             )
             TrendItem(
-                label = "Time Trend",
+                label = stringResource(R.string.label_time_trend),
                 value = if (trends.extractionTimeTrend >= 0) "+${
                     String.format(
                         "%.1f",
                         trends.extractionTimeTrend
                     )
-                }s" else "${String.format("%.1f", trends.extractionTimeTrend)}s",
+                }s" else stringResource(R.string.format_extraction_time_trend_display, trends.extractionTimeTrend),
                 isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
                 modifier = Modifier.weight(1f)
             )
@@ -727,7 +727,7 @@ private fun ShotTrendsCard(
             )
             Spacer(modifier = Modifier.width(spacing.small))
             Text(
-                text = if (trends.isImproving) "Improving consistency" else "Room for improvement",
+                text = if (trends.isImproving) stringResource(R.string.text_improving_consistency) else stringResource(R.string.text_room_for_improvement),
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (trends.isImproving) {
                     MaterialTheme.colorScheme.primary
@@ -749,7 +749,7 @@ private fun BrewRatioAnalysisCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Info,
-            title = "Brew Ratio Analysis"
+            title = stringResource(R.string.text_brew_ratio_analysis)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -760,18 +760,13 @@ private fun BrewRatioAnalysisCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatisticItem(
-                label = "Average",
-                value = "1:${String.format("%.1f", analysis.avgRatio)}",
+                label = stringResource(R.string.label_average),
+                value = stringResource(R.string.format_avg_brew_ratio_display, analysis.avgRatio),
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Range",
-                value = "1:${
-                    String.format(
-                        "%.1f",
-                        analysis.minRatio
-                    )
-                } - 1:${String.format("%.1f", analysis.maxRatio)}",
+                label = stringResource(R.string.label_range),
+                value = stringResource(R.string.format_brew_ratio_range, analysis.minRatio, analysis.maxRatio),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -784,20 +779,20 @@ private fun BrewRatioAnalysisCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatisticItem(
-                label = "Typical Range",
-                value = "${String.format("%.0f", analysis.typicalRatioPercentage)}%",
+                label = stringResource(R.string.label_typical_range),
+                value = stringResource(R.string.format_typical_ratio_percentage, analysis.typicalRatioPercentage),
                 isGood = analysis.typicalRatioPercentage > 70,
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Under-extracted",
-                value = "${String.format("%.0f", analysis.underExtractedPercentage)}%",
+                label = stringResource(R.string.label_under_extracted),
+                value = stringResource(R.string.format_under_extracted_percentage, analysis.underExtractedPercentage),
                 isGood = analysis.underExtractedPercentage < 20,
                 modifier = Modifier.weight(1f)
             )
             StatisticItem(
-                label = "Over-extracted",
-                value = "${String.format("%.0f", analysis.overExtractedPercentage)}%",
+                label = stringResource(R.string.label_over_extracted),
+                value = stringResource(R.string.format_over_extracted_percentage, analysis.overExtractedPercentage),
                 isGood = analysis.overExtractedPercentage < 20,
                 modifier = Modifier.weight(1f)
             )
@@ -807,7 +802,7 @@ private fun BrewRatioAnalysisCard(
 
         // Distribution
         Text(
-            text = "Distribution",
+            text = stringResource(R.string.text_distribution),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Medium
         )
@@ -824,7 +819,7 @@ private fun BrewRatioAnalysisCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "$count shots",
+                        text = stringResource(R.string.format_shots_count, count),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -844,7 +839,7 @@ private fun ExtractionTimeAnalysisCard(
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
-                text = "Extraction Time Analysis",
+                text = stringResource(R.string.text_extraction_time_analysis),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -857,13 +852,13 @@ private fun ExtractionTimeAnalysisCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 StatisticItem(
-                    label = "Average",
-                    value = "${analysis.avgTime.toInt()}s",
+                    label = stringResource(R.string.label_average),
+                    value = stringResource(R.string.format_avg_extraction_time_display, analysis.avgTime.toInt()),
                     modifier = Modifier.weight(1f)
                 )
                 StatisticItem(
-                    label = "Range",
-                    value = "${analysis.minTime}s - ${analysis.maxTime}s",
+                    label = stringResource(R.string.label_range),
+                    value = stringResource(R.string.format_time_range_display, analysis.minTime, analysis.maxTime),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -876,20 +871,20 @@ private fun ExtractionTimeAnalysisCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 StatisticItem(
-                    label = "Optimal (25-30s)",
-                    value = "${String.format("%.0f", analysis.optimalTimePercentage)}%",
+                    label = stringResource(R.string.label_optimal_time_range_short),
+                    value = stringResource(R.string.format_optimal_extraction_percentage, analysis.optimalTimePercentage),
                     isGood = analysis.optimalTimePercentage > 50,
                     modifier = Modifier.weight(1f)
                 )
                 StatisticItem(
-                    label = "Too Fast",
-                    value = "${String.format("%.0f", analysis.tooFastPercentage)}%",
+                    label = stringResource(R.string.label_too_fast),
+                    value = stringResource(R.string.format_too_fast_percentage, analysis.tooFastPercentage),
                     isGood = analysis.tooFastPercentage < 30,
                     modifier = Modifier.weight(1f)
                 )
                 StatisticItem(
-                    label = "Too Slow",
-                    value = "${String.format("%.0f", analysis.tooSlowPercentage)}%",
+                    label = stringResource(R.string.label_too_slow),
+                    value = stringResource(R.string.format_too_slow_percentage, analysis.tooSlowPercentage),
                     isGood = analysis.tooSlowPercentage < 30,
                     modifier = Modifier.weight(1f)
                 )
@@ -899,7 +894,7 @@ private fun ExtractionTimeAnalysisCard(
 
             // Distribution
             Text(
-                text = "Distribution",
+                text = stringResource(R.string.text_distribution),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -916,7 +911,7 @@ private fun ExtractionTimeAnalysisCard(
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "$count shots",
+                            text = stringResource(R.string.format_shots_count, count),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -937,7 +932,7 @@ private fun GrinderSettingAnalysisCard(
     CoffeeCard(modifier = modifier) {
         Column {
             Text(
-                text = "Grinder Setting Analysis",
+                text = stringResource(R.string.text_grinder_setting_analysis),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -945,7 +940,7 @@ private fun GrinderSettingAnalysisCard(
             Spacer(modifier = Modifier.height(spacing.medium))
 
             Text(
-                text = "${analysis.totalSettings} different settings used",
+                text = stringResource(R.string.format_settings_different_used, analysis.totalSettings),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -955,7 +950,7 @@ private fun GrinderSettingAnalysisCard(
             // Most used setting
             analysis.mostUsedSetting?.let { setting ->
                 Text(
-                    text = "Most Used Setting",
+                    text = stringResource(R.string.text_most_used_setting),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -972,7 +967,7 @@ private fun GrinderSettingAnalysisCard(
             // Best performing setting
             analysis.bestPerformingSetting?.let { setting ->
                 Text(
-                    text = "Best Performing Setting",
+                    text = stringResource(R.string.text_best_performing_setting),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
@@ -1018,7 +1013,7 @@ private fun GrinderSettingItem(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "${setting.shotCount} shots",
+                    text = stringResource(R.string.format_shots_count, setting.shotCount),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1031,22 +1026,17 @@ private fun GrinderSettingItem(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 Text(
-                    text = "Avg Ratio: 1:${String.format("%.1f", setting.avgBrewRatio)}",
+                    text = stringResource(R.string.format_avg_ratio, setting.avgBrewRatio),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Avg Time: ${setting.avgExtractionTime.toInt()}s",
+                    text = stringResource(R.string.format_avg_time, setting.avgExtractionTime.toInt()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Optimal: ${
-                        String.format(
-                            "%.0f",
-                            setting.optimalExtractionPercentage
-                        )
-                    }%",
+                    text = stringResource(R.string.format_optimal_extraction_percentage_long, setting.optimalExtractionPercentage),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1135,7 +1125,7 @@ private fun LoadMoreItem(
             LoadingIndicator(message = stringResource(R.string.loading_more_shots))
         } else {
             Text(
-                text = "Loading more...",
+                text = stringResource(R.string.loading_more),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1153,10 +1143,10 @@ private fun ShotSuccessIndicator(
     // Calculate success score based on optimal parameters
     val successScore = calculateShotSuccessScore(shot)
     val successText = when {
-        successScore >= 80 -> "Excellent"
-        successScore >= 60 -> "Good"
-        successScore >= 40 -> "Fair"
-        else -> "Needs Work"
+        successScore >= 80 -> stringResource(R.string.text_excellent)
+        successScore >= 60 -> stringResource(R.string.text_good)
+        successScore >= 40 -> stringResource(R.string.text_fair)
+        else -> stringResource(R.string.text_needs_work)
     }
 
     val successColor = when {

@@ -106,13 +106,13 @@
 
 ## Phase 4: String Externalization and Internationalization Support
 
-- [ ] 15. Audit hardcoded strings across all screens
+- [x] 15. Audit hardcoded strings across all screens
   - Identify all hardcoded text strings in UI components
   - Document string usage patterns and contexts
   - Create inventory of strings requiring externalization
   - _Requirements: 6.1, 6.4_
 
-- [ ] 16. Externalize all hardcoded strings to string resources
+- [x] 16. Externalize all hardcoded strings to string resources
   - Move all hardcoded strings to strings.xml
   - Replace hardcoded strings with stringResource() calls
   - Implement proper string resource naming conventions

@@ -43,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -134,7 +135,7 @@ fun CircularTimer(
         isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> 1.02f // Slightly larger when below minimum
         else -> 1f
     }
-    
+
     val scale by animateFloatAsState(
         targetValue = targetScale,
         animationSpec = spring(
@@ -222,7 +223,7 @@ fun CircularTimer(
         ) {
             // Timer text with enhanced formatting
             Text(
-                text = formatExtractionTime(currentTime),
+                text = formatExtractionTime(currentTime, stringResource(R.string.timer_seconds_suffix)),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -234,7 +235,7 @@ fun CircularTimer(
                 // Timer is running but below minimum save threshold
                 isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> {
                     Text(
-                        text = "Minimum 5s required",
+                        text = stringResource(R.string.error_minimum_time_required),
                         style = MaterialTheme.typography.bodySmall,
                         color = animatedColor,
                         textAlign = TextAlign.Center,
@@ -244,9 +245,9 @@ fun CircularTimer(
                 // Timer is running and above minimum - show extraction quality
                 showColorCoding && isRunning && elapsedSeconds >= ValidationUtils.MIN_EXTRACTION_TIME -> {
                     val qualityText = when (getExtractionQuality(elapsedSeconds, isRunning)) {
-                        ExtractionQuality.UNDER_EXTRACTED -> "Under-extracted"
-                        ExtractionQuality.OPTIMAL -> "Optimal range"
-                        ExtractionQuality.OVER_EXTRACTED -> "Over-extracted"
+                        ExtractionQuality.UNDER_EXTRACTED -> stringResource(R.string.label_under_extracted)
+                        ExtractionQuality.OPTIMAL -> stringResource(R.string.label_optimal_time)
+                        ExtractionQuality.OVER_EXTRACTED -> stringResource(R.string.label_over_extracted)
                         ExtractionQuality.NEUTRAL -> ""
                     }
 
@@ -274,7 +275,7 @@ fun CircularTimer(
                         )
                         Spacer(modifier = Modifier.width(spacing.extraSmall))
                         Text(
-                            text = if (isRunning) "Tap to stop" else "Tap to start",
+                            text = if (isRunning) stringResource(R.string.text_tap_to_stop) else stringResource(R.string.text_tap_to_start),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                             textAlign = TextAlign.Center
@@ -285,7 +286,7 @@ fun CircularTimer(
                 targetTime != null -> {
                     // Show target time for non-color-coded timers
                     Text(
-                        text = "/ ${formatExtractionTime(targetTime)}",
+                        text = stringResource(R.string.format_extraction_time_with_target, formatExtractionTime(targetTime, stringResource(R.string.timer_seconds_suffix))),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -384,13 +385,13 @@ fun TimerControls(
                 if (isRunning) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_pause),
-                        contentDescription = "Pause",
+                        contentDescription = stringResource(R.string.cd_pause),
                         modifier = Modifier.size(spacing.iconMedium)
                     )
                 } else {
                     Icon(
                         imageVector = Icons.Default.PlayArrow,
-                        contentDescription = "Start",
+                        contentDescription = stringResource(R.string.cd_start),
                         modifier = Modifier.size(spacing.iconMedium)
                     )
                 }
@@ -399,7 +400,7 @@ fun TimerControls(
             // Reset button (optional)
             if (showReset) {
                 CoffeeSecondaryButton(
-                    text = "Reset",
+                    text = stringResource(R.string.button_reset),
                     onClick = onReset,
                     modifier = Modifier.height(spacing.touchTarget)
                 )
@@ -439,7 +440,7 @@ fun EnhancedTimerControls(
         // Reset button (optional) - styled to complement the enhanced timer button
         if (showReset) {
             CoffeeSecondaryButton(
-                text = "Reset",
+                text = stringResource(R.string.button_reset),
                 onClick = {
                     // Light haptic feedback for reset
                     triggerHapticFeedback(context, false)
@@ -468,10 +469,10 @@ enum class ExtractionQuality {
  * Enhanced time formatting for espresso extraction times.
  * Shows seconds only for times under 60 seconds, MM:SS for longer times.
  */
-fun formatExtractionTime(timeMs: Long): String {
+fun formatExtractionTime(timeMs: Long, timer_seconds_suffix: String = "s"): String {
     val totalSeconds = maxOf(0, (timeMs / 1000).toInt()) // Handle negative values
     return when {
-        totalSeconds < 60 -> "${totalSeconds}s"
+        totalSeconds < 60 -> "${totalSeconds}" + timer_seconds_suffix
         else -> {
             val minutes = totalSeconds / 60
             val seconds = totalSeconds % 60
@@ -532,6 +533,9 @@ data class TimerButtonState(
 @Composable
 fun rememberTimerButtonState(isRunning: Boolean): TimerButtonState {
     var lastActionTime by remember { mutableLongStateOf(0L) }
+    
+    val stopDescription = stringResource(R.string.text_stop_timer)
+    val startDescription = stringResource(R.string.text_start_timer)
 
     return remember(isRunning) {
         TimerButtonState(
@@ -539,7 +543,7 @@ fun rememberTimerButtonState(isRunning: Boolean): TimerButtonState {
             buttonColor = if (isRunning) Color(0xFFF44336) else Color(0xFF4CAF50), // Red for stop, Green for start
             iconColor = Color.White,
             icon = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
-            contentDescription = if (isRunning) "Stop timer" else "Start timer",
+            contentDescription = if (isRunning) stopDescription else startDescription,
             lastActionTime = lastActionTime
         ).also {
             lastActionTime = System.currentTimeMillis()
@@ -747,7 +751,7 @@ fun ClickableTimerControls(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
-                        contentDescription = "Reset timer",
+                        contentDescription = stringResource(R.string.cd_reset_timer),
                         modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                     )
                 }

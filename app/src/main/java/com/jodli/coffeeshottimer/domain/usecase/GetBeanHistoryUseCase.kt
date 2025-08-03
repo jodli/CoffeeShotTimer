@@ -2,6 +2,8 @@ package com.jodli.coffeeshottimer.domain.usecase
 
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -35,7 +37,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get bean history",
                             exception
                         )
@@ -66,7 +69,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get filtered bean history",
                             exception
                         )
@@ -91,14 +95,15 @@ class GetBeanHistoryUseCase @Inject constructor(
                 } else {
                     Result.failure(
                         result.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to get beans")
+                            ?: DomainException(DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS)
                     )
                 }
             }
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to group beans by status",
                             exception
                         )
@@ -132,7 +137,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get beans by date range",
                             exception
                         )
@@ -159,14 +165,15 @@ class GetBeanHistoryUseCase @Inject constructor(
                 } else {
                     Result.failure(
                         result.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to get beans")
+                            ?: DomainException(DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS)
                     )
                 }
             }
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to group beans by roast month",
                             exception
                         )
@@ -198,7 +205,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get recently added beans",
                             exception
                         )
@@ -226,7 +234,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get beans with grinder settings",
                             exception
                         )
@@ -280,7 +289,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             Result.success(stats ?: BeanHistoryStats())
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error getting bean history stats",
                     exception
                 )
@@ -306,7 +316,8 @@ class GetBeanHistoryUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get inactive beans",
                             exception
                         )

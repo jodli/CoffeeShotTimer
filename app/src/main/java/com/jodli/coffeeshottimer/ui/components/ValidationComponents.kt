@@ -21,32 +21,58 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import java.text.DecimalFormat
 import java.time.LocalDate
 
 /**
  * Validation utilities and components for consistent form validation across the app.
  */
-object ValidationUtils {
+class ValidationUtils(
+    val stringProvider: ValidationStringProvider
+) {
+
+    companion object {
+        // Constants remain accessible statically
+        const val MIN_EXTRACTION_TIME = 5
+        const val MAX_EXTRACTION_TIME = 120
+        const val OPTIMAL_EXTRACTION_TIME_MIN = 25
+        const val OPTIMAL_EXTRACTION_TIME_MAX = 30
+
+        // Text validation constants
+        private const val MIN_BEAN_NAME_LENGTH = 2
+        private const val MAX_BEAN_NAME_LENGTH = 100
+        const val MAX_NOTES_LENGTH = 500
+        const val MAX_GRINDER_SETTING_LENGTH = 50
+
+        // Brew ratio constants
+        const val MIN_TYPICAL_BREW_RATIO = 1.5
+        const val MAX_TYPICAL_BREW_RATIO = 3.0
+        const val OPTIMAL_BREW_RATIO_MIN = 2.0
+        const val OPTIMAL_BREW_RATIO_MAX = 2.5
+    }
 
     // Time validation constants
-    const val MIN_EXTRACTION_TIME = 5
-    const val MAX_EXTRACTION_TIME = 120
-    const val OPTIMAL_EXTRACTION_TIME_MIN = 25
-    const val OPTIMAL_EXTRACTION_TIME_MAX = 30
+    // NOTE: These are duplicated from companion object for instance access
+    val MIN_EXTRACTION_TIME = Companion.MIN_EXTRACTION_TIME
+    val MAX_EXTRACTION_TIME = Companion.MAX_EXTRACTION_TIME
+    val OPTIMAL_EXTRACTION_TIME_MIN = Companion.OPTIMAL_EXTRACTION_TIME_MIN
+    val OPTIMAL_EXTRACTION_TIME_MAX = Companion.OPTIMAL_EXTRACTION_TIME_MAX
 
     // Text validation constants
-    private const val MAX_BEAN_NAME_LENGTH = 100
-    private const val MIN_BEAN_NAME_LENGTH = 2
-    const val MAX_NOTES_LENGTH = 500
-    const val MAX_GRINDER_SETTING_LENGTH = 50
+    private val MIN_BEAN_NAME_LENGTH = 2
+    private val MAX_BEAN_NAME_LENGTH = 100
+    val MAX_NOTES_LENGTH = Companion.MAX_NOTES_LENGTH
+    val MAX_GRINDER_SETTING_LENGTH = Companion.MAX_GRINDER_SETTING_LENGTH
 
     // Brew ratio constants
-    const val MIN_TYPICAL_BREW_RATIO = 1.5
-    const val MAX_TYPICAL_BREW_RATIO = 3.0
-    const val OPTIMAL_BREW_RATIO_MIN = 2.0
-    const val OPTIMAL_BREW_RATIO_MAX = 2.5
+    val MIN_TYPICAL_BREW_RATIO = Companion.MIN_TYPICAL_BREW_RATIO
+    val MAX_TYPICAL_BREW_RATIO = Companion.MAX_TYPICAL_BREW_RATIO
+    val OPTIMAL_BREW_RATIO_MIN = Companion.OPTIMAL_BREW_RATIO_MIN
+    val OPTIMAL_BREW_RATIO_MAX = Companion.OPTIMAL_BREW_RATIO_MAX
 
     private val decimalFormat = DecimalFormat("#.#")
 
@@ -64,32 +90,24 @@ object ValidationUtils {
 
         if (value.isBlank()) {
             if (isRequired) {
-                errors.add("$fieldName is required")
+                errors.add(stringProvider.getFieldRequiredError(fieldName))
             }
             return ValidationResult(errors.isEmpty(), errors)
         }
 
         val weight = value.toDoubleOrNull()
         when {
-            weight == null -> errors.add("Please enter a valid number")
+            weight == null -> errors.add(stringProvider.getValidNumberError())
             weight < minWeight -> errors.add(
-                "$fieldName must be at least ${
-                    decimalFormat.format(
-                        minWeight
-                    )
-                }g"
+                stringProvider.getMinimumWeightError(fieldName, decimalFormat.format(minWeight))
             )
 
             weight > maxWeight -> errors.add(
-                "$fieldName cannot exceed ${
-                    decimalFormat.format(
-                        maxWeight
-                    )
-                }g"
+                stringProvider.getMaximumWeightError(fieldName, decimalFormat.format(maxWeight))
             )
 
             value.contains('.') && value.substringAfter('.').length > 1 ->
-                errors.add("$fieldName can have at most 1 decimal place")
+                errors.add(stringProvider.getOneDecimalPlaceError(fieldName))
         }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -103,10 +121,10 @@ object ValidationUtils {
 
         when {
             timeSeconds < MIN_EXTRACTION_TIME ->
-                errors.add("Extraction time must be at least $MIN_EXTRACTION_TIME seconds")
+                errors.add(stringProvider.getExtractionTimeMinimumError(MIN_EXTRACTION_TIME))
 
             timeSeconds > MAX_EXTRACTION_TIME ->
-                errors.add("Extraction time cannot exceed $MAX_EXTRACTION_TIME seconds")
+                errors.add(stringProvider.getExtractionTimeMaximumError(MAX_EXTRACTION_TIME))
         }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -123,18 +141,18 @@ object ValidationUtils {
         val trimmedName = name.trim()
 
         when {
-            trimmedName.isEmpty() -> errors.add("Bean name is required")
+            trimmedName.isEmpty() -> errors.add(stringProvider.getBeanNameRequiredError())
             trimmedName.length < MIN_BEAN_NAME_LENGTH ->
-                errors.add("Bean name must be at least $MIN_BEAN_NAME_LENGTH characters")
+                errors.add(stringProvider.getBeanNameMinimumLengthError(MIN_BEAN_NAME_LENGTH))
 
             trimmedName.length > MAX_BEAN_NAME_LENGTH ->
-                errors.add("Bean name cannot exceed $MAX_BEAN_NAME_LENGTH characters")
+                errors.add(stringProvider.getBeanNameMaximumLengthError(MAX_BEAN_NAME_LENGTH))
 
             !trimmedName.matches(Regex("^[a-zA-Z0-9\\s\\-_&.()]+$")) ->
-                errors.add("Bean name contains invalid characters")
+                errors.add(stringProvider.getBeanNameInvalidCharactersError())
 
             existingNames.any { it.equals(trimmedName, ignoreCase = true) } ->
-                errors.add("Bean name already exists")
+                errors.add(stringProvider.getBeanNameExistsError())
         }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -148,9 +166,9 @@ object ValidationUtils {
         val today = LocalDate.now()
 
         when {
-            date.isAfter(today) -> errors.add("Roast date cannot be in the future")
+            date.isAfter(today) -> errors.add(stringProvider.getRoastDateFutureError())
             date.isBefore(today.minusDays(365)) ->
-                errors.add("Roast date cannot be more than 365 days ago")
+                errors.add(stringProvider.getRoastDateTooOldError())
         }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -163,7 +181,7 @@ object ValidationUtils {
         val errors = mutableListOf<String>()
 
         if (notes.length > MAX_NOTES_LENGTH) {
-            errors.add("Notes cannot exceed $MAX_NOTES_LENGTH characters")
+            errors.add(stringProvider.getNotesMaximumLengthError(MAX_NOTES_LENGTH))
         }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -177,12 +195,12 @@ object ValidationUtils {
         val trimmedSetting = setting.trim()
 
         when {
-            trimmedSetting.isEmpty() && isRequired -> errors.add("Grinder setting is required")
+            trimmedSetting.isEmpty() && isRequired -> errors.add(stringProvider.getGrinderSettingRequiredError())
             trimmedSetting.length > MAX_GRINDER_SETTING_LENGTH ->
-                errors.add("Grinder setting cannot exceed $MAX_GRINDER_SETTING_LENGTH characters")
+                errors.add(stringProvider.getGrinderSettingMaximumLengthError(MAX_GRINDER_SETTING_LENGTH))
 
             trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.#]+$")) ->
-                errors.add("Grinder setting contains invalid characters")
+                errors.add(stringProvider.getGrinderSettingInvalidCharactersError())
         }
 
         return ValidationResult(errors.isEmpty(), errors)
@@ -209,6 +227,7 @@ fun ValidatedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    validationUtils: ValidationUtils,
     modifier: Modifier = Modifier,
     errorMessage: String? = null,
     warningMessage: String? = null,
@@ -249,7 +268,7 @@ fun ValidatedTextField(
                     Text(label)
                     if (isRequired) {
                         Text(
-                            text = " *",
+                            text = stringResource(R.string.validation_required_field),
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.labelMedium
                         )
@@ -262,7 +281,7 @@ fun ValidatedTextField(
                 {
                     Icon(
                         imageVector = if (hasError) Icons.Default.Error else Icons.Default.Warning,
-                        contentDescription = if (hasError) "Error" else "Warning",
+                        contentDescription = if (hasError) validationUtils.stringProvider.getErrorContentDescription() else validationUtils.stringProvider.getWarningContentDescription(),
                         tint = if (hasError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
                     )
                 }
@@ -304,7 +323,7 @@ fun ValidatedTextField(
                     // Character count for fields with max length
                     if (maxLength != null) {
                         Text(
-                            text = "${value.length}/$maxLength",
+                            text = stringResource(R.string.validation_character_count, value.length, maxLength),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.fillMaxWidth()

@@ -88,12 +88,12 @@ fun ShotDetailsScreen(
     ) {
         // Top App Bar
         TopAppBar(
-            title = { Text("Shot Details") },
+            title = { Text(stringResource(R.string.title_shot_details)) },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             },
@@ -110,7 +110,7 @@ fun ShotDetailsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = "Previous shot"
+                                contentDescription = stringResource(R.string.cd_previous_shot)
                             )
                         }
                     }
@@ -125,7 +125,7 @@ fun ShotDetailsScreen(
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = "Next shot"
+                                contentDescription = stringResource(R.string.cd_next_shot)
                             )
                         }
                     }
@@ -136,7 +136,7 @@ fun ShotDetailsScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete shot",
+                            contentDescription = stringResource(R.string.cd_delete_shot),
                             tint = MaterialTheme.colorScheme.error
                         )
                     }
@@ -160,7 +160,7 @@ fun ShotDetailsScreen(
 
                 uiState.error != null -> {
                     ErrorState(
-                        title = "Error loading shot details",
+                        title = stringResource(R.string.error_loading_shot_details),
                         message = uiState.error ?: "Unknown error occurred",
                         onRetry = { viewModel.refreshShotDetails() },
                         modifier = Modifier.align(Alignment.Center)
@@ -186,8 +186,8 @@ fun ShotDetailsScreen(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Shot") },
-            text = { Text("Are you sure you want to delete this shot? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.button_delete_shot)) },
+            text = { Text(stringResource(R.string.format_delete_shot_confirmation)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -198,14 +198,14 @@ fun ShotDetailsScreen(
                     }
                 ) {
                     Text(
-                        "Delete",
+                        stringResource(R.string.text_bean_management_delete),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.text_dialog_cancel))
                 }
             }
         )
@@ -317,11 +317,11 @@ private fun ShotOverviewCard(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Quality Score: ",
+                            text = stringResource(R.string.text_quality_score),
                             style = MaterialTheme.typography.bodyMedium
                         )
                         Text(
-                            text = "${shotDetails.analysis.qualityScore}/100",
+                            text = stringResource(R.string.format_quality_score, shotDetails.analysis.qualityScore),
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Bold,
                             color = when {
@@ -348,7 +348,7 @@ private fun ShotOverviewCard(
                         }
                     )
                     Text(
-                        text = "Brew Ratio",
+                        text = stringResource(R.string.text_brew_ratio),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -363,17 +363,17 @@ private fun ShotOverviewCard(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 MetricDisplay(
-                    label = "Input",
-                    value = "${shot.coffeeWeightIn}g",
+                    label = stringResource(R.string.label_input),
+                    value = stringResource(R.string.format_weight_display_g, shot.coffeeWeightIn.toInt()),
                     modifier = Modifier.weight(1f)
                 )
                 MetricDisplay(
-                    label = "Output",
-                    value = "${shot.coffeeWeightOut}g",
+                    label = stringResource(R.string.label_output),
+                    value = stringResource(R.string.format_weight_display_g, shot.coffeeWeightOut.toInt()),
                     modifier = Modifier.weight(1f)
                 )
                 MetricDisplay(
-                    label = "Time",
+                    label = stringResource(R.string.label_time),
                     value = shot.getFormattedExtractionTime(),
                     isGood = shot.isOptimalExtractionTime(),
                     modifier = Modifier.weight(1f)
@@ -394,7 +394,7 @@ private fun BeanInformationCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Info,
-            title = "Bean Information"
+            title = stringResource(R.string.text_bean_information)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -415,7 +415,7 @@ private fun BeanInformationCard(
         ) {
             Column {
                 Text(
-                    text = "Roast Date",
+                    text = stringResource(R.string.text_roast_date),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -427,12 +427,12 @@ private fun BeanInformationCard(
 
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = "Days Since Roast",
+                    text = stringResource(R.string.text_days_since_roast),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${shotDetails.daysSinceRoast} days",
+                    text = stringResource(R.string.format_days, shotDetails.daysSinceRoast),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (bean.isFresh()) {
                         MaterialTheme.colorScheme.primary
@@ -447,7 +447,7 @@ private fun BeanInformationCard(
         if (bean.notes.isNotBlank()) {
             Spacer(modifier = Modifier.height(spacing.medium))
             Text(
-                text = "Bean Notes",
+                text = stringResource(R.string.text_bean_notes),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -470,7 +470,7 @@ private fun ShotParametersCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Settings,
-            title = "Shot Parameters"
+            title = stringResource(R.string.text_shot_parameters)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -484,13 +484,13 @@ private fun ShotParametersCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 ParameterItem(
-                    label = "Coffee Weight In",
-                    value = "${shot.coffeeWeightIn}g",
+                    label = stringResource(R.string.label_coffee_weight_in),
+                    value = stringResource(R.string.format_weight_display_g, shot.coffeeWeightIn.toInt()),
                     modifier = Modifier.weight(1f)
                 )
                 ParameterItem(
-                    label = "Coffee Weight Out",
-                    value = "${shot.coffeeWeightOut}g",
+                    label = stringResource(R.string.label_coffee_weight_out),
+                    value = stringResource(R.string.format_weight_display_g, shot.coffeeWeightOut.toInt()),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -500,13 +500,13 @@ private fun ShotParametersCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 ParameterItem(
-                    label = "Extraction Time",
+                    label = stringResource(R.string.label_extraction_time),
                     value = shot.getFormattedExtractionTime(),
                     isOptimal = shot.isOptimalExtractionTime(),
                     modifier = Modifier.weight(1f)
                 )
                 ParameterItem(
-                    label = "Brew Ratio",
+                    label = stringResource(R.string.label_brew_ratio),
                     value = shot.getFormattedBrewRatio(),
                     isOptimal = shot.isTypicalBrewRatio(),
                     modifier = Modifier.weight(1f)
@@ -514,7 +514,7 @@ private fun ShotParametersCard(
             }
 
             ParameterItem(
-                label = "Grinder Setting",
+                label = stringResource(R.string.label_grinder_setting),
                 value = shot.grinderSetting,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -533,7 +533,7 @@ private fun ShotAnalysisCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Info,
-            title = "Shot Analysis"
+            title = stringResource(R.string.text_shot_analysis)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -544,17 +544,17 @@ private fun ShotAnalysisCard(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             QualityIndicatorChip(
-                label = "Extraction Time",
+                label = stringResource(R.string.label_extraction_time),
                 isGood = analysis.isOptimalExtraction,
                 modifier = Modifier.weight(1f)
             )
             QualityIndicatorChip(
-                label = "Brew Ratio",
+                label = stringResource(R.string.label_brew_ratio),
                 isGood = analysis.isTypicalRatio,
                 modifier = Modifier.weight(1f)
             )
             QualityIndicatorChip(
-                label = "Consistency",
+                label = stringResource(R.string.label_consistency),
                 isGood = analysis.isConsistentWithHistory,
                 modifier = Modifier.weight(1f)
             )
@@ -565,7 +565,7 @@ private fun ShotAnalysisCard(
         // Deviations from average
         if (shotDetails.relatedShotsCount > 1) {
             Text(
-                text = "Compared to your average for this bean:",
+                text = stringResource(R.string.text_compared_to_average),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -576,26 +576,26 @@ private fun ShotAnalysisCard(
                 verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
             ) {
                 DeviationItem(
-                    label = "Brew Ratio",
+                    label = stringResource(R.string.label_brew_ratio),
                     deviation = analysis.brewRatioDeviation,
-                    format = "%.2f"
+                    format = stringResource(R.string.format_decimal_two_place)
                 )
                 DeviationItem(
-                    label = "Extraction Time",
+                    label = stringResource(R.string.label_extraction_time),
                     deviation = analysis.extractionTimeDeviation,
-                    format = "%.0f",
+                    format = stringResource(R.string.format_decimal_zero_place),
                     suffix = "s"
                 )
                 DeviationItem(
-                    label = "Weight In",
+                    label = stringResource(R.string.label_weight_in),
                     deviation = analysis.weightInDeviation,
-                    format = "%.1f",
+                    format = stringResource(R.string.format_decimal_one_place),
                     suffix = "g"
                 )
                 DeviationItem(
-                    label = "Weight Out",
+                    label = stringResource(R.string.label_weight_out),
                     deviation = analysis.weightOutDeviation,
-                    format = "%.1f",
+                    format = stringResource(R.string.format_decimal_one_place),
                     suffix = "g"
                 )
             }
@@ -606,7 +606,7 @@ private fun ShotAnalysisCard(
             Spacer(modifier = Modifier.height(spacing.medium))
 
             Text(
-                text = "Recommendations",
+                text = stringResource(R.string.text_recommendations),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -615,7 +615,7 @@ private fun ShotAnalysisCard(
 
             analysis.recommendations.forEach { recommendation ->
                 Text(
-                    text = "• $recommendation",
+                    text = stringResource(R.string.symbol_bullet, recommendation),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -639,13 +639,13 @@ private fun ShotNotesCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Edit,
-            title = "Notes",
+            title = stringResource(R.string.label_notes),
             actions = {
                 if (!editNotesState.isEditing) {
                     IconButton(onClick = onStartEditingNotes) {
                         Icon(
                             imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit notes"
+                            contentDescription = stringResource(R.string.cd_edit_notes)
                         )
                     }
                 }
@@ -659,8 +659,8 @@ private fun ShotNotesCard(
             CoffeeTextField(
                 value = editNotesState.notes,
                 onValueChange = onUpdateNotes,
-                label = "Shot Notes",
-                placeholder = "Add notes about this shot...",
+                label = stringResource(R.string.label_shot_notes),
+                placeholder = stringResource(R.string.placeholder_shot_notes),
                 singleLine = false,
                 maxLines = 5,
                 modifier = Modifier.fillMaxWidth()
@@ -673,14 +673,14 @@ private fun ShotNotesCard(
                 horizontalArrangement = Arrangement.spacedBy(spacing.small)
             ) {
                 CoffeeSecondaryButton(
-                    text = "Cancel",
+                    text = stringResource(R.string.button_cancel),
                     onClick = onCancelEditingNotes,
                     icon = Icons.Default.Close,
                     modifier = Modifier.weight(1f)
                 )
 
                 CoffeePrimaryButton(
-                    text = if (editNotesState.isSaving) "Saving..." else "Save",
+                    text = if (editNotesState.isSaving) stringResource(R.string.cd_saving) else stringResource(R.string.cd_save),
                     onClick = onSaveNotes,
                     enabled = !editNotesState.isSaving && editNotesState.hasChanges,
                     icon = Icons.Default.Check,
@@ -705,7 +705,7 @@ private fun ShotNotesCard(
                 )
             } else {
                 Text(
-                    text = "No notes for this shot",
+                    text = stringResource(R.string.text_no_notes),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -724,13 +724,13 @@ private fun ShotContextCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Info,
-            title = "Shot Context"
+            title = stringResource(R.string.text_shot_context)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
         Text(
-            text = "This is shot ${shotDetails.relatedShotsCount} of ${shotDetails.relatedShotsCount} with ${shotDetails.bean.name}",
+            text = stringResource(R.string.format_shot_context, shotDetails.relatedShotsCount, shotDetails.relatedShotsCount, shotDetails.bean.name),
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -738,13 +738,7 @@ private fun ShotContextCard(
 
         shotDetails.previousShot?.let { previousShot ->
             Text(
-                text = "Previous shot: ${
-                    previousShot.timestamp.format(
-                        DateTimeFormatter.ofPattern(
-                            "MMM dd, HH:mm"
-                        )
-                    )
-                } (${previousShot.getFormattedBrewRatio()})",
+                text = stringResource(R.string.format_previous_shot, previousShot.timestamp.format( DateTimeFormatter.ofPattern( "MMM dd, HH:mm")), previousShot.getFormattedBrewRatio()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -752,7 +746,7 @@ private fun ShotContextCard(
 
         shotDetails.nextShot?.let { nextShot ->
             Text(
-                text = "Next shot: ${nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm"))} (${nextShot.getFormattedBrewRatio()})",
+                text = stringResource(R.string.format_next_shot, nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm")), nextShot.getFormattedBrewRatio()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -887,7 +881,7 @@ private fun DeviationItem(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            text = "${if (deviation >= 0) "+" else ""}${format.format(deviation)}$suffix",
+            text = stringResource(R.string.format_deviation_display, if (deviation >= 0) "+" else "", format.format(deviation) + suffix),
             style = MaterialTheme.typography.bodySmall,
             color = when {
                 kotlin.math.abs(deviation) < 0.1 -> MaterialTheme.colorScheme.primary

@@ -42,13 +42,13 @@ import kotlinx.coroutines.delay
 /**
  * Debug dialog that provides database management utilities for developers.
  * Only available in debug builds to prevent accidental use in production.
- * 
+ *
  * Features:
  * - Fill database with realistic test data for screenshots
  * - Clear all database data for clean testing
  * - Loading states and result feedback
  * - Confirmation dialogs for destructive operations
- * 
+ *
  * @param isVisible Whether the dialog should be displayed
  * @param onDismiss Callback invoked when dialog should be dismissed
  * @param onFillDatabase Callback invoked when fill database button is tapped
@@ -109,7 +109,7 @@ fun DebugDialog(
                         )
                         Spacer(modifier = Modifier.width(spacing.small))
                         Text(
-                            text = "Debug Tools",
+                            text = stringResource(R.string.title_debug_tools),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -119,7 +119,7 @@ fun DebugDialog(
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = "Close debug dialog",
+                            contentDescription = stringResource(R.string.cd_close_debug_dialog),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -129,7 +129,7 @@ fun DebugDialog(
 
                 // Debug mode indicator
                 Text(
-                    text = "Developer utilities for testing and screenshots",
+                    text = stringResource(R.string.text_debug_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.fillMaxWidth()
@@ -142,7 +142,7 @@ fun DebugDialog(
                     val isError = result.contains("Failed") || result.contains("Error")
                     if (isError) {
                         ErrorCard(
-                            title = "Operation Failed",
+                            title = stringResource(R.string.error_operation_failed),
                             message = result,
                             onDismiss = onDismiss,
                             modifier = Modifier.fillMaxWidth()
@@ -188,14 +188,14 @@ fun DebugDialog(
                     ) {
                         // Fill Database button
                         CoffeePrimaryButton(
-                            text = "Fill Database",
+                            text = stringResource(R.string.button_fill_database),
                             onClick = onFillDatabase,
                             icon = Icons.Default.Storage,
                             enabled = !isLoading
                         )
 
                         Text(
-                            text = "Populates database with realistic coffee beans and shot records for testing and screenshots",
+                            text = stringResource(R.string.text_fill_database_description),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)
@@ -205,14 +205,14 @@ fun DebugDialog(
 
                         // Add More Shots button
                         CoffeeSecondaryButton(
-                            text = "Add More Shots",
+                            text = stringResource(R.string.button_add_more_shots),
                             onClick = onAddMoreShots,
                             icon = Icons.Default.Add,
                             enabled = !isLoading
                         )
 
                         Text(
-                            text = "Adds 10 additional shot records to existing beans for extended testing data",
+                            text = stringResource(R.string.text_add_shots_description),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)
@@ -222,14 +222,14 @@ fun DebugDialog(
 
                         // Clear Database button
                         CoffeeSecondaryButton(
-                            text = "Clear Database",
+                            text = stringResource(R.string.button_clear_database),
                             onClick = onShowConfirmation,
                             icon = Icons.Default.Delete,
                             enabled = !isLoading
                         )
 
                         Text(
-                            text = "Removes all data from the database. This action requires confirmation.",
+                            text = stringResource(R.string.text_clear_database_description),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)
@@ -256,14 +256,14 @@ fun DebugDialog(
                     )
                     Spacer(modifier = Modifier.width(spacing.small))
                     Text(
-                        text = "Clear Database?",
+                        text = stringResource(R.string.dialog_clear_database_title),
                         color = MaterialTheme.colorScheme.error
                     )
                 }
             },
             text = {
                 Text(
-                    text = "This will permanently delete all coffee beans, shot records, and related data from the database. This action cannot be undone.\n\nAre you sure you want to continue?",
+                    text = stringResource(R.string.dialog_clear_database_message),
                     style = MaterialTheme.typography.bodyMedium
                 )
             },
@@ -275,7 +275,7 @@ fun DebugDialog(
                     }
                 ) {
                     Text(
-                        text = "Clear Database",
+                        text = stringResource(R.string.button_clear_database),
                         color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.Bold
                     )
@@ -283,7 +283,7 @@ fun DebugDialog(
             },
             dismissButton = {
                 TextButton(onClick = onHideConfirmation) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.text_dialog_cancel))
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,

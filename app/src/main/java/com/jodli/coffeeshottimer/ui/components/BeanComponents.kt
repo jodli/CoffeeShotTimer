@@ -25,6 +25,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -86,7 +87,7 @@ fun BeanCard(
 
                 val daysSinceRoast = bean.daysSinceRoast()
                 Text(
-                    text = "Roasted: $daysSinceRoast days ago",
+                    text = stringResource(R.string.format_roasted_days_ago, daysSinceRoast),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (bean.isFresh())
                         MaterialTheme.colorScheme.primary
@@ -110,7 +111,7 @@ fun BeanCard(
                 IconButton(onClick = onEdit) {
                     Icon(
                         imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit bean",
+                        contentDescription = stringResource(R.string.cd_edit_bean),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -125,7 +126,7 @@ fun BeanCard(
                 shape = RoundedCornerShape(spacing.cornerSmall)
             ) {
                 Text(
-                    text = "Currently Selected",
+                    text = stringResource(R.string.text_currently_selected),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.padding(

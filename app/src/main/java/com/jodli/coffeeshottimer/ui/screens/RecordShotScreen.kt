@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import com.jodli.coffeeshottimer.R
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -43,7 +42,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.BuildConfig
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.components.BeanCard
 import com.jodli.coffeeshottimer.ui.components.CardHeader
@@ -123,14 +124,14 @@ fun RecordShotScreen(
                 onDebugActivated = { debugViewModel.showDialog() }
             ) {
                 Text(
-                    text = "New Shot",
+                    text = stringResource(R.string.title_new_shot),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
             }
         } else {
             Text(
-                text = "New Shot",
+                text = stringResource(R.string.title_new_shot),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -235,7 +236,7 @@ fun RecordShotScreen(
                         onClick = { viewModel.clearSuccessMessage() }
                     ) {
                         Text(
-                            text = "Dismiss",
+                            text = stringResource(R.string.button_dismiss),
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
                     }
@@ -246,7 +247,7 @@ fun RecordShotScreen(
         // Error message
         errorMessage?.let { error ->
             ErrorCard(
-                title = "Recording Error",
+                title = stringResource(R.string.error_recording_error),
                 message = error,
                 onDismiss = { viewModel.clearErrorMessage() },
                 onRetry = { viewModel.recordShot() }
@@ -308,14 +309,14 @@ private fun BeanSelectionCard(
     ) {
         CardHeader(
             icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-            title = "Selected Bean",
+            title = stringResource(R.string.text_selected_bean),
             actions = {
                 TextButton(
                     onClick = onManageBeans,
                     contentPadding = PaddingValues(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
                 ) {
                     Text(
-                        text = "Manage",
+                        text = stringResource(R.string.button_manage),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -332,7 +333,7 @@ private fun BeanSelectionCard(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = selectedBean?.name ?: "Tap to select bean",
+                    text = selectedBean?.name ?: stringResource(R.string.text_tap_to_select_bean),
                     style = MaterialTheme.typography.titleMedium,
                     color = if (selectedBean != null)
                         MaterialTheme.colorScheme.onSurface
@@ -344,7 +345,7 @@ private fun BeanSelectionCard(
                 selectedBean?.let { bean ->
                     val daysSinceRoast = bean.daysSinceRoast()
                     Text(
-                        text = "$daysSinceRoast days since roast",
+                        text = stringResource(R.string.format_days_since_roast, daysSinceRoast),
                         style = MaterialTheme.typography.bodySmall,
                         color = if (bean.isFresh())
                             MaterialTheme.colorScheme.primary
@@ -356,7 +357,7 @@ private fun BeanSelectionCard(
 
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Select bean",
+                contentDescription = stringResource(R.string.cd_select_bean),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -378,7 +379,7 @@ private fun TimerSection(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Settings,
-            title = "Extraction Timer"
+            title = stringResource(R.string.text_extraction_timer)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -412,7 +413,7 @@ private fun BrewRatioCard(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Info,
-            title = "Brew Ratio",
+            title = stringResource(R.string.text_brew_ratio),
             actions = {
                 Text(
                     text = formattedBrewRatio ?: "--",
@@ -428,9 +429,9 @@ private fun BrewRatioCard(
 
         brewRatio?.let {
             val status = when {
-                it < 1.5 -> "Strong extraction"
-                it > 3.0 -> "Weak extraction"
-                else -> "Typical espresso range"
+                it < 1.5 -> stringResource(R.string.text_strong_extraction)
+                it > 3.0 -> stringResource(R.string.text_weak_extraction)
+                else -> stringResource(R.string.text_typical_extraction)
             }
 
             Spacer(modifier = Modifier.height(spacing.small))
@@ -469,7 +470,7 @@ private fun GrinderSettingSection(
                     contentPadding = PaddingValues(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
                 ) {
                     Text(
-                        text = "Use Suggested: $suggestedSetting",
+                        text = stringResource(R.string.format_use_suggested, suggestedSetting),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -501,7 +502,7 @@ private fun NotesSection(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Edit,
-            title = "Notes (Optional)"
+            title = stringResource(R.string.text_notes_optional)
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -509,8 +510,8 @@ private fun NotesSection(
         OutlinedTextField(
             value = notes,
             onValueChange = onNotesChange,
-            label = { Text("Notes") },
-            placeholder = { Text("Tasting notes, adjustments, etc.") },
+            label = { Text(stringResource(R.string.label_notes)) },
+            placeholder = { Text(stringResource(R.string.placeholder_notes)) },
             maxLines = 3,
             modifier = Modifier.fillMaxWidth()
         )
@@ -525,7 +526,7 @@ private fun SaveShotButton(
     modifier: Modifier = Modifier
 ) {
     CoffeePrimaryButton(
-        text = if (isLoading) "Saving..." else "Save Shot",
+        text = if (isLoading) stringResource(R.string.cd_saving) else stringResource(R.string.cd_save_shot),
         onClick = onClick,
         enabled = enabled && !isLoading,
         modifier = modifier
@@ -559,7 +560,7 @@ private fun BeanSelectorBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Select Bean",
+                    text = stringResource(R.string.text_select_bean),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
@@ -567,7 +568,7 @@ private fun BeanSelectorBottomSheet(
                     onClick = onManageBeans
                 ) {
                     Text(
-                        text = "Manage Beans",
+                        text = stringResource(R.string.text_manage_beans),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -579,8 +580,8 @@ private fun BeanSelectorBottomSheet(
             if (beans.isEmpty()) {
                 EmptyState(
                     icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                    title = "No Beans Available",
-                    description = "Add some beans in Bean Management to get started",
+                    title = stringResource(R.string.text_no_beans_available),
+                    description = stringResource(R.string.text_add_some_beans),
                     modifier = Modifier.padding(spacing.large)
                 )
             } else {

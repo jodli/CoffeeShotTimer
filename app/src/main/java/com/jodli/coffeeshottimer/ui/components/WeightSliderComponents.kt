@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlin.math.roundToInt
 
@@ -133,7 +135,7 @@ fun WeightSlider(
                 modifier = Modifier.padding(start = spacing.small)
             ) {
                 Text(
-                    text = "${displayValue.roundToInt()}g",
+                    text = stringResource(R.string.format_weight_display_value_g, displayValue.roundToInt()),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -178,12 +180,12 @@ fun WeightSlider(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "${minWeight.roundToInt()}g",
+                text = stringResource(R.string.format_weight_display_min_g, minWeight.roundToInt()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "${maxWeight.roundToInt()}g",
+                text = stringResource(R.string.format_weight_display_max_g, maxWeight.roundToInt()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -218,7 +220,7 @@ fun CoffeeWeightInSlider(
     WeightSlider(
         value = value,
         onValueChange = onValueChange,
-        label = "Coffee In",
+        label = stringResource(R.string.label_coffee_in),
         modifier = modifier,
         minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
         maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
@@ -242,7 +244,7 @@ fun CoffeeWeightOutSlider(
     WeightSlider(
         value = value,
         onValueChange = onValueChange,
-        label = "Coffee Out",
+        label = stringResource(R.string.label_coffee_out),
         modifier = modifier,
         minWeight = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
         maxWeight = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT,
@@ -295,7 +297,7 @@ fun GrinderSettingSlider(
                     modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                 )
                 Text(
-                    text = "Grinder Setting",
+                    text = stringResource(R.string.text_grinder_setting),
                     style = MaterialTheme.typography.titleMedium,
                     color = if (enabled) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -310,9 +312,9 @@ fun GrinderSettingSlider(
             ) {
                 Text(
                     text = if (displayValue == displayValue.toInt().toFloat()) {
-                        "${displayValue.toInt()}"
+                        stringResource(R.string.format_weight_display_int, displayValue.toInt())
                     } else {
-                        "%.1f".format(displayValue)
+                        stringResource(R.string.format_decimal_one_place).format(displayValue)
                     },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
@@ -378,12 +380,12 @@ fun GrinderSettingSlider(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "0.5",
+                text = stringResource(R.string.weight_min_value),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = "20.0",
+                text = stringResource(R.string.weight_max_value),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -393,7 +395,7 @@ fun GrinderSettingSlider(
         if (suggestedSetting != null && value.isEmpty()) {
             Spacer(modifier = Modifier.height(spacing.extraSmall))
             Text(
-                text = "Suggested: $suggestedSetting (based on last use with this bean)",
+                text = stringResource(R.string.format_suggested_setting, suggestedSetting),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(start = spacing.medium)
@@ -512,7 +514,7 @@ private fun GrinderSettingRangeIndicator(
         ) {
             if (previousSuccessfulSettings.isNotEmpty()) {
                 Text(
-                    text = "• Previous successful",
+                    text = stringResource(R.string.symbol_previous_successful),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.tertiary
                 )
@@ -520,7 +522,7 @@ private fun GrinderSettingRangeIndicator(
 
             if (suggestedSetting != null) {
                 Text(
-                    text = "■ Suggested",
+                    text = stringResource(R.string.symbol_square),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.secondary,
                     textAlign = TextAlign.End
@@ -549,7 +551,7 @@ fun WeightSlidersSection(
     CoffeeCard(modifier = modifier) {
         CardHeader(
             icon = Icons.Default.Scale,
-            title = "Weight Measurements"
+            title = stringResource(R.string.text_weight_measurements)
         )
 
         Spacer(modifier = Modifier.height(spacing.large))

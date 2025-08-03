@@ -3,6 +3,8 @@ package com.jodli.coffeeshottimer.domain.usecase
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -48,7 +50,8 @@ class AddBeanUseCase @Inject constructor(
             val validationResult = beanRepository.validateBean(bean)
             if (!validationResult.isValid) {
                 return Result.failure(
-                    BeanUseCaseException.ValidationError(
+                    DomainException(
+                        DomainErrorCode.VALIDATION_FAILED,
                         "Bean validation failed: ${validationResult.errors.joinToString(", ")}"
                     )
                 )
@@ -61,12 +64,13 @@ class AddBeanUseCase @Inject constructor(
             } else {
                 Result.failure(
                     addResult.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to add bean")
+                        ?: DomainException(DomainErrorCode.FAILED_TO_ADD_BEAN)
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error adding bean",
                     exception
                 )
@@ -110,7 +114,7 @@ class AddBeanUseCase @Inject constructor(
     suspend fun isBeanNameAvailable(name: String): Result<Boolean> {
         return try {
             if (name.trim().isEmpty()) {
-                Result.failure(BeanUseCaseException.ValidationError("Bean name cannot be empty"))
+                Result.failure(DomainException(DomainErrorCode.BEAN_NAME_EMPTY))
             } else {
                 val existingBean = beanRepository.getBeanByName(name.trim())
                 if (existingBean.isSuccess) {
@@ -118,13 +122,14 @@ class AddBeanUseCase @Inject constructor(
                 } else {
                     Result.failure(
                         existingBean.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to check bean name")
+                            ?: DomainException(DomainErrorCode.FAILED_TO_CHECK_BEAN_NAME)
                     )
                 }
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error checking bean name",
                     exception
                 )
@@ -163,14 +168,4 @@ class AddBeanUseCase @Inject constructor(
             "grinderSetting" to "Optional, max 50 characters"
         )
     }
-}
-
-/**
- * Sealed class representing different types of bean use case exceptions.
- */
-sealed class BeanUseCaseException(message: String, cause: Throwable? = null) :
-    Exception(message, cause) {
-    class ValidationError(message: String) : BeanUseCaseException(message)
-    class UnknownError(message: String, cause: Throwable? = null) :
-        BeanUseCaseException(message, cause)
 }

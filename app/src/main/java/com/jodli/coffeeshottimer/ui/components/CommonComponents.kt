@@ -34,6 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import androidx.compose.ui.res.stringResource
+import com.jodli.coffeeshottimer.R
 
 /**
  * Reusable card component with consistent styling
@@ -344,8 +346,6 @@ fun ErrorState(
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
-    retryText: String = "Retry",
-    dismissText: String = "Dismiss"
 ) {
     val spacing = LocalSpacing.current
 
@@ -388,23 +388,23 @@ fun ErrorState(
         // Action buttons
         if (onRetry != null || onDismiss != null) {
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(spacing.small),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (onDismiss != null) {
                     CoffeeSecondaryButton(
-                        text = dismissText,
+                        text = stringResource(R.string.text_dialog_dismiss),
                         onClick = onDismiss,
                         modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
                         fillMaxWidth = false
                     )
                 }
-                
+
                 if (onRetry != null) {
                     CoffeePrimaryButton(
-                        text = retryText,
+                        text = stringResource(R.string.text_dialog_retry),
                         onClick = onRetry,
                         modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
                         fillMaxWidth = false
@@ -425,8 +425,6 @@ fun ErrorCard(
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
     onDismiss: (() -> Unit)? = null,
-    retryText: String = "Retry",
-    dismissText: String = "Dismiss"
 ) {
     val spacing = LocalSpacing.current
 
@@ -448,18 +446,18 @@ fun ErrorCard(
                             onClick = onDismiss
                         ) {
                             Text(
-                                text = dismissText,
+                                text = stringResource(R.string.text_dialog_dismiss),
                                 color = MaterialTheme.colorScheme.onErrorContainer
                             )
                         }
                     }
-                    
+
                     if (onRetry != null) {
                         TextButton(
                             onClick = onRetry
                         ) {
                             Text(
-                                text = retryText,
+                                text = stringResource(R.string.text_dialog_retry),
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 fontWeight = FontWeight.Medium
                             )
@@ -470,7 +468,7 @@ fun ErrorCard(
         )
 
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,
@@ -506,7 +504,7 @@ fun CardHeader(
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(spacing.iconMedium)
             )
-            
+
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,

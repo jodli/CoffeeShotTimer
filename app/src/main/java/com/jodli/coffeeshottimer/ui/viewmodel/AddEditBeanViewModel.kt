@@ -8,6 +8,10 @@ import com.jodli.coffeeshottimer.ui.validation.validateBeanNameEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateNotesEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateRoastDateEnhanced
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
+import com.jodli.coffeeshottimer.R
 
 /**
  * ViewModel for adding and editing coffee bean profiles.
@@ -23,8 +28,14 @@ import javax.inject.Inject
 @HiltViewModel
 class AddEditBeanViewModel @Inject constructor(
     private val addBeanUseCase: AddBeanUseCase,
-    private val updateBeanUseCase: UpdateBeanUseCase
+    private val updateBeanUseCase: UpdateBeanUseCase,
+    private val stringResourceProvider: StringResourceProvider,
+    private val validationStringProvider: ValidationStringProvider,
+    private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
+
+    // Create validation utils instance
+    private val validationUtils = ValidationUtils(validationStringProvider)
 
     private val _uiState = MutableStateFlow(AddEditBeanUiState())
     val uiState: StateFlow<AddEditBeanUiState> = _uiState.asStateFlow()
@@ -52,13 +63,15 @@ class AddEditBeanViewModel @Inject constructor(
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Bean not found"
+                        error = domainErrorTranslator.translateError(
+                            result.exceptionOrNull()
+                        )
                     )
                 }
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to load bean"
+                    error = domainErrorTranslator.translateResultError(result)
                 )
             }
         }
@@ -108,7 +121,7 @@ class AddEditBeanViewModel @Inject constructor(
             }
 
             // Use enhanced validation with contextual tips
-            val validationResult = name.validateBeanNameEnhanced(existingNames)
+            val validationResult = name.validateBeanNameEnhanced(validationUtils, existingNames)
 
             if (!validationResult.isValid) {
                 // Join all errors and tips into a single message
@@ -123,12 +136,12 @@ class AddEditBeanViewModel @Inject constructor(
 
                 if (isAvailable.isSuccess) {
                     if (isAvailable.getOrNull() == false) {
-                        _uiState.value = _uiState.value.copy(nameError = "Bean name already exists\nTip: Try adding the roaster name or roast level to make it unique")
+                        _uiState.value = _uiState.value.copy(nameError = stringResourceProvider.getString(R.string.text_bean_name_already_exists_tip))
                     } else {
                         _uiState.value = _uiState.value.copy(nameError = null)
                     }
                 } else {
-                    _uiState.value = _uiState.value.copy(nameError = "Unable to validate bean name")
+                    _uiState.value = _uiState.value.copy(nameError = domainErrorTranslator.translateError(isAvailable.exceptionOrNull()))
                 }
             }
         }
@@ -136,13 +149,13 @@ class AddEditBeanViewModel @Inject constructor(
 
     private fun validateRoastDate(date: LocalDate) {
         // Use enhanced validation with contextual tips
-        val validationResult = date.validateRoastDateEnhanced()
+        val validationResult = date.validateRoastDateEnhanced(validationUtils)
         _uiState.value = _uiState.value.copy(roastDateError = if (validationResult.errors.isNotEmpty()) validationResult.errors.joinToString("\n") else null)
     }
 
     private fun validateNotes(notes: String) {
         // Use enhanced validation with helpful suggestions
-        val validationResult = notes.validateNotesEnhanced()
+        val validationResult = notes.validateNotesEnhanced(validationUtils)
         _uiState.value = _uiState.value.copy(notesError = if (validationResult.errors.isNotEmpty()) validationResult.errors.joinToString("\n") else null)
     }
 
@@ -194,7 +207,7 @@ class AddEditBeanViewModel @Inject constructor(
             } else {
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to save bean"
+                    error = domainErrorTranslator.translateResultError(result)
                 )
             }
         }
@@ -213,7 +226,7 @@ class AddEditBeanViewModel @Inject constructor(
      */
     fun updateAndValidateGrinderSetting(setting: String) {
         // Use enhanced validation with helpful tips
-        val validationResult = setting.validateGrinderSettingEnhanced(false) // Not required for beans
+        val validationResult = setting.validateGrinderSettingEnhanced(validationUtils, false) // Not required for beans
 
         _uiState.value = _uiState.value.copy(
             lastGrinderSetting = setting,
