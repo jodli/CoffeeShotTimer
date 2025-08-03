@@ -5,12 +5,15 @@ import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.R
 
 /**
  * ViewModel for the Shot Details screen.
@@ -19,7 +22,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ShotDetailsViewModel @Inject constructor(
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
-    private val shotRepository: ShotRepository
+    private val shotRepository: ShotRepository,
+    private val stringResourceProvider: StringResourceProvider,
+    private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShotDetailsUiState())
@@ -35,7 +40,7 @@ class ShotDetailsViewModel @Inject constructor(
         if (shotId.isBlank()) {
             _uiState.value = _uiState.value.copy(
                 isLoading = false,
-                error = "Invalid shot ID"
+                error = stringResourceProvider.getString(R.string.validation_empty_id)
             )
             return
         }
@@ -59,7 +64,7 @@ class ShotDetailsViewModel @Inject constructor(
                 onFailure = { exception ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = exception.message ?: "Failed to load shot details"
+                        error = domainErrorTranslator.translateError(exception)
                     )
                 }
             )
@@ -121,7 +126,7 @@ class ShotDetailsViewModel @Inject constructor(
                 onFailure = { exception ->
                     _editNotesState.value = _editNotesState.value.copy(
                         isSaving = false,
-                        error = exception.message ?: "Failed to save notes"
+                        error = domainErrorTranslator.translateError(exception)
                     )
                 }
             )
@@ -157,7 +162,7 @@ class ShotDetailsViewModel @Inject constructor(
                 onFailure = { exception ->
                     _uiState.value = _uiState.value.copy(
                         isDeletingShot = false,
-                        error = exception.message ?: "Failed to delete shot"
+                        error = exception.message ?: stringResourceProvider.getString(R.string.error_failed_to_delete_shot)
                     )
                 }
             )

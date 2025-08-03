@@ -1,23 +1,15 @@
 <resources>
     <string name="app_name_prod">Coffee Shot Timer</string>
     <string name="app_name_dev">Coffee Shot Timer DEV</string>
-    <string name="app_description">Track your espresso shots with precision timing and detailed measurements</string>
-
-    <!-- Content descriptions for accessibility -->
-    <string name="app_icon_description">Coffee Shot Timer app icon</string>
-
-    <!-- App store listing strings -->
-    <string name="app_short_description">Espresso shot tracking for home baristas</string>
-    <string name="app_long_description">Coffee Shot Timer helps home baristas perfect their espresso shots with precise timing, weight measurements, and detailed tracking. Record shot parameters, manage coffee beans, and analyze your brewing patterns to consistently pull amazing espresso.</string>
-
-    <!-- Keywords for app store -->
-    <string name="app_keywords">espresso, coffee, timer, barista, brewing, shot tracking, coffee beans</string>
-
     <!-- App shortcuts -->
     <string name="record_shot_short">Record Shot</string>
     <string name="record_shot_long">Record new espresso shot</string>
     <string name="view_history_short">History</string>
     <string name="view_history_long">View shot history</string>
+
+    <string name="view_new_shot">New Shot</string>
+    <string name="view_history">History</string>
+    <string name="view_beans">Beans</string>
 
     <!-- Loading messages -->
     <string name="loading_bean_details">Loading bean details…</string>
@@ -27,4 +19,382 @@
     <string name="loading_analysis">Loading analysis…</string>
     <string name="loading_more_shots">Loading more shots…</string>
     <string name="processing_database_operation">Processing database operation…</string>
+    <string name="loading_more">Loading more…</string>
+
+    <!-- Screen titles -->
+    <string name="title_shot_history">Shot History</string>
+    <string name="title_shot_details">Shot Details</string>
+    <string name="title_bean_management">Bean Management</string>
+    <string name="title_new_shot">New Shot</string>
+    <string name="title_debug_tools">Debug Tools</string>
+    <string name="title_filter_shots">Filter Shots</string>
+    <string name="title_error">Error</string>
+
+    <!-- UI Text -->
+    <string name="text_filtered_results">Filtered results</string>
+    <string name="text_quality_score">Quality Score: </string>
+    <string name="text_brew_ratio">Brew Ratio</string>
+    <string name="text_roast_date">Roast Date</string>
+    <string name="text_days_since_roast">Days Since Roast</string>
+    <string name="text_bean_notes">Bean Notes</string>
+    <string name="text_bean_information">Bean Information</string>
+    <string name="text_shot_parameters">Shot Parameters</string>
+    <string name="text_shot_analysis">Shot Analysis</string>
+    <string name="text_shot_context">Shot Context</string>
+    <string name="text_recommendations">Recommendations</string>
+    <string name="text_compared_to_average">Compared to your average for this bean:</string>
+    <string name="text_no_notes">No notes for this shot</string>
+    <string name="text_currently_selected">Currently Selected</string>
+    <string name="text_add_bean">Add Bean</string>
+    <string name="text_use_for_shot">Use for Shot</string>
+    <string name="text_selected_bean">Selected Bean</string>
+    <string name="text_extraction_timer">Extraction Timer</string>
+    <string name="text_notes_optional">Notes (Optional)</string>
+    <string name="text_select_bean">Select Bean</string>
+    <string name="text_manage_beans">Manage Beans</string>
+    <string name="text_no_beans_available">No Beans Available</string>
+    <string name="text_weight_measurements">Weight Measurements</string>
+    <string name="text_grinder_setting">Grinder Setting</string>
+    <string name="text_bean_status">Bean Status</string>
+    <string name="text_select_roast_date">Select Roast Date</string>
+    <string name="text_active_long">Active - visible in bean lists</string>
+    <string name="text_inactive">Inactive</string>
+    <string name="text_bean_name_already_exists_tip">Bean name already exists\nTip: Try adding the roaster name or roast level to make it unique</string>
+    <string name="text_search_beans_hint">Try adjusting your search or filter settings</string>
+    <string name="text_start_date">Start Date</string>
+    <string name="text_end_date">End Date</string>
+    <string name="text_date_range_format">Date: %1$s - %2$s</string>
+    <string name="text_add_first_bean">Add your first coffee bean to start tracking shots</string>
+    <string name="text_add_some_beans">Add some beans in Bean Management to get started</string>
+    <string name="text_record_shots_analysis">Record some shots to see analysis and insights</string>
+    <string name="text_database_cleared">Database cleared successfully!</string>
+    <string name="text_database_filled">Database filled with test data successfully!</string>
+    <string name="text_bean_name_required">Bean name is required</string>
+    <string name="text_tap_to_select_bean">Tap to select Bean</string>
+    <string name="text_tap_to_start">Tap to start</string>
+    <string name="text_tap_to_stop">Tap to stop</string>
+    <string name="text_stop_timer">Stop timer</string>
+    <string name="text_start_timer">Start timer</string>
+    <string name="text_fresh">Fresh</string>
+    <string name="text_too_fresh">Too Fresh</string>
+    <string name="text_good">Good</string>
+    <string name="text_excellent">Excellent</string>
+    <string name="text_fair">Fair</string>
+    <string name="text_needs_work">Needs Work</string>
+    <string name="text_stale">Stale</string>
+    <string name="text_strong_extraction">Strong Extraction</string>
+    <string name="text_weak_extraction">Weak Extraction</string>
+    <string name="text_typical_extraction">Typical espresso range</string>
+    <string name="text_record_successfully">Shot recorded successfully! Brew ratio: %1$s, Time: %2$s</string>
+
+    <!-- Labels -->
+    <string name="label_ratio">Ratio</string>
+    <string name="label_ratio_trend">Ratio Trend</string>
+    <string name="label_time_trend">Time Trend</string>
+    <string name="label_min_ratio">Min Ratio</string>
+    <string name="label_max_ratio">Max Ratio</string>
+    <string name="label_min_time">Min Time</string>
+    <string name="label_max_time">Max Time</string>
+    <string name="label_coffee_in">Coffee In</string>
+    <string name="label_coffee_out">Coffee Out</string>
+    <string name="label_weight_in">Weight In</string>
+    <string name="label_weight_out">Weight Out</string>
+    <string name="label_bean_name_required">Bean Name *</string>
+    <string name="label_roast_date_required">Roast Date *</string>
+    <string name="label_search_beans">Search beans</string>
+    <string name="label_coffee_weight_in">Coffee Weight In</string>
+    <string name="label_coffee_weight_out">Coffee Weight Out</string>
+    <string name="label_extraction_time">Extraction Time</string>
+    <string name="label_shot_notes">Shot Notes</string>
+    <string name="label_total_shots">Total Shots</string>
+    <string name="label_beans_used">Beans Used</string>
+    <string name="label_avg_ratio">Avg Ratio</string>
+    <string name="label_avg_time">Avg Time</string>
+    <string name="label_optimal_time">Optimal Time</string>
+    <string name="label_brew_ratio">Brew Ratio</string>
+    <string name="label_good_ratio">Good Ratio</string>
+    <string name="label_consistency">Consistency</string>
+    <string name="label_shots_per_day">Shots/Day</string>
+    <string name="label_grinder">Grinder</string>
+    <string name="label_grinder_setting">Grinder Setting</string>
+    <string name="label_notes">Notes</string>
+    <string name="label_input">Input</string>
+    <string name="label_output">Output</string>
+    <string name="label_time">Time</string>
+    <string name="label_average">Average</string>
+    <string name="label_range">Range</string>
+    <string name="label_typical_range">Typical Range</string>
+    <string name="label_under_extracted">Under-extracted</string>
+    <string name="label_over_extracted">Over-extracted</string>
+    <string name="label_optimal_time_range_short">Optimal (25-30s)</string>
+    <string name="label_too_fast">Too Fast</string>
+    <string name="label_too_slow">Too Slow</string>
+
+    <!-- Analysis and Statistics -->
+    <string name="text_overall_statistics">Overall Statistics</string>
+    <string name="text_extraction_time_analysis">Extraction Time Analysis</string>
+    <string name="text_brew_ratio_analysis">Brew Ratio Analysis</string>
+    <string name="text_grinder_setting_analysis">Grinder Setting Analysis</string>
+    <string name="text_distribution">Distribution</string>
+    <string name="text_most_used_setting">Most Used Setting</string>
+    <string name="text_best_performing_setting">Best Performing Setting</string>
+    <string name="text_active_filters">Active Filters</string>
+    <string name="text_no_analysis_data">No analysis data available</string>
+
+    <string name="text_dialog_ok">OK</string>
+    <string name="text_dialog_cancel">Cancel</string>
+    <string name="text_dialog_retry">Retry</string>
+    <string name="text_dialog_dismiss">Dismiss</string>
+
+    <!-- Bean Management Dialog -->
+    <string name="text_bean_management_delete">Delete</string>
+
+    <!-- Filter Dialog -->
+    <string name="text_coffee_bean">Coffee Bean</string>
+    <string name="text_all_beans">All beans</string>
+    <string name="text_unknown_bean">Unknown bean</string>
+    <string name="text_all">All</string>
+    <string name="text_active">Active</string>
+    <string name="text_date_range">Date Range</string>
+    <string name="text_brew_ratio_range">Brew Ratio Range</string>
+    <string name="text_extraction_time_range">Extraction Time Range (seconds)</string>
+    <string name="text_quality_filters">Quality Filters</string>
+    <string name="text_optimal_extraction_only">Optimal extraction time only</string>
+    <string name="text_typical_ratio_only">Typical brew ratio only</string>
+    <string name="text_optimal_time_range">25–30 seconds</string>
+    <string name="text_typical_ratio_range">1:1.5 to 1:3.0</string>
+    <string name="text_improving_consistency">Improving consistency</string>
+    <string name="text_room_for_improvement">Room for improvement</string>
+
+    <!-- Buttons -->
+    <string name="button_clear_all">Clear All</string>
+    <string name="button_apply_filters">Apply Filters</string>
+    <string name="button_clear_start">Clear Start</string>
+    <string name="button_clear_end">Clear End</string>
+    <string name="button_dismiss">Dismiss</string>
+    <string name="button_manage">Manage</string>
+    <string name="button_cancel">Cancel</string>
+    <string name="button_delete_bean">Delete Bean</string>
+    <string name="button_permanently_delete_bean">Permanently delete Bean</string>
+    <string name="button_delete_shot">Delete Shot</string>
+
+    <!-- Debug Dialog -->
+    <string name="text_debug_description">Developer utilities for testing and screenshots</string>
+    <string name="button_fill_database">Fill Database</string>
+    <string name="text_fill_database_description">Populates database with realistic coffee beans and shot records for testing and screenshots</string>
+    <string name="button_add_more_shots">Add More Shots</string>
+    <string name="text_add_shots_description">Adds 10 additional shot records to existing beans for extended testing data</string>
+    <string name="button_clear_database">Clear Database</string>
+    <string name="text_clear_database_description">Removes all data from the database. This action requires confirmation.</string>
+    <string name="dialog_clear_database_title">Clear Database?</string>
+    <string name="dialog_clear_database_message">This will permanently delete all coffee beans, shot records, and related data from the database. This action cannot be undone.\n\nAre you sure you want to continue?</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_edit_bean">Edit bean</string>
+    <string name="cd_update_bean">Update bean</string>
+    <string name="cd_saving">Saving…</string>
+    <string name="cd_save_shot">Save Shot</string>
+    <string name="cd_save">Save</string>
+    <string name="cd_close">Close</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_start">Start</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_close_debug_dialog">Close debug dialog</string>
+    <string name="cd_reset_timer">Reset timer</string>
+    <string name="cd_reactivate_bean">Reactivate bean</string>
+    <string name="cd_select_bean">Select bean</string>
+    <string name="cd_previous_shot">Previous shot</string>
+    <string name="cd_next_shot">Next shot</string>
+    <string name="cd_delete_shot">Delete shot</string>
+    <string name="cd_edit_notes">Edit notes</string>
+    <string name="cd_filter_shots">Filter shots</string>
+    <string name="cd_shot_list">Show shot list</string>
+    <string name="cd_analysis">Show shot analysis</string>
+    <string name="cd_no_shots">No shots found</string>
+    <string name="cd_no_shots_recorded">No shots recorded</string>
+
+    <!-- Error Messages -->
+    <string name="error_bean_id_cannot_be_empty">Bean ID cannot be empty</string>
+    <string name="error_bean_not_found">Bean not found</string>
+    <string name="error_bean_name_cannot_be_empty">Bean name cannot be empty</string>
+    <string name="error_grinder_setting_cannot_be_empty">Grinder setting cannot be empty</string>
+    <string name="error_failed_to_delete_shot">Failed to delete shot</string>
+    <string name="error_failed_to_get_active_beans">Failed to get active beans</string>
+    <string name="error_failed_to_add_bean">Failed to add bean</string>
+    <string name="error_failed_to_update_bean">Failed to update bean</string>
+    <string name="error_failed_to_update_grinder_setting">Failed to update grinder setting</string>
+    <string name="error_failed_to_update_active_status">Failed to update active status</string>
+    <string name="error_failed_to_check_bean_name">Failed to check bean name</string>
+    <string name="error_failed_to_get_bean">Failed to get bean</string>
+    <string name="error_failed_to_get_active_bean_count">Failed to get active bean count</string>
+    <string name="error_failed_to_check_for_active_beans">Failed to check for active beans</string>
+    <string name="error_failed_to_load_shot_history">Failed to load shot history: %1$s</string>
+    <string name="error_failed_to_load_analysis">Failed to load analysis: %1$s</string>
+    <string name="error_failed_to_load_more_shots">Failed to load more shots: %1$s</string>
+    <string name="error_bean_validation_failed">Bean validation failed: %1$s</string>
+    <string name="error_loading_beans">Error loading beans</string>
+    <string name="error_loading_shots">Error loading shots</string>
+    <string name="error_loading_shot_details">Error loading shot details</string>
+    <string name="error_recording_error">Recording Error</string>
+    <string name="error_operation_failed">Operation Failed</string>
+    <string name="error_minimum_time_required">Minimum 5s required</string>
+    <string name="error_extraction_time_minimum">Extraction time must be at least %1$d seconds</string>
+    <string name="error_unknown_error_occurred">Unknown error occurred</string>
+    <string name="error_loading_data">Error loading %1$s</string>
+    <string name="error_saving_data">Error saving data</string>
+    <string name="error_deleting_data">Error deleting data</string>
+
+    <!-- Shot Validation Errors -->
+    <string name="error_shot_validation_failed">Shot validation failed</string>
+    <string name="error_coffee_weight_in_invalid">Coffee input weight is invalid</string>
+    <string name="error_coffee_weight_out_invalid">Coffee output weight is invalid</string>
+
+    <!-- Validation Messages -->
+    <string name="validation_required_field"> *</string>
+    <string name="validation_character_count">%1$d/%2$d</string>
+    <string name="validation_valid_number">Please enter a valid number</string>
+    <string name="validation_empty_id">ID cannot be empty</string>
+    <string name="validation_fill_required">Please fill in all required fields</string>
+
+    <!-- Field Labels for Validation -->
+    <string name="validation_coffee_input_weight">Coffee input weight</string>
+    <string name="validation_coffee_output_weight">Coffee output weight</string>
+
+    <!-- Validation Error Messages -->
+    <string name="validation_field_required">%1$s is required</string>
+    <string name="validation_minimum_weight">%1$s must be at least %2$sg</string>
+    <string name="validation_maximum_weight">%1$s cannot exceed %2$sg</string>
+    <string name="validation_one_decimal_place">%1$s can have at most 1 decimal place</string>
+    <string name="validation_extraction_time_minimum">Extraction time must be at least %1$d seconds</string>
+    <string name="validation_extraction_time_maximum">Extraction time cannot exceed %1$d seconds</string>
+    <string name="validation_bean_name_minimum_length">Bean name must be at least %1$d characters</string>
+    <string name="validation_bean_name_maximum_length">Bean name cannot exceed %1$d characters</string>
+    <string name="validation_bean_name_invalid_characters">Bean name contains invalid characters</string>
+    <string name="validation_roast_date_future">Roast date cannot be in the future</string>
+    <string name="validation_roast_date_too_old">Roast date cannot be more than 365 days ago</string>
+    <string name="validation_notes_maximum_length">Notes cannot exceed %1$d characters</string>
+    <string name="validation_grinder_setting_required">Grinder setting is required</string>
+    <string name="validation_grinder_setting_maximum_length">Grinder setting cannot exceed %1$d characters</string>
+    <string name="validation_grinder_setting_invalid_characters">Grinder setting contains invalid characters</string>
+    <string name="validation_output_weight_less_than_input">Output weight cannot be less than input weight</string>
+
+    <!-- Validation Tips and Warnings -->
+    <string name="validation_tip_grinder_setting">Tip: Record your grinder setting to remember what worked well</string>
+    <string name="validation_tip_descriptive_name">Tip: Try a more descriptive name like \'Ethiopian Yirgacheffe\'</string>
+    <string name="validation_tip_basic_punctuation">Tip: Use letters, numbers, spaces, and basic punctuation only</string>
+    <string name="validation_tip_unique_name">Tip: Try adding the roaster name or roast level to make it unique</string>
+    <string name="validation_tip_roast_date_today">Tip: Use today\'s date if you\'re not sure of the exact roast date</string>
+    <string name="validation_note_old_beans">Note: Beans older than 30 days may have lost some flavor</string>
+    <string name="validation_tip_notes_helpful">Tip: Notes help you remember what you liked about this bean</string>
+    <string name="validation_note_character_limit">Note: You\'re approaching the character limit</string>
+    <string name="validation_tip_short_extraction_sour">Tip: Very short extractions often taste sour</string>
+    <string name="validation_tip_long_extraction_bitter">Tip: Very long extractions often taste bitter</string>
+
+    <!-- Brew Ratio Warnings -->
+    <string name="validation_warning_ratio_concentrated">This ratio is quite concentrated - it might taste very strong</string>
+    <string name="validation_warning_ratio_diluted">This ratio is quite diluted - it might taste weak</string>
+    <string name="validation_warning_ratio_higher">Consider a slightly higher ratio for better balance</string>
+    <string name="validation_warning_ratio_lower">Consider a slightly lower ratio for more intensity</string>
+
+    <!-- Extraction Time Warnings -->
+    <string name="validation_warning_grind_finer">Consider grinding finer or using more coffee for longer extraction</string>
+    <string name="validation_warning_grind_coarser">Consider grinding coarser or using less coffee for shorter extraction</string>
+    <string name="validation_success_optimal_time">Great extraction time! This is in the optimal range for espresso</string>
+
+    <!-- Bean Age Warnings -->
+    <string name="validation_warning_very_fresh_beans">Very fresh beans – consider waiting 2-4 days for optimal flavor</string>
+    <string name="validation_success_fresh_beans">Fresh beans - perfect timing for espresso!</string>
+    <string name="validation_warning_aging_beans">Beans are getting older but still good for espresso</string>
+    <string name="validation_warning_old_beans">Older beans - flavor may be diminished</string>
+
+    <!-- Content Descriptions for Validation -->
+    <string name="validation_cd_error">Error</string>
+    <string name="validation_cd_warning">Warning</string>
+
+    <!-- Placeholders -->
+    <string name="placeholder_notes">Tasting notes, adjustments, etc.</string>
+    <string name="placeholder_grinder_setting">e.g., 15, Fine, Medium-Fine</string>
+    <string name="placeholder_min_ratio">1.5</string>
+    <string name="placeholder_max_ratio">3.0</string>
+    <string name="placeholder_min_extraction_time">20</string>
+    <string name="placeholder_max_extraction_time">35</string>
+    <string name="placeholder_enter_bean_name">Enter bean name</string>
+    <string name="placeholder_enter_bean_name_search">Enter bean name…</string>
+    <string name="placeholder_select_roast_date">Select roast date</string>
+    <string name="placeholder_optional_bean_notes">Optional notes about this bean</string>
+    <string name="placeholder_optional_grinder_setting">Optional initial grinder setting</string>
+    <string name="placeholder_shot_notes">Add notes about this shot…</string>
+
+    <!-- Format Strings -->
+    <string name="format_days_since_roast">%1$d days since roast</string>
+    <string name="format_roasted_days_ago">Roasted: %1$d days ago</string>
+    <string name="format_last_grind">Last grind: %1$s</string>
+    <string name="format_quality_score">%1$d/100</string>
+    <string name="format_days">%1$d days</string>
+    <string name="format_weight_in_out">%1$dg → %2$dg</string>
+    <string name="format_shots_count">%1$d shots</string>
+    <string name="format_avg_ratio">Avg Ratio: 1:%1$.1f</string>
+    <string name="format_avg_time">Avg Time: %1$ds</string>
+    <string name="format_bean">Bean: %1$s</string>
+    <string name="format_grinder">Grinder: %1$s</string>
+    <string name="format_shot_trends">Shot Trends (%1$d days)</string>
+    <string name="format_use_suggested">Use Suggested: %1$s</string>
+    <string name="format_suggested_setting">Suggested: %1$s (based on last use with this bean)</string>
+    <string name="format_brew_ratio_range_long">Brew Ratio: 1:%1$s - 1:%2$s</string>
+    <string name="format_previous_shot">Previous shot: %1$s (%2$s)</string>
+    <string name="format_next_shot">Next shot: %1$s (%2$s)</string>
+    <string name="format_shot_context">This is shot %1$d of %2$d with %3$s</string>
+    <string name="format_delete_bean_confirmation">Are you sure you want to delete \"%1$s\"? This will deactivate the bean and hide it from active lists.</string>
+    <string name="format_delete_shot_confirmation">Are you sure you want to delete this shot? This action cannot be undone.</string>
+    <string name="format_most_used_grinder_setting">Most used grinder setting: %1$s</string>
+    <string name="format_decimal_two_place">%.2f</string>
+    <string name="format_decimal_one_place">%.1f</string>
+    <string name="format_decimal_zero_place">%.0f</string>
+
+    <!-- Special Characters and Symbols -->
+    <string name="symbol_bullet">• %1$s</string>
+    <string name="symbol_square">■ Suggested</string>
+    <string name="symbol_previous_successful">• Previous successful</string>
+
+    <!-- Weight Slider -->
+    <string name="weight_min_value">0.5</string>
+    <string name="weight_max_value">20.0</string>
+
+    <!-- Additional format strings -->
+    <string name="button_reset">Reset</string>
+
+    <!-- Remaining UI strings -->
+    <string name="format_settings_different_used">%1$d different settings used</string>
+    <string name="format_weight_display_g">%1$dg</string>
+    <string name="format_days_since_roast_filter">%1$d days since roast</string>
+    <string name="format_deviation_display">%1$s%2$s</string>
+
+    <!-- Additional format strings for UI display -->
+    <string name="format_weight_display_value_g">%1$dg</string>
+    <string name="format_weight_display_min_g">%1$dg</string>
+    <string name="format_weight_display_max_g">%1$dg</string>
+    <string name="format_weight_display_int">%1$d</string>
+    <string name="format_time_filter_display">Time: %1$ds - %2$ds</string>
+    <string name="format_extraction_time_with_target">/ %1$s</string>
+
+    <!-- Format strings for statistics -->
+    <string name="format_avg_brew_ratio_display">1:%1$.1f</string>
+    <string name="format_avg_extraction_time_display">%1$ds</string>
+    <string name="format_optimal_extraction_percentage_long">Optimal: %1$.0f%%</string>
+    <string name="format_optimal_extraction_percentage">%1$.0f%%</string>
+    <string name="format_typical_ratio_percentage">%1$.0f%%</string>
+    <string name="format_extraction_time_trend_display">%1$.1fs</string>
+    <string name="format_time_range_display">%1$ds - %2$ds</string>
+    <string name="format_under_extracted_percentage">%1$.0f%%</string>
+    <string name="format_over_extracted_percentage">%1$.0f%%</string>
+    <string name="format_too_fast_percentage">%1$.0f%%</string>
+    <string name="format_too_slow_percentage">%1$.0f%%</string>
+    <string name="format_brew_ratio_range">1:%1$.1f - 1:%2$.1f</string>
+
+    <!-- Timer display suffixes -->
+    <string name="timer_seconds_suffix">s</string>
+
+    <!-- Text that appears multiple times -->
+    <string name="text_unknown_error">Unknown error occurred</string>
+    <string name="text_bean_name_exists">Bean name already exists</string>
 </resources>

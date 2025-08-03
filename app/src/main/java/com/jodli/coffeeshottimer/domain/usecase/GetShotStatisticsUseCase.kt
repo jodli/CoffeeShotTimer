@@ -3,6 +3,8 @@ package com.jodli.coffeeshottimer.domain.usecase
 import com.jodli.coffeeshottimer.data.dao.ShotStatistics
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -77,7 +79,10 @@ class GetShotStatisticsUseCase @Inject constructor(
                 }
             )
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting overall statistics", exception)
+            )
         }
     }
 
@@ -110,7 +115,10 @@ class GetShotStatisticsUseCase @Inject constructor(
                 }
             )
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot trends", exception)
+            )
         }
     }
 
@@ -133,7 +141,10 @@ class GetShotStatisticsUseCase @Inject constructor(
                 }
             )
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting grinder setting analysis", exception)
+            )
         }
     }
 
@@ -162,7 +173,10 @@ class GetShotStatisticsUseCase @Inject constructor(
                 }
             )
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting brew ratio analysis", exception)
+            )
         }
     }
 
@@ -191,7 +205,10 @@ class GetShotStatisticsUseCase @Inject constructor(
                 }
             )
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting extraction time analysis", exception)
+            )
         }
     }
 

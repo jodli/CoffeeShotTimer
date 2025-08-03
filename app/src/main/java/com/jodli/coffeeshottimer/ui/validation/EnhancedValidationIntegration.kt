@@ -2,6 +2,7 @@ package com.jodli.coffeeshottimer.ui.validation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +16,9 @@ import kotlinx.coroutines.launch
 /**
  * Enhanced ViewModel base class with integrated validation support.
  */
-abstract class ValidatedViewModel : ViewModel() {
+abstract class ValidatedViewModel(
+    protected val validationUtils: ValidationUtils
+) : ViewModel() {
 
     protected val _validationErrors = MutableStateFlow<List<String>>(emptyList())
     val validationErrors: StateFlow<List<String>> = _validationErrors.asStateFlow()
@@ -28,7 +31,9 @@ abstract class ValidatedViewModel : ViewModel() {
 /**
  * Example enhanced shot recording ViewModel with integrated validation.
  */
-class EnhancedShotRecordingViewModel : ValidatedViewModel() {
+class EnhancedShotRecordingViewModel(
+    validationUtils: ValidationUtils
+) : ValidatedViewModel(validationUtils) {
 
     // Form fields
     private val _coffeeWeightIn = MutableStateFlow("")
@@ -69,7 +74,8 @@ class EnhancedShotRecordingViewModel : ValidatedViewModel() {
                 coffeeWeightOut = _coffeeWeightOut.value,
                 extractionTimeSeconds = 27, // Would come from timer
                 grinderSetting = _grinderSetting.value,
-                notes = _notes.value
+                notes = _notes.value,
+                validationUtils
             )
 
             // Update overall validation state
@@ -87,7 +93,7 @@ class EnhancedShotRecordingViewModel : ValidatedViewModel() {
 
         if (weightIn != null && weightOut != null && weightIn > 0) {
             val brewRatio = weightOut / weightIn
-            _brewRatioWarnings.value = brewRatio.getBrewRatioWarnings()
+            _brewRatioWarnings.value = brewRatio.getBrewRatioWarnings(validationUtils)
         } else {
             _brewRatioWarnings.value = emptyList()
         }

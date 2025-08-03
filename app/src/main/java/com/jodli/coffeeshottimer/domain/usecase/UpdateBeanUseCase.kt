@@ -3,6 +3,8 @@ package com.jodli.coffeeshottimer.domain.usecase
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +39,7 @@ class UpdateBeanUseCase @Inject constructor(
         return try {
             // Validate bean ID
             if (beanId.trim().isEmpty()) {
-                return Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
+                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
             }
 
             // Get existing bean to preserve creation timestamp
@@ -45,12 +47,12 @@ class UpdateBeanUseCase @Inject constructor(
             if (existingBeanResult.isFailure) {
                 return Result.failure(
                     existingBeanResult.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to get existing bean")
+                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to get existing bean")
                 )
             }
 
             val existingBean = existingBeanResult.getOrNull()
-                ?: return Result.failure(BeanUseCaseException.ValidationError("Bean not found"))
+                ?: return Result.failure(DomainException(DomainErrorCode.BEAN_NOT_FOUND))
 
             // Create updated bean instance
             val updatedBean = existingBean.copy(
@@ -65,7 +67,8 @@ class UpdateBeanUseCase @Inject constructor(
             val validationResult = beanRepository.validateBean(updatedBean)
             if (!validationResult.isValid) {
                 return Result.failure(
-                    BeanUseCaseException.ValidationError(
+                    DomainException(
+                        DomainErrorCode.VALIDATION_FAILED,
                         "Bean validation failed: ${validationResult.errors.joinToString(", ")}"
                     )
                 )
@@ -78,12 +81,13 @@ class UpdateBeanUseCase @Inject constructor(
             } else {
                 Result.failure(
                     updateResult.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to update bean")
+                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update bean")
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error updating bean",
                     exception
                 )
@@ -103,11 +107,11 @@ class UpdateBeanUseCase @Inject constructor(
     ): Result<Unit> {
         return try {
             if (beanId.trim().isEmpty()) {
-                return Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
+                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
             }
 
             if (grinderSetting.trim().isEmpty()) {
-                return Result.failure(BeanUseCaseException.ValidationError("Grinder setting cannot be empty"))
+                return Result.failure(DomainException(DomainErrorCode.GRINDER_SETTING_EMPTY))
             }
 
             val result =
@@ -117,12 +121,13 @@ class UpdateBeanUseCase @Inject constructor(
             } else {
                 Result.failure(
                     result.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to update grinder setting")
+                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update grinder setting")
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error updating grinder setting",
                     exception
                 )
@@ -142,7 +147,7 @@ class UpdateBeanUseCase @Inject constructor(
     ): Result<Unit> {
         return try {
             if (beanId.trim().isEmpty()) {
-                return Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
+                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
             }
 
             val result = beanRepository.updateBeanActiveStatus(beanId.trim(), isActive)
@@ -151,12 +156,13 @@ class UpdateBeanUseCase @Inject constructor(
             } else {
                 Result.failure(
                     result.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to update active status")
+                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update active status")
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error updating active status",
                     exception
                 )
@@ -225,9 +231,9 @@ class UpdateBeanUseCase @Inject constructor(
     suspend fun isBeanNameAvailableForUpdate(beanId: String, name: String): Result<Boolean> {
         return try {
             if (beanId.trim().isEmpty()) {
-                Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
+                Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
             } else if (name.trim().isEmpty()) {
-                Result.failure(BeanUseCaseException.ValidationError("Bean name cannot be empty"))
+                Result.failure(DomainException(DomainErrorCode.BEAN_NAME_EMPTY))
             } else {
                 val existingBean = beanRepository.getBeanByName(name.trim())
                 if (existingBean.isSuccess) {
@@ -237,13 +243,14 @@ class UpdateBeanUseCase @Inject constructor(
                 } else {
                     Result.failure(
                         existingBean.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to check bean name")
+                            ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to check bean name")
                     )
                 }
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error checking bean name",
                     exception
                 )
@@ -259,7 +266,7 @@ class UpdateBeanUseCase @Inject constructor(
     suspend fun getBeanForEditing(beanId: String): Result<Bean> {
         return try {
             if (beanId.trim().isEmpty()) {
-                Result.failure(BeanUseCaseException.ValidationError("Bean ID cannot be empty"))
+                Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
             } else {
                 val result = beanRepository.getBeanById(beanId.trim())
                 if (result.isSuccess) {
@@ -267,18 +274,19 @@ class UpdateBeanUseCase @Inject constructor(
                     if (bean != null) {
                         Result.success(bean)
                     } else {
-                        Result.failure(BeanUseCaseException.ValidationError("Bean not found"))
+                        Result.failure(DomainException(DomainErrorCode.BEAN_NOT_FOUND))
                     }
                 } else {
                     Result.failure(
                         result.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to get bean")
+                            ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to get bean")
                     )
                 }
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error getting bean",
                     exception
                 )
@@ -313,14 +321,16 @@ class UpdateBeanUseCase @Inject constructor(
                 Result.success(successCount)
             } else {
                 Result.failure(
-                    BeanUseCaseException.ValidationError(
+                    DomainException(
+                        DomainErrorCode.VALIDATION_FAILED,
                         "Some beans failed to update: ${errors.joinToString(", ")}"
                     )
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error in bulk update",
                     exception
                 )

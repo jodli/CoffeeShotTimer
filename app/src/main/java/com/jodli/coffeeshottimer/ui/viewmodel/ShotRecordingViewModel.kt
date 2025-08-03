@@ -3,15 +3,19 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
 import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightIn
 import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightOut
 import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -49,8 +53,14 @@ class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
+    private val domainErrorTranslator: DomainErrorTranslator,
+    private val stringResourceProvider: StringResourceProvider,
+    private val validationStringProvider: ValidationStringProvider,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    // Create validation utils instance
+    private val validationUtils = ValidationUtils(validationStringProvider)
 
     // Bean management state
     private val _activeBeans = MutableStateFlow<List<Bean>>(emptyList())
@@ -170,7 +180,7 @@ class ShotRecordingViewModel @Inject constructor(
                         _errorMessage.value = null
                     },
                     onFailure = { exception ->
-                        _errorMessage.value = exception.message
+                        _errorMessage.value = domainErrorTranslator.translateError(exception)
                     }
                 )
                 _isLoading.value = false
@@ -337,7 +347,7 @@ class ShotRecordingViewModel @Inject constructor(
         _coffeeWeightIn.value = value
 
         // Use enhanced validation with contextual tips
-        val validationResult = value.validateCoffeeWeightIn()
+        val validationResult = value.validateCoffeeWeightIn(validationUtils)
         _coffeeWeightInError.value = validationResult.errors.firstOrNull()
 
         calculateBrewRatio()
@@ -351,7 +361,7 @@ class ShotRecordingViewModel @Inject constructor(
         _coffeeWeightOut.value = value
 
         // Use enhanced validation with contextual tips
-        val validationResult = value.validateCoffeeWeightOut()
+        val validationResult = value.validateCoffeeWeightOut(validationUtils)
         _coffeeWeightOutError.value = validationResult.errors.firstOrNull()
 
         calculateBrewRatio()
@@ -365,7 +375,7 @@ class ShotRecordingViewModel @Inject constructor(
         _grinderSetting.value = value
 
         // Use enhanced validation with helpful tips
-        val validationResult = value.validateGrinderSettingEnhanced()
+        val validationResult = value.validateGrinderSettingEnhanced(validationUtils)
         _grinderSettingError.value = validationResult.errors.firstOrNull()
 
         validateForm()
@@ -393,7 +403,7 @@ class ShotRecordingViewModel @Inject constructor(
             _isOptimalBrewRatio.value = recordShotUseCase.isTypicalBrewRatio(ratio)
 
             // Update brew ratio warnings using enhanced validation
-            _brewRatioWarnings.value = ratio.getBrewRatioWarnings()
+            _brewRatioWarnings.value = ratio.getBrewRatioWarnings(validationUtils)
         } else {
             _formattedBrewRatio.value = null
             _isOptimalBrewRatio.value = false
@@ -406,11 +416,11 @@ class ShotRecordingViewModel @Inject constructor(
      */
     private fun validateForm() {
         val hasValidBean = _selectedBean.value != null
-        val hasValidWeights = _coffeeWeightIn.value.isNotBlank() && 
+        val hasValidWeights = _coffeeWeightIn.value.isNotBlank() &&
                 _coffeeWeightOut.value.isNotBlank() &&
                 _coffeeWeightInError.value == null &&
                 _coffeeWeightOutError.value == null
-        val hasValidGrinder = _grinderSetting.value.isNotBlank() && 
+        val hasValidGrinder = _grinderSetting.value.isNotBlank() &&
                 _grinderSettingError.value == null
         val hasValidTimer = timerState.value.elapsedTimeSeconds >= ValidationUtils.MIN_EXTRACTION_TIME
 
@@ -419,9 +429,9 @@ class ShotRecordingViewModel @Inject constructor(
         _isFormValid.value = isValid
 
         // Show timer validation feedback if everything else is valid but timer is insufficient
-        val shouldShowTimerValidation = hasValidBean && hasValidWeights && hasValidGrinder && 
+        val shouldShowTimerValidation = hasValidBean && hasValidWeights && hasValidGrinder &&
                 !hasValidTimer && timerState.value.elapsedTimeSeconds > 0
-        
+
         if (shouldShowTimerValidation && !_showTimerValidation.value) {
             _showTimerValidation.value = true
         } else if (!shouldShowTimerValidation && _showTimerValidation.value) {
@@ -467,15 +477,15 @@ class ShotRecordingViewModel @Inject constructor(
         val shotNotes = _notes.value
 
         if (bean == null || weightIn == null || weightOut == null || grinder.isBlank()) {
-            _errorMessage.value = "Please fill in all required fields"
+            _errorMessage.value = stringResourceProvider.getString(R.string.validation_fill_required)
             return
         }
 
         // Check minimum extraction time and show visual feedback
         if (timerState.value.elapsedTimeSeconds < ValidationUtils.MIN_EXTRACTION_TIME) {
             _showTimerValidation.value = true
-            _errorMessage.value = "Extraction time must be at least ${ValidationUtils.MIN_EXTRACTION_TIME} seconds"
-            
+            _errorMessage.value = context.getString(R.string.error_extraction_time_minimum, ValidationUtils.MIN_EXTRACTION_TIME)
+
             // Auto-hide validation feedback after 3 seconds
             viewModelScope.launch {
                 delay(3000L)
@@ -515,7 +525,7 @@ class ShotRecordingViewModel @Inject constructor(
                     val brewRatio = shot.getFormattedBrewRatio()
                     val extractionTime = shot.getFormattedExtractionTime()
                     _successMessage.value =
-                        "Shot recorded successfully! Brew ratio: $brewRatio, Time: $extractionTime"
+                        stringResourceProvider.getString(R.string.text_record_successfully, brewRatio, extractionTime)
 
                     // Clear draft after successful recording
                     clearDraft()
@@ -531,7 +541,7 @@ class ShotRecordingViewModel @Inject constructor(
                     }
                 },
                 onFailure = { exception ->
-                    _errorMessage.value = exception.message ?: "Failed to record shot"
+                    _errorMessage.value = domainErrorTranslator.translateError(exception)
                 }
             )
         }
@@ -543,19 +553,19 @@ class ShotRecordingViewModel @Inject constructor(
     private fun clearForm() {
         // Keep current successful values as new defaults
         val currentWeightIn = _coffeeWeightIn.value
-        val currentWeightOut = _coffeeWeightOut.value  
+        val currentWeightOut = _coffeeWeightOut.value
         val currentGrinder = _grinderSetting.value
-        
+
         // Update suggestions with current successful values
         _suggestedCoffeeWeightIn.value = currentWeightIn
         _suggestedCoffeeWeightOut.value = currentWeightOut
         _suggestedGrinderSetting.value = currentGrinder
-        
+
         // Keep the successful values
         _coffeeWeightIn.value = currentWeightIn
         _coffeeWeightOut.value = currentWeightOut
         _grinderSetting.value = currentGrinder
-        
+
         // Only clear non-persistent fields
         _notes.value = ""
         _coffeeWeightInError.value = null
@@ -564,7 +574,7 @@ class ShotRecordingViewModel @Inject constructor(
         _brewRatio.value = null
         _formattedBrewRatio.value = null
         _isOptimalBrewRatio.value = false
-        
+
         // Recalculate brew ratio with kept values
         calculateBrewRatio()
         validateForm()
@@ -727,7 +737,7 @@ class ShotRecordingViewModel @Inject constructor(
     fun triggerTimerValidation() {
         if (timerState.value.elapsedTimeSeconds < ValidationUtils.MIN_EXTRACTION_TIME) {
             _showTimerValidation.value = true
-            
+
             // Auto-hide validation feedback after 3 seconds
             viewModelScope.launch {
                 delay(3000L)

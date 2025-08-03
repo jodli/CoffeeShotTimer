@@ -7,15 +7,16 @@ import java.time.LocalDate
 
 /**
  * Extension functions for enhanced validation with user-friendly messages.
+ * These extensions work with ValidationUtils that require a ValidationStringProvider.
  */
 
 /**
  * Validates coffee input weight with contextual error messages.
  */
-fun String.validateCoffeeWeightIn(): ValidationResult {
-    return ValidationUtils.validateCoffeeWeight(
+fun String.validateCoffeeWeightIn(validationUtils: ValidationUtils): ValidationResult {
+    return validationUtils.validateCoffeeWeight(
         value = this,
-        fieldName = "Coffee input weight",
+        fieldName = validationUtils.stringProvider.getCoffeeInputWeightLabel(),
         minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT.toDouble(),
         maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT.toDouble()
     )
@@ -24,10 +25,10 @@ fun String.validateCoffeeWeightIn(): ValidationResult {
 /**
  * Validates coffee output weight with contextual error messages.
  */
-fun String.validateCoffeeWeightOut(): ValidationResult {
-    return ValidationUtils.validateCoffeeWeight(
+fun String.validateCoffeeWeightOut(validationUtils: ValidationUtils): ValidationResult {
+    return validationUtils.validateCoffeeWeight(
         value = this,
-        fieldName = "Coffee output weight",
+        fieldName = validationUtils.stringProvider.getCoffeeOutputWeightLabel(),
         minWeight = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT.toDouble(),
         maxWeight = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT.toDouble()
     )
@@ -36,14 +37,14 @@ fun String.validateCoffeeWeightOut(): ValidationResult {
 /**
  * Validates grinder setting with enhanced error messages.
  */
-fun String.validateGrinderSettingEnhanced(isRequired: Boolean = true): ValidationResult {
-    return ValidationUtils.validateGrinderSetting(this, isRequired).let { result ->
+fun String.validateGrinderSettingEnhanced(validationUtils: ValidationUtils, isRequired: Boolean = true): ValidationResult {
+    return validationUtils.validateGrinderSetting(this, isRequired).let { result ->
         if (!result.isValid) {
             val enhancedErrors = result.errors.toMutableList()
 
             // Add helpful tips for grinder settings
             if (this.trim().isEmpty() && isRequired) {
-                enhancedErrors.add("Tip: Record your grinder setting to remember what worked well")
+                enhancedErrors.add(validationUtils.stringProvider.getGrinderSettingTip())
             }
 
             ValidationResult(false, enhancedErrors)
@@ -54,21 +55,21 @@ fun String.validateGrinderSettingEnhanced(isRequired: Boolean = true): Validatio
 /**
  * Validates bean name with enhanced error messages and suggestions.
  */
-fun String.validateBeanNameEnhanced(existingNames: List<String> = emptyList()): ValidationResult {
-    return ValidationUtils.validateBeanName(this, existingNames).let { result ->
+fun String.validateBeanNameEnhanced(validationUtils: ValidationUtils, existingNames: List<String> = emptyList()): ValidationResult {
+    return validationUtils.validateBeanName(this, existingNames).let { result ->
         if (!result.isValid) {
             val enhancedErrors = result.errors.toMutableList()
             val trimmedName = this.trim()
 
             when {
                 trimmedName.length == 1 ->
-                    enhancedErrors.add("Tip: Try a more descriptive name like 'Ethiopian Yirgacheffe'")
+                    enhancedErrors.add(validationUtils.stringProvider.getDescriptiveNameTip())
 
                 trimmedName.contains(Regex("[^a-zA-Z0-9\\s\\-_&.()]")) ->
-                    enhancedErrors.add("Tip: Use letters, numbers, spaces, and basic punctuation only")
+                    enhancedErrors.add(validationUtils.stringProvider.getBasicPunctuationTip())
 
                 existingNames.any { it.equals(trimmedName, ignoreCase = true) } ->
-                    enhancedErrors.add("Tip: Try adding the roaster name or roast level to make it unique")
+                    enhancedErrors.add(validationUtils.stringProvider.getUniqueNameTip())
             }
 
             ValidationResult(false, enhancedErrors)
@@ -79,18 +80,18 @@ fun String.validateBeanNameEnhanced(existingNames: List<String> = emptyList()): 
 /**
  * Validates roast date with enhanced contextual messages.
  */
-fun LocalDate.validateRoastDateEnhanced(): ValidationResult {
-    return ValidationUtils.validateRoastDate(this).let { result ->
+fun LocalDate.validateRoastDateEnhanced(validationUtils: ValidationUtils): ValidationResult {
+    return validationUtils.validateRoastDate(this).let { result ->
         if (!result.isValid) {
             val enhancedErrors = result.errors.toMutableList()
             val today = LocalDate.now()
 
             when {
                 this.isAfter(today) ->
-                    enhancedErrors.add("Tip: Use today's date if you're not sure of the exact roast date")
+                    enhancedErrors.add(validationUtils.stringProvider.getRoastDateTodayTip())
 
                 this.isBefore(today.minusDays(30)) ->
-                    enhancedErrors.add("Note: Beans older than 30 days may have lost some flavor")
+                    enhancedErrors.add(validationUtils.stringProvider.getOldBeansNote())
             }
 
             ValidationResult(false, enhancedErrors)
@@ -101,17 +102,17 @@ fun LocalDate.validateRoastDateEnhanced(): ValidationResult {
 /**
  * Validates notes with character count and helpful suggestions.
  */
-fun String.validateNotesEnhanced(): ValidationResult {
-    return ValidationUtils.validateNotes(this).let { result ->
+fun String.validateNotesEnhanced(validationUtils: ValidationUtils): ValidationResult {
+    return validationUtils.validateNotes(this).let { result ->
         val warnings = mutableListOf<String>()
 
         // Add helpful suggestions for notes
         when {
             this.trim().isEmpty() ->
-                warnings.add("Tip: Notes help you remember what you liked about this bean")
+                warnings.add(validationUtils.stringProvider.getNotesHelpfulTip())
 
             this.length > ValidationUtils.MAX_NOTES_LENGTH * 0.8 ->
-                warnings.add("Note: You're approaching the character limit")
+                warnings.add(validationUtils.stringProvider.getCharacterLimitNote())
         }
 
         if (!result.isValid) {
@@ -125,17 +126,17 @@ fun String.validateNotesEnhanced(): ValidationResult {
 /**
  * Validates extraction time with contextual feedback.
  */
-fun Int.validateExtractionTimeEnhanced(): ValidationResult {
-    return ValidationUtils.validateExtractionTime(this).let { result ->
+fun Int.validateExtractionTimeEnhanced(validationUtils: ValidationUtils): ValidationResult {
+    return validationUtils.validateExtractionTime(this).let { result ->
         if (!result.isValid) {
             val enhancedErrors = result.errors.toMutableList()
 
             when {
                 this < ValidationUtils.MIN_EXTRACTION_TIME ->
-                    enhancedErrors.add("Tip: Very short extractions often taste sour")
+                    enhancedErrors.add(validationUtils.stringProvider.getShortExtractionSourTip())
 
                 this > ValidationUtils.MAX_EXTRACTION_TIME ->
-                    enhancedErrors.add("Tip: Very long extractions often taste bitter")
+                    enhancedErrors.add(validationUtils.stringProvider.getLongExtractionBitterTip())
             }
 
             ValidationResult(false, enhancedErrors)
@@ -146,21 +147,21 @@ fun Int.validateExtractionTimeEnhanced(): ValidationResult {
 /**
  * Generates warnings for brew ratio based on espresso standards.
  */
-fun Double.getBrewRatioWarnings(): List<String> {
+fun Double.getBrewRatioWarnings(validationUtils: ValidationUtils): List<String> {
     val warnings = mutableListOf<String>()
 
     when {
         this < ValidationUtils.MIN_TYPICAL_BREW_RATIO ->
-            warnings.add("This ratio is quite concentrated - it might taste very strong")
+            warnings.add(validationUtils.stringProvider.getRatioConcentratedWarning())
 
         this > ValidationUtils.MAX_TYPICAL_BREW_RATIO ->
-            warnings.add("This ratio is quite diluted - it might taste weak")
+            warnings.add(validationUtils.stringProvider.getRatioDilutedWarning())
 
         this < ValidationUtils.OPTIMAL_BREW_RATIO_MIN ->
-            warnings.add("Consider a slightly higher ratio for better balance")
+            warnings.add(validationUtils.stringProvider.getRatioHigherWarning())
 
         this > ValidationUtils.OPTIMAL_BREW_RATIO_MAX ->
-            warnings.add("Consider a slightly lower ratio for more intensity")
+            warnings.add(validationUtils.stringProvider.getRatioLowerWarning())
     }
 
     return warnings
@@ -169,18 +170,18 @@ fun Double.getBrewRatioWarnings(): List<String> {
 /**
  * Generates warnings for extraction time based on espresso standards.
  */
-fun Int.getExtractionTimeWarnings(): List<String> {
+fun Int.getExtractionTimeWarnings(validationUtils: ValidationUtils): List<String> {
     val warnings = mutableListOf<String>()
 
     when {
         this < ValidationUtils.OPTIMAL_EXTRACTION_TIME_MIN ->
-            warnings.add("Consider grinding finer or using more coffee for longer extraction")
+            warnings.add(validationUtils.stringProvider.getGrindFinerWarning())
 
         this > ValidationUtils.OPTIMAL_EXTRACTION_TIME_MAX ->
-            warnings.add("Consider grinding coarser or using less coffee for shorter extraction")
+            warnings.add(validationUtils.stringProvider.getGrindCoarserWarning())
 
         this in ValidationUtils.OPTIMAL_EXTRACTION_TIME_MIN..ValidationUtils.OPTIMAL_EXTRACTION_TIME_MAX ->
-            warnings.add("Great extraction time! This is in the optimal range for espresso")
+            warnings.add(validationUtils.stringProvider.getOptimalTimeSuccess())
     }
 
     return warnings
@@ -194,17 +195,18 @@ fun validateCompleteShot(
     coffeeWeightOut: String,
     extractionTimeSeconds: Int,
     grinderSetting: String,
-    notes: String
+    notes: String,
+    validationUtils: ValidationUtils
 ): ValidationResult {
     val allErrors = mutableListOf<String>()
     val allWarnings = mutableListOf<String>()
 
     // Validate individual fields
-    val weightInResult = coffeeWeightIn.validateCoffeeWeightIn()
-    val weightOutResult = coffeeWeightOut.validateCoffeeWeightOut()
-    val timeResult = extractionTimeSeconds.validateExtractionTimeEnhanced()
-    val grinderResult = grinderSetting.validateGrinderSettingEnhanced()
-    val notesResult = notes.validateNotesEnhanced()
+    val weightInResult = coffeeWeightIn.validateCoffeeWeightIn(validationUtils)
+    val weightOutResult = coffeeWeightOut.validateCoffeeWeightOut(validationUtils)
+    val timeResult = extractionTimeSeconds.validateExtractionTimeEnhanced(validationUtils)
+    val grinderResult = grinderSetting.validateGrinderSettingEnhanced(validationUtils)
+    val notesResult = notes.validateNotesEnhanced(validationUtils)
 
     // Collect errors
     allErrors.addAll(weightInResult.errors)
@@ -220,14 +222,14 @@ fun validateCompleteShot(
 
 				if (weightIn != null && weightOut != null) {
             val brewRatio = weightOut / weightIn
-            allWarnings.addAll(brewRatio.getBrewRatioWarnings())
+            allWarnings.addAll(brewRatio.getBrewRatioWarnings(validationUtils))
         }
 
-        allWarnings.addAll(extractionTimeSeconds.getExtractionTimeWarnings())
+        allWarnings.addAll(extractionTimeSeconds.getExtractionTimeWarnings(validationUtils))
 
         // Cross-field validation
         if (weightIn != null && weightOut != null && weightOut < weightIn) {
-            allErrors.add("Output weight cannot be less than input weight")
+            allErrors.add(validationUtils.stringProvider.getOutputWeightLessThanInputError())
         }
     }
 
@@ -242,16 +244,17 @@ fun validateCompleteBean(
     roastDate: LocalDate,
     notes: String,
     grinderSetting: String,
+    validationUtils: ValidationUtils,
     existingNames: List<String> = emptyList()
 ): ValidationResult {
     val allErrors = mutableListOf<String>()
     val allWarnings = mutableListOf<String>()
 
     // Validate individual fields
-    val nameResult = name.validateBeanNameEnhanced(existingNames)
-    val dateResult = roastDate.validateRoastDateEnhanced()
-    val notesResult = notes.validateNotesEnhanced()
-    val grinderResult = grinderSetting.validateGrinderSettingEnhanced(false) // Not required
+    val nameResult = name.validateBeanNameEnhanced(validationUtils, existingNames)
+    val dateResult = roastDate.validateRoastDateEnhanced(validationUtils)
+    val notesResult = notes.validateNotesEnhanced(validationUtils)
+    val grinderResult = grinderSetting.validateGrinderSettingEnhanced(validationUtils, false) // Not required
 
     // Collect errors and warnings
     allErrors.addAll(nameResult.errors)
@@ -263,16 +266,16 @@ fun validateCompleteBean(
     val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(roastDate, LocalDate.now())
     when {
         daysSinceRoast < 2 ->
-            allWarnings.add("Very fresh beans - consider waiting 2-4 days for optimal flavor")
+            allWarnings.add(validationUtils.stringProvider.getVeryFreshBeansWarning())
 
         daysSinceRoast in 2..30 ->
-            allWarnings.add("Fresh beans - perfect timing for espresso!")
+            allWarnings.add(validationUtils.stringProvider.getFreshBeansSuccess())
 
         daysSinceRoast in 30..90 ->
-            allWarnings.add("Beans are getting older but still good for espresso")
+            allWarnings.add(validationUtils.stringProvider.getAgingBeansWarning())
 
         daysSinceRoast > 90 ->
-            allWarnings.add("Older beans - flavor may be diminished")
+            allWarnings.add(validationUtils.stringProvider.getOldBeansWarning())
     }
 
     return ValidationResult(allErrors.isEmpty(), allErrors + allWarnings)
