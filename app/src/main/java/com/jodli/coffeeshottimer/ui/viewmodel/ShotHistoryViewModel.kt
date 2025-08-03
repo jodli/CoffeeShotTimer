@@ -2,6 +2,7 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.PaginationConfig
 import com.jodli.coffeeshottimer.data.model.Shot
@@ -15,6 +16,8 @@ import com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,7 +37,9 @@ class ShotHistoryViewModel @Inject constructor(
     private val getShotHistoryUseCase: GetShotHistoryUseCase,
     private val getActiveBeansUseCase: GetActiveBeansUseCase,
     private val getShotStatisticsUseCase: GetShotStatisticsUseCase,
-    private val memoryOptimizer: MemoryOptimizer
+    private val memoryOptimizer: MemoryOptimizer,
+    private val stringResourceProvider: StringResourceProvider,
+    private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ShotHistoryUiState())
@@ -68,7 +73,7 @@ class ShotHistoryViewModel @Inject constructor(
             getActiveBeansUseCase.execute()
                 .catch { error ->
                     _uiState.value = _uiState.value.copy(
-                        error = "Failed to load beans: ${error.message}"
+                        error = domainErrorTranslator.translateError(error)
                     )
                 }
                 .collect { result ->
@@ -78,7 +83,7 @@ class ShotHistoryViewModel @Inject constructor(
                         },
                         onFailure = { error ->
                             _uiState.value = _uiState.value.copy(
-                                error = "Failed to load beans: ${error.message}"
+                                error = domainErrorTranslator.translateError(error)
                             )
                         }
                     )
@@ -123,14 +128,14 @@ class ShotHistoryViewModel @Inject constructor(
                     onFailure = { error ->
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = "Failed to load shot history: ${error.message}"
+                            error = domainErrorTranslator.translateError(error)
                         )
                     }
                 )
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "Failed to load shot history: ${exception.message}"
+                    error = domainErrorTranslator.translateError(exception)
                 )
             }
         }
@@ -171,7 +176,7 @@ class ShotHistoryViewModel @Inject constructor(
                             // Only update error if we're not in a loading state
                             if (!_uiState.value.isLoading) {
                                 _uiState.value = _uiState.value.copy(
-                                    error = "Failed to load shot history: ${error.message}"
+                                    error = domainErrorTranslator.translateError(error)
                                 )
                             }
                         }
@@ -181,7 +186,7 @@ class ShotHistoryViewModel @Inject constructor(
                 // Only update error if we're not in a loading state
                 if (!_uiState.value.isLoading) {
                     _uiState.value = _uiState.value.copy(
-                        error = "Failed to load shot history: ${exception.message}"
+                        error = stringResourceProvider.getString(R.string.error_failed_to_load_shot_history, exception.message ?: "")
                     )
                 }
             }
@@ -264,7 +269,7 @@ class ShotHistoryViewModel @Inject constructor(
 
 
     fun getBeanName(beanId: String): String {
-        return _uiState.value.availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
+        return _uiState.value.availableBeans.find { it.id == beanId }?.name ?: stringResourceProvider.getString(R.string.text_unknown_error)
     }
 
     fun toggleAnalysisView() {
@@ -321,7 +326,7 @@ class ShotHistoryViewModel @Inject constructor(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     analysisLoading = false,
-                    error = "Failed to load analysis: ${exception.message}"
+                    error = stringResourceProvider.getString(R.string.error_failed_to_load_analysis, exception.message ?: "")
                 )
             }
         }
@@ -374,7 +379,7 @@ class ShotHistoryViewModel @Inject constructor(
                     onFailure = { error ->
                         _uiState.value = _uiState.value.copy(
                             isLoadingMore = false,
-                            error = "Failed to load more shots: ${error.message}"
+                            error = domainErrorTranslator.translateError(error)
                         )
                         // Revert page increment on failure
                         currentPaginationConfig = currentPaginationConfig.copy(
@@ -385,7 +390,7 @@ class ShotHistoryViewModel @Inject constructor(
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoadingMore = false,
-                    error = "Failed to load more shots: ${exception.message}"
+                    error = stringResourceProvider.getString(R.string.error_failed_to_load_more_shots, exception.message ?: "")
                 )
                 // Revert page increment on failure
                 currentPaginationConfig = currentPaginationConfig.copy(

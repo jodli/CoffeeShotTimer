@@ -4,6 +4,8 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -32,23 +34,23 @@ class GetShotDetailsUseCase @Inject constructor(
             val shotResult = shotRepository.getShotById(shotId)
             if (shotResult.isFailure) {
                 return Result.failure(
-                    shotResult.exceptionOrNull() ?: Exception("Failed to get shot")
+                    shotResult.exceptionOrNull() ?: DomainException(DomainErrorCode.SHOT_NOT_FOUND, "Failed to get shot")
                 )
             }
 
             val shot = shotResult.getOrNull()
-                ?: return Result.failure(Exception("Shot not found"))
+                ?: return Result.failure(DomainException(DomainErrorCode.SHOT_NOT_FOUND))
 
             // Get the associated bean
             val beanResult = beanRepository.getBeanById(shot.beanId)
             if (beanResult.isFailure) {
                 return Result.failure(
-                    beanResult.exceptionOrNull() ?: Exception("Failed to get bean")
+                    beanResult.exceptionOrNull() ?: DomainException(DomainErrorCode.BEAN_NOT_FOUND, "Failed to get bean")
                 )
             }
 
             val bean = beanResult.getOrNull()
-                ?: return Result.failure(Exception("Associated bean not found"))
+                ?: return Result.failure(DomainException(DomainErrorCode.BEAN_NOT_FOUND, "Associated bean not found"))
 
             // Calculate additional metrics
             val daysSinceRoast = ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now()).toInt()
@@ -83,7 +85,10 @@ class GetShotDetailsUseCase @Inject constructor(
 
             Result.success(shotDetails)
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot details", exception)
+            )
         }
     }
 
@@ -100,12 +105,12 @@ class GetShotDetailsUseCase @Inject constructor(
 
             if (shot1Result.isFailure) {
                 return Result.failure(
-                    shot1Result.exceptionOrNull() ?: Exception("Failed to get first shot")
+                    shot1Result.exceptionOrNull() ?: DomainException(DomainErrorCode.SHOT_NOT_FOUND, "Failed to get first shot")
                 )
             }
             if (shot2Result.isFailure) {
                 return Result.failure(
-                    shot2Result.exceptionOrNull() ?: Exception("Failed to get second shot")
+                    shot2Result.exceptionOrNull() ?: DomainException(DomainErrorCode.SHOT_NOT_FOUND, "Failed to get second shot")
                 )
             }
 
@@ -125,7 +130,10 @@ class GetShotDetailsUseCase @Inject constructor(
 
             Result.success(comparison)
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error comparing shots", exception)
+            )
         }
     }
 
@@ -147,7 +155,10 @@ class GetShotDetailsUseCase @Inject constructor(
 
             getShotDetails(lastShot.id)
         } catch (exception: Exception) {
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting last shot for bean", exception)
+            )
         }
     }
 

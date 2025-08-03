@@ -94,7 +94,7 @@ fun AddEditBeanScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = if (uiState.isEditMode) "Edit Bean" else "Add Bean",
+                    text = if (uiState.isEditMode) stringResource(R.string.cd_edit_bean) else stringResource(R.string.text_add_bean),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -103,7 +103,7 @@ fun AddEditBeanScreen(
                 IconButton(onClick = onNavigateBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(R.string.cd_back)
                     )
                 }
             }
@@ -129,8 +129,8 @@ fun AddEditBeanScreen(
                 CoffeeTextField(
                     value = uiState.name,
                     onValueChange = viewModel::updateName,
-                    label = "Bean Name *",
-                    placeholder = "Enter bean name",
+                    label = stringResource(R.string.label_bean_name_required),
+                    placeholder = stringResource(R.string.placeholder_enter_bean_name),
                     leadingIcon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
                     isError = uiState.nameError != null,
                     errorMessage = uiState.nameError
@@ -140,8 +140,8 @@ fun AddEditBeanScreen(
                 CoffeeTextField(
                     value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                     onValueChange = { }, // Read-only, handled by date picker
-                    label = "Roast Date *",
-                    placeholder = "Select roast date",
+                    label = stringResource(R.string.label_roast_date_required),
+                    placeholder = stringResource(R.string.placeholder_select_roast_date),
                     leadingIcon = Icons.Default.DateRange,
                     trailingIcon = Icons.Default.DateRange,
                     onTrailingIconClick = { showDatePicker = true },
@@ -154,8 +154,8 @@ fun AddEditBeanScreen(
                 CoffeeTextField(
                     value = uiState.notes,
                     onValueChange = viewModel::updateNotes,
-                    label = "Notes",
-                    placeholder = "Optional notes about this bean",
+                    label = stringResource(R.string.label_notes),
+                    placeholder = stringResource(R.string.placeholder_optional_bean_notes),
                     leadingIcon = Icons.Default.Edit,
                     isError = uiState.notesError != null,
                     errorMessage = uiState.notesError,
@@ -167,8 +167,8 @@ fun AddEditBeanScreen(
                 CoffeeTextField(
                     value = uiState.lastGrinderSetting,
                     onValueChange = viewModel::updateAndValidateGrinderSetting,
-                    label = "Grinder Setting",
-                    placeholder = "Optional initial grinder setting",
+                    label = stringResource(R.string.label_grinder_setting),
+                    placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
                     leadingIcon = Icons.Filled.Engineering,
                     isError = uiState.grinderSettingError != null,
                     errorMessage = uiState.grinderSettingError
@@ -181,7 +181,7 @@ fun AddEditBeanScreen(
                     ) {
                         CardHeader(
                             icon = Icons.Default.Settings,
-                            title = "Bean Status",
+                            title = stringResource(R.string.text_bean_status),
                             actions = {
                                 Switch(
                                     checked = uiState.isActive,
@@ -191,9 +191,9 @@ fun AddEditBeanScreen(
                         )
 
                         Spacer(modifier = Modifier.height(spacing.small))
-                        
+
                         Text(
-                            text = if (uiState.isActive) "Active - visible in bean lists" else "Inactive - hidden from active lists",
+                            text = if (uiState.isActive) stringResource(R.string.text_active_long) else stringResource(R.string.text_inactive),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -203,7 +203,7 @@ fun AddEditBeanScreen(
                 // Error Message
                 if (uiState.error != null) {
                     ErrorCard(
-                        title = "Error",
+                        title = stringResource(R.string.title_error),
                         message = uiState.error ?: "Unknown error occurred",
                         onDismiss = viewModel::clearError,
                         onRetry = { viewModel.saveBean() }
@@ -214,7 +214,7 @@ fun AddEditBeanScreen(
 
                 // Save Button
                 CoffeePrimaryButton(
-                    text = if (uiState.isSaving) "Saving..." else if (uiState.isEditMode) "Update Bean" else "Add Bean",
+                    text = if (uiState.isSaving) stringResource(R.string.cd_saving) else if (uiState.isEditMode) stringResource(R.string.cd_update_bean) else stringResource(R.string.text_add_bean),
                     onClick = viewModel::saveBean,
                     enabled = !uiState.isSaving && uiState.name.isNotBlank(),
                     modifier = Modifier.fillMaxWidth()
@@ -264,12 +264,12 @@ private fun DatePickerDialog(
                     }
                 }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.text_dialog_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.text_dialog_cancel))
             }
         }
     ) {
@@ -277,7 +277,7 @@ private fun DatePickerDialog(
             state = datePickerState,
             title = {
                 Text(
-                    text = "Select Roast Date",
+                    text = stringResource(R.string.text_select_roast_date),
                     modifier = Modifier.padding(spacing.medium)
                 )
             }

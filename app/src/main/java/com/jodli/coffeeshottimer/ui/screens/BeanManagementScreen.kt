@@ -83,13 +83,13 @@ fun BeanManagementScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Bean Management",
+                text = stringResource(R.string.title_bean_management),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold
             )
 
             CoffeePrimaryButton(
-                text = "Add Bean",
+                text = stringResource(R.string.text_add_bean),
                 onClick = onAddBeanClick,
                 icon = Icons.Default.Add,
                 modifier = Modifier.widthIn(max = spacing.buttonMaxWidth - 60.dp)
@@ -108,8 +108,8 @@ fun BeanManagementScreen(
             CoffeeTextField(
                 value = searchQuery,
                 onValueChange = viewModel::updateSearchQuery,
-                label = "Search beans",
-                placeholder = "Enter bean name...",
+                label = stringResource(R.string.label_search_beans),
+                placeholder = stringResource(R.string.placeholder_enter_bean_name_search),
                 leadingIcon = Icons.Default.Search,
                 trailingIcon = if (searchQuery.isNotEmpty()) Icons.Default.Clear else null,
                 onTrailingIconClick = if (searchQuery.isNotEmpty()) {
@@ -123,7 +123,7 @@ fun BeanManagementScreen(
                 onClick = viewModel::toggleShowInactive,
                 label = {
                     Text(
-                        text = if (showInactive) "All" else "Active",
+                        text = if (showInactive) stringResource(R.string.text_all) else stringResource(R.string.text_active),
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
@@ -153,7 +153,7 @@ fun BeanManagementScreen(
 
             uiState.error != null -> {
                 ErrorState(
-                    title = "Error loading beans",
+                    title = stringResource(R.string.error_loading_beans),
                     message = uiState.error ?: "Unknown error occurred",
                     onRetry = {
                         viewModel.clearError()
@@ -166,13 +166,13 @@ fun BeanManagementScreen(
             uiState.beans.isEmpty() -> {
                 EmptyState(
                     icon = Icons.Default.Add,
-                    title = if (searchQuery.isNotEmpty()) "No beans found" else "No beans yet",
+                    title = stringResource(R.string.text_no_beans_available),
                     description = if (searchQuery.isNotEmpty()) {
-                        "Try adjusting your search or filter settings"
+                        stringResource(R.string.text_search_beans_hint)
                     } else {
-                        "Add your first coffee bean to start tracking shots"
+                        stringResource(R.string.text_add_first_bean)
                     },
-                    actionText = if (searchQuery.isEmpty()) "Add Bean" else null,
+                    actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null,
                     onActionClick = if (searchQuery.isEmpty()) onAddBeanClick else null
                 )
             }
@@ -211,10 +211,10 @@ fun BeanManagementScreen(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = null },
             title = {
-                Text("Delete Bean")
+                Text(stringResource(R.string.button_delete_bean))
             },
             text = {
-                Text("Are you sure you want to delete \"${bean.name}\"? This will deactivate the bean and hide it from active lists.")
+                Text(stringResource(R.string.format_delete_bean_confirmation, bean.name))
             },
             confirmButton = {
                 TextButton(
@@ -223,14 +223,14 @@ fun BeanManagementScreen(
                         showDeleteDialog = null
                     }
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.text_bean_management_delete))
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = { showDeleteDialog = null }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.text_dialog_cancel))
                 }
             }
         )
@@ -265,7 +265,7 @@ private fun BeanListItem(
                             shape = androidx.compose.foundation.shape.RoundedCornerShape(spacing.cornerSmall)
                         ) {
                             Text(
-                                text = "Inactive",
+                                text = stringResource(R.string.text_inactive),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onErrorContainer,
                                 modifier = Modifier.padding(
@@ -275,11 +275,11 @@ private fun BeanListItem(
                             )
                         }
                     }
-                    
+
                     // Action buttons
                     if (bean.isActive) {
                         CoffeeSecondaryButton(
-                            text = "Use for Shot",
+                            text = stringResource(R.string.text_use_for_shot),
                             onClick = onUseForShot,
                             modifier = Modifier.height(spacing.iconButtonSize),
                             fillMaxWidth = false
@@ -293,7 +293,7 @@ private fun BeanListItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
-                                contentDescription = "Reactivate bean",
+                                contentDescription = stringResource(R.string.cd_reactivate_bean),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(spacing.iconSmall)
                             )
@@ -306,7 +306,7 @@ private fun BeanListItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = if (bean.isActive) "Delete bean" else "Permanently delete bean",
+                            contentDescription = if (bean.isActive) stringResource(R.string.button_delete_bean) else stringResource(R.string.button_permanently_delete_bean),
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(spacing.iconSmall)
                         )
@@ -328,7 +328,7 @@ private fun BeanListItem(
                 horizontalArrangement = Arrangement.spacedBy(spacing.small)
             ) {
                 Text(
-                    text = "Roasted: $daysSinceRoast days ago",
+                    text = stringResource(R.string.format_roasted_days_ago, daysSinceRoast),
                     style = MaterialTheme.typography.bodySmall,
                     color = if (isFresh)
                         MaterialTheme.colorScheme.primary
@@ -345,11 +345,11 @@ private fun BeanListItem(
                     shape = androidx.compose.foundation.shape.CircleShape
                 ) {
                     Text(
-                        text = if (isFresh) "Fresh" else when {
-                            daysSinceRoast < 4 -> "Too Fresh"
-                            daysSinceRoast <= 45 -> "Good"
-                            daysSinceRoast <= 90 -> "OK"
-                            else -> "Stale"
+                        text = if (isFresh) stringResource(R.string.text_fresh) else when {
+                            daysSinceRoast < 4 -> stringResource(R.string.text_too_fresh)
+                            daysSinceRoast <= 45 -> stringResource(R.string.text_good)
+                            daysSinceRoast <= 90 -> stringResource(R.string.text_dialog_ok)
+                            else -> stringResource(R.string.text_stale)
                         },
                         style = MaterialTheme.typography.labelSmall,
                         color = if (isFresh)
@@ -365,7 +365,7 @@ private fun BeanListItem(
             if (!bean.lastGrinderSetting.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(spacing.extraSmall))
                 Text(
-                    text = "Last grind: ${bean.lastGrinderSetting}",
+                    text = stringResource(R.string.format_last_grind, bean.lastGrinderSetting),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

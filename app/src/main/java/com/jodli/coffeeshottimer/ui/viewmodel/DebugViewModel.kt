@@ -10,6 +10,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.R
 
 /**
  * ViewModel for managing debug dialog state and database operations.
@@ -18,7 +21,9 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class DebugViewModel @Inject constructor(
-    private val databasePopulator: DatabasePopulator?
+    private val databasePopulator: DatabasePopulator?,
+    private val stringResourceProvider: StringResourceProvider,
+    private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DebugUiState())
@@ -81,12 +86,12 @@ class DebugViewModel @Inject constructor(
                 databasePopulator.populateForScreenshots()
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = "Database filled with test data successfully!"
+                    operationResult = stringResourceProvider.getString(R.string.text_database_filled)
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = "Failed to fill database: ${e.message}"
+                    operationResult = domainErrorTranslator.getLoadingError("fill database") + ": ${domainErrorTranslator.translateError(e)}"
                 )
             }
         }
@@ -94,7 +99,7 @@ class DebugViewModel @Inject constructor(
 
     /**
      * Adds additional shots to existing beans for testing purposes.
-     * 
+     *
      * @param count Number of additional shots to create (default: 10)
      */
     fun addMoreShots(count: Int = 10) {
@@ -115,7 +120,7 @@ class DebugViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = "Failed to add shots: ${e.message}"
+                    operationResult = domainErrorTranslator.translateError(e)
                 )
             }
         }
@@ -139,12 +144,12 @@ class DebugViewModel @Inject constructor(
                 databasePopulator.clearAllData()
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = "Database cleared successfully!"
+                    operationResult = stringResourceProvider.getString(R.string.text_database_cleared)
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = "Failed to clear database: ${e.message}"
+                    operationResult = domainErrorTranslator.getDeleteError() + ": ${domainErrorTranslator.translateError(e)}"
                 )
             }
         }

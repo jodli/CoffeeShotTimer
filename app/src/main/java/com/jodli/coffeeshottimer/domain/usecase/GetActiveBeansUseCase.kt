@@ -2,6 +2,8 @@ package com.jodli.coffeeshottimer.domain.usecase
 
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -34,7 +36,8 @@ class GetActiveBeansUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get active beans",
                             exception
                         )
@@ -61,7 +64,8 @@ class GetActiveBeansUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get filtered active beans",
                             exception
                         )
@@ -99,14 +103,15 @@ class GetActiveBeansUseCase @Inject constructor(
                 } else {
                     Result.failure(
                         result.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to get active beans")
+                            ?: DomainException(DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS)
                     )
                 }
             }
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to get active beans by freshness",
                             exception
                         )
@@ -134,7 +139,8 @@ class GetActiveBeansUseCase @Inject constructor(
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.UNKNOWN_ERROR,
                             "Failed to get active beans with grinder settings",
                             exception
                         )
@@ -155,12 +161,13 @@ class GetActiveBeansUseCase @Inject constructor(
             } else {
                 Result.failure(
                     result.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to get active bean count")
+                        ?: DomainException(DomainErrorCode.FAILED_TO_GET_ACTIVE_BEAN_COUNT, DomainErrorCode.FAILED_TO_GET_ACTIVE_BEAN_COUNT.code)
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error getting active bean count",
                     exception
                 )
@@ -188,7 +195,8 @@ class GetActiveBeansUseCase @Inject constructor(
             Result.success(mostRecentBean)
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error getting most recent active bean",
                     exception
                 )
@@ -208,12 +216,13 @@ class GetActiveBeansUseCase @Inject constructor(
             } else {
                 Result.failure(
                     countResult.exceptionOrNull()
-                        ?: BeanUseCaseException.UnknownError("Failed to check for active beans")
+                        ?: DomainException(DomainErrorCode.FAILED_TO_CHECK_FOR_ACTIVE_BEANS, DomainErrorCode.FAILED_TO_CHECK_FOR_ACTIVE_BEANS.code)
                 )
             }
         } catch (exception: Exception) {
             Result.failure(
-                BeanUseCaseException.UnknownError(
+                DomainException(
+                    DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error checking for active beans",
                     exception
                 )
@@ -237,14 +246,15 @@ class GetActiveBeansUseCase @Inject constructor(
                 } else {
                     Result.failure(
                         result.exceptionOrNull()
-                            ?: BeanUseCaseException.UnknownError("Failed to get active beans")
+                            ?: DomainException(DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS)
                     )
                 }
             }
             .catch { exception ->
                 emit(
                     Result.failure(
-                        BeanUseCaseException.UnknownError(
+                        DomainException(
+                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
                             "Failed to group active beans by freshness",
                             exception
                         )

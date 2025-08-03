@@ -3,6 +3,8 @@ package com.jodli.coffeeshottimer.domain.usecase
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -186,7 +188,7 @@ class RecordShotUseCase @Inject constructor(
                     error = error
                 )
 
-                Result.failure(result.exceptionOrNull() ?: Exception(error))
+                Result.failure(result.exceptionOrNull() ?: DomainException(DomainErrorCode.SHOT_RECORDING_FAILED, error))
             }
         } catch (exception: Exception) {
             // Update recording state with error
@@ -195,7 +197,10 @@ class RecordShotUseCase @Inject constructor(
                 error = exception.message ?: "Unknown error occurred"
             )
 
-            Result.failure(exception)
+            Result.failure(
+                if (exception is DomainException) exception
+                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error recording shot", exception)
+            )
         }
     }
 

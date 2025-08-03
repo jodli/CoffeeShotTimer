@@ -2,11 +2,15 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.domain.exception.DomainException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +31,9 @@ class BeanManagementViewModel @Inject constructor(
     private val getActiveBeansUseCase: GetActiveBeansUseCase,
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase,
     private val updateBeanUseCase: UpdateBeanUseCase,
-    private val beanRepository: BeanRepository
+    private val beanRepository: BeanRepository,
+    private val stringResourceProvider: StringResourceProvider,
+    private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BeanManagementUiState())
@@ -63,7 +69,7 @@ class BeanManagementViewModel @Inject constructor(
                 .catch { exception ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Failed to load beans: ${exception.message}"
+                        error = domainErrorTranslator.translateError(exception)
                     )
                 }
                 .collect { result ->
@@ -77,7 +83,7 @@ class BeanManagementViewModel @Inject constructor(
                     } else {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = result.exceptionOrNull()?.message ?: "Failed to load beans"
+                            error = domainErrorTranslator.translateResultError(result)
                         )
                     }
                 }
@@ -102,7 +108,7 @@ class BeanManagementViewModel @Inject constructor(
                 .catch { exception ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = "Failed to load beans: ${exception.message}"
+                        error = domainErrorTranslator.translateError(exception)
                     )
                 }
                 .collect { result ->
@@ -116,7 +122,7 @@ class BeanManagementViewModel @Inject constructor(
                     } else {
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
-                            error = result.exceptionOrNull()?.message ?: "Failed to load beans"
+                            error = domainErrorTranslator.translateResultError(result)
                         )
                     }
                 }
@@ -142,7 +148,7 @@ class BeanManagementViewModel @Inject constructor(
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to delete bean"
+                    error = domainErrorTranslator.translateResultError(result)
                 )
             }
         }
@@ -159,7 +165,7 @@ class BeanManagementViewModel @Inject constructor(
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = result.exceptionOrNull()?.message ?: "Failed to reactivate bean"
+                    error = domainErrorTranslator.translateResultError(result)
                 )
             }
         }
@@ -204,14 +210,13 @@ class BeanManagementViewModel @Inject constructor(
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = result.exceptionOrNull()?.message ?: "Failed to set current bean"
+                        error = domainErrorTranslator.translateResultError(result)
                     )
                 }
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = grinderResult.exceptionOrNull()?.message
-                        ?: "Failed to update grinder setting"
+                    error = domainErrorTranslator.translateResultError(grinderResult)
                 )
             }
         }

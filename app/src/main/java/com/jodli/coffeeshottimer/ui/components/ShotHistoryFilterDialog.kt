@@ -42,6 +42,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.res.stringResource
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -100,12 +102,12 @@ fun ShotHistoryFilterDialog(
                 // Header
                 CardHeader(
                     icon = Icons.Default.FilterList,
-                    title = "Filter Shots",
+                    title = stringResource(R.string.title_filter_shots),
                     actions = {
                         IconButton(onClick = onDismiss) {
                             Icon(
                                 imageVector = Icons.Default.Clear,
-                                contentDescription = "Close"
+                                contentDescription = stringResource(R.string.cd_close)
                             )
                         }
                     }
@@ -121,7 +123,7 @@ fun ShotHistoryFilterDialog(
                     verticalArrangement = Arrangement.spacedBy(spacing.medium)
                 ) {
                     // Bean filter
-                    FilterSection(title = "Coffee Bean") {
+                    FilterSection(title = stringResource(R.string.text_coffee_bean)) {
                         Column {
                             Row(
                                 modifier = Modifier
@@ -139,7 +141,7 @@ fun ShotHistoryFilterDialog(
                                     onClick = null
                                 )
                                 Spacer(modifier = Modifier.width(spacing.small))
-                                Text("All beans")
+                                Text(stringResource(R.string.text_all_beans))
                             }
 
                             availableBeans.forEach { bean ->
@@ -162,7 +164,7 @@ fun ShotHistoryFilterDialog(
                                     Column {
                                         Text(bean.name)
                                         Text(
-                                            text = "${bean.daysSinceRoast()} days since roast",
+                                            text = stringResource(R.string.format_days_since_roast_filter, bean.daysSinceRoast()),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
@@ -173,7 +175,7 @@ fun ShotHistoryFilterDialog(
                     }
 
                     // Date range filter
-                    FilterSection(title = "Date Range") {
+                    FilterSection(title = stringResource(R.string.text_date_range)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(spacing.small)
@@ -191,7 +193,7 @@ fun ShotHistoryFilterDialog(
                                 Spacer(modifier = Modifier.width(spacing.extraSmall))
                                 Text(
                                     text = startDate?.format(DateTimeFormatter.ofPattern("MMM dd"))
-                                        ?: "Start Date"
+                                        ?: stringResource(R.string.text_start_date)
                                 )
                             }
 
@@ -208,7 +210,7 @@ fun ShotHistoryFilterDialog(
                                 Spacer(modifier = Modifier.width(spacing.extraSmall))
                                 Text(
                                     text = endDate?.format(DateTimeFormatter.ofPattern("MMM dd"))
-                                        ?: "End Date"
+                                        ?: stringResource(R.string.text_end_date)
                                 )
                             }
                         }
@@ -223,7 +225,7 @@ fun ShotHistoryFilterDialog(
                                         onClick = { startDate = null },
                                         modifier = Modifier.weight(1f)
                                     ) {
-                                        Text("Clear Start")
+                                        Text(stringResource(R.string.button_clear_start))
                                     }
                                 } else {
                                     Spacer(modifier = Modifier.weight(1f))
@@ -234,7 +236,7 @@ fun ShotHistoryFilterDialog(
                                         onClick = { endDate = null },
                                         modifier = Modifier.weight(1f)
                                     ) {
-                                        Text("Clear End")
+                                        Text(stringResource(R.string.button_clear_end))
                                     }
                                 } else {
                                     Spacer(modifier = Modifier.weight(1f))
@@ -244,17 +246,17 @@ fun ShotHistoryFilterDialog(
                     }
 
                     // Grinder setting filter
-                    FilterSection(title = "Grinder Setting") {
+                    FilterSection(title = stringResource(R.string.text_grinder_setting)) {
                         CoffeeTextField(
                             value = grinderSetting,
                             onValueChange = { grinderSetting = it },
-                            label = "Grinder Setting",
-                            placeholder = "e.g., 15, Fine, Medium-Fine"
+                            label = stringResource(R.string.label_grinder_setting),
+                            placeholder = stringResource(R.string.placeholder_grinder_setting)
                         )
                     }
 
                     // Brew ratio filter
-                    FilterSection(title = "Brew Ratio Range") {
+                    FilterSection(title = stringResource(R.string.text_brew_ratio_range)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(spacing.small)
@@ -262,23 +264,23 @@ fun ShotHistoryFilterDialog(
                             CoffeeTextField(
                                 value = minBrewRatio,
                                 onValueChange = { minBrewRatio = it },
-                                label = "Min Ratio",
-                                placeholder = "1.5",
+                                label = stringResource(R.string.label_min_ratio),
+                                placeholder = stringResource(R.string.placeholder_min_ratio),
                                 modifier = Modifier.weight(1f)
                             )
 
                             CoffeeTextField(
                                 value = maxBrewRatio,
                                 onValueChange = { maxBrewRatio = it },
-                                label = "Max Ratio",
-                                placeholder = "3.0",
+                                label = stringResource(R.string.label_max_ratio),
+                                placeholder = stringResource(R.string.placeholder_max_ratio),
                                 modifier = Modifier.weight(1f)
                             )
                         }
                     }
 
                     // Extraction time filter
-                    FilterSection(title = "Extraction Time Range (seconds)") {
+                    FilterSection(title = stringResource(R.string.text_extraction_time_range)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.spacedBy(spacing.small)
@@ -286,23 +288,23 @@ fun ShotHistoryFilterDialog(
                             CoffeeTextField(
                                 value = minExtractionTime,
                                 onValueChange = { minExtractionTime = it },
-                                label = "Min Time",
-                                placeholder = "20",
+                                label = stringResource(R.string.label_min_time),
+                                placeholder = stringResource(R.string.placeholder_min_extraction_time),
                                 modifier = Modifier.weight(1f)
                             )
 
                             CoffeeTextField(
                                 value = maxExtractionTime,
                                 onValueChange = { maxExtractionTime = it },
-                                label = "Max Time",
-                                placeholder = "35",
+                                label = stringResource(R.string.label_max_time),
+                                placeholder = stringResource(R.string.placeholder_max_extraction_time),
                                 modifier = Modifier.weight(1f)
                             )
                         }
                     }
 
                     // Quality filters
-                    FilterSection(title = "Quality Filters") {
+                    FilterSection(title = stringResource(R.string.text_quality_filters)) {
                         Column {
                             Row(
                                 modifier = Modifier
@@ -316,9 +318,9 @@ fun ShotHistoryFilterDialog(
                                 )
                                 Spacer(modifier = Modifier.width(spacing.small))
                                 Column {
-                                    Text("Optimal extraction time only")
+                                    Text(stringResource(R.string.text_optimal_extraction_only))
                                     Text(
-                                        text = "25-30 seconds",
+                                        text = stringResource(R.string.text_optimal_time_range),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -337,9 +339,9 @@ fun ShotHistoryFilterDialog(
                                 )
                                 Spacer(modifier = Modifier.width(spacing.small))
                                 Column {
-                                    Text("Typical brew ratio only")
+                                    Text(stringResource(R.string.text_typical_ratio_only))
                                     Text(
-                                        text = "1:1.5 to 1:3.0",
+                                        text = stringResource(R.string.text_typical_ratio_range),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
@@ -357,7 +359,7 @@ fun ShotHistoryFilterDialog(
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     CoffeeSecondaryButton(
-                        text = "Clear All",
+                        text = stringResource(R.string.button_clear_all),
                         onClick = {
                             selectedBeanId = null
                             startDate = null
@@ -374,7 +376,7 @@ fun ShotHistoryFilterDialog(
                     )
 
                     CoffeePrimaryButton(
-                        text = "Apply Filters",
+                        text = stringResource(R.string.button_apply_filters),
                         onClick = {
                             val filter = ShotHistoryFilter(
                                 beanId = selectedBeanId,
@@ -462,12 +464,12 @@ private fun DatePickerDialog(
                     }
                 }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.text_dialog_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.text_dialog_cancel))
             }
         }
     ) {
