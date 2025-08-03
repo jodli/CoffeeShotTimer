@@ -53,6 +53,8 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.FAILED_TO_GET_SHOT_HISTORY -> context.getString(R.string.error_loading_shots)
             DomainErrorCode.FAILED_TO_GET_SHOT_STATISTICS -> context.getString(R.string.error_loading_shot_details)
             DomainErrorCode.FAILED_TO_DELETE_SHOT -> context.getString(R.string.error_deleting_data)
+            DomainErrorCode.FAILED_TO_GET_SHOT -> context.getString(R.string.error_loading_shot_details)
+            DomainErrorCode.ASSOCIATED_BEAN_NOT_FOUND -> context.getString(R.string.error_bean_not_found)
 
             DomainErrorCode.VALIDATION_FAILED -> {
                 if (details != null) {
