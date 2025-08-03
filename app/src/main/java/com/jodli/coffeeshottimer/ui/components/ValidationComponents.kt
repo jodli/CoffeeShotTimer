@@ -30,12 +30,6 @@ import java.time.LocalDate
  */
 object ValidationUtils {
 
-    // Weight validation constants
-    const val MIN_COFFEE_WEIGHT_IN = 8.0
-    const val MAX_COFFEE_WEIGHT_IN = 35.0
-    const val MIN_COFFEE_WEIGHT_OUT = 10.0
-    const val MAX_COFFEE_WEIGHT_OUT = 80.0
-
     // Time validation constants
     const val MIN_EXTRACTION_TIME = 5
     const val MAX_EXTRACTION_TIME = 120
