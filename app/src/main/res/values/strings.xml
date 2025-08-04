@@ -177,6 +177,7 @@
     <string name="button_delete_bean">Delete Bean</string>
     <string name="button_permanently_delete_bean">Permanently delete Bean</string>
     <string name="button_delete_shot">Delete Shot</string>
+    <string name="button_view_details">View Details</string>
 
     <!-- Debug Dialog -->
     <string name="text_debug_description">Developer utilities for testing and screenshots</string>
@@ -212,6 +213,7 @@
     <string name="cd_analysis">Show shot analysis</string>
     <string name="cd_no_shots">No shots found</string>
     <string name="cd_no_shots_recorded">No shots recorded</string>
+    <string name="cd_shot_recorded_success">Shot recorded successfully</string>
 
     <!-- Error Messages -->
     <string name="error_bean_id_cannot_be_empty">Bean ID cannot be empty</string>
@@ -350,6 +352,7 @@
     <string name="format_decimal_two_place">%.2f</string>
     <string name="format_decimal_one_place">%.1f</string>
     <string name="format_decimal_zero_place">%.0f</string>
+    <string name="text_more">+%1$d more</string>
 
     <!-- Special Characters and Symbols -->
     <string name="symbol_bullet">• %1$s</string>
@@ -397,4 +400,18 @@
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unknown error occurred</string>
     <string name="text_bean_name_exists">Bean name already exists</string>
+
+    <!-- Shot Recommendations -->
+    <string name="recommendation_grind_finer">Consider using a finer grind to slow extraction (current: %1$ss)</string>
+    <string name="recommendation_grind_coarser">Consider using a coarser grind to speed extraction (current: %1$ss)</string>
+    <string name="recommendation_increase_yield">Consider extracting more liquid for a higher yield (current ratio: 1:%1$s)</string>
+    <string name="recommendation_decrease_yield">Consider stopping extraction earlier for a lower yield (current ratio: 1:%1$s)</string>
+    <string name="recommendation_ratio_inconsistency">This shot\'s ratio differs significantly from your average (deviation: %1$s, average: 1:%2$s)</string>
+    <string name="recommendation_dose_adjustment">Consider adjusting your coffee dose for better consistency</string>
+    <string name="recommendation_timing_consistency">Focus on consistent timing for more predictable results</string>
+
+    <!-- Shot Recorded Dialog -->
+    <string name="dialog_shot_recorded_title">Shot Recorded!</string>
+    <string name="dialog_shot_recorded_successfully">Shot Recorded Successfully!</string>
+    <string name="dialog_view_details_for_more_recommendations">View details for more recommendations</string>
 </resources>

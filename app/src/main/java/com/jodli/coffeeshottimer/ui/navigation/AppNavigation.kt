@@ -26,6 +26,9 @@ fun AppNavigation(
             RecordShotScreen(
                 onNavigateToBeanManagement = {
                     navController.navigate(NavigationDestinations.BeanManagement.route)
+                },
+                onNavigateToShotDetails = { shotId ->
+                    navController.navigate(NavigationDestinations.ShotDetails.createRoute(shotId))
                 }
             )
         }

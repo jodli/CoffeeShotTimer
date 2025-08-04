@@ -56,6 +56,7 @@ import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
 import com.jodli.coffeeshottimer.ui.components.SectionHeader
+import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.TimerControls
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
@@ -66,6 +67,7 @@ import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 @Composable
 fun RecordShotScreen(
     onNavigateToBeanManagement: () -> Unit = {},
+    onNavigateToShotDetails: (String) -> Unit = {},
     viewModel: ShotRecordingViewModel = hiltViewModel(),
     debugViewModel: DebugViewModel = hiltViewModel()
 ) {
@@ -92,6 +94,8 @@ fun RecordShotScreen(
     val isFormValid by viewModel.isFormValid.collectAsStateWithLifecycle()
     val successMessage by viewModel.successMessage.collectAsStateWithLifecycle()
     val showTimerValidation by viewModel.showTimerValidation.collectAsStateWithLifecycle()
+    val showShotRecordedDialog by viewModel.showShotRecordedDialog.collectAsStateWithLifecycle()
+    val recordedShotData by viewModel.recordedShotData.collectAsStateWithLifecycle()
 
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
@@ -258,6 +262,19 @@ fun RecordShotScreen(
 
         // Bottom spacing for navigation bar
         Spacer(modifier = Modifier.height(spacing.large))
+    }
+
+    // Shot Recorded Dialog with Recommendations
+    if (showShotRecordedDialog && recordedShotData != null) {
+        ShotRecordedDialog(
+            brewRatio = recordedShotData!!.brewRatio,
+            extractionTime = recordedShotData!!.extractionTime,
+            recommendations = recordedShotData!!.recommendations,
+            onDismiss = { viewModel.hideShotRecordedDialog() },
+            onViewDetails = {
+                onNavigateToShotDetails(recordedShotData!!.shotId)
+            }
+        )
     }
 
     // Debug Dialog (only in debug builds)

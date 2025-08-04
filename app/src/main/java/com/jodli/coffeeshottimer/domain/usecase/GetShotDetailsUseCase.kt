@@ -215,26 +215,69 @@ class GetShotDetailsUseCase @Inject constructor(
         qualityScore = qualityScore.coerceIn(0, 100)
 
         // Generate recommendations
-        val recommendations = mutableListOf<String>()
+        val recommendations = mutableListOf<ShotRecommendation>()
 
         if (!isOptimalExtraction) {
             if (shot.extractionTimeSeconds < 25) {
-                recommendations.add("Consider using a finer grind to slow extraction")
+                recommendations.add(
+                    ShotRecommendation(
+                        type = RecommendationType.GRIND_FINER,
+                        priority = RecommendationPriority.HIGH,
+                        currentValue = shot.extractionTimeSeconds.toDouble(),
+                        targetRange = 25.0..30.0,
+                        context = mapOf("currentTime" to shot.extractionTimeSeconds.toString())
+                    )
+                )
             } else {
-                recommendations.add("Consider using a coarser grind to speed extraction")
+                recommendations.add(
+                    ShotRecommendation(
+                        type = RecommendationType.GRIND_COARSER,
+                        priority = RecommendationPriority.HIGH,
+                        currentValue = shot.extractionTimeSeconds.toDouble(),
+                        targetRange = 25.0..30.0,
+                        context = mapOf("currentTime" to shot.extractionTimeSeconds.toString())
+                    )
+                )
             }
         }
 
         if (!isTypicalRatio) {
             if (shot.brewRatio < 1.5) {
-                recommendations.add("Consider extracting more liquid for a higher yield")
+                recommendations.add(
+                    ShotRecommendation(
+                        type = RecommendationType.INCREASE_YIELD,
+                        priority = RecommendationPriority.MEDIUM,
+                        currentValue = shot.brewRatio,
+                        targetRange = 1.5..3.0,
+                        context = mapOf("currentRatio" to String.format("%.2f", shot.brewRatio))
+                    )
+                )
             } else if (shot.brewRatio > 3.0) {
-                recommendations.add("Consider stopping extraction earlier for a lower yield")
+                recommendations.add(
+                    ShotRecommendation(
+                        type = RecommendationType.DECREASE_YIELD,
+                        priority = RecommendationPriority.MEDIUM,
+                        currentValue = shot.brewRatio,
+                        targetRange = 1.5..3.0,
+                        context = mapOf("currentRatio" to String.format("%.2f", shot.brewRatio))
+                    )
+                )
             }
         }
 
         if (kotlin.math.abs(brewRatioDeviation) > 0.5) {
-            recommendations.add("This shot's ratio differs significantly from your average for this bean")
+            recommendations.add(
+                ShotRecommendation(
+                    type = RecommendationType.RATIO_INCONSISTENCY,
+                    priority = RecommendationPriority.LOW,
+                    currentValue = shot.brewRatio,
+                    targetRange = (avgBrewRatio - 0.3)..(avgBrewRatio + 0.3),
+                    context = mapOf(
+                        "deviation" to String.format("%.2f", brewRatioDeviation),
+                        "avgRatio" to String.format("%.2f", avgBrewRatio)
+                    )
+                )
+            )
         }
 
         return ShotAnalysis(
@@ -284,7 +327,7 @@ data class ShotAnalysis(
     val avgExtractionTimeForBean: Double,
     val avgWeightInForBean: Double,
     val avgWeightOutForBean: Double,
-    val recommendations: List<String>
+    val recommendations: List<ShotRecommendation>
 )
 
 /**
@@ -326,4 +369,37 @@ data class ShotComparison(
             }"
         )
     }
+}
+
+/**
+ * Represents a structured recommendation for shot improvement.
+ */
+data class ShotRecommendation(
+    val type: RecommendationType,
+    val priority: RecommendationPriority,
+    val currentValue: Double,
+    val targetRange: ClosedFloatingPointRange<Double>,
+    val context: Map<String, String> = emptyMap()
+)
+
+/**
+ * Types of recommendations that can be made for shot improvement.
+ */
+enum class RecommendationType {
+    GRIND_FINER,
+    GRIND_COARSER,
+    INCREASE_YIELD,
+    DECREASE_YIELD,
+    RATIO_INCONSISTENCY,
+    DOSE_ADJUSTMENT,
+    TIMING_CONSISTENCY
+}
+
+/**
+ * Priority levels for recommendations.
+ */
+enum class RecommendationPriority {
+    HIGH,    // Critical for shot quality
+    MEDIUM,  // Important for consistency
+    LOW      // Nice to have improvements
 }

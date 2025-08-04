@@ -7,7 +7,9 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
@@ -51,6 +53,7 @@ data class ShotDraft(
 @HiltViewModel
 class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
+    private val getShotDetailsUseCase: GetShotDetailsUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
     private val domainErrorTranslator: DomainErrorTranslator,
@@ -136,6 +139,13 @@ class ShotRecordingViewModel @Inject constructor(
     // Success feedback state
     private val _successMessage = MutableStateFlow<String?>(null)
     val successMessage: StateFlow<String?> = _successMessage.asStateFlow()
+
+    // Shot recorded dialog state
+    private val _showShotRecordedDialog = MutableStateFlow(false)
+    val showShotRecordedDialog: StateFlow<Boolean> = _showShotRecordedDialog.asStateFlow()
+
+    private val _recordedShotData = MutableStateFlow<RecordedShotData?>(null)
+    val recordedShotData: StateFlow<RecordedShotData?> = _recordedShotData.asStateFlow()
 
     // Timer validation feedback state
     private val _showTimerValidation = MutableStateFlow(false)
@@ -521,12 +531,6 @@ class ShotRecordingViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { shot ->
-                    // Show success feedback
-                    val brewRatio = shot.getFormattedBrewRatio()
-                    val extractionTime = shot.getFormattedExtractionTime()
-                    _successMessage.value =
-                        stringResourceProvider.getString(R.string.text_record_successfully, brewRatio, extractionTime)
-
                     // Clear draft after successful recording
                     clearDraft()
 
@@ -534,11 +538,8 @@ class ShotRecordingViewModel @Inject constructor(
                     clearForm()
                     _errorMessage.value = null
 
-                    // Auto-clear success message after 5 seconds
-                    viewModelScope.launch {
-                        delay(5000L)
-                        _successMessage.value = null
-                    }
+                    // Load shot details with recommendations and show dialog
+                    loadShotDetailsAndShowDialog(shot.id, shot.getFormattedBrewRatio(), shot.getFormattedExtractionTime())
                 },
                 onFailure = { exception ->
                     _errorMessage.value = domainErrorTranslator.translateError(exception)
@@ -710,6 +711,41 @@ class ShotRecordingViewModel @Inject constructor(
         }
     }
 
+
+
+    /**
+     * Load shot details with recommendations and show the success dialog.
+     */
+    private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String) {
+        getShotDetailsUseCase.getShotDetails(shotId).fold(
+            onSuccess = { shotDetails ->
+                _recordedShotData.value = RecordedShotData(
+                    brewRatio = brewRatio,
+                    extractionTime = extractionTime,
+                    recommendations = shotDetails.analysis.recommendations,
+                    shotId = shotId
+                )
+                _showShotRecordedDialog.value = true
+            },
+            onFailure = {
+                // Fallback to simple success message if we can't load recommendations
+                _successMessage.value = stringResourceProvider.getString(
+                    R.string.text_record_successfully, 
+                    brewRatio, 
+                    extractionTime
+                )
+            }
+        )
+    }
+
+    /**
+     * Hide the shot recorded dialog.
+     */
+    fun hideShotRecordedDialog() {
+        _showShotRecordedDialog.value = false
+        _recordedShotData.value = null
+    }
+
     /**
      * Clear success message.
      */
@@ -765,5 +801,14 @@ class ShotRecordingViewModel @Inject constructor(
             saveDraftIfNeeded()
         }
     }
-
 }
+
+/**
+ * Data class for recorded shot information to display in success dialog.
+ */
+data class RecordedShotData(
+    val brewRatio: String,
+    val extractionTime: String,
+    val recommendations: List<ShotRecommendation>,
+    val shotId: String
+)
