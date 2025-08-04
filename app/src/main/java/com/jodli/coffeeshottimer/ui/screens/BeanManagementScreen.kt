@@ -92,7 +92,7 @@ fun BeanManagementScreen(
                 text = stringResource(R.string.text_add_bean),
                 onClick = onAddBeanClick,
                 icon = Icons.Default.Add,
-                modifier = Modifier.widthIn(max = spacing.buttonMaxWidth - 60.dp)
+                fillMaxWidth = false
             )
         }
 
