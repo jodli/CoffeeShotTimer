@@ -189,6 +189,7 @@ class ValidationUtils(
 
     /**
      * Validates grinder setting with length and character checking.
+     * Supports both decimal points (.) and commas (,) for locale compatibility.
      */
     fun validateGrinderSetting(setting: String, isRequired: Boolean = true): ValidationResult {
         val errors = mutableListOf<String>()
@@ -199,7 +200,7 @@ class ValidationUtils(
             trimmedSetting.length > MAX_GRINDER_SETTING_LENGTH ->
                 errors.add(stringProvider.getGrinderSettingMaximumLengthError(MAX_GRINDER_SETTING_LENGTH))
 
-            trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.#]+$")) ->
+            trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.,#]+$")) ->
                 errors.add(stringProvider.getGrinderSettingInvalidCharactersError())
         }
 
