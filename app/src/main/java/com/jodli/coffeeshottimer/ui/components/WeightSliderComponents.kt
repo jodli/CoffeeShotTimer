@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlin.math.roundToInt
+import java.util.Locale
 
 /**
  * Constants for weight slider bounds
@@ -56,6 +57,24 @@ object WeightSliderConstants {
     const val COFFEE_IN_MAX_WEIGHT = 20f
     const val COFFEE_OUT_MIN_WEIGHT = 25f
     const val COFFEE_OUT_MAX_WEIGHT = 55f
+}
+
+/**
+ * Parse a float value that may use either decimal point (.) or comma (,) as decimal separator.
+ * This handles locale differences where some locales use comma as decimal separator.
+ */
+private fun parseLocaleAwareFloat(value: String): Float? {
+    if (value.isBlank()) return null
+    
+    return try {
+        // First try direct parsing (works for US locale with decimal point)
+        value.toFloatOrNull() ?: run {
+            // If that fails, try replacing comma with decimal point and parse
+            value.replace(',', '.').toFloatOrNull()
+        }
+    } catch (e: Exception) {
+        null
+    }
 }
 
 /**
@@ -95,7 +114,7 @@ fun WeightSlider(
     val hapticFeedback = LocalHapticFeedback.current
 
     // Convert string value to float, default to minWeight if invalid
-    val currentValue = value.toFloatOrNull()?.coerceIn(minWeight, maxWeight) ?: minWeight
+    val currentValue = parseLocaleAwareFloat(value)?.coerceIn(minWeight, maxWeight) ?: minWeight
 
     // Ensure the value is always a whole number for display consistency
     val displayValue = currentValue.roundToInt().toFloat()
@@ -270,8 +289,8 @@ fun GrinderSettingSlider(
     val spacing = LocalSpacing.current
     val hapticFeedback = LocalHapticFeedback.current
 
-    // Convert string value to float, default to 5.0 if invalid
-    val currentValue = value.toFloatOrNull()?.coerceIn(0.5f, 20.0f) ?: 5.0f
+    // Convert string value to float, supporting both decimal point and comma
+    val currentValue = parseLocaleAwareFloat(value)?.coerceIn(0.5f, 20.0f) ?: 5.0f
 
     // Ensure the value follows 0.5 increment steps
     val displayValue = (currentValue * 2).roundToInt() / 2.0f
@@ -314,7 +333,8 @@ fun GrinderSettingSlider(
                     text = if (displayValue == displayValue.toInt().toFloat()) {
                         stringResource(R.string.format_weight_display_int, displayValue.toInt())
                     } else {
-                        stringResource(R.string.format_decimal_one_place).format(displayValue)
+                        // Use locale-independent formatting for consistency
+                        String.format(Locale.US, "%.1f", displayValue)
                     },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
@@ -354,11 +374,12 @@ fun GrinderSettingSlider(
                     previousValue = roundedValue
                 }
 
-                // Format output based on whether it's a whole number or has decimal
+                // Format output using locale-independent decimal point notation
                 val formattedValue = if (roundedValue == roundedValue.toInt().toFloat()) {
                     roundedValue.toInt().toString()
                 } else {
-                    "%.1f".format(roundedValue)
+                    // Use US locale to ensure decimal point (.) instead of comma (,)
+                    String.format(java.util.Locale.US, "%.1f", roundedValue)
                 }
 
                 onValueChange(formattedValue)
