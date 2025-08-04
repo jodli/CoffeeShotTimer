@@ -60,6 +60,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.RecommendationCard
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
 import java.time.format.DateTimeFormatter
@@ -264,6 +265,16 @@ private fun ShotDetailsContent(
         // Analysis Card
         item {
             ShotAnalysisCard(shotDetails = shotDetails)
+        }
+
+        // Recommendations Card
+        if (shotDetails.analysis.recommendations.isNotEmpty()) {
+            item {
+                RecommendationCard(
+                    recommendations = shotDetails.analysis.recommendations,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
         // Notes Card
@@ -601,26 +612,7 @@ private fun ShotAnalysisCard(
             }
         }
 
-        // Recommendations
-        if (analysis.recommendations.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(spacing.medium))
 
-            Text(
-                text = stringResource(R.string.text_recommendations),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            analysis.recommendations.forEach { recommendation ->
-                Text(
-                    text = stringResource(R.string.symbol_bullet, recommendation),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
     }
 }
 

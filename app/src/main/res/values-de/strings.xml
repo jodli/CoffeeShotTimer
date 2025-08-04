@@ -179,6 +179,7 @@
     <string name="button_delete_bean">Bohne löschen</string>
     <string name="button_permanently_delete_bean">Bohne endgültig löschen</string>
     <string name="button_delete_shot">Shot löschen</string>
+    <string name="button_view_details">Details anzeigen</string>
 
     <!-- Debug Dialog -->
     <string name="text_debug_description">Entwickler-Tools für Tests und Screenshots</string>
@@ -214,6 +215,7 @@
     <string name="cd_analysis">Shot-Analyse anzeigen</string>
     <string name="cd_no_shots">Keine Shots gefunden</string>
     <string name="cd_no_shots_recorded">Keine Shots aufgenommen</string>
+    <string name="cd_shot_recorded_success">Shot erfolgreich aufgenommen</string>
 
     <!-- Error Messages -->
     <string name="error_bean_id_cannot_be_empty">Bohnen-ID darf nicht leer sein</string>
@@ -352,6 +354,7 @@
     <string name="format_decimal_two_place">%.2f</string>
     <string name="format_decimal_one_place">%.1f</string>
     <string name="format_decimal_zero_place">%.0f</string>
+    <string name="text_more">+%1$d weitere</string>
 
     <!-- Special Characters and Symbols -->
     <string name="symbol_bullet">• %1$s</string>
@@ -399,4 +402,18 @@
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unbekannter Fehler aufgetreten</string>
     <string name="text_bean_name_exists">Bohnenname existiert bereits</string>
+
+    <!-- Shot Recommendations -->
+    <string name="recommendation_grind_finer">Erwäge feiner zu mahlen, um die Extraktion zu verlangsamen (aktuell: %1$ss)</string>
+    <string name="recommendation_grind_coarser">Erwäge gröber zu mahlen, um die Extraktion zu beschleunigen (aktuell: %1$ss)</string>
+    <string name="recommendation_increase_yield">Erwäge mehr Flüssigkeit zu extrahieren für höhere Ausbeute (aktuelles Verhältnis: 1:%1$s)</string>
+    <string name="recommendation_decrease_yield">Erwäge die Extraktion früher zu stoppen für niedrigere Ausbeute (aktuelles Verhältnis: 1:%1$s)</string>
+    <string name="recommendation_ratio_inconsistency">Das Verhältnis dieses Shots weicht deutlich von deinem Durchschnitt ab (Abweichung: %1$s, Durchschnitt: 1:%2$s)</string>
+    <string name="recommendation_dose_adjustment">Erwäge deine Kaffeemenge für bessere Konsistenz anzupassen</string>
+    <string name="recommendation_timing_consistency">Konzentriere dich auf konsistentes Timing für vorhersagbarere Ergebnisse</string>
+
+    <!-- Shot Recorded Dialog -->
+    <string name="dialog_shot_recorded_title">Shot aufgenommen!</string>
+    <string name="dialog_shot_recorded_successfully">Shot erfolgreich aufgenommen!</string>
+    <string name="dialog_view_details_for_more_recommendations">Details anzeigen für weitere Empfehlungen</string>
 </resources>
