@@ -127,7 +127,7 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateGrinderSettingEnhanced should provide helpful tip for empty setting`() {
-        val result = "".validateGrinderSettingEnhanced(true)
+        val result = "".validateGrinderSettingEnhanced(validationUtils, true)
         assertFalse("Empty required setting should fail", result.isValid)
         assertTrue("Should provide helpful tip",
             result.errors.any { it.contains("remember", ignoreCase = true) })
@@ -135,19 +135,19 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateBeanNameEnhanced should pass for valid names`() {
-        val result = "Ethiopian Yirgacheffe".validateBeanNameEnhanced()
+        val result = "Ethiopian Yirgacheffe".validateBeanNameEnhanced(validationUtils)
         assertTrue("Valid bean name should pass", result.isValid)
         assertTrue("Valid name should have no errors", result.errors.isEmpty())
     }
 
     @Test
     fun `validateBeanNameEnhanced should provide helpful tips for problematic names`() {
-        val shortResult = "A".validateBeanNameEnhanced()
+        val shortResult = "A".validateBeanNameEnhanced(validationUtils)
         assertFalse("Single character name should fail", shortResult.isValid)
         assertTrue("Should suggest more descriptive name",
             shortResult.errors.any { it.contains("descriptive", ignoreCase = true) })
 
-        val duplicateResult = "Existing Bean".validateBeanNameEnhanced(listOf("Existing Bean"))
+        val duplicateResult = "Existing Bean".validateBeanNameEnhanced(validationUtils, listOf("Existing Bean"))
         assertFalse("Duplicate name should fail", duplicateResult.isValid)
         assertTrue("Should suggest making name unique",
             duplicateResult.errors.any { it.contains("unique", ignoreCase = true) })
@@ -155,19 +155,19 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateRoastDateEnhanced should pass for valid dates`() {
-        val result = LocalDate.now().minusDays(7).validateRoastDateEnhanced()
+        val result = LocalDate.now().minusDays(7).validateRoastDateEnhanced(validationUtils)
         assertTrue("Valid roast date should pass", result.isValid)
         assertTrue("Valid date should have no errors", result.errors.isEmpty())
     }
 
     @Test
     fun `validateRoastDateEnhanced should provide helpful tips for problematic dates`() {
-        val futureResult = LocalDate.now().plusDays(1).validateRoastDateEnhanced()
+        val futureResult = LocalDate.now().plusDays(1).validateRoastDateEnhanced(validationUtils)
         assertFalse("Future date should fail", futureResult.isValid)
         assertTrue("Should suggest using today's date",
             futureResult.errors.any { it.contains("today", ignoreCase = true) })
 
-        val oldResult = LocalDate.now().minusDays(450).validateRoastDateEnhanced()
+        val oldResult = LocalDate.now().minusDays(450).validateRoastDateEnhanced(validationUtils)
         assertFalse("Very old date should fail", oldResult.isValid)
         assertTrue("Should warn about flavor loss",
             oldResult.errors.any { it.contains("flavor", ignoreCase = true) })
@@ -175,18 +175,18 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateNotesEnhanced should pass for valid notes`() {
-        val result = "Great flavor with chocolate notes".validateNotesEnhanced()
+        val result = "Great flavor with chocolate notes".validateNotesEnhanced(validationUtils)
         assertTrue("Valid notes should pass", result.isValid)
     }
 
     @Test
     fun `validateExtractionTimeEnhanced should provide contextual feedback`() {
-        val shortResult = 3.validateExtractionTimeEnhanced()
+        val shortResult = 3.validateExtractionTimeEnhanced(validationUtils)
         assertFalse("Very short time should fail", shortResult.isValid)
         assertTrue("Should warn about sour taste",
             shortResult.errors.any { it.contains("sour", ignoreCase = true) })
 
-        val longResult = 150.validateExtractionTimeEnhanced()
+        val longResult = 150.validateExtractionTimeEnhanced(validationUtils)
         assertFalse("Very long time should fail", longResult.isValid)
         assertTrue("Should warn about bitter taste",
             longResult.errors.any { it.contains("bitter", ignoreCase = true) })
@@ -212,17 +212,17 @@ class ValidationExtensionsTest {
 
     @Test
     fun `getExtractionTimeWarnings should provide appropriate feedback`() {
-        val shortTime = 20.getExtractionTimeWarnings()
+        val shortTime = 20.getExtractionTimeWarnings(validationUtils)
         assertTrue("Short time should have warning", shortTime.isNotEmpty())
         assertTrue("Should suggest grinding finer",
             shortTime.any { it.contains("finer", ignoreCase = true) })
 
-        val longTime = 35.getExtractionTimeWarnings()
+        val longTime = 35.getExtractionTimeWarnings(validationUtils)
         assertTrue("Long time should have warning", longTime.isNotEmpty())
         assertTrue("Should suggest grinding coarser",
             longTime.any { it.contains("coarser", ignoreCase = true) })
 
-        val optimalTime = 27.getExtractionTimeWarnings()
+        val optimalTime = 27.getExtractionTimeWarnings(validationUtils)
         assertTrue("Optimal time should have positive feedback", optimalTime.isNotEmpty())
         assertTrue("Should mention optimal range",
             optimalTime.any { it.contains("optimal", ignoreCase = true) })
@@ -235,7 +235,8 @@ class ValidationExtensionsTest {
             coffeeWeightOut = "36.0",
             extractionTimeSeconds = 27,
             grinderSetting = "15",
-            notes = "Perfect shot"
+            notes = "Perfect shot",
+            validationUtils = validationUtils
         )
         assertTrue("Valid complete shot should pass", validResult.isValid)
 
@@ -244,7 +245,8 @@ class ValidationExtensionsTest {
             coffeeWeightOut = "60.0", // Above new max of 55g
             extractionTimeSeconds = 200,
             grinderSetting = "",
-            notes = ""
+            notes = "",
+            validationUtils = validationUtils
         )
         assertFalse("Invalid complete shot should fail", invalidResult.isValid)
         assertTrue("Should have multiple errors", invalidResult.errors.size > 1)
@@ -257,7 +259,8 @@ class ValidationExtensionsTest {
             coffeeWeightOut = "15.0", // Less than input
             extractionTimeSeconds = 27,
             grinderSetting = "15",
-            notes = ""
+            notes = "",
+            validationUtils = validationUtils
         )
         assertFalse("Output less than input should fail", result.isValid)
     }
@@ -268,7 +271,8 @@ class ValidationExtensionsTest {
             name = "Ethiopian Yirgacheffe",
             roastDate = LocalDate.now().minusDays(7),
             notes = "Floral and bright",
-            grinderSetting = "15"
+            grinderSetting = "15",
+            validationUtils = validationUtils
         )
         assertTrue("Valid complete bean should pass", validResult.isValid)
 
@@ -276,7 +280,8 @@ class ValidationExtensionsTest {
             name = "",
             roastDate = LocalDate.now().plusDays(1),
             notes = "x".repeat(600), // Too long
-            grinderSetting = "x".repeat(60) // Too long
+            grinderSetting = "x".repeat(60), // Too long
+            validationUtils = validationUtils
         )
         assertFalse("Invalid complete bean should fail", invalidResult.isValid)
         assertTrue("Should have multiple errors", invalidResult.errors.size > 1)
@@ -288,7 +293,8 @@ class ValidationExtensionsTest {
             name = "Fresh Bean",
             roastDate = LocalDate.now().minusDays(10),
             notes = "",
-            grinderSetting = ""
+            grinderSetting = "",
+            validationUtils = validationUtils
         )
         assertTrue("Fresh bean validation should pass", freshResult.isValid)
         // Should have warnings about very fresh beans
@@ -297,7 +303,8 @@ class ValidationExtensionsTest {
             name = "Old Bean",
             roastDate = LocalDate.now().minusDays(300),
             notes = "",
-            grinderSetting = ""
+            grinderSetting = "",
+            validationUtils = validationUtils
         )
         assertTrue("Old bean validation should pass basic validation", oldResult.isValid)
         // Should have warnings about older beans

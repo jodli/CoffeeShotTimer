@@ -9,28 +9,28 @@ class TimerComponentsTest {
     @Test
     fun `formatExtractionTime formats seconds correctly for under 60 seconds`() {
         // Test various second values under 60
-        assertEquals("0s", formatExtractionTime(0L))
-        assertEquals("1s", formatExtractionTime(1000L))
-        assertEquals("25s", formatExtractionTime(25000L))
-        assertEquals("30s", formatExtractionTime(30000L))
-        assertEquals("59s", formatExtractionTime(59000L))
+        assertEquals("0s", formatExtractionTime(0L, "s"))
+        assertEquals("1s", formatExtractionTime(1000L, "s"))
+        assertEquals("25s", formatExtractionTime(25000L, "s"))
+        assertEquals("30s", formatExtractionTime(30000L, "s"))
+        assertEquals("59s", formatExtractionTime(59000L, "s"))
     }
 
     @Test
     fun `formatExtractionTime formats MM SS correctly for 60 seconds and over`() {
         // Test minute formatting for longer times
-        assertEquals("01:00", formatExtractionTime(60000L))
-        assertEquals("01:30", formatExtractionTime(90000L))
-        assertEquals("02:00", formatExtractionTime(120000L))
-        assertEquals("02:30", formatExtractionTime(150000L))
+        assertEquals("01:00", formatExtractionTime(60000L, "s"))
+        assertEquals("01:30", formatExtractionTime(90000L, "s"))
+        assertEquals("02:00", formatExtractionTime(120000L, "s"))
+        assertEquals("02:30", formatExtractionTime(150000L, "s"))
     }
 
     @Test
     fun `formatExtractionTime handles edge cases correctly`() {
         // Test boundary conditions
-        assertEquals("59s", formatExtractionTime(59999L)) // Just under 60 seconds
-        assertEquals("01:00", formatExtractionTime(60000L)) // Exactly 60 seconds
-        assertEquals("01:00", formatExtractionTime(60001L)) // Just over 60 seconds
+        assertEquals("59s", formatExtractionTime(59999L, "s")) // Just under 60 seconds
+        assertEquals("01:00", formatExtractionTime(60000L, "s")) // Exactly 60 seconds
+        assertEquals("01:00", formatExtractionTime(60001L, "s")) // Just over 60 seconds
     }
 
     @Test
@@ -118,7 +118,7 @@ class TimerComponentsTest {
     @Test
     fun `formatExtractionTime handles negative and zero values`() {
         // Test edge cases with negative or zero values
-        assertEquals("0s", formatExtractionTime(0L))
-        assertEquals("0s", formatExtractionTime(-1000L)) // Should handle negative gracefully
+        assertEquals("0s", formatExtractionTime(0L, "s"))
+        assertEquals("0s", formatExtractionTime(-1000L, "s")) // Should handle negative gracefully
     }
 }

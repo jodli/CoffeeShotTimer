@@ -4,6 +4,8 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.RepositoryException
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -143,8 +145,8 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
-        assertTrue(exception?.message?.contains("Bean ID cannot be empty") == true)
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_ID_EMPTY)
         
         coVerify(exactly = 0) { beanRepository.getBeanById(any()) }
     }
@@ -164,8 +166,8 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
-        assertTrue(exception?.message?.contains("Bean not found") == true)
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_NOT_FOUND)
     }
     
     @Test
@@ -189,7 +191,7 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
+        assertTrue(exception is DomainException)
         assertTrue(exception?.message?.contains("Bean name cannot be empty") == true)
         
         coVerify(exactly = 0) { beanRepository.updateBean(any()) }
@@ -223,8 +225,8 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
-        assertTrue(exception?.message?.contains("Bean ID cannot be empty") == true)
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_ID_EMPTY)
     }
     
     @Test
@@ -239,8 +241,8 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
-        assertTrue(exception?.message?.contains("Grinder setting cannot be empty") == true)
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.GRINDER_SETTING_EMPTY)
     }
     
     @Test
@@ -271,8 +273,8 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
-        assertTrue(exception?.message?.contains("Bean ID cannot be empty") == true)
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_ID_EMPTY)
     }
     
     @Test
@@ -374,8 +376,8 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
-        assertTrue(exception?.message?.contains("Bean not found") == true)
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_NOT_FOUND)
     }
     
     @Test
@@ -418,7 +420,7 @@ class UpdateBeanUseCaseTest {
         // Then
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
-        assertTrue(exception is BeanUseCaseException.ValidationError)
+        assertTrue(exception is DomainException)
         assertTrue(exception?.message?.contains("Some beans failed to update") == true)
     }
 }

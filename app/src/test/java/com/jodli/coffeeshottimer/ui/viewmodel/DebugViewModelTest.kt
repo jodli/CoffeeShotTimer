@@ -1,6 +1,8 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.data.util.DatabasePopulator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -29,6 +31,8 @@ class DebugViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var databasePopulator: DatabasePopulator
+    private lateinit var stringResourceProvider: StringResourceProvider
+    private lateinit var domainErrorTranslator: DomainErrorTranslator
     private lateinit var viewModel: DebugViewModel
 
     @Before
@@ -38,7 +42,20 @@ class DebugViewModelTest {
         
         Dispatchers.setMain(testDispatcher)
         databasePopulator = mockk(relaxed = true)
-        viewModel = DebugViewModel(databasePopulator)
+        stringResourceProvider = mockk(relaxed = true)
+        domainErrorTranslator = mockk(relaxed = true)
+        
+        // Setup mock responses for string resources
+        coEvery { stringResourceProvider.getString(any()) } returns "Mock string"
+        coEvery { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_database_filled) } returns "Database filled with test data successfully!"
+        coEvery { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_database_cleared) } returns "Database cleared successfully!"
+        
+        // Setup mock responses for error translator
+        coEvery { domainErrorTranslator.getLoadingError(any()) } returns "Failed to fill database"
+        coEvery { domainErrorTranslator.getDeleteError() } returns "Failed to clear database"
+        coEvery { domainErrorTranslator.translateError(any()) } returns "Unknown error occurred"
+        
+        viewModel = DebugViewModel(databasePopulator, stringResourceProvider, domainErrorTranslator)
     }
 
     @After
@@ -114,7 +131,7 @@ class DebugViewModelTest {
     @Test
     fun `fillDatabase should not execute when databasePopulator is null`() = runTest {
         // Given
-        val viewModelWithNullPopulator = DebugViewModel(null)
+        val viewModelWithNullPopulator = DebugViewModel(null, stringResourceProvider, domainErrorTranslator)
 
         // When
         viewModelWithNullPopulator.fillDatabase()
@@ -159,13 +176,9 @@ class DebugViewModelTest {
         // Then
         val state = viewModel.uiState.value
         assertFalse("Should not be loading after error", state.isLoading)
-        assertTrue(
-            "Should contain error message",
-            state.operationResult?.contains("Failed to fill database") == true
-        )
-        assertTrue(
-            "Should contain original error message",
-            state.operationResult?.contains(errorMessage) == true
+        assertEquals(
+            "Failed to fill database: Unknown error occurred",
+            state.operationResult
         )
     }
 
@@ -223,13 +236,9 @@ class DebugViewModelTest {
 
         // Then
         val state = viewModel.uiState.value
-        assertTrue(
-            "Should contain error message",
-            state.operationResult?.contains("Failed to add shots") == true
-        )
-        assertTrue(
-            "Should contain original error message",
-            state.operationResult?.contains(errorMessage) == true
+        assertEquals(
+            "Unknown error occurred",
+            state.operationResult
         )
     }
 
@@ -270,13 +279,9 @@ class DebugViewModelTest {
         val state = viewModel.uiState.value
         assertFalse("Should not be loading after error", state.isLoading)
         assertFalse("Confirmation should be hidden after error", state.showConfirmation)
-        assertTrue(
-            "Should contain error message",
-            state.operationResult?.contains("Failed to clear database") == true
-        )
-        assertTrue(
-            "Should contain original error message",
-            state.operationResult?.contains(errorMessage) == true
+        assertEquals(
+            "Failed to clear database: Unknown error occurred",
+            state.operationResult
         )
     }
 

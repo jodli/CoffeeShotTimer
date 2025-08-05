@@ -2,6 +2,8 @@ package com.jodli.coffeeshottimer.debug
 
 import com.jodli.coffeeshottimer.data.util.DatabasePopulator
 import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,6 +26,8 @@ class ConditionalCompilationTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var databasePopulator: DatabasePopulator
+    private lateinit var stringResourceProvider: StringResourceProvider
+    private lateinit var domainErrorTranslator: DomainErrorTranslator
     private lateinit var debugViewModel: DebugViewModel
 
     @Before
@@ -33,7 +37,9 @@ class ConditionalCompilationTest {
         
         Dispatchers.setMain(testDispatcher)
         databasePopulator = mockk(relaxed = true)
-        debugViewModel = DebugViewModel(databasePopulator)
+        stringResourceProvider = mockk(relaxed = true)
+        domainErrorTranslator = mockk(relaxed = true)
+        debugViewModel = DebugViewModel(databasePopulator, stringResourceProvider, domainErrorTranslator)
     }
 
     @After

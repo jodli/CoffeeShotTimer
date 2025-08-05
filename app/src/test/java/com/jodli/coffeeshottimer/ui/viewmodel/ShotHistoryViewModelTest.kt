@@ -10,6 +10,8 @@ import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
 import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
 import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -33,6 +35,8 @@ class ShotHistoryViewModelTest {
     private val getActiveBeansUseCase = mockk<GetActiveBeansUseCase>()
     private val getShotStatisticsUseCase = mockk<GetShotStatisticsUseCase>()
     private val memoryOptimizer = mockk<MemoryOptimizer>(relaxed = true)
+    private val stringResourceProvider = mockk<StringResourceProvider>(relaxed = true)
+    private val domainErrorTranslator = mockk<DomainErrorTranslator>(relaxed = true)
     
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -62,7 +66,11 @@ class ShotHistoryViewModelTest {
             com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis.empty()
         )
         
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
+        // Setup string resource provider mocks
+        every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_unknown_error) } returns "Unknown error occurred"
+        every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.error_failed_to_load_analysis, any()) } returns "Failed to load analysis: Unknown error occurred"
+        
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
     }
 
     @After
@@ -157,7 +165,7 @@ class ShotHistoryViewModelTest {
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(testBeans))
         
         // Recreate viewModel to pick up the new mock
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
         
         // Wait for initial data load
         testDispatcher.scheduler.advanceTimeBy(500)
@@ -169,7 +177,7 @@ class ShotHistoryViewModelTest {
     @Test
     fun `getBeanName returns unknown for non-existing bean`() {
         val beanName = viewModel.getBeanName("non-existing-id")
-        assertEquals("Unknown Bean", beanName)
+        assertEquals("Unknown error occurred", beanName)
     }
 
     @Test
@@ -299,7 +307,7 @@ class ShotHistoryViewModelTest {
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
         assertFalse(uiState.analysisLoading)
-        assertTrue(uiState.error?.contains("Failed to load analysis") == true)
+        assertEquals("Failed to load analysis: Unknown error occurred", uiState.error)
     }
 
     @Test

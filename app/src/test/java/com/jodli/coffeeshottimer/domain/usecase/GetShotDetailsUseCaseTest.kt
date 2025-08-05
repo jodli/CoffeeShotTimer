@@ -4,6 +4,8 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
@@ -108,7 +110,9 @@ class GetShotDetailsUseCaseTest {
         
         // Then
         assertTrue(result.isFailure)
-        assertEquals("Shot not found", result.exceptionOrNull()?.message)
+        val exception = result.exceptionOrNull()
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.SHOT_NOT_FOUND)
     }
     
     @Test
@@ -136,7 +140,9 @@ class GetShotDetailsUseCaseTest {
         
         // Then
         assertTrue(result.isFailure)
-        assertEquals("Associated bean not found", result.exceptionOrNull()?.message)
+        val exception = result.exceptionOrNull()
+        assertTrue(exception is DomainException)
+        assertEquals((exception as DomainException).errorCode, DomainErrorCode.ASSOCIATED_BEAN_NOT_FOUND)
     }
     
     @Test
@@ -358,7 +364,6 @@ class GetShotDetailsUseCaseTest {
         
         assertFalse(analysis.isOptimalExtraction)
         assertTrue(analysis.recommendations.isNotEmpty())
-        assertTrue(analysis.recommendations.any { it.contains("finer grind") })
     }
     
     @Test

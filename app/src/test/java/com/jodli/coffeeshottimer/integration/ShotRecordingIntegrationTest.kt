@@ -8,9 +8,13 @@ import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecordingState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,8 +41,12 @@ class ShotRecordingIntegrationTest {
     private val testDispatcher = StandardTestDispatcher()
     
     private lateinit var recordShotUseCase: RecordShotUseCase
+    private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
+    private lateinit var stringResourceProvider: StringResourceProvider
+    private lateinit var domainErrorTranslator: DomainErrorTranslator
+    private lateinit var validationStringProvider: ValidationStringProvider
     private lateinit var context: Context
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
@@ -50,8 +58,12 @@ class ShotRecordingIntegrationTest {
         
         // Create mock dependencies
         recordShotUseCase = mockk(relaxed = true)
+        getShotDetailsUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         shotRepository = mockk(relaxed = true)
+        stringResourceProvider = mockk(relaxed = true)
+        domainErrorTranslator = mockk(relaxed = true)
+        validationStringProvider = mockk(relaxed = true)
         context = mockk(relaxed = true)
         sharedPreferences = mockk(relaxed = true)
         editor = mockk(relaxed = true)
@@ -110,7 +122,7 @@ class ShotRecordingIntegrationTest {
             Result.success(testShot)
             
         // Create ViewModel
-        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository, shotRepository, context)
+        viewModel = ShotRecordingViewModel(recordShotUseCase, getShotDetailsUseCase, beanRepository, shotRepository, domainErrorTranslator, stringResourceProvider, validationStringProvider, context)
     }
     
     @After
