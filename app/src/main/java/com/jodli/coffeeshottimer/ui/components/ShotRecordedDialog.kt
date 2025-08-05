@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
@@ -58,13 +59,21 @@ fun ShotRecordedDialog(
                     textAlign = TextAlign.Center
                 )
 
-                // Recommendations if available
+                // Next steps based on this shot
                 if (recommendations.isNotEmpty()) {
                     HorizontalDivider()
+                    
+                    Text(
+                        text = stringResource(R.string.text_next_steps_based_on_shot),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
+                    )
                     
                     CompactRecommendationList(
                         recommendations = recommendations,
                         maxItems = 2,
+                        showAsNextSteps = true,
                         modifier = Modifier.fillMaxWidth()
                     )
                     
@@ -157,12 +166,23 @@ fun ShotRecordedBottomSheet(
                 textAlign = TextAlign.Center
             )
 
-            // Recommendations if available
+            // Next steps based on this shot
             if (recommendations.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(spacing.small))
+                
+                Text(
+                    text = stringResource(R.string.text_next_steps_based_on_shot),
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
+                )
+                
                 Spacer(modifier = Modifier.height(spacing.small))
                 
                 RecommendationCard(
                     recommendations = recommendations,
+                    showAsNextSteps = true,
                     modifier = Modifier.fillMaxWidth()
                 )
             }

@@ -26,9 +26,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -53,6 +55,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
+import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
+import com.jodli.coffeeshottimer.domain.usecase.RecommendationPriority
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
@@ -60,7 +64,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
-import com.jodli.coffeeshottimer.ui.components.RecommendationCard
+import com.jodli.coffeeshottimer.ui.util.formatForDisplay
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
 import java.time.format.DateTimeFormatter
@@ -262,19 +266,9 @@ private fun ShotDetailsContent(
             ShotParametersCard(shotDetails = shotDetails)
         }
 
-        // Analysis Card
+        // Analysis & Recommendations Card (combined)
         item {
-            ShotAnalysisCard(shotDetails = shotDetails)
-        }
-
-        // Recommendations Card
-        if (shotDetails.analysis.recommendations.isNotEmpty()) {
-            item {
-                RecommendationCard(
-                    recommendations = shotDetails.analysis.recommendations,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+            ShotAnalysisAndRecommendationsCard(shotDetails = shotDetails)
         }
 
         // Notes Card
@@ -534,7 +528,7 @@ private fun ShotParametersCard(
 }
 
 @Composable
-private fun ShotAnalysisCard(
+private fun ShotAnalysisAndRecommendationsCard(
     shotDetails: ShotDetails,
     modifier: Modifier = Modifier
 ) {
@@ -612,7 +606,55 @@ private fun ShotAnalysisCard(
             }
         }
 
-
+        // Recommendations section (integrated)
+        if (analysis.recommendations.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(spacing.medium))
+            
+            HorizontalDivider(
+                modifier = Modifier.padding(vertical = spacing.small),
+                color = MaterialTheme.colorScheme.outlineVariant
+            )
+            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lightbulb,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(spacing.iconSmall)
+                )
+                Text(
+                    text = stringResource(R.string.text_recommendations_for_next_shot),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(spacing.small))
+            
+            Column(
+                verticalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                analysis.recommendations.take(3).forEach { recommendation ->
+                    RecommendationItemInline(
+                        recommendation = recommendation,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                
+                if (analysis.recommendations.size > 3) {
+                    Text(
+                        text = stringResource(R.string.text_and_more_recommendations, analysis.recommendations.size - 3),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = spacing.medium)
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -880,6 +922,43 @@ private fun DeviationItem(
                 kotlin.math.abs(deviation) < 0.3 -> MaterialTheme.colorScheme.onSurface
                 else -> MaterialTheme.colorScheme.error
             }
+        )
+    }
+}
+
+@Composable
+private fun RecommendationItemInline(
+    recommendation: ShotRecommendation,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(spacing.small),
+        verticalAlignment = Alignment.Top
+    ) {
+        // Priority indicator with proper alignment
+        Box(
+            modifier = Modifier
+                .padding(top = spacing.priorityIndicator) // Align with text baseline
+                .size(spacing.priorityIndicator)
+                .background(
+                    color = when (recommendation.priority) {
+                        RecommendationPriority.HIGH -> MaterialTheme.colorScheme.error
+                        RecommendationPriority.MEDIUM -> MaterialTheme.colorScheme.tertiary
+                        RecommendationPriority.LOW -> MaterialTheme.colorScheme.primary
+                    },
+                    shape = CircleShape
+                )
+        )
+        
+        // Recommendation text
+        Text(
+            text = recommendation.formatForDisplay(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
         )
     }
 }
