@@ -8,8 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -34,12 +39,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.res.stringResource
@@ -64,6 +72,7 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun RecordShotScreen(
     onNavigateToBeanManagement: () -> Unit = {},
@@ -105,6 +114,8 @@ fun RecordShotScreen(
 
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+    val coroutineScope = rememberCoroutineScope()
 
     // Convert timer state for UI
     val uiTimerState = when {
@@ -118,6 +129,8 @@ fun RecordShotScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
+            .imePadding()
             .verticalScroll(scrollState)
             .padding(spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.large)
@@ -204,6 +217,8 @@ fun RecordShotScreen(
         NotesSection(
             notes = notes,
             onNotesChange = viewModel::updateNotes,
+            bringIntoViewRequester = bringIntoViewRequester,
+            coroutineScope = coroutineScope,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -508,15 +523,20 @@ private fun GrinderSettingSection(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun NotesSection(
     notes: String,
     onNotesChange: (String) -> Unit,
+    bringIntoViewRequester: BringIntoViewRequester,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
-    CoffeeCard(modifier = modifier) {
+    CoffeeCard(
+        modifier = modifier.bringIntoViewRequester(bringIntoViewRequester)
+    ) {
         CardHeader(
             icon = Icons.Default.Edit,
             title = stringResource(R.string.text_notes_optional)
@@ -530,7 +550,15 @@ private fun NotesSection(
             label = { Text(stringResource(R.string.label_notes)) },
             placeholder = { Text(stringResource(R.string.placeholder_notes)) },
             maxLines = 3,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusEvent { focusState ->
+                    if (focusState.isFocused) {
+                        coroutineScope.launch {
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                }
         )
     }
 }
