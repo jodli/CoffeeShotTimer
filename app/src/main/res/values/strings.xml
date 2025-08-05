@@ -414,4 +414,10 @@
     <string name="dialog_shot_recorded_title">Shot Recorded!</string>
     <string name="dialog_shot_recorded_successfully">Shot Recorded Successfully!</string>
     <string name="dialog_view_details_for_more_recommendations">View details for more recommendations</string>
+
+    <!-- Next Steps and Recommendations -->
+    <string name="text_next_steps">Next Steps</string>
+    <string name="text_recommendations_for_next_shot">Recommendations for next shot</string>
+    <string name="text_next_steps_based_on_shot">Based on this shot:</string>
+    <string name="text_and_more_recommendations">+%1$d more recommendations</string>
 </resources>

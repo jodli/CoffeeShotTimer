@@ -42,6 +42,7 @@ data class Spacing(
     val buttonMaxWidth: Dp = 200.dp,
     val sliderHeight: Dp = 32.dp,
     val qualityIndicator: Dp = 8.dp,
+    val priorityIndicator: Dp = 6.dp,
     val fabSize: Dp = 56.dp,
     val fabSizeSmall: Dp = 40.dp,
     val timerButtonSize: Dp = 80.dp,

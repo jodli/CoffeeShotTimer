@@ -26,7 +26,8 @@ import com.jodli.coffeeshottimer.ui.util.FormattedRecommendation
 @Composable
 fun RecommendationCard(
     recommendations: List<ShotRecommendation>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    showAsNextSteps: Boolean = false
 ) {
     val spacing = LocalSpacing.current
     val formattedRecommendations = recommendations.formatForDisplay()
@@ -35,7 +36,11 @@ fun RecommendationCard(
         CoffeeCard(modifier = modifier) {
             CardHeader(
                 icon = Icons.Default.Lightbulb,
-                title = stringResource(R.string.text_recommendations)
+                title = if (showAsNextSteps) {
+                    stringResource(R.string.text_next_steps)
+                } else {
+                    stringResource(R.string.text_recommendations)
+                }
             )
             
             Spacer(modifier = Modifier.height(spacing.medium))
@@ -129,7 +134,8 @@ private fun getPriorityColorAndDescription(priority: RecommendationPriority): Pa
 fun CompactRecommendationList(
     recommendations: List<ShotRecommendation>,
     modifier: Modifier = Modifier,
-    maxItems: Int = 3
+    maxItems: Int = 3,
+    showAsNextSteps: Boolean = false
 ) {
     val spacing = LocalSpacing.current
     val formattedRecommendations = recommendations.formatForDisplay().take(maxItems)
@@ -141,7 +147,11 @@ fun CompactRecommendationList(
         ) {
             // Section header following typography hierarchy
             Text(
-                text = stringResource(R.string.text_recommendations),
+                text = if (showAsNextSteps) {
+                    stringResource(R.string.text_next_steps)
+                } else {
+                    stringResource(R.string.text_recommendations)
+                },
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )
@@ -184,8 +194,8 @@ private fun CompactRecommendationItem(
         // Smaller priority indicator for compact view
         PriorityIndicator(
             priority = recommendation.priority,
-            size = 6.dp,
-            modifier = Modifier.padding(top = 6.dp) // Align with text baseline
+            size = LocalSpacing.current.priorityIndicator,
+            modifier = Modifier.padding(top = LocalSpacing.current.priorityIndicator) // Align with text baseline
         )
         
         // Recommendation text with caption typography
