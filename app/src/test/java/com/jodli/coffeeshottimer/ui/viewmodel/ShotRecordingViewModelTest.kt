@@ -4,6 +4,10 @@ import android.content.Context
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -24,8 +28,12 @@ class ShotRecordingViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     
     private lateinit var recordShotUseCase: RecordShotUseCase
+    private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
+    private lateinit var stringResourceProvider: StringResourceProvider
+    private lateinit var domainErrorTranslator: DomainErrorTranslator
+    private lateinit var validationStringProvider: ValidationStringProvider
     private lateinit var context: Context
     private lateinit var viewModel: ShotRecordingViewModel
     
@@ -34,13 +42,17 @@ class ShotRecordingViewModelTest {
         Dispatchers.setMain(testDispatcher)
         
         // Create mock dependencies
-        recordShotUseCase = mockk(relaxed = true)
-        beanRepository = mockk(relaxed = true)
-        shotRepository = mockk(relaxed = true)
-        context = mockk(relaxed = true)
-        
+        recordShotUseCase = mockk<RecordShotUseCase>(relaxed = true)
+        getShotDetailsUseCase = mockk<GetShotDetailsUseCase>(relaxed = true)
+        beanRepository = mockk<BeanRepository>(relaxed = true)
+        shotRepository = mockk<ShotRepository>(relaxed = true)
+        context = mockk<Context>(relaxed = true)
+        stringResourceProvider = mockk<StringResourceProvider>(relaxed = true)
+        domainErrorTranslator = mockk<DomainErrorTranslator>(relaxed = true)
+        validationStringProvider = mockk<ValidationStringProvider>(relaxed = true)
+
         // Create ViewModel with injected dependencies
-        viewModel = ShotRecordingViewModel(recordShotUseCase, beanRepository, shotRepository, context)
+        viewModel = ShotRecordingViewModel(recordShotUseCase, getShotDetailsUseCase, beanRepository, shotRepository, domainErrorTranslator, stringResourceProvider, validationStringProvider, context)
     }
     
     @After

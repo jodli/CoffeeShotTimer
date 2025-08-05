@@ -2,6 +2,9 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,6 +32,9 @@ class AddEditBeanViewModelTest {
 
     private val addBeanUseCase: AddBeanUseCase = mockk(relaxed = true)
     private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
+    private val stringResourceProvider: StringResourceProvider = mockk(relaxed = true)
+    private val validationStringProvider: ValidationStringProvider = mockk(relaxed = true)
+    private val domainErrorTranslator: DomainErrorTranslator = mockk(relaxed = true)
 
     private lateinit var viewModel: AddEditBeanViewModel
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
@@ -37,9 +43,15 @@ class AddEditBeanViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         
+        // Setup mock responses for validation string provider
+        io.mockk.every { validationStringProvider.getGrinderSettingMaximumLengthError(50) } returns "Grinder setting cannot exceed 50 characters"
+        
         viewModel = AddEditBeanViewModel(
             addBeanUseCase,
-            updateBeanUseCase
+            updateBeanUseCase,
+            stringResourceProvider,
+            validationStringProvider,
+            domainErrorTranslator
         )
     }
 
