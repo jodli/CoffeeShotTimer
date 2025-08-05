@@ -1,7 +1,7 @@
 # Feature Idea: Intelligent Brewing Advisor
 
 ## Rough Concept
-Enhance the existing shot analysis with intelligent brewing advice based on taste notes. When users enter descriptive words in the "Notes" section (like "sour", "bitter", "weak", "harsh"), the app would analyze the text and provide specific, actionable recommendations on how to improve the next shot.
+Enhance the existing shot analysis with intelligent brewing advice based on taste notes. When users enter descriptive words in the "Notes" section (like "sour", "bitter", "weak", "harsh"), the app analyzes the text and provides specific, actionable recommendations on how to improve the next shot.
 
 ## Why This Would Be Useful
 - **Learning acceleration**: Helps users understand the connection between taste and brewing parameters
@@ -10,13 +10,25 @@ Enhance the existing shot analysis with intelligent brewing advice based on tast
 - **Confidence building**: Users get specific next steps rather than guessing what to adjust
 - **Progressive improvement**: Creates a feedback loop between tasting and brewing adjustments
 
-## Notes
-- Could use sentiment analysis or keyword matching to identify taste descriptors
-- Should map taste issues to specific parameter adjustments (grind size, dose, time, temperature)
-- Could learn from user patterns over time (if they consistently follow advice and improve)
-- Should integrate with existing shot analysis recommendations
-- Could include a taste vocabulary guide to help users describe what they're tasting
-- Might benefit from a simple rating system alongside notes (1-5 stars for different aspects)
-- Could suggest brewing parameter ranges based on detected taste issues
-- Should handle multiple taste descriptors in one note ("bitter and weak")
-- Could provide educational content about why certain adjustments help specific taste issues
+## Core Features
+
+### Taste Analysis Engine
+- **Keyword recognition**: Identify taste descriptors in user notes (sour, bitter, weak, harsh, etc.)
+- **Parameter mapping**: Map taste issues to specific brewing adjustments
+- **Multi-issue handling**: Process multiple descriptors in one note ("bitter and weak")
+- **Integration**: Work with existing shot analysis recommendations
+
+### Smart Recommendations
+- **Specific adjustments**: Suggest concrete parameter changes (grind finer, reduce dose, etc.)
+- **Contextual advice**: Consider current shot metrics when making suggestions
+- **Learning patterns**: Track which advice leads to better outcomes over time
+- **Why explanations**: Brief explanations of why certain adjustments help
+
+## Implementation Notes
+- Use simple keyword matching for taste descriptor recognition
+- Focus on the most common taste issues and their solutions
+- Integrate seamlessly with existing notes and shot analysis workflow
+- Keep recommendations actionable and specific
+
+# Monetization Opportunity
+**AI-Powered Brewing Intelligence**: Offer advanced taste analysis and personalized brewing recommendations as a premium subscription. While basic keyword matching remains free, premium users get access to sophisticated pattern recognition, personalized learning algorithms that adapt to their taste preferences, and integration with a curated database of coffee profiles and brewing recipes from specialty roasters and cafes.
