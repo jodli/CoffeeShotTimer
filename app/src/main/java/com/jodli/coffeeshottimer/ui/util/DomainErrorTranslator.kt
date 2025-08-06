@@ -56,6 +56,15 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.FAILED_TO_GET_SHOT -> context.getString(R.string.error_loading_shot_details)
             DomainErrorCode.ASSOCIATED_BEAN_NOT_FOUND -> context.getString(R.string.error_bean_not_found)
 
+            // Photo operation errors
+            DomainErrorCode.PHOTO_SAVE_FAILED -> context.getString(R.string.error_photo_save_failed)
+            DomainErrorCode.PHOTO_DELETE_FAILED -> context.getString(R.string.error_photo_delete_failed)
+            DomainErrorCode.PHOTO_NOT_FOUND -> context.getString(R.string.error_photo_not_found)
+            DomainErrorCode.PHOTO_COMPRESSION_FAILED -> context.getString(R.string.error_photo_compression_failed)
+            DomainErrorCode.PHOTO_STORAGE_FULL -> context.getString(R.string.error_photo_storage_full)
+            DomainErrorCode.PHOTO_INVALID_URI -> context.getString(R.string.error_photo_invalid_uri)
+            DomainErrorCode.PHOTO_FILE_ACCESS_ERROR -> context.getString(R.string.error_photo_file_access_error)
+
             DomainErrorCode.VALIDATION_FAILED -> {
                 if (details != null) {
                     context.getString(R.string.error_bean_validation_failed, details)

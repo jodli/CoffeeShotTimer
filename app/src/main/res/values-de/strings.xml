@@ -253,6 +253,15 @@
     <string name="error_coffee_weight_in_invalid">Kaffee-Eingabegewicht ist ungültig</string>
     <string name="error_coffee_weight_out_invalid">Kaffee-Ausgabegewicht ist ungültig</string>
 
+    <!-- Photo Operation Errors -->
+    <string name="error_photo_save_failed">Foto speichern fehlgeschlagen</string>
+    <string name="error_photo_delete_failed">Foto löschen fehlgeschlagen</string>
+    <string name="error_photo_not_found">Foto nicht gefunden</string>
+    <string name="error_photo_compression_failed">Foto-Komprimierung fehlgeschlagen</string>
+    <string name="error_photo_storage_full">Speicher ist voll - Foto kann nicht gespeichert werden</string>
+    <string name="error_photo_invalid_uri">Ungültiges Foto ausgewählt</string>
+    <string name="error_photo_file_access_error">Zugriff auf Foto-Datei nicht möglich</string>
+
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>
     <string name="validation_character_count">%1$d/%2$d</string>
