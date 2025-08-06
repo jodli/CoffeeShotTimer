@@ -16,7 +16,8 @@ import java.util.UUID
         androidx.room.Index(value = ["name"], unique = true),
         androidx.room.Index(value = ["isActive"]),
         androidx.room.Index(value = ["roastDate"]),
-        androidx.room.Index(value = ["createdAt"])
+        androidx.room.Index(value = ["createdAt"]),
+        androidx.room.Index(value = ["photoPath"])
     ]
 )
 data class Bean(
@@ -27,6 +28,7 @@ data class Bean(
     val notes: String = "",
     val isActive: Boolean = true,
     val lastGrinderSetting: String? = null,
+    val photoPath: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
     /**
@@ -56,6 +58,17 @@ data class Bean(
             errors.add("Notes cannot exceed 500 characters")
         }
 
+        // Validate photo path
+        photoPath?.let { path ->
+            if (path.isBlank()) {
+                errors.add("Photo path cannot be empty if provided")
+            } else if (path.length > 500) {
+                errors.add("Photo path cannot exceed 500 characters")
+            } else if (!isValidPhotoPath(path)) {
+                errors.add("Photo path must be a valid file path")
+            }
+        }
+
         return ValidationResult(errors.isEmpty(), errors)
     }
 
@@ -75,6 +88,28 @@ data class Bean(
     fun isFresh(): Boolean {
         val daysSinceRoast = daysSinceRoast()
         return daysSinceRoast in 4..21
+    }
+
+    /**
+     * Checks if the bean has a photo associated with it.
+     * @return true if photoPath is not null and not blank
+     */
+    fun hasPhoto(): Boolean {
+        return !photoPath.isNullOrBlank()
+    }
+
+    /**
+     * Validates if the provided photo path is valid.
+     * @param path The photo path to validate
+     * @return true if the path is valid
+     */
+    private fun isValidPhotoPath(path: String): Boolean {
+        // Basic validation for photo path
+        // Should not contain invalid characters and should have reasonable structure
+        val invalidChars = listOf("<", ">", ":", "\"", "|", "?", "*")
+        return !invalidChars.any { path.contains(it) } && 
+               path.trim() == path && // No leading/trailing whitespace
+               !path.contains("..") // No directory traversal
     }
 }
 
