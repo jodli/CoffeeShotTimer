@@ -1,13 +1,13 @@
 # Implementation Plan
 
-- [ ] 1. Set up database foundation for photo storage
+- [x] 1. Set up database foundation for photo storage
   - Create database migration to add photoPath field to Bean entity
   - Update Bean data class with photoPath field and validation
   - Add photo-related methods to BeanDao interface
   - Write unit tests for Bean entity validation with photo field
   - _Requirements: 1.4, 2.3, 6.3, 7.3_
 
-- [ ] 2. Implement photo storage management system
+- [x] 2. Implement photo storage management system
   - Create PhotoStorageManager interface and implementation
   - Implement image compression and file storage operations
   - Add photo file cleanup and storage management utilities
