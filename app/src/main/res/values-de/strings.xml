@@ -261,6 +261,41 @@
     <string name="error_photo_storage_full">Speicher ist voll - Foto kann nicht gespeichert werden</string>
     <string name="error_photo_invalid_uri">Ungültiges Foto ausgewählt</string>
     <string name="error_photo_file_access_error">Zugriff auf Foto-Datei nicht möglich</string>
+    <string name="error_camera_unavailable">Kamera ist nicht verfügbar</string>
+    <string name="error_camera_permission_denied">Kamera-Berechtigung ist erforderlich, um Fotos aufzunehmen</string>
+
+    <!-- Photo UI Strings -->
+    <string name="text_bean_photo">Bohnenfoto</string>
+    <string name="text_add_photo">Foto hinzufügen</string>
+    <string name="text_replace_photo">Foto ersetzen</string>
+    <string name="text_delete_photo">Foto löschen</string>
+    <string name="text_view_photo">Foto anzeigen</string>
+    <string name="text_take_photo">Foto aufnehmen</string>
+    <string name="text_choose_from_gallery">Aus Galerie wählen</string>
+    <string name="text_photo_options">Foto-Optionen</string>
+    <string name="text_no_photo">Kein Foto hinzugefügt</string>
+    <string name="text_loading_photo">Lade Foto…</string>
+    <string name="text_saving_photo">Speichere Foto…</string>
+    <string name="text_deleting_photo">Lösche Foto…</string>
+    <string name="text_photo_saved">Foto erfolgreich gespeichert</string>
+    <string name="text_photo_deleted">Foto erfolgreich gelöscht</string>
+    <string name="text_photo_replaced">Foto erfolgreich ersetzt</string>
+    
+    <!-- Photo Confirmation Dialogs -->
+    <string name="dialog_delete_photo_title">Foto löschen?</string>
+    <string name="dialog_delete_photo_message">Bist du sicher, dass du dieses Foto löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.</string>
+    <string name="dialog_replace_photo_title">Foto ersetzen?</string>
+    <string name="dialog_replace_photo_message">Dies ersetzt das aktuelle Foto. Das alte Foto wird dauerhaft gelöscht.</string>
+    
+    <!-- Photo Content Descriptions -->
+    <string name="cd_bean_photo">Bohnenfoto</string>
+    <string name="cd_add_photo">Foto hinzufügen</string>
+    <string name="cd_replace_photo">Foto ersetzen</string>
+    <string name="cd_delete_photo">Foto löschen</string>
+    <string name="cd_view_photo">Foto anzeigen</string>
+    <string name="cd_photo_placeholder">Kein Foto verfügbar</string>
+    <string name="cd_close_photo_viewer">Foto-Betrachter schließen</string>
+    <string name="cd_photo_loading">Foto wird geladen</string>
 
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>

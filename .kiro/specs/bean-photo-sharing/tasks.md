@@ -36,11 +36,12 @@
   - Write unit tests for camera integration components
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 6. Create photo UI components
+- [x] 6. Create photo UI components
   - Implement BeanPhotoSection composable for photo display and actions
   - Create PhotoActionSheet for camera/gallery selection
   - Implement PhotoViewer for full-screen photo viewing
   - Add proper loading states and error handling to photo components
+  - Add strings to resources for proper translation
   - _Requirements: 3.1, 3.3, 8.2, 8.4_
 
 - [ ] 7. Update AddEditBeanViewModel for photo operations
