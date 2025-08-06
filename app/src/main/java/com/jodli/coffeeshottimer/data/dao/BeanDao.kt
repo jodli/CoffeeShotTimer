@@ -88,4 +88,35 @@ interface BeanDao {
      */
     @Query("SELECT COUNT(*) FROM beans WHERE isActive = 1")
     suspend fun getActiveBeanCount(): Int
+
+    /**
+     * Update the photo path for a specific bean.
+     */
+    @Query("UPDATE beans SET photoPath = :photoPath WHERE id = :beanId")
+    suspend fun updateBeanPhoto(beanId: String, photoPath: String?)
+
+    /**
+     * Get all beans that have photos.
+     */
+    @Query("SELECT * FROM beans WHERE photoPath IS NOT NULL AND photoPath != '' ORDER BY createdAt DESC")
+    fun getBeansWithPhotos(): Flow<List<Bean>>
+
+    /**
+     * Get beans filtered by photo status.
+     */
+    @Query(
+        """
+        SELECT * FROM beans 
+        WHERE (:hasPhoto = 0 OR (photoPath IS NOT NULL AND photoPath != ''))
+        AND (:activeOnly = 0 OR isActive = 1)
+        ORDER BY createdAt DESC
+    """
+    )
+    fun getBeansByPhotoStatus(hasPhoto: Boolean, activeOnly: Boolean): Flow<List<Bean>>
+
+    /**
+     * Remove photo path from a specific bean (set to null).
+     */
+    @Query("UPDATE beans SET photoPath = NULL WHERE id = :beanId")
+    suspend fun removeBeanPhoto(beanId: String)
 }

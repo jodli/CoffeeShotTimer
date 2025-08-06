@@ -346,4 +346,229 @@ class BeanTest {
         // Then
         assertNotEquals("Beans should have different IDs", bean1.id, bean2.id)
     }
+
+    // Photo field validation tests
+
+    @Test
+    fun `validate returns valid result for bean with valid photo path`() {
+        // Given
+        val beanWithPhoto = Bean(
+            name = "Bean with Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = "/data/photos/bean_photo.jpg"
+        )
+
+        // When
+        val result = beanWithPhoto.validate()
+
+        // Then
+        assertTrue("Bean with valid photo path should be valid", result.isValid)
+        assertTrue("Should have no errors", result.errors.isEmpty())
+    }
+
+    @Test
+    fun `validate returns valid result for bean with null photo path`() {
+        // Given
+        val beanWithoutPhoto = Bean(
+            name = "Bean without Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = null
+        )
+
+        // When
+        val result = beanWithoutPhoto.validate()
+
+        // Then
+        assertTrue("Bean with null photo path should be valid", result.isValid)
+        assertTrue("Should have no errors", result.errors.isEmpty())
+    }
+
+    @Test
+    fun `validate returns invalid result for bean with empty photo path`() {
+        // Given
+        val beanWithEmptyPhoto = Bean(
+            name = "Bean with Empty Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = ""
+        )
+
+        // When
+        val result = beanWithEmptyPhoto.validate()
+
+        // Then
+        assertFalse("Bean with empty photo path should be invalid", result.isValid)
+        assertTrue("Should contain photo path error", 
+            result.errors.contains("Photo path cannot be empty if provided"))
+    }
+
+    @Test
+    fun `validate returns invalid result for bean with blank photo path`() {
+        // Given
+        val beanWithBlankPhoto = Bean(
+            name = "Bean with Blank Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = "   "
+        )
+
+        // When
+        val result = beanWithBlankPhoto.validate()
+
+        // Then
+        assertFalse("Bean with blank photo path should be invalid", result.isValid)
+        assertTrue("Should contain photo path error", 
+            result.errors.contains("Photo path cannot be empty if provided"))
+    }
+
+    @Test
+    fun `validate returns invalid result for photo path exceeding 500 characters`() {
+        // Given
+        val longPhotoPath = "/data/photos/" + "a".repeat(500) + ".jpg"
+        val beanWithLongPhotoPath = Bean(
+            name = "Bean with Long Photo Path",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = longPhotoPath
+        )
+
+        // When
+        val result = beanWithLongPhotoPath.validate()
+
+        // Then
+        assertFalse("Bean with long photo path should be invalid", result.isValid)
+        assertTrue("Should contain photo path length error", 
+            result.errors.contains("Photo path cannot exceed 500 characters"))
+    }
+
+    @Test
+    fun `validate returns invalid result for photo path with invalid characters`() {
+        // Given
+        val invalidPhotoPath = "/data/photos/bean<photo>.jpg"
+        val beanWithInvalidPhotoPath = Bean(
+            name = "Bean with Invalid Photo Path",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = invalidPhotoPath
+        )
+
+        // When
+        val result = beanWithInvalidPhotoPath.validate()
+
+        // Then
+        assertFalse("Bean with invalid photo path should be invalid", result.isValid)
+        assertTrue("Should contain photo path validation error", 
+            result.errors.contains("Photo path must be a valid file path"))
+    }
+
+    @Test
+    fun `validate returns invalid result for photo path with directory traversal`() {
+        // Given
+        val traversalPhotoPath = "/data/photos/../../../etc/passwd"
+        val beanWithTraversalPath = Bean(
+            name = "Bean with Traversal Path",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = traversalPhotoPath
+        )
+
+        // When
+        val result = beanWithTraversalPath.validate()
+
+        // Then
+        assertFalse("Bean with directory traversal path should be invalid", result.isValid)
+        assertTrue("Should contain photo path validation error", 
+            result.errors.contains("Photo path must be a valid file path"))
+    }
+
+    @Test
+    fun `validate returns invalid result for photo path with leading or trailing whitespace`() {
+        // Given
+        val whitespacePhotoPath = "  /data/photos/bean_photo.jpg  "
+        val beanWithWhitespacePath = Bean(
+            name = "Bean with Whitespace Path",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = whitespacePhotoPath
+        )
+
+        // When
+        val result = beanWithWhitespacePath.validate()
+
+        // Then
+        assertFalse("Bean with whitespace in photo path should be invalid", result.isValid)
+        assertTrue("Should contain photo path validation error", 
+            result.errors.contains("Photo path must be a valid file path"))
+    }
+
+    @Test
+    fun `hasPhoto returns true when photo path is provided`() {
+        // Given
+        val beanWithPhoto = Bean(
+            name = "Bean with Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = "/data/photos/bean_photo.jpg"
+        )
+
+        // When
+        val result = beanWithPhoto.hasPhoto()
+
+        // Then
+        assertTrue("Bean with photo path should have photo", result)
+    }
+
+    @Test
+    fun `hasPhoto returns false when photo path is null`() {
+        // Given
+        val beanWithoutPhoto = Bean(
+            name = "Bean without Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = null
+        )
+
+        // When
+        val result = beanWithoutPhoto.hasPhoto()
+
+        // Then
+        assertFalse("Bean with null photo path should not have photo", result)
+    }
+
+    @Test
+    fun `hasPhoto returns false when photo path is empty`() {
+        // Given
+        val beanWithEmptyPhoto = Bean(
+            name = "Bean with Empty Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = ""
+        )
+
+        // When
+        val result = beanWithEmptyPhoto.hasPhoto()
+
+        // Then
+        assertFalse("Bean with empty photo path should not have photo", result)
+    }
+
+    @Test
+    fun `hasPhoto returns false when photo path is blank`() {
+        // Given
+        val beanWithBlankPhoto = Bean(
+            name = "Bean with Blank Photo",
+            roastDate = LocalDate.now().minusDays(7),
+            photoPath = "   "
+        )
+
+        // When
+        val result = beanWithBlankPhoto.hasPhoto()
+
+        // Then
+        assertFalse("Bean with blank photo path should not have photo", result)
+    }
+
+    @Test
+    fun `photoPath defaults to null`() {
+        // Given
+        val bean = Bean(
+            name = "Simple Bean",
+            roastDate = LocalDate.now().minusDays(7)
+        )
+
+        // Then
+        assertNull("photoPath should default to null", bean.photoPath)
+        assertFalse("Bean should not have photo by default", bean.hasPhoto())
+    }
 }
