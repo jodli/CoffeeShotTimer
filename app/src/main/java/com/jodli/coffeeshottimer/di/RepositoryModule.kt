@@ -4,6 +4,8 @@ import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
+import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManagerImpl
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManagerImpl
 import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
@@ -95,4 +97,17 @@ abstract class RepositoryModule {
     abstract fun bindPhotoStorageManager(
         photoStorageManagerImpl: PhotoStorageManagerImpl
     ): PhotoStorageManager
+
+    /**
+     * Binds the PhotoCaptureManagerImpl to PhotoCaptureManager interface.
+     * Uses singleton scope to ensure consistent photo capture management.
+     *
+     * @param photoCaptureManagerImpl The implementation to bind
+     * @return PhotoCaptureManager interface
+     */
+    @Binds
+    @Singleton
+    abstract fun bindPhotoCaptureManager(
+        photoCaptureManagerImpl: PhotoCaptureManagerImpl
+    ): PhotoCaptureManager
 }
