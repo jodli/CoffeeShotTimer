@@ -1,11 +1,14 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.net.Uri
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -16,7 +19,8 @@ import javax.inject.Singleton
  */
 @Singleton
 class BeanRepository @Inject constructor(
-    private val beanDao: BeanDao
+    private val beanDao: BeanDao,
+    private val photoStorageManager: PhotoStorageManager
 ) {
 
     // In-memory storage for current bean selection (could be replaced with SharedPreferences for persistence)
@@ -183,6 +187,14 @@ class BeanRepository @Inject constructor(
             // Check if bean exists
             val existingBean = beanDao.getBeanById(bean.id)
                 ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
+
+            // Delete associated photo file if it exists
+            existingBean.photoPath?.let { photoPath ->
+                photoStorageManager.deletePhoto(photoPath).getOrElse { exception ->
+                    // Log the error but don't fail the bean deletion
+                    // This handles cases where the file might already be deleted
+                }
+            }
 
             beanDao.deleteBean(bean)
             Result.success(Unit)
@@ -396,6 +408,227 @@ class BeanRepository @Inject constructor(
      */
     fun getCurrentBeanId(): String? {
         return _currentBeanId
+    }
+
+    // Photo-related operations
+
+    /**
+     * Add a photo to a bean.
+     * @param beanId The ID of the bean to add photo to
+     * @param imageUri The URI of the image to add
+     * @return Result indicating success or failure
+     */
+    suspend fun addPhotoToBean(beanId: String, imageUri: Uri): Result<String> {
+        return try {
+            if (beanId.isBlank()) {
+                return Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
+            }
+
+            // Check if bean exists
+            val existingBean = beanDao.getBeanById(beanId)
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
+
+            // If bean already has a photo, delete the old one first
+            existingBean.photoPath?.let { oldPhotoPath ->
+                photoStorageManager.deletePhoto(oldPhotoPath)
+            }
+
+            // Save the new photo
+            val photoPath = photoStorageManager.savePhoto(imageUri, beanId).getOrElse { exception ->
+                return Result.failure(
+                    RepositoryException.DatabaseError(
+                        "Failed to save photo",
+                        exception
+                    )
+                )
+            }
+
+            // Update bean with new photo path
+            beanDao.updateBeanPhoto(beanId, photoPath)
+            Result.success(photoPath)
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to add photo to bean",
+                    exception
+                )
+            )
+        }
+    }
+
+    /**
+     * Remove a photo from a bean.
+     * @param beanId The ID of the bean to remove photo from
+     * @return Result indicating success or failure
+     */
+    suspend fun removePhotoFromBean(beanId: String): Result<Unit> {
+        return try {
+            if (beanId.isBlank()) {
+                return Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
+            }
+
+            // Check if bean exists
+            val existingBean = beanDao.getBeanById(beanId)
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
+
+            // Delete the photo file if it exists
+            existingBean.photoPath?.let { photoPath ->
+                photoStorageManager.deletePhoto(photoPath).getOrElse { exception ->
+                    // Log the error but don't fail the operation - we still want to remove the reference
+                    // This handles cases where the file might already be deleted
+                }
+            }
+
+            // Remove photo path from bean
+            beanDao.removeBeanPhoto(beanId)
+            Result.success(Unit)
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to remove photo from bean",
+                    exception
+                )
+            )
+        }
+    }
+
+    /**
+     * Get a bean's photo file.
+     * @param beanId The ID of the bean
+     * @return Result containing the photo file or null if no photo exists
+     */
+    suspend fun getBeanPhoto(beanId: String): Result<File?> {
+        return try {
+            if (beanId.isBlank()) {
+                return Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
+            }
+
+            // Check if bean exists
+            val bean = beanDao.getBeanById(beanId)
+                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
+
+            // Get photo file if path exists
+            val photoFile = bean.photoPath?.let { photoPath ->
+                photoStorageManager.getPhotoFile(photoPath)
+            }
+
+            Result.success(photoFile)
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get bean photo",
+                    exception
+                )
+            )
+        }
+    }
+
+    /**
+     * Get a photo file by path.
+     * @param photoPath The path of the photo
+     * @return Result containing the photo file or null if file doesn't exist
+     */
+    suspend fun getPhotoFile(photoPath: String): Result<File?> {
+        return try {
+            if (photoPath.isBlank()) {
+                return Result.failure(RepositoryException.ValidationError("Photo path cannot be empty"))
+            }
+
+            val photoFile = photoStorageManager.getPhotoFile(photoPath)
+            Result.success(photoFile)
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get photo file",
+                    exception
+                )
+            )
+        }
+    }
+
+    /**
+     * Get all beans that have photos.
+     * @return Flow of beans with photos with error handling
+     */
+    fun getBeansWithPhotos(): Flow<Result<List<Bean>>> = flow {
+        beanDao.getBeansWithPhotos().collect { beans ->
+            emit(Result.success(beans))
+        }
+    }.catch { exception ->
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get beans with photos",
+                    exception
+                )
+            )
+        )
+    }
+
+    /**
+     * Get beans filtered by photo status.
+     * @param hasPhoto Whether to filter for beans with photos
+     * @param activeOnly Whether to show only active beans
+     * @return Flow of filtered beans with error handling
+     */
+    fun getBeansByPhotoStatus(hasPhoto: Boolean, activeOnly: Boolean): Flow<Result<List<Bean>>> = flow {
+        beanDao.getBeansByPhotoStatus(hasPhoto, activeOnly).collect { beans ->
+            emit(Result.success(beans))
+        }
+    }.catch { exception ->
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get beans by photo status",
+                    exception
+                )
+            )
+        )
+    }
+
+    /**
+     * Clean up orphaned photo files that are no longer referenced by any bean.
+     * @return Result indicating the number of files cleaned up or error
+     */
+    suspend fun cleanupOrphanedPhotos(): Result<Int> {
+        return try {
+            // Get all photo paths currently referenced by beans
+            val allBeans = beanDao.getAllBeans()
+            var referencedPhotoPaths = setOf<String>()
+            
+            allBeans.collect { beans ->
+                referencedPhotoPaths = beans.mapNotNull { it.photoPath }.toSet()
+            }
+
+            // Clean up orphaned files
+            val cleanupResult = photoStorageManager.cleanupOrphanedFiles(referencedPhotoPaths)
+            cleanupResult
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to cleanup orphaned photos",
+                    exception
+                )
+            )
+        }
+    }
+
+    /**
+     * Get the total storage size used by photos.
+     * @return Result containing the total size in bytes
+     */
+    suspend fun getPhotoStorageSize(): Result<Long> {
+        return try {
+            val size = photoStorageManager.getTotalStorageSize()
+            Result.success(size)
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get photo storage size",
+                    exception
+                )
+            )
+        }
     }
 }
 

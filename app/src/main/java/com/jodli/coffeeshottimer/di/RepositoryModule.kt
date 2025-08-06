@@ -29,12 +29,16 @@ abstract class RepositoryModule {
          * Uses singleton scope to ensure consistent data access.
          *
          * @param beanDao The BeanDao dependency
+         * @param photoStorageManager The PhotoStorageManager dependency
          * @return BeanRepository instance
          */
         @Provides
         @Singleton
-        fun provideBeanRepository(beanDao: BeanDao): BeanRepository {
-            return BeanRepository(beanDao)
+        fun provideBeanRepository(
+            beanDao: BeanDao,
+            photoStorageManager: PhotoStorageManager
+        ): BeanRepository {
+            return BeanRepository(beanDao, photoStorageManager)
         }
 
         /**
