@@ -1,11 +1,21 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
+import android.net.Uri
 import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
+import com.jodli.coffeeshottimer.domain.exception.DomainException
+import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
+import com.jodli.coffeeshottimer.data.model.Bean
 import io.mockk.mockk
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -32,6 +42,9 @@ class AddEditBeanViewModelTest {
 
     private val addBeanUseCase: AddBeanUseCase = mockk(relaxed = true)
     private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
+    private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase = mockk(relaxed = true)
+    private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase = mockk(relaxed = true)
+    private val getBeanPhotoUseCase: GetBeanPhotoUseCase = mockk(relaxed = true)
     private val stringResourceProvider: StringResourceProvider = mockk(relaxed = true)
     private val validationStringProvider: ValidationStringProvider = mockk(relaxed = true)
     private val domainErrorTranslator: DomainErrorTranslator = mockk(relaxed = true)
@@ -49,6 +62,9 @@ class AddEditBeanViewModelTest {
         viewModel = AddEditBeanViewModel(
             addBeanUseCase,
             updateBeanUseCase,
+            addPhotoToBeanUseCase,
+            removePhotoFromBeanUseCase,
+            getBeanPhotoUseCase,
             stringResourceProvider,
             validationStringProvider,
             domainErrorTranslator
@@ -58,6 +74,21 @@ class AddEditBeanViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
+    }
+
+    private fun setupEditMode(beanId: String, existingPhotoPath: String? = null): Bean {
+        val mockBean = mockk<Bean> {
+            every { id } returns beanId
+            every { name } returns "Test Bean"
+            every { roastDate } returns LocalDate.now()
+            every { notes } returns ""
+            every { isActive } returns true
+            every { lastGrinderSetting } returns null
+            every { photoPath } returns existingPhotoPath
+        }
+        
+        coEvery { updateBeanUseCase.getBeanForEditing(beanId) } returns Result.success(mockBean)
+        return mockBean
     }
 
     @Test
@@ -78,6 +109,10 @@ class AddEditBeanViewModelTest {
         assertFalse(initialState.saveSuccess)
         assertNull(initialState.error)
         assertFalse(initialState.isEditMode)
+        assertNull(initialState.photoPath)
+        assertNull(initialState.pendingPhotoUri)
+        assertFalse(initialState.isPhotoLoading)
+        assertNull(initialState.photoError)
     }
 
     @Test
@@ -188,5 +223,277 @@ class AddEditBeanViewModelTest {
         viewModel.resetSaveSuccess()
         
         assertFalse(viewModel.uiState.value.saveSuccess)
+    }
+
+    // Photo functionality tests
+
+    @Test
+    fun `addPhoto in create mode should store pending photo URI`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        
+        viewModel.addPhoto(mockUri)
+        
+        val state = viewModel.uiState.value
+        assertEquals(mockUri, state.pendingPhotoUri)
+        assertNull(state.photoPath)
+        assertFalse(state.isPhotoLoading)
+        assertNull(state.photoError)
+    }
+
+    @Test
+    fun `addPhoto in edit mode should call use case and update photo path`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        val beanId = "test-bean-id"
+        val photoPath = "/path/to/photo.jpg"
+        // Setup edit mode
+        setupEditMode(beanId)
+        viewModel.initializeForEdit(beanId)
+        
+        // Mock successful photo addition
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.success(photoPath)
+        
+        viewModel.addPhoto(mockUri)
+        
+        val state = viewModel.uiState.value
+        assertEquals(photoPath, state.photoPath)
+        assertNull(state.pendingPhotoUri)
+        assertFalse(state.isPhotoLoading)
+        assertNull(state.photoError)
+        
+        coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
+    }
+
+    @Test
+    fun `addPhoto in edit mode should handle failure`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        val beanId = "test-bean-id"
+        val errorMessage = "Failed to save photo"
+        val exception = DomainException(DomainErrorCode.PHOTO_SAVE_FAILED, errorMessage)
+        
+        // Setup edit mode
+        setupEditMode(beanId)
+        viewModel.initializeForEdit(beanId)
+        
+        // Mock failed photo addition
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.failure(exception)
+        every { domainErrorTranslator.translateResultError(any<Result<String>>()) } returns errorMessage
+        
+        viewModel.addPhoto(mockUri)
+        
+        val state = viewModel.uiState.value
+        assertNull(state.photoPath)
+        assertFalse(state.isPhotoLoading)
+        assertEquals(errorMessage, state.photoError)
+        
+        coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
+    }
+
+    @Test
+    fun `replacePhoto should call addPhoto`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        
+        viewModel.replacePhoto(mockUri)
+        
+        // In create mode, should store as pending
+        assertEquals(mockUri, viewModel.uiState.value.pendingPhotoUri)
+    }
+
+    @Test
+    fun `removePhoto in create mode should clear pending photo URI`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        
+        // First add a photo
+        viewModel.addPhoto(mockUri)
+        assertEquals(mockUri, viewModel.uiState.value.pendingPhotoUri)
+        
+        // Then remove it
+        viewModel.removePhoto()
+        
+        val state = viewModel.uiState.value
+        assertNull(state.pendingPhotoUri)
+        assertNull(state.photoPath)
+        assertFalse(state.isPhotoLoading)
+        assertNull(state.photoError)
+    }
+
+    @Test
+    fun `removePhoto in edit mode should call use case and clear photo path`() = runTest(testDispatcher) {
+        val beanId = "test-bean-id"
+        
+        // Setup edit mode
+        setupEditMode(beanId)
+        viewModel.initializeForEdit(beanId)
+        
+        // Mock successful photo removal
+        coEvery { removePhotoFromBeanUseCase.execute(beanId) } returns Result.success(Unit)
+        
+        viewModel.removePhoto()
+        
+        val state = viewModel.uiState.value
+        assertNull(state.photoPath)
+        assertNull(state.pendingPhotoUri)
+        assertFalse(state.isPhotoLoading)
+        assertNull(state.photoError)
+        
+        coVerify { removePhotoFromBeanUseCase.execute(beanId) }
+    }
+
+    @Test
+    fun `removePhoto in edit mode should handle failure`() = runTest(testDispatcher) {
+        val beanId = "test-bean-id"
+        val errorMessage = "Failed to remove photo"
+        val exception = DomainException(DomainErrorCode.PHOTO_DELETE_FAILED, errorMessage)
+        
+        // Setup edit mode
+        setupEditMode(beanId)
+        viewModel.initializeForEdit(beanId)
+        
+        // Mock failed photo removal
+        coEvery { removePhotoFromBeanUseCase.execute(beanId) } returns Result.failure(exception)
+        every { domainErrorTranslator.translateResultError(any<Result<Unit>>()) } returns errorMessage
+        
+        viewModel.removePhoto()
+        
+        val state = viewModel.uiState.value
+        assertFalse(state.isPhotoLoading)
+        assertEquals(errorMessage, state.photoError)
+        
+        coVerify { removePhotoFromBeanUseCase.execute(beanId) }
+    }
+
+    @Test
+    fun `clearPhotoError should clear photo error`() = runTest(testDispatcher) {
+        // Simulate an error state
+        val mockUri: Uri = mockk()
+        val beanId = "test-bean-id"
+        val exception = DomainException(DomainErrorCode.PHOTO_SAVE_FAILED, "Error")
+        
+        setupEditMode(beanId)
+        viewModel.initializeForEdit(beanId)
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.failure(exception)
+        every { domainErrorTranslator.translateResultError(any<Result<String>>()) } returns "Error"
+        
+        viewModel.addPhoto(mockUri)
+        assertNotNull(viewModel.uiState.value.photoError)
+        
+        // Clear the error
+        viewModel.clearPhotoError()
+        
+        assertNull(viewModel.uiState.value.photoError)
+    }
+
+    @Test
+    fun `hasPhoto should return true when photo path exists`() = runTest(testDispatcher) {
+        // Simulate having a photo path
+        val beanId = "test-bean-id"
+        setupEditMode(beanId)
+        viewModel.initializeForEdit(beanId)
+        
+        // Manually set photo path for testing
+        val mockUri: Uri = mockk()
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.success("/path/to/photo.jpg")
+        
+        viewModel.addPhoto(mockUri)
+        
+        assertTrue(viewModel.hasPhoto())
+    }
+
+    @Test
+    fun `hasPhoto should return true when pending photo URI exists`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        
+        viewModel.addPhoto(mockUri)
+        
+        assertTrue(viewModel.hasPhoto())
+    }
+
+    @Test
+    fun `hasPhoto should return false when no photo exists`() = runTest(testDispatcher) {
+        assertFalse(viewModel.hasPhoto())
+    }
+
+    @Test
+    fun `getCurrentPhotoUri should return pending photo URI in create mode`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        
+        viewModel.addPhoto(mockUri)
+        
+        assertEquals(mockUri, viewModel.getCurrentPhotoUri())
+    }
+
+    @Test
+    fun `getCurrentPhotoUri should return null when no pending photo`() = runTest(testDispatcher) {
+        assertNull(viewModel.getCurrentPhotoUri())
+    }
+
+    @Test
+    fun `hasUnsavedChanges should detect pending photo changes`() = runTest(testDispatcher) {
+        assertFalse(viewModel.hasUnsavedChanges())
+        
+        val mockUri: Uri = mockk()
+        viewModel.addPhoto(mockUri)
+        
+        assertTrue(viewModel.hasUnsavedChanges())
+    }
+
+    @Test
+    fun `saveBean in create mode should handle pending photo`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        val beanId = "new-bean-id"
+        val photoPath = "/path/to/photo.jpg"
+        val mockBean = mockk<Bean> {
+            every { id } returns beanId
+        }
+        
+        // Setup form with valid data and pending photo
+        viewModel.updateName("Test Bean")
+        viewModel.addPhoto(mockUri)
+        
+        // Mock successful bean creation and photo addition
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.success(photoPath)
+        coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
+        
+        viewModel.saveBean()
+        
+        val state = viewModel.uiState.value
+        assertTrue(state.saveSuccess)
+        assertFalse(state.isSaving)
+        assertNull(state.error)
+        
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
+    }
+
+    @Test
+    fun `saveBean should handle photo save failure gracefully`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        val beanId = "new-bean-id"
+        val photoError = "Photo save failed"
+        val exception = DomainException(DomainErrorCode.PHOTO_SAVE_FAILED, photoError)
+        val mockBean = mockk<Bean> {
+            every { id } returns beanId
+        }
+        
+        // Setup form with valid data and pending photo
+        viewModel.updateName("Test Bean")
+        viewModel.addPhoto(mockUri)
+        
+        // Mock successful bean creation but failed photo addition
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.failure(exception)
+        coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
+        every { domainErrorTranslator.translateResultError(any<Result<String>>()) } returns photoError
+        
+        viewModel.saveBean()
+        
+        val state = viewModel.uiState.value
+        assertTrue(state.saveSuccess) // Bean was saved successfully
+        assertFalse(state.isSaving)
+        assertEquals(photoError, state.photoError) // But photo error is shown
+        assertNull(state.error) // Main error is null
+        
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
     }
 }
