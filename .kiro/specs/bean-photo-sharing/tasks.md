@@ -29,7 +29,7 @@
   - Write unit tests for repository photo operations
   - _Requirements: 1.4, 2.3, 4.5, 6.3_
 
-- [ ] 5. Implement camera integration and permission handling
+- [x] 5. Implement camera integration and permission handling
   - Create PhotoCaptureManager for camera and gallery operations
   - Implement camera permission request and handling logic
   - Add image capture intent creation and result handling
