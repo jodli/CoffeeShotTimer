@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
+import android.net.Uri
 import com.jodli.coffeeshottimer.ui.validation.validateBeanNameEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateNotesEnhanced
@@ -29,6 +33,9 @@ import com.jodli.coffeeshottimer.R
 class AddEditBeanViewModel @Inject constructor(
     private val addBeanUseCase: AddBeanUseCase,
     private val updateBeanUseCase: UpdateBeanUseCase,
+    private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase,
+    private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase,
+    private val getBeanPhotoUseCase: GetBeanPhotoUseCase,
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
     private val domainErrorTranslator: DomainErrorTranslator
@@ -57,6 +64,8 @@ class AddEditBeanViewModel @Inject constructor(
                         notes = bean.notes,
                         isActive = bean.isActive,
                         lastGrinderSetting = bean.lastGrinderSetting ?: "",
+                        photoPath = bean.photoPath,
+                        pendingPhotoUri = null, // Clear any pending photo in edit mode
                         isLoading = false,
                         isEditMode = true
                     )
@@ -179,6 +188,7 @@ class AddEditBeanViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isSaving = true, error = null)
 
             val result = if (editingBeanId != null) {
+                // Edit mode: update existing bean
                 updateBeanUseCase.execute(
                     beanId = editingBeanId!!,
                     name = currentState.name.trim(),
@@ -189,6 +199,7 @@ class AddEditBeanViewModel @Inject constructor(
                         .takeIf { it.isNotEmpty() }
                 )
             } else {
+                // Create mode: add new bean
                 addBeanUseCase.execute(
                     name = currentState.name.trim(),
                     roastDate = currentState.roastDate,
@@ -200,6 +211,24 @@ class AddEditBeanViewModel @Inject constructor(
             }
 
             if (result.isSuccess) {
+                // If we're in create mode and have a pending photo, add it to the newly created bean
+                if (editingBeanId == null && currentState.pendingPhotoUri != null) {
+                    val newBean = result.getOrNull()
+                    if (newBean != null) {
+                        val photoResult = addPhotoToBeanUseCase.execute(newBean.id, currentState.pendingPhotoUri)
+                        if (photoResult.isFailure) {
+                            // Photo failed to save, but bean was created successfully
+                            // Show warning but don't fail the entire operation
+                            _uiState.value = _uiState.value.copy(
+                                isSaving = false,
+                                saveSuccess = true,
+                                photoError = domainErrorTranslator.translateResultError(photoResult)
+                            )
+                            return@launch
+                        }
+                    }
+                }
+                
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     saveSuccess = true
@@ -219,6 +248,105 @@ class AddEditBeanViewModel @Inject constructor(
 
     fun resetSaveSuccess() {
         _uiState.value = _uiState.value.copy(saveSuccess = false)
+    }
+
+    /**
+     * Adds or replaces a photo for the bean.
+     * In create mode, stores the photo URI temporarily until bean is saved.
+     * In edit mode, immediately updates the bean's photo.
+     */
+    fun addPhoto(imageUri: Uri) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isPhotoLoading = true, photoError = null)
+            
+            if (editingBeanId != null) {
+                // Edit mode: immediately update the bean's photo
+                val result = addPhotoToBeanUseCase.execute(editingBeanId!!, imageUri)
+                if (result.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        photoPath = result.getOrNull(),
+                        isPhotoLoading = false,
+                        pendingPhotoUri = null // Clear any pending photo
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isPhotoLoading = false,
+                        photoError = domainErrorTranslator.translateResultError(result)
+                    )
+                }
+            } else {
+                // Create mode: store photo URI temporarily
+                _uiState.value = _uiState.value.copy(
+                    pendingPhotoUri = imageUri,
+                    isPhotoLoading = false,
+                    photoPath = null // Clear any existing photo path
+                )
+            }
+        }
+    }
+
+    /**
+     * Replaces the current photo with a new one.
+     * This is essentially the same as addPhoto but provides semantic clarity.
+     */
+    fun replacePhoto(imageUri: Uri) {
+        addPhoto(imageUri)
+    }
+
+    /**
+     * Removes the photo from the bean.
+     * In create mode, clears the pending photo URI.
+     * In edit mode, removes the photo from the bean and storage.
+     */
+    fun removePhoto() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isPhotoLoading = true, photoError = null)
+            
+            if (editingBeanId != null) {
+                // Edit mode: remove photo from bean and storage
+                val result = removePhotoFromBeanUseCase.execute(editingBeanId!!)
+                if (result.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        photoPath = null,
+                        isPhotoLoading = false,
+                        pendingPhotoUri = null
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isPhotoLoading = false,
+                        photoError = domainErrorTranslator.translateResultError(result)
+                    )
+                }
+            } else {
+                // Create mode: just clear the pending photo URI
+                _uiState.value = _uiState.value.copy(
+                    pendingPhotoUri = null,
+                    isPhotoLoading = false,
+                    photoPath = null
+                )
+            }
+        }
+    }
+
+    fun clearPhotoError() {
+        _uiState.value = _uiState.value.copy(photoError = null)
+    }
+
+    /**
+     * Checks if the bean currently has a photo (either saved or pending).
+     */
+    fun hasPhoto(): Boolean {
+        val currentState = _uiState.value
+        return currentState.photoPath != null || currentState.pendingPhotoUri != null
+    }
+
+    /**
+     * Gets the current photo URI for display purposes.
+     * Returns the pending photo URI in create mode, or null if no photo.
+     */
+    fun getCurrentPhotoUri(): Uri? {
+        val currentState = _uiState.value
+        return currentState.pendingPhotoUri
     }
 
     /**
@@ -252,14 +380,16 @@ class AddEditBeanViewModel @Inject constructor(
             // This would require storing original values, for now return true if any field has content
             currentState.name.isNotBlank() ||
                     currentState.notes.isNotBlank() ||
-                    currentState.lastGrinderSetting.isNotBlank()
+                    currentState.lastGrinderSetting.isNotBlank() ||
+                    currentState.pendingPhotoUri != null
         } else {
             // In add mode, check if any field has been modified from defaults
             currentState.name.isNotBlank() ||
                     currentState.roastDate != LocalDate.now() ||
                     currentState.notes.isNotBlank() ||
                     currentState.lastGrinderSetting.isNotBlank() ||
-                    !currentState.isActive
+                    !currentState.isActive ||
+                    currentState.pendingPhotoUri != null
         }
     }
 
@@ -274,6 +404,8 @@ data class AddEditBeanUiState(
     val notes: String = "",
     val isActive: Boolean = true,
     val lastGrinderSetting: String = "",
+    val photoPath: String? = null,
+    val pendingPhotoUri: Uri? = null, // Photo URI pending save in create mode
     val nameError: String? = null,
     val roastDateError: String? = null,
     val notesError: String? = null,
@@ -282,5 +414,7 @@ data class AddEditBeanUiState(
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
     val error: String? = null,
-    val isEditMode: Boolean = false
+    val isEditMode: Boolean = false,
+    val isPhotoLoading: Boolean = false,
+    val photoError: String? = null
 )

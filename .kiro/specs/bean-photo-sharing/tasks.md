@@ -44,7 +44,7 @@
   - Add strings to resources for proper translation
   - _Requirements: 3.1, 3.3, 8.2, 8.4_
 
-- [ ] 7. Update AddEditBeanViewModel for photo operations
+- [x] 7. Update AddEditBeanViewModel for photo operations
   - Add photo-related state properties to ViewModel
   - Implement photo capture, replacement, and deletion methods
   - Add proper error handling and loading states for photo operations
