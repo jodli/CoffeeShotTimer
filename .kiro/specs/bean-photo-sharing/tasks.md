@@ -22,7 +22,7 @@
   - Return DomainExceptions with DomainErrorCodes for proper translation
   - _Requirements: 2.3, 4.3, 4.5, 6.1_
 
-- [ ] 4. Update repository layer for photo operations
+- [x] 4. Update repository layer for photo operations
   - Add photo-related methods to BeanRepository interface
   - Implement photo operations in BeanRepositoryImpl
   - Update repository to handle photo file cleanup when beans are deleted

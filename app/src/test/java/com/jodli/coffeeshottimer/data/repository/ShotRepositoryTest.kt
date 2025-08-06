@@ -5,6 +5,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.jodli.coffeeshottimer.data.database.AppDatabase
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
+import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -36,7 +37,7 @@ class ShotRepositoryTest {
         ).allowMainThreadQueries().build()
         
         shotRepository = ShotRepository(database.shotDao(), database.beanDao())
-        beanRepository = BeanRepository(database.beanDao())
+        beanRepository = BeanRepository(database.beanDao(), mockk())
         
         // Create a test bean for shots
         testBean = createTestBean("Test Bean")

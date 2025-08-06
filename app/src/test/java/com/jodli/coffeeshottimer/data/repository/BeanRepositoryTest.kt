@@ -1,9 +1,15 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.net.Uri
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.jodli.coffeeshottimer.data.database.AppDatabase
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -12,6 +18,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.io.File
 import java.time.LocalDate
 
 /**
@@ -23,6 +30,7 @@ class BeanRepositoryTest {
 
     private lateinit var database: AppDatabase
     private lateinit var repository: BeanRepository
+    private lateinit var mockPhotoStorageManager: PhotoStorageManager
     
     @Before
     fun setup() {
@@ -31,7 +39,8 @@ class BeanRepositoryTest {
             AppDatabase::class.java
         ).allowMainThreadQueries().build()
         
-        repository = BeanRepository(database.beanDao())
+        mockPhotoStorageManager = mockk()
+        repository = BeanRepository(database.beanDao(), mockPhotoStorageManager)
     }
     
     @After
@@ -363,6 +372,367 @@ class BeanRepositoryTest {
         assertFalse("Bean with duplicate name should fail validation", validationResult.isValid)
         assertTrue("Should have uniqueness error", 
             validationResult.errors.any { it.contains("already exists") })
+    }
+
+    // Photo-related tests
+
+    @Test
+    fun addPhotoToBean_validData_succeeds() = runTest {
+        // Given
+        val bean = createTestBean("Test Bean")
+        repository.addBean(bean)
+        
+        val mockUri = mockk<Uri>()
+        val expectedPhotoPath = "/path/to/photo.jpg"
+        
+        coEvery { mockPhotoStorageManager.savePhoto(mockUri, bean.id) } returns Result.success(expectedPhotoPath)
+        
+        // When
+        val result = repository.addPhotoToBean(bean.id, mockUri)
+        
+        // Then
+        assertTrue("Adding photo to bean should succeed", result.isSuccess)
+        assertEquals("Should return correct photo path", expectedPhotoPath, result.getOrNull())
+        
+        coVerify { mockPhotoStorageManager.savePhoto(mockUri, bean.id) }
+        
+        // Verify bean was updated with photo path
+        val updatedBean = repository.getBeanById(bean.id).getOrNull()
+        assertEquals("Bean should have photo path", expectedPhotoPath, updatedBean?.photoPath)
+    }
+
+    @Test
+    fun addPhotoToBean_replacesExistingPhoto() = runTest {
+        // Given
+        val bean = createTestBean("Test Bean")
+        repository.addBean(bean)
+        
+        val oldPhotoPath = "/path/to/old_photo.jpg"
+        val newPhotoPath = "/path/to/new_photo.jpg"
+        
+        // Add initial photo
+        coEvery { mockPhotoStorageManager.savePhoto(any(), bean.id) } returns Result.success(oldPhotoPath)
+        repository.addPhotoToBean(bean.id, mockk())
+        
+        // Setup for replacement
+        val mockNewUri = mockk<Uri>()
+        coEvery { mockPhotoStorageManager.deletePhoto(oldPhotoPath) } returns Result.success(Unit)
+        coEvery { mockPhotoStorageManager.savePhoto(mockNewUri, bean.id) } returns Result.success(newPhotoPath)
+        
+        // When
+        val result = repository.addPhotoToBean(bean.id, mockNewUri)
+        
+        // Then
+        assertTrue("Replacing photo should succeed", result.isSuccess)
+        assertEquals("Should return new photo path", newPhotoPath, result.getOrNull())
+        
+        coVerify { mockPhotoStorageManager.deletePhoto(oldPhotoPath) }
+        coVerify { mockPhotoStorageManager.savePhoto(mockNewUri, bean.id) }
+    }
+
+    @Test
+    fun addPhotoToBean_nonExistentBean_fails() = runTest {
+        // Given
+        val nonExistentBeanId = "non-existent-id"
+        val mockUri = mockk<Uri>()
+        
+        // When
+        val result = repository.addPhotoToBean(nonExistentBeanId, mockUri)
+        
+        // Then
+        assertTrue("Adding photo to non-existent bean should fail", result.isFailure)
+        assertTrue("Should be not found error", result.exceptionOrNull() is RepositoryException.NotFoundError)
+    }
+
+    @Test
+    fun addPhotoToBean_emptyBeanId_fails() = runTest {
+        // Given
+        val mockUri = mockk<Uri>()
+        
+        // When
+        val result = repository.addPhotoToBean("", mockUri)
+        
+        // Then
+        assertTrue("Adding photo with empty bean ID should fail", result.isFailure)
+        assertTrue("Should be validation error", result.exceptionOrNull() is RepositoryException.ValidationError)
+    }
+
+    @Test
+    fun addPhotoToBean_storageFailure_fails() = runTest {
+        // Given
+        val bean = createTestBean("Test Bean")
+        repository.addBean(bean)
+        
+        val mockUri = mockk<Uri>()
+        val storageException = Exception("Storage failed")
+        
+        coEvery { mockPhotoStorageManager.savePhoto(mockUri, bean.id) } returns Result.failure(storageException)
+        
+        // When
+        val result = repository.addPhotoToBean(bean.id, mockUri)
+        
+        // Then
+        assertTrue("Adding photo with storage failure should fail", result.isFailure)
+        assertTrue("Should be database error", result.exceptionOrNull() is RepositoryException.DatabaseError)
+    }
+
+    @Test
+    fun removePhotoFromBean_existingPhoto_succeeds() = runTest {
+        // Given
+        val bean = createTestBean("Test Bean")
+        repository.addBean(bean)
+        
+        val photoPath = "/path/to/photo.jpg"
+        
+        // Add photo first
+        coEvery { mockPhotoStorageManager.savePhoto(any(), bean.id) } returns Result.success(photoPath)
+        repository.addPhotoToBean(bean.id, mockk())
+        
+        // Setup for removal
+        coEvery { mockPhotoStorageManager.deletePhoto(photoPath) } returns Result.success(Unit)
+        
+        // When
+        val result = repository.removePhotoFromBean(bean.id)
+        
+        // Then
+        assertTrue("Removing photo should succeed", result.isSuccess)
+        
+        coVerify { mockPhotoStorageManager.deletePhoto(photoPath) }
+        
+        // Verify bean photo path was removed
+        val updatedBean = repository.getBeanById(bean.id).getOrNull()
+        assertNull("Bean should not have photo path", updatedBean?.photoPath)
+    }
+
+    @Test
+    fun removePhotoFromBean_nonExistentBean_fails() = runTest {
+        // Given
+        val nonExistentBeanId = "non-existent-id"
+        
+        // When
+        val result = repository.removePhotoFromBean(nonExistentBeanId)
+        
+        // Then
+        assertTrue("Removing photo from non-existent bean should fail", result.isFailure)
+        assertTrue("Should be not found error", result.exceptionOrNull() is RepositoryException.NotFoundError)
+    }
+
+    @Test
+    fun removePhotoFromBean_emptyBeanId_fails() = runTest {
+        // When
+        val result = repository.removePhotoFromBean("")
+        
+        // Then
+        assertTrue("Removing photo with empty bean ID should fail", result.isFailure)
+        assertTrue("Should be validation error", result.exceptionOrNull() is RepositoryException.ValidationError)
+    }
+
+    @Test
+    fun getBeanPhoto_existingPhoto_returnsFile() = runTest {
+        // Given
+        val bean = createTestBean("Test Bean")
+        repository.addBean(bean)
+        
+        val photoPath = "/path/to/photo.jpg"
+        val mockFile = mockk<File>()
+        
+        // Add photo first
+        coEvery { mockPhotoStorageManager.savePhoto(any(), bean.id) } returns Result.success(photoPath)
+        repository.addPhotoToBean(bean.id, mockk())
+        
+        coEvery { mockPhotoStorageManager.getPhotoFile(photoPath) } returns mockFile
+        
+        // When
+        val result = repository.getBeanPhoto(bean.id)
+        
+        // Then
+        assertTrue("Getting bean photo should succeed", result.isSuccess)
+        assertEquals("Should return correct file", mockFile, result.getOrNull())
+        
+        coVerify { mockPhotoStorageManager.getPhotoFile(photoPath) }
+    }
+
+    @Test
+    fun getBeanPhoto_noPhoto_returnsNull() = runTest {
+        // Given
+        val bean = createTestBean("Test Bean")
+        repository.addBean(bean)
+        
+        // When
+        val result = repository.getBeanPhoto(bean.id)
+        
+        // Then
+        assertTrue("Getting bean photo should succeed", result.isSuccess)
+        assertNull("Should return null when no photo", result.getOrNull())
+    }
+
+    @Test
+    fun getPhotoFile_validPath_returnsFile() = runTest {
+        // Given
+        val photoPath = "/path/to/photo.jpg"
+        val mockFile = mockk<File>()
+        
+        coEvery { mockPhotoStorageManager.getPhotoFile(photoPath) } returns mockFile
+        
+        // When
+        val result = repository.getPhotoFile(photoPath)
+        
+        // Then
+        assertTrue("Getting photo file should succeed", result.isSuccess)
+        assertEquals("Should return correct file", mockFile, result.getOrNull())
+        
+        coVerify { mockPhotoStorageManager.getPhotoFile(photoPath) }
+    }
+
+    @Test
+    fun getPhotoFile_emptyPath_fails() = runTest {
+        // When
+        val result = repository.getPhotoFile("")
+        
+        // Then
+        assertTrue("Getting photo file with empty path should fail", result.isFailure)
+        assertTrue("Should be validation error", result.exceptionOrNull() is RepositoryException.ValidationError)
+    }
+
+    @Test
+    fun getBeansWithPhotos_returnsCorrectBeans() = runTest {
+        // Given
+        val beanWithPhoto = createTestBean("Bean With Photo")
+        val beanWithoutPhoto = createTestBean("Bean Without Photo")
+        
+        repository.addBean(beanWithPhoto)
+        repository.addBean(beanWithoutPhoto)
+        
+        // Add photo to first bean
+        coEvery { mockPhotoStorageManager.savePhoto(any(), beanWithPhoto.id) } returns Result.success("/path/to/photo.jpg")
+        repository.addPhotoToBean(beanWithPhoto.id, mockk())
+        
+        // When
+        val result = repository.getBeansWithPhotos().first()
+        
+        // Then
+        assertTrue("Getting beans with photos should succeed", result.isSuccess)
+        val beans = result.getOrNull()
+        assertEquals("Should return only beans with photos", 1, beans?.size)
+        assertEquals("Should return the bean with photo", "Bean With Photo", beans?.first()?.name)
+    }
+
+    @Test
+    fun getBeansByPhotoStatus_filtersCorrectly() = runTest {
+        // Given
+        val activeBeanWithPhoto = createTestBean("Active Bean With Photo", isActive = true)
+        val activeBeanWithoutPhoto = createTestBean("Active Bean Without Photo", isActive = true)
+        val inactiveBeanWithPhoto = createTestBean("Inactive Bean With Photo", isActive = false)
+        
+        repository.addBean(activeBeanWithPhoto)
+        repository.addBean(activeBeanWithoutPhoto)
+        repository.addBean(inactiveBeanWithPhoto)
+        
+        // Add photos to beans with photos
+        coEvery { mockPhotoStorageManager.savePhoto(any(), activeBeanWithPhoto.id) } returns Result.success("/path/to/photo1.jpg")
+        coEvery { mockPhotoStorageManager.savePhoto(any(), inactiveBeanWithPhoto.id) } returns Result.success("/path/to/photo2.jpg")
+        repository.addPhotoToBean(activeBeanWithPhoto.id, mockk())
+        repository.addPhotoToBean(inactiveBeanWithPhoto.id, mockk())
+        
+        // When - filter for active beans with photos
+        val result = repository.getBeansByPhotoStatus(hasPhoto = true, activeOnly = true).first()
+        
+        // Then
+        assertTrue("Getting beans by photo status should succeed", result.isSuccess)
+        val beans = result.getOrNull()
+        assertEquals("Should return only active beans with photos", 1, beans?.size)
+        assertEquals("Should return the active bean with photo", "Active Bean With Photo", beans?.first()?.name)
+    }
+
+    @Test
+    fun cleanupOrphanedPhotos_removesUnreferencedFiles() = runTest {
+        // Given
+        val referencedPaths = setOf("/path/to/photo1.jpg", "/path/to/photo2.jpg")
+        val cleanedUpCount = 3
+        
+        coEvery { mockPhotoStorageManager.cleanupOrphanedFiles(referencedPaths) } returns Result.success(cleanedUpCount)
+        
+        // When
+        val result = repository.cleanupOrphanedPhotos()
+        
+        // Then
+        assertTrue("Cleanup should succeed", result.isSuccess)
+        assertEquals("Should return correct cleanup count", cleanedUpCount, result.getOrNull())
+        
+        coVerify { mockPhotoStorageManager.cleanupOrphanedFiles(any()) }
+    }
+
+    @Test
+    fun getPhotoStorageSize_returnsCorrectSize() = runTest {
+        // Given
+        val expectedSize = 1024L * 1024L // 1MB
+        
+        coEvery { mockPhotoStorageManager.getTotalStorageSize() } returns expectedSize
+        
+        // When
+        val result = repository.getPhotoStorageSize()
+        
+        // Then
+        assertTrue("Getting photo storage size should succeed", result.isSuccess)
+        assertEquals("Should return correct size", expectedSize, result.getOrNull())
+        
+        coVerify { mockPhotoStorageManager.getTotalStorageSize() }
+    }
+
+    @Test
+    fun deleteBean_withPhoto_deletesPhotoFile() = runTest {
+        // Given
+        val bean = createTestBean("Bean With Photo")
+        repository.addBean(bean)
+        
+        val photoPath = "/path/to/photo.jpg"
+        
+        // Add photo first
+        coEvery { mockPhotoStorageManager.savePhoto(any(), bean.id) } returns Result.success(photoPath)
+        repository.addPhotoToBean(bean.id, mockk())
+        
+        // Setup for deletion
+        coEvery { mockPhotoStorageManager.deletePhoto(photoPath) } returns Result.success(Unit)
+        
+        // When
+        val result = repository.deleteBean(bean)
+        
+        // Then
+        assertTrue("Deleting bean with photo should succeed", result.isSuccess)
+        
+        coVerify { mockPhotoStorageManager.deletePhoto(photoPath) }
+        
+        // Verify bean is deleted
+        val retrievedBean = repository.getBeanById(bean.id).getOrNull()
+        assertNull("Bean should be deleted", retrievedBean)
+    }
+
+    @Test
+    fun deleteBean_photoDeleteFails_stillDeletesBean() = runTest {
+        // Given
+        val bean = createTestBean("Bean With Photo")
+        repository.addBean(bean)
+        
+        val photoPath = "/path/to/photo.jpg"
+        
+        // Add photo first
+        coEvery { mockPhotoStorageManager.savePhoto(any(), bean.id) } returns Result.success(photoPath)
+        repository.addPhotoToBean(bean.id, mockk())
+        
+        // Setup for deletion failure
+        coEvery { mockPhotoStorageManager.deletePhoto(photoPath) } returns Result.failure(Exception("Delete failed"))
+        
+        // When
+        val result = repository.deleteBean(bean)
+        
+        // Then
+        assertTrue("Deleting bean should succeed even if photo delete fails", result.isSuccess)
+        
+        coVerify { mockPhotoStorageManager.deletePhoto(photoPath) }
+        
+        // Verify bean is still deleted
+        val retrievedBean = repository.getBeanById(bean.id).getOrNull()
+        assertNull("Bean should be deleted even if photo delete fails", retrievedBean)
     }
     
     /**
