@@ -14,7 +14,7 @@
   - Write unit tests for PhotoStorageManager operations
   - _Requirements: 1.4, 6.1, 6.2, 7.3_
 
-- [ ] 3. Create photo management use cases
+- [x] 3. Create photo management use cases
   - Implement AddPhotoToBeanUseCase for adding photos to beans
   - Implement RemovePhotoFromBeanUseCase for deleting bean photos
   - Implement GetBeanPhotoUseCase for retrieving photo files
