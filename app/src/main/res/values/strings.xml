@@ -259,6 +259,41 @@
     <string name="error_photo_storage_full">Storage is full - cannot save photo</string>
     <string name="error_photo_invalid_uri">Invalid photo selected</string>
     <string name="error_photo_file_access_error">Cannot access photo file</string>
+    <string name="error_camera_unavailable">Camera is not available</string>
+    <string name="error_camera_permission_denied">Camera permission is required to take photos</string>
+
+    <!-- Photo UI Strings -->
+    <string name="text_bean_photo">Bean Photo</string>
+    <string name="text_add_photo">Add Photo</string>
+    <string name="text_replace_photo">Replace Photo</string>
+    <string name="text_delete_photo">Delete Photo</string>
+    <string name="text_view_photo">View Photo</string>
+    <string name="text_take_photo">Take Photo</string>
+    <string name="text_choose_from_gallery">Choose from Gallery</string>
+    <string name="text_photo_options">Photo Options</string>
+    <string name="text_no_photo">No photo added</string>
+    <string name="text_loading_photo">Loading photo…</string>
+    <string name="text_saving_photo">Saving photo…</string>
+    <string name="text_deleting_photo">Deleting photo…</string>
+    <string name="text_photo_saved">Photo saved successfully</string>
+    <string name="text_photo_deleted">Photo deleted successfully</string>
+    <string name="text_photo_replaced">Photo replaced successfully</string>
+    
+    <!-- Photo Confirmation Dialogs -->
+    <string name="dialog_delete_photo_title">Delete Photo?</string>
+    <string name="dialog_delete_photo_message">Are you sure you want to delete this photo? This action cannot be undone.</string>
+    <string name="dialog_replace_photo_title">Replace Photo?</string>
+    <string name="dialog_replace_photo_message">This will replace the current photo. The old photo will be permanently deleted.</string>
+    
+    <!-- Photo Content Descriptions -->
+    <string name="cd_bean_photo">Bean photo</string>
+    <string name="cd_add_photo">Add photo</string>
+    <string name="cd_replace_photo">Replace photo</string>
+    <string name="cd_delete_photo">Delete photo</string>
+    <string name="cd_view_photo">View photo</string>
+    <string name="cd_photo_placeholder">No photo available</string>
+    <string name="cd_close_photo_viewer">Close photo viewer</string>
+    <string name="cd_photo_loading">Photo loading</string>
 
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>
