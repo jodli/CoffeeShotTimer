@@ -270,6 +270,11 @@
     <string name="text_replace_photo">Foto ersetzen</string>
     <string name="text_delete_photo">Foto löschen</string>
     <string name="text_view_photo">Foto anzeigen</string>
+    
+    <!-- Short photo button text -->
+    <string name="text_view_short">Ansehen</string>
+    <string name="text_replace_short">Ersetzen</string>
+    <string name="text_delete_short">Löschen</string>
     <string name="text_take_photo">Foto aufnehmen</string>
     <string name="text_choose_from_gallery">Aus Galerie wählen</string>
     <string name="text_photo_options">Foto-Optionen</string>
@@ -466,4 +471,7 @@
     <string name="text_recommendations_for_next_shot">Empfehlungen für nächsten Shot</string>
     <string name="text_next_steps_based_on_shot">Basierend auf diesem Shot:</string>
     <string name="text_and_more_recommendations">+%1$d weitere Empfehlungen</string>
+        
+    <!-- Photo pending state -->
+    <string name="text_photo_will_be_saved">Foto wird erst mit der Bohne gespeichert</string>
 </resources>

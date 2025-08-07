@@ -1,5 +1,7 @@
 package com.jodli.coffeeshottimer.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,17 +46,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.res.stringResource
+import android.net.Uri
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.BeanPhotoSection
+import com.jodli.coffeeshottimer.ui.components.PhotoViewer
+import com.jodli.coffeeshottimer.ui.components.PendingPhotoViewer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
 import java.time.LocalDate
@@ -69,8 +76,56 @@ fun AddEditBeanScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spacing = LocalSpacing.current
+    val context = LocalContext.current
 
     var showDatePicker by remember { mutableStateOf(false) }
+    var showPhotoViewer by remember { mutableStateOf(false) }
+    var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Camera launcher
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && tempCameraUri != null) {
+            viewModel.addPhoto(tempCameraUri!!)
+        }
+        tempCameraUri = null
+    }
+
+    // Gallery launcher
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let { viewModel.addPhoto(it) }
+    }
+
+    // Permission launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val cameraGranted = permissions[android.Manifest.permission.CAMERA] ?: false
+        if (cameraGranted) {
+            // Permission granted, launch camera
+            launchCamera(viewModel, cameraLauncher) { uri -> tempCameraUri = uri }
+        } else {
+            // Permission denied, fallback to gallery
+            galleryLauncher.launch("image/*")
+        }
+    }
+
+    // Function to handle photo capture
+    fun handlePhotoCapture() {
+        // For now, just launch gallery as a placeholder
+        // TODO: Implement proper camera/gallery selection dialog
+        galleryLauncher.launch("image/*")
+    }
+
+    // Function to handle photo viewing
+    fun handlePhotoView() {
+        if (uiState.photoPath != null || uiState.pendingPhotoUri != null) {
+            showPhotoViewer = true
+        }
+    }
 
     // Initialize for edit mode if beanId is provided
     LaunchedEffect(beanId) {
@@ -174,6 +229,18 @@ fun AddEditBeanScreen(
                     errorMessage = uiState.grinderSettingError
                 )
 
+                // Photo Section - available in both create and edit modes
+                BeanPhotoSection(
+                    photoPath = uiState.photoPath,
+                    pendingPhotoUri = uiState.pendingPhotoUri,
+                    isLoading = uiState.isPhotoLoading,
+                    error = uiState.photoError,
+                    onAddPhoto = ::handlePhotoCapture,
+                    onReplacePhoto = ::handlePhotoCapture,
+                    onDeletePhoto = viewModel::removePhoto,
+                    onViewPhoto = ::handlePhotoView
+                )
+
                 // Active Status (only show in edit mode)
                 if (uiState.isEditMode) {
                     CoffeeCard(
@@ -239,6 +306,37 @@ fun AddEditBeanScreen(
             onDismiss = { showDatePicker = false }
         )
     }
+
+    // Photo Viewer
+    if (showPhotoViewer) {
+        val photoPath = uiState.photoPath
+        val pendingPhotoUri = uiState.pendingPhotoUri
+        
+        when {
+            photoPath != null -> {
+                PhotoViewer(
+                    photoPath = photoPath,
+                    onDismiss = { showPhotoViewer = false }
+                )
+            }
+            pendingPhotoUri != null -> {
+                PendingPhotoViewer(
+                    photoUri = pendingPhotoUri,
+                    onDismiss = { showPhotoViewer = false }
+                )
+            }
+        }
+    }
+}
+
+// Helper function to launch camera (placeholder for now)
+private fun launchCamera(
+    viewModel: AddEditBeanViewModel,
+    cameraLauncher: androidx.activity.compose.ManagedActivityResultLauncher<Uri, Boolean>,
+    onTempUriCreated: (Uri) -> Unit
+) {
+    // TODO: Implement proper camera launch with PhotoCaptureManager
+    // For now, this is a placeholder
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
