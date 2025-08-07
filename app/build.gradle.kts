@@ -243,6 +243,7 @@ dependencies {
 
     // Coil for image loading
     implementation(libs.coil.compose)
+    implementation(libs.coil.base)
 
     // Core library desugaring for Java 8 time APIs
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")

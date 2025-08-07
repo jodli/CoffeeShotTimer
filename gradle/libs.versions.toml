@@ -62,6 +62,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Coil for image loading
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-base = { group = "io.coil-kt", name = "coil", version.ref = "coil" }
 
 # Testing dependencies
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
