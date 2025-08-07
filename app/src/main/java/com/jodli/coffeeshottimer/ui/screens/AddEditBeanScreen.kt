@@ -61,6 +61,7 @@ import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.BeanPhotoSection
 import com.jodli.coffeeshottimer.ui.components.PhotoViewer
+import com.jodli.coffeeshottimer.ui.components.PhotoActionSheet
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
 import java.time.LocalDate
@@ -79,14 +80,20 @@ fun AddEditBeanScreen(
 
     var showDatePicker by remember { mutableStateOf(false) }
     var showPhotoViewer by remember { mutableStateOf(false) }
+    var showPhotoActionSheet by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraPermissionGranted by remember { mutableStateOf(viewModel.isCameraPermissionGranted(context)) }
 
     // Camera launcher
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
-        if (success && tempCameraUri != null) {
-            viewModel.addPhoto(tempCameraUri!!)
+        val currentTempUri = tempCameraUri
+        if (success && currentTempUri != null) {
+            viewModel.addPhoto(currentTempUri)
+        } else if (currentTempUri != null) {
+            // Camera capture failed or was cancelled, cleanup temp file
+            viewModel.cleanupTempCameraFile(currentTempUri)
         }
         tempCameraUri = null
     }
@@ -98,25 +105,71 @@ fun AddEditBeanScreen(
         uri?.let { viewModel.addPhoto(it) }
     }
 
+    // Function to launch gallery
+    val launchGallery = remember {
+        {
+            galleryLauncher.launch("image/*")
+        }
+    }
+
+    // Function to launch camera
+    val launchCamera = remember {
+        {
+            try {
+                val cameraResult = viewModel.createCameraIntent(context)
+                if (cameraResult != null) {
+                    val (intent, uri) = cameraResult
+                    tempCameraUri = uri
+                    cameraLauncher.launch(uri)
+                } else {
+                    // Camera intent creation failed, fallback to gallery
+                    launchGallery()
+                }
+            } catch (e: Exception) {
+                // Camera intent creation failed, fallback to gallery
+                launchGallery()
+            }
+        }
+    }
+
     // Permission launcher
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         val cameraGranted = permissions[android.Manifest.permission.CAMERA] ?: false
+        cameraPermissionGranted = cameraGranted
         if (cameraGranted) {
-            // Permission granted, launch camera
-            launchCamera(viewModel, cameraLauncher) { uri -> tempCameraUri = uri }
+            // Permission granted, launch camera directly
+            launchCamera()
         } else {
-            // Permission denied, fallback to gallery
-            galleryLauncher.launch("image/*")
+            // Permission denied, show error message
+            viewModel.clearPhotoError()
+            // Could show a message about permission being required
         }
     }
 
-    // Function to handle photo capture
-    fun handlePhotoCapture() {
-        // For now, just launch gallery as a placeholder
-        // TODO: Implement proper camera/gallery selection dialog
-        galleryLauncher.launch("image/*")
+    // Function to handle camera capture request
+    val handleCameraCapture = remember {
+        {
+            if (viewModel.isCameraAvailable(context)) {
+                if (cameraPermissionGranted) {
+                    launchCamera()
+                } else {
+                    // Request camera permission
+                    permissionLauncher.launch(viewModel.getRequiredPermissions())
+                }
+            } else {
+                // Camera not available, fallback to gallery
+                launchGallery()
+            }
+        }
+    }
+
+    // Function to handle photo capture (shows action sheet)
+    val handlePhotoCapture = remember {
+        {
+            showPhotoActionSheet = true
+        }
     }
 
     // Function to handle photo viewing
@@ -138,6 +191,15 @@ fun AddEditBeanScreen(
         if (uiState.saveSuccess) {
             onNavigateBack()
             viewModel.resetSaveSuccess()
+        }
+    }
+
+    // Cleanup temp camera file when component is disposed
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose {
+            tempCameraUri?.let { uri ->
+                viewModel.cleanupTempCameraFile(uri)
+            }
         }
     }
 
@@ -236,10 +298,10 @@ fun AddEditBeanScreen(
                     error = uiState.photoError,
                     successMessage = uiState.photoSuccessMessage,
                     canRetry = uiState.canRetryPhotoOperation,
-                    onAddPhoto = ::handlePhotoCapture,
-                    onReplacePhoto = ::handlePhotoCapture,
+                    onAddPhoto = { handlePhotoCapture() },
+                    onReplacePhoto = { handlePhotoCapture() },
                     onDeletePhoto = viewModel::removePhoto,
-                    onViewPhoto = ::handlePhotoView,
+                    onViewPhoto = { handlePhotoView() },
                     onRetry = viewModel::retryPhotoOperation,
                     onClearError = viewModel::clearPhotoError,
                     onClearSuccess = viewModel::clearPhotoSuccessMessage
@@ -319,16 +381,33 @@ fun AddEditBeanScreen(
             onDismiss = { showPhotoViewer = false }
         )
     }
-}
 
-// Helper function to launch camera (placeholder for now)
-private fun launchCamera(
-    viewModel: AddEditBeanViewModel,
-    cameraLauncher: androidx.activity.compose.ManagedActivityResultLauncher<Uri, Boolean>,
-    onTempUriCreated: (Uri) -> Unit
-) {
-    // TODO: Implement proper camera launch with PhotoCaptureManager
-    // For now, this is a placeholder
+    // Photo Action Sheet
+    if (showPhotoActionSheet) {
+        PhotoActionSheet(
+            onCameraCapture = {
+                showPhotoActionSheet = false
+                launchCamera()
+            },
+            onGallerySelect = {
+                showPhotoActionSheet = false
+                launchGallery()
+            },
+            onDismiss = { showPhotoActionSheet = false },
+            cameraAvailable = viewModel.isCameraAvailable(context),
+            cameraPermissionGranted = cameraPermissionGranted,
+            storagePermissionGranted = true, // Gallery access doesn't require explicit permission on modern Android
+            onRequestCameraPermission = {
+                showPhotoActionSheet = false
+                permissionLauncher.launch(viewModel.getRequiredPermissions())
+            },
+            onRequestStoragePermission = {
+                // Not needed for gallery access on modern Android
+                showPhotoActionSheet = false
+                launchGallery()
+            }
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

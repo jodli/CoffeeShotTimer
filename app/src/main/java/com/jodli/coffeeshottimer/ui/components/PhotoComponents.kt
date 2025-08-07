@@ -83,7 +83,6 @@ fun BeanPhotoSection(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    var showActionSheet by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     CoffeeCard(modifier = modifier) {
@@ -120,7 +119,7 @@ fun BeanPhotoSection(
                 PhotoDisplaySection(
                     photoPath = photoPath,
                     onViewPhoto = onViewPhoto,
-                    onReplacePhoto = { showActionSheet = true },
+                    onReplacePhoto = onReplacePhoto,
                     onDeletePhoto = { showDeleteDialog = true }
                 )
             }
@@ -128,30 +127,15 @@ fun BeanPhotoSection(
                 PendingPhotoDisplaySection(
                     pendingPhotoUri = pendingPhotoUri,
                     onViewPhoto = onViewPhoto,
-                    onReplacePhoto = { showActionSheet = true },
+                    onReplacePhoto = onReplacePhoto,
                     onDeletePhoto = { showDeleteDialog = true }
                 )
             }
             else -> {
                 PhotoEmptyState(
-                    onAddPhoto = { showActionSheet = true }
+                    onAddPhoto = onAddPhoto
                 )
             }
-        }
-
-        // Photo action sheet
-        if (showActionSheet) {
-            PhotoActionSheet(
-                onCameraCapture = {
-                    showActionSheet = false
-                    if (photoPath != null) onReplacePhoto() else onAddPhoto()
-                },
-                onGallerySelect = {
-                    showActionSheet = false
-                    if (photoPath != null) onReplacePhoto() else onAddPhoto()
-                },
-                onDismiss = { showActionSheet = false }
-            )
         }
 
         // Delete confirmation dialog
@@ -649,7 +633,7 @@ private fun PhotoActionItem(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
                 subtitle?.let { sub ->
                     Text(
                         text = sub,
@@ -703,7 +687,7 @@ private fun PhotoActionItemDisabled(
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                 )
-                
+
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
