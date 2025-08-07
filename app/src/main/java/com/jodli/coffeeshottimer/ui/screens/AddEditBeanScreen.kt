@@ -83,6 +83,7 @@ fun AddEditBeanScreen(
     var showPhotoActionSheet by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
     var cameraPermissionGranted by remember { mutableStateOf(viewModel.isCameraPermissionGranted(context)) }
+    var storagePermissionGranted by remember { mutableStateOf(viewModel.isStoragePermissionGranted(context)) }
 
     // Camera launcher
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -105,10 +106,41 @@ fun AddEditBeanScreen(
         uri?.let { viewModel.addPhoto(it) }
     }
 
-    // Function to launch gallery
-    val launchGallery = remember {
-        {
+    // Permission launcher
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        val cameraGranted = permissions[android.Manifest.permission.CAMERA] ?: false
+
+        cameraPermissionGranted = cameraGranted
+        storagePermissionGranted = viewModel.isStoragePermissionGranted(context) // Re-check storage permission
+
+        if (cameraGranted) {
+            // Permission granted, launch camera directly
+            try {
+                val cameraResult = viewModel.createCameraIntent(context)
+                if (cameraResult != null) {
+                    val (intent, uri) = cameraResult
+                    tempCameraUri = uri
+                    cameraLauncher.launch(uri)
+                } else {
+                    // Camera intent creation failed, fallback to gallery
+                    if (storagePermissionGranted) {
+                        galleryLauncher.launch("image/*")
+                    }
+                }
+            } catch (e: Exception) {
+                // Camera intent creation failed, fallback to gallery
+                if (storagePermissionGranted) {
+                    galleryLauncher.launch("image/*")
+                }
+            }
+        } else if (storagePermissionGranted) {
+            // Camera permission denied but storage granted, use gallery
             galleryLauncher.launch("image/*")
+        } else {
+            // Both permissions denied
+            viewModel.clearPhotoError()
         }
     }
 
@@ -123,28 +155,34 @@ fun AddEditBeanScreen(
                     cameraLauncher.launch(uri)
                 } else {
                     // Camera intent creation failed, fallback to gallery
-                    launchGallery()
+                    if (storagePermissionGranted) {
+                        galleryLauncher.launch("image/*")
+                    } else {
+                        // Need to request storage permission for gallery fallback
+                        permissionLauncher.launch(viewModel.getRequiredPermissions())
+                    }
                 }
             } catch (e: Exception) {
                 // Camera intent creation failed, fallback to gallery
-                launchGallery()
+                if (storagePermissionGranted) {
+                    galleryLauncher.launch("image/*")
+                } else {
+                    // Need to request storage permission for gallery fallback
+                    permissionLauncher.launch(viewModel.getRequiredPermissions())
+                }
             }
         }
     }
 
-    // Permission launcher
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val cameraGranted = permissions[android.Manifest.permission.CAMERA] ?: false
-        cameraPermissionGranted = cameraGranted
-        if (cameraGranted) {
-            // Permission granted, launch camera directly
-            launchCamera()
-        } else {
-            // Permission denied, show error message
-            viewModel.clearPhotoError()
-            // Could show a message about permission being required
+    // Function to launch gallery
+    val launchGallery = remember {
+        {
+            if (storagePermissionGranted) {
+                galleryLauncher.launch("image/*")
+            } else {
+                // Request storage permission first
+                permissionLauncher.launch(viewModel.getRequiredPermissions())
+            }
         }
     }
 
@@ -396,15 +434,14 @@ fun AddEditBeanScreen(
             onDismiss = { showPhotoActionSheet = false },
             cameraAvailable = viewModel.isCameraAvailable(context),
             cameraPermissionGranted = cameraPermissionGranted,
-            storagePermissionGranted = true, // Gallery access doesn't require explicit permission on modern Android
+            storagePermissionGranted = storagePermissionGranted,
             onRequestCameraPermission = {
                 showPhotoActionSheet = false
                 permissionLauncher.launch(viewModel.getRequiredPermissions())
             },
             onRequestStoragePermission = {
-                // Not needed for gallery access on modern Android
                 showPhotoActionSheet = false
-                launchGallery()
+                permissionLauncher.launch(viewModel.getRequiredPermissions())
             }
         )
     }
