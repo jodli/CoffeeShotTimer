@@ -8,6 +8,9 @@ import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
 import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
+import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.validation.validateBeanNameEnhanced
@@ -47,6 +50,7 @@ class AddEditBeanViewModel @Inject constructor(
     private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase,
     private val getBeanPhotoUseCase: GetBeanPhotoUseCase,
     private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase,
+    private val photoCaptureManager: PhotoCaptureManager,
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
     private val domainErrorTranslator: DomainErrorTranslator
@@ -239,7 +243,7 @@ class AddEditBeanViewModel @Inject constructor(
                         }
                     }
                 }
-                
+
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
                     saveSuccess = true
@@ -269,13 +273,13 @@ class AddEditBeanViewModel @Inject constructor(
     fun addPhoto(imageUri: Uri) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                isPhotoLoading = true, 
+                isPhotoLoading = true,
                 photoError = null,
                 photoSuccessMessage = null,
                 canRetryPhotoOperation = false,
                 lastFailedPhotoOperation = null
             )
-            
+
             if (editingBeanId != null) {
                 // Edit mode: immediately update the bean's photo
                 val result = addPhotoToBeanUseCase.execute(editingBeanId!!, imageUri)
@@ -313,13 +317,13 @@ class AddEditBeanViewModel @Inject constructor(
     fun replacePhoto(imageUri: Uri) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                isPhotoLoading = true, 
+                isPhotoLoading = true,
                 photoError = null,
                 photoSuccessMessage = null,
                 canRetryPhotoOperation = false,
                 lastFailedPhotoOperation = null
             )
-            
+
             if (editingBeanId != null) {
                 // Edit mode: replace the bean's photo
                 val result = addPhotoToBeanUseCase.execute(editingBeanId!!, imageUri)
@@ -358,13 +362,13 @@ class AddEditBeanViewModel @Inject constructor(
     fun removePhoto() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
-                isPhotoLoading = true, 
+                isPhotoLoading = true,
                 photoError = null,
                 photoSuccessMessage = null,
                 canRetryPhotoOperation = false,
                 lastFailedPhotoOperation = null
             )
-            
+
             if (editingBeanId != null) {
                 // Edit mode: remove photo from bean and storage
                 val result = removePhotoFromBeanUseCase.execute(editingBeanId!!)
@@ -413,7 +417,7 @@ class AddEditBeanViewModel @Inject constructor(
     fun retryPhotoOperation() {
         val currentState = _uiState.value
         val lastOperation = currentState.lastFailedPhotoOperation ?: return
-        
+
         when (lastOperation) {
             PhotoOperation.ADD_PHOTO -> {
                 // For retry, we need the URI from the last attempt
@@ -505,6 +509,56 @@ class AddEditBeanViewModel @Inject constructor(
                     !currentState.isActive ||
                     currentState.pendingPhotoUri != null
         }
+    }
+
+    // Camera-related methods that delegate to PhotoCaptureManager
+
+    /**
+     * Checks if camera permission is granted.
+     */
+    fun isCameraPermissionGranted(context: Context): Boolean {
+        return photoCaptureManager.isCameraPermissionGranted(context)
+    }
+
+    /**
+     * Creates a camera capture intent with a temporary file URI.
+     */
+    fun createCameraIntent(context: Context): Pair<Intent, Uri>? {
+        return try {
+            photoCaptureManager.createImageCaptureIntent()
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    /**
+     * Creates a gallery selection intent.
+     */
+    fun createGalleryIntent(): Intent {
+        return photoCaptureManager.createImagePickerIntent()
+    }
+
+    /**
+     * Cleans up a temporary camera file.
+     */
+    fun cleanupTempCameraFile(uri: Uri) {
+        viewModelScope.launch {
+            photoCaptureManager.cleanupTempFile(uri)
+        }
+    }
+
+    /**
+     * Checks if camera is available on the device.
+     */
+    fun isCameraAvailable(context: Context): Boolean {
+        return photoCaptureManager.isCameraAvailable(context)
+    }
+
+    /**
+     * Gets the list of required permissions for camera functionality.
+     */
+    fun getRequiredPermissions(): Array<String> {
+        return photoCaptureManager.getRequiredPermissions()
     }
 
 }

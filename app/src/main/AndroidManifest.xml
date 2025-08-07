@@ -4,14 +4,29 @@
 
     <!-- Vibrate permission for timer alerts -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    
+
     <!-- Camera permission for bean photo capture -->
     <uses-permission android:name="android.permission.CAMERA" />
-    
+
     <!-- Read external storage for gallery photo selection -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" 
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- Package visibility for camera apps on Android 11+ -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.PICK" />
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+            <data android:mimeType="image/*" />
+        </intent>
+    </queries>
 
     <application
         android:name=".CoffeeShotTimerApplication"
