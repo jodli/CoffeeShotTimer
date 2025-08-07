@@ -51,7 +51,7 @@
   - Write unit tests for ViewModel photo functionality
   - _Requirements: 1.1, 2.1, 4.1, 8.5_
 
-- [ ] 8. Integrate photo section into AddEditBeanScreen
+- [x] 8. Integrate photo section into AddEditBeanScreen
   - Add BeanPhotoSection to the bean editing UI layout
   - Implement photo action handling (capture, replace, delete)
   - Add proper spacing and styling consistent with app design system

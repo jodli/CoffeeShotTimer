@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.components
 
+import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +66,7 @@ import java.io.File
 @Composable
 fun BeanPhotoSection(
     photoPath: String?,
+    pendingPhotoUri: Uri? = null,
     isLoading: Boolean = false,
     error: String? = null,
     onAddPhoto: () -> Unit,
@@ -98,6 +100,14 @@ fun BeanPhotoSection(
             photoPath != null -> {
                 PhotoDisplaySection(
                     photoPath = photoPath,
+                    onViewPhoto = onViewPhoto,
+                    onReplacePhoto = { showActionSheet = true },
+                    onDeletePhoto = { showDeleteDialog = true }
+                )
+            }
+            pendingPhotoUri != null -> {
+                PendingPhotoDisplaySection(
+                    pendingPhotoUri = pendingPhotoUri,
                     onViewPhoto = onViewPhoto,
                     onReplacePhoto = { showActionSheet = true },
                     onDeletePhoto = { showDeleteDialog = true }
@@ -227,21 +237,95 @@ private fun PhotoDisplaySection(
             horizontalArrangement = Arrangement.spacedBy(spacing.small)
         ) {
             CoffeeSecondaryButton(
-                text = stringResource(R.string.text_view_photo),
+                text = stringResource(R.string.text_view_short),
                 onClick = onViewPhoto,
                 icon = Icons.Default.Image,
                 modifier = Modifier.weight(1f)
             )
 
             CoffeeSecondaryButton(
-                text = stringResource(R.string.text_replace_photo),
+                text = stringResource(R.string.text_replace_short),
                 onClick = onReplacePhoto,
                 icon = Icons.Default.Edit,
                 modifier = Modifier.weight(1f)
             )
 
             CoffeeSecondaryButton(
-                text = stringResource(R.string.text_delete_photo),
+                text = stringResource(R.string.text_delete_short),
+                onClick = onDeletePhoto,
+                icon = Icons.Default.Delete,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+/**
+ * Pending photo display section for create mode when photo is selected but not yet saved
+ */
+@Composable
+private fun PendingPhotoDisplaySection(
+    pendingPhotoUri: Uri,
+    onViewPhoto: () -> Unit,
+    onReplacePhoto: () -> Unit,
+    onDeletePhoto: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val context = LocalContext.current
+
+    Column(modifier = modifier) {
+        // Photo display
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(16f / 9f)
+                .clickable { onViewPhoto() },
+            shape = RoundedCornerShape(spacing.cornerMedium),
+            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(pendingPhotoUri)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = stringResource(R.string.cd_bean_photo),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Pending indicator
+        Text(
+            text = stringResource(R.string.text_photo_will_be_saved),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = spacing.small)
+        )
+
+        // Action buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            CoffeeSecondaryButton(
+                text = stringResource(R.string.text_view_short),
+                onClick = onViewPhoto,
+                icon = Icons.Default.Image,
+                modifier = Modifier.weight(1f)
+            )
+
+            CoffeeSecondaryButton(
+                text = stringResource(R.string.text_replace_short),
+                onClick = onReplacePhoto,
+                icon = Icons.Default.Edit,
+                modifier = Modifier.weight(1f)
+            )
+
+            CoffeeSecondaryButton(
+                text = stringResource(R.string.text_delete_short),
                 onClick = onDeletePhoto,
                 icon = Icons.Default.Delete,
                 modifier = Modifier.weight(1f)
@@ -433,6 +517,52 @@ fun PhotoViewer(
         AsyncImage(
             model = ImageRequest.Builder(context)
                 .data(File(photoPath))
+                .crossfade(true)
+                .build(),
+            contentDescription = stringResource(R.string.cd_bean_photo),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
+
+        // Close button
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(spacing.medium)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.cd_close_photo_viewer),
+                tint = Color.White,
+                modifier = Modifier.size(spacing.iconMedium)
+            )
+        }
+    }
+}
+
+/**
+ * Full-screen photo viewer for pending photos (URIs)
+ */
+@Composable
+fun PendingPhotoViewer(
+    photoUri: Uri,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val context = LocalContext.current
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable { onDismiss() }
+    ) {
+        // Photo
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(photoUri)
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(R.string.cd_bean_photo),

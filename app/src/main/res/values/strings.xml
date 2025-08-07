@@ -268,6 +268,11 @@
     <string name="text_replace_photo">Replace Photo</string>
     <string name="text_delete_photo">Delete Photo</string>
     <string name="text_view_photo">View Photo</string>
+    
+    <!-- Short photo button text -->
+    <string name="text_view_short">View</string>
+    <string name="text_replace_short">Replace</string>
+    <string name="text_delete_short">Delete</string>
     <string name="text_take_photo">Take Photo</string>
     <string name="text_choose_from_gallery">Choose from Gallery</string>
     <string name="text_photo_options">Photo Options</string>
@@ -464,4 +469,7 @@
     <string name="text_recommendations_for_next_shot">Recommendations for next shot</string>
     <string name="text_next_steps_based_on_shot">Based on this shot:</string>
     <string name="text_and_more_recommendations">+%1$d more recommendations</string>
+    
+    <!-- Photo pending state -->
+    <string name="text_photo_will_be_saved">Photo will be saved when you save the bean</string>
 </resources>
