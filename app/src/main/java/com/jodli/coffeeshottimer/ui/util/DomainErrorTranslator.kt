@@ -64,6 +64,13 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.PHOTO_STORAGE_FULL -> context.getString(R.string.error_photo_storage_full)
             DomainErrorCode.PHOTO_INVALID_URI -> context.getString(R.string.error_photo_invalid_uri)
             DomainErrorCode.PHOTO_FILE_ACCESS_ERROR -> context.getString(R.string.error_photo_file_access_error)
+            
+            // Camera and permission errors
+            DomainErrorCode.CAMERA_UNAVAILABLE -> context.getString(R.string.error_camera_unavailable)
+            DomainErrorCode.CAMERA_PERMISSION_DENIED -> context.getString(R.string.error_camera_permission_denied)
+            DomainErrorCode.STORAGE_PERMISSION_DENIED -> context.getString(R.string.error_storage_permission_denied)
+            DomainErrorCode.PHOTO_CAPTURE_FAILED -> context.getString(R.string.error_photo_capture_failed)
+            DomainErrorCode.PHOTO_SELECTION_CANCELLED -> context.getString(R.string.error_photo_selection_cancelled)
 
             DomainErrorCode.VALIDATION_FAILED -> {
                 if (details != null) {

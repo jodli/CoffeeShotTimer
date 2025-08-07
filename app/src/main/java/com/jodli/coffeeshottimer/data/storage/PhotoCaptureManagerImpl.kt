@@ -13,6 +13,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,19 +41,33 @@ class PhotoCaptureManagerImpl @Inject constructor(
     }
     
     override fun createImageCaptureIntent(): Pair<Intent, Uri> {
+        // Verify camera is available before creating intent
+        if (!isCameraAvailable(context)) {
+            throw IllegalStateException("Camera is not available on this device")
+        }
+        
         // Create temporary file for camera capture
-        val tempFile = File.createTempFile(
-            TEMP_PHOTO_PREFIX,
-            PHOTO_EXTENSION,
-            tempPhotosDir
-        )
+        val tempFile = try {
+            File.createTempFile(
+                TEMP_PHOTO_PREFIX,
+                PHOTO_EXTENSION,
+                tempPhotosDir
+            )
+        } catch (e: IOException) {
+            throw IllegalStateException("Cannot create temporary file for camera capture", e)
+        }
         
         // Create URI using FileProvider for security
-        val tempUri = FileProvider.getUriForFile(
-            context,
-            FILE_PROVIDER_AUTHORITY,
-            tempFile
-        )
+        val tempUri = try {
+            FileProvider.getUriForFile(
+                context,
+                FILE_PROVIDER_AUTHORITY,
+                tempFile
+            )
+        } catch (e: IllegalArgumentException) {
+            tempFile.delete() // Clean up the temp file
+            throw IllegalStateException("Cannot create file URI for camera capture", e)
+        }
         
         // Create camera intent
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
@@ -60,6 +75,12 @@ class PhotoCaptureManagerImpl @Inject constructor(
             // Grant temporary permissions to camera app
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        
+        // Verify that there's a camera app available to handle the intent
+        if (intent.resolveActivity(context.packageManager) == null) {
+            tempFile.delete() // Clean up the temp file
+            throw IllegalStateException("No camera app available to handle photo capture")
         }
         
         return Pair(intent, tempUri)

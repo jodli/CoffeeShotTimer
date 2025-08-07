@@ -225,7 +225,10 @@ class AddPhotoToBeanUseCaseTest {
 
         // Then
         assertTrue(result.isFailure)
-        assertEquals(saveException, result.exceptionOrNull())
+        val exception = result.exceptionOrNull()
+        assertTrue(exception is DomainException)
+        assertEquals(DomainErrorCode.PHOTO_SAVE_FAILED, (exception as DomainException).errorCode)
+        assertEquals(saveException, exception.cause)
 
         coVerify { photoStorageManager.savePhoto(mockImageUri, beanId) }
         coVerify(exactly = 0) { beanRepository.updateBean(any()) }

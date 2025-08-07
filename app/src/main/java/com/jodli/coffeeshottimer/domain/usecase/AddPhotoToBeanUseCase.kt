@@ -56,9 +56,21 @@ class AddPhotoToBeanUseCase @Inject constructor(
             // Save the new photo
             val saveResult = photoStorageManager.savePhoto(imageUri, beanId.trim())
             if (saveResult.isFailure) {
+                val exception = saveResult.exceptionOrNull()
+                val errorCode = when {
+                    exception?.message?.contains("Insufficient storage", ignoreCase = true) == true -> 
+                        DomainErrorCode.PHOTO_STORAGE_FULL
+                    exception?.message?.contains("compression failed", ignoreCase = true) == true -> 
+                        DomainErrorCode.PHOTO_COMPRESSION_FAILED
+                    exception?.message?.contains("Permission denied", ignoreCase = true) == true -> 
+                        DomainErrorCode.PHOTO_FILE_ACCESS_ERROR
+                    exception?.message?.contains("input stream", ignoreCase = true) == true -> 
+                        DomainErrorCode.PHOTO_INVALID_URI
+                    else -> DomainErrorCode.PHOTO_SAVE_FAILED
+                }
+                
                 return Result.failure(
-                    saveResult.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.PHOTO_SAVE_FAILED, "Failed to save photo")
+                    DomainException(errorCode, exception?.message ?: "Failed to save photo", exception)
                 )
             }
 

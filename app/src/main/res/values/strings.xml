@@ -261,6 +261,9 @@
     <string name="error_photo_file_access_error">Cannot access photo file</string>
     <string name="error_camera_unavailable">Camera is not available</string>
     <string name="error_camera_permission_denied">Camera permission is required to take photos</string>
+    <string name="error_storage_permission_denied">Storage permission is required to access photos</string>
+    <string name="error_photo_capture_failed">Failed to capture photo</string>
+    <string name="error_photo_selection_cancelled">Photo selection was cancelled</string>
 
     <!-- Photo UI Strings -->
     <string name="text_bean_photo">Bean Photo</string>
@@ -284,6 +287,11 @@
     <string name="text_photo_deleted">Photo deleted successfully</string>
     <string name="text_photo_replaced">Photo replaced successfully</string>
     <string name="text_photo_will_be_saved">Photo will be saved when you save the bean</string>
+    <string name="text_retry">Retry</string>
+    <string name="text_try_again">Try Again</string>
+    <string name="text_open_settings">Open Settings</string>
+    <string name="text_grant_permission">Grant Permission</string>
+    <string name="text_use_gallery_instead">Use Gallery Instead</string>
     
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Delete Photo?</string>
@@ -301,6 +309,8 @@
     <string name="cd_close_photo_viewer">Close photo viewer</string>
     <string name="cd_photo_loading">Photo loading</string>
     <string name="cd_bean_photo_thumbnail">Bean photo thumbnail</string>
+    <string name="cd_dismiss_success">Dismiss success message</string>
+    <string name="cd_dismiss_error">Dismiss error message</string>
 
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>
