@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +54,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.mutableStateOf
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jodli.coffeeshottimer.R
@@ -496,11 +498,12 @@ private fun PhotoActionItem(
 }
 
 /**
- * Full-screen photo viewer
+ * Full-screen photo viewer that can handle both file paths and URIs
  */
 @Composable
 fun PhotoViewer(
-    photoPath: String,
+    photoPath: String? = null,
+    photoUri: Uri? = null,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -516,7 +519,7 @@ fun PhotoViewer(
         // Photo
         AsyncImage(
             model = ImageRequest.Builder(context)
-                .data(File(photoPath))
+                .data(photoPath?.let { File(it) } ?: photoUri)
                 .crossfade(true)
                 .build(),
             contentDescription = stringResource(R.string.cd_bean_photo),
@@ -541,51 +544,7 @@ fun PhotoViewer(
     }
 }
 
-/**
- * Full-screen photo viewer for pending photos (URIs)
- */
-@Composable
-fun PendingPhotoViewer(
-    photoUri: Uri,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val context = LocalContext.current
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .clickable { onDismiss() }
-    ) {
-        // Photo
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(photoUri)
-                .crossfade(true)
-                .build(),
-            contentDescription = stringResource(R.string.cd_bean_photo),
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Fit
-        )
-
-        // Close button
-        IconButton(
-            onClick = onDismiss,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(spacing.medium)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.cd_close_photo_viewer),
-                tint = Color.White,
-                modifier = Modifier.size(spacing.iconMedium)
-            )
-        }
-    }
-}
 
 /**
  * Delete photo confirmation dialog
@@ -617,4 +576,48 @@ private fun PhotoDeleteDialog(
             }
         }
     )
+}
+
+/**
+ * Small photo thumbnail for bean list items
+ */
+@Composable
+fun BeanPhotoThumbnail(
+    photoPath: String?,
+    onPhotoClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val context = LocalContext.current
+
+    if (photoPath != null) {
+        Card(
+            modifier = modifier
+                .size(spacing.thumbnailSize)
+                .then(
+                    if (onPhotoClick != null) {
+                        Modifier.clickable { onPhotoClick() }
+                    } else {
+                        Modifier
+                    }
+                ),
+            shape = RoundedCornerShape(spacing.cornerSmall),
+            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
+        ) {
+            AsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(File(photoPath))
+                    .crossfade(true)
+                    .build(),
+                contentDescription = stringResource(R.string.cd_bean_photo_thumbnail),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+    } else {
+        // Empty placeholder for consistent spacing
+        Box(
+            modifier = modifier.size(spacing.thumbnailSize)
+        )
+    }
 }

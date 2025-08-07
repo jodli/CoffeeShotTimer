@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.ui.components.BeanPhotoThumbnail
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
@@ -54,6 +55,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.PhotoViewer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
 
@@ -70,6 +72,7 @@ fun BeanManagementScreen(
     val spacing = LocalSpacing.current
 
     var showDeleteDialog by remember { mutableStateOf<Bean?>(null) }
+    var showPhotoViewer by remember { mutableStateOf<String?>(null) }
 
     Column(
         modifier = Modifier
@@ -198,7 +201,10 @@ fun BeanManagementScreen(
                             },
                             onReactivate = if (!bean.isActive) {
                                 { viewModel.reactivateBean(bean.id) }
-                            } else null
+                            } else null,
+                            onPhotoClick = { photoPath ->
+                                showPhotoViewer = photoPath
+                            }
                         )
                     }
                 }
@@ -235,6 +241,15 @@ fun BeanManagementScreen(
             }
         )
     }
+
+    // Photo Viewer
+    showPhotoViewer?.let { photoPath ->
+        PhotoViewer(
+            photoPath = photoPath,
+            photoUri = null,
+            onDismiss = { showPhotoViewer = null }
+        )
+    }
 }
 
 @Composable
@@ -244,6 +259,7 @@ private fun BeanListItem(
     onDelete: () -> Unit,
     onUseForShot: () -> Unit,
     onReactivate: (() -> Unit)? = null,
+    onPhotoClick: ((String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -317,7 +333,23 @@ private fun BeanListItem(
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        Column {
+        // Photo and content row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            // Photo thumbnail
+            BeanPhotoThumbnail(
+                photoPath = bean.photoPath,
+                onPhotoClick = if (bean.hasPhoto() && onPhotoClick != null) {
+                    { onPhotoClick(bean.photoPath!!) }
+                } else null
+            )
+
+            // Bean information
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
 
             // Days since roast with freshness indicator
             val daysSinceRoast = bean.daysSinceRoast()
@@ -381,6 +413,7 @@ private fun BeanListItem(
                     maxLines = 2,
                     overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                 )
+            }
             }
         }
     }

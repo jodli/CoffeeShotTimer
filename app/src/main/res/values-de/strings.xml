@@ -285,7 +285,8 @@
     <string name="text_photo_saved">Foto erfolgreich gespeichert</string>
     <string name="text_photo_deleted">Foto erfolgreich gelöscht</string>
     <string name="text_photo_replaced">Foto erfolgreich ersetzt</string>
-    
+    <string name="text_photo_will_be_saved">Foto wird erst mit der Bohne gespeichert</string>
+
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Foto löschen?</string>
     <string name="dialog_delete_photo_message">Bist du sicher, dass du dieses Foto löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.</string>
@@ -301,6 +302,7 @@
     <string name="cd_photo_placeholder">Kein Foto verfügbar</string>
     <string name="cd_close_photo_viewer">Foto-Betrachter schließen</string>
     <string name="cd_photo_loading">Foto wird geladen</string>
+    <string name="cd_bean_photo_thumbnail">Bohnen Foto</string>
 
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>
@@ -471,7 +473,4 @@
     <string name="text_recommendations_for_next_shot">Empfehlungen für nächsten Shot</string>
     <string name="text_next_steps_based_on_shot">Basierend auf diesem Shot:</string>
     <string name="text_and_more_recommendations">+%1$d weitere Empfehlungen</string>
-        
-    <!-- Photo pending state -->
-    <string name="text_photo_will_be_saved">Foto wird erst mit der Bohne gespeichert</string>
 </resources>
