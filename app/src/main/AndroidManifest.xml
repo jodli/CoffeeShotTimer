@@ -8,6 +8,9 @@
     <!-- Camera permission for bean photo capture -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- Camera hardware feature (not required for Chrome OS compatibility) -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <!-- Read external storage for gallery photo selection -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
