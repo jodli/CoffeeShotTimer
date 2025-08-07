@@ -6,6 +6,7 @@ import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
+import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -45,6 +46,7 @@ class AddEditBeanViewModelTest {
     private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase = mockk(relaxed = true)
     private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase = mockk(relaxed = true)
     private val getBeanPhotoUseCase: GetBeanPhotoUseCase = mockk(relaxed = true)
+    private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase = mockk(relaxed = true)
     private val stringResourceProvider: StringResourceProvider = mockk(relaxed = true)
     private val validationStringProvider: ValidationStringProvider = mockk(relaxed = true)
     private val domainErrorTranslator: DomainErrorTranslator = mockk(relaxed = true)
@@ -65,6 +67,7 @@ class AddEditBeanViewModelTest {
             addPhotoToBeanUseCase,
             removePhotoFromBeanUseCase,
             getBeanPhotoUseCase,
+            checkPhotoCapabilityUseCase,
             stringResourceProvider,
             validationStringProvider,
             domainErrorTranslator

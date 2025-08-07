@@ -71,10 +71,15 @@ fun BeanPhotoSection(
     pendingPhotoUri: Uri? = null,
     isLoading: Boolean = false,
     error: String? = null,
+    successMessage: String? = null,
+    canRetry: Boolean = false,
     onAddPhoto: () -> Unit,
     onReplacePhoto: () -> Unit,
     onDeletePhoto: () -> Unit,
     onViewPhoto: () -> Unit,
+    onRetry: () -> Unit = {},
+    onClearError: () -> Unit = {},
+    onClearSuccess: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -89,6 +94,15 @@ fun BeanPhotoSection(
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
+        // Success message display
+        successMessage?.let { message ->
+            PhotoSuccessState(
+                message = message,
+                onDismiss = onClearSuccess
+            )
+            Spacer(modifier = Modifier.height(spacing.medium))
+        }
+
         when {
             isLoading -> {
                 PhotoLoadingState()
@@ -96,7 +110,10 @@ fun BeanPhotoSection(
             error != null -> {
                 PhotoErrorState(
                     error = error,
-                    onRetry = onAddPhoto
+                    canRetry = canRetry,
+                    onRetry = onRetry,
+                    onTryAgain = onAddPhoto,
+                    onDismiss = onClearError
                 )
             }
             photoPath != null -> {
@@ -172,27 +189,126 @@ private fun PhotoLoadingState(
 }
 
 /**
- * Error state for photo operations
+ * Success state for photo operations
  */
 @Composable
-private fun PhotoErrorState(
-    error: String,
-    onRetry: () -> Unit,
+private fun PhotoSuccessState(
+    message: String,
+    onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(200.dp),
-        contentAlignment = Alignment.Center
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        shape = RoundedCornerShape(spacing.cornerMedium)
     ) {
-        ErrorState(
-            title = stringResource(R.string.title_error),
-            message = error,
-            onRetry = onRetry
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.medium),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.weight(1f)
+            )
+
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(spacing.iconSmall)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.cd_dismiss_success),
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(spacing.iconSmall)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Error state for photo operations with retry functionality
+ */
+@Composable
+private fun PhotoErrorState(
+    error: String,
+    canRetry: Boolean = false,
+    onRetry: () -> Unit = {},
+    onTryAgain: () -> Unit,
+    onDismiss: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer
+        ),
+        shape = RoundedCornerShape(spacing.cornerMedium)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.medium)
+        ) {
+            // Error message
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Text(
+                    text = error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.weight(1f)
+                )
+
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.size(spacing.iconSmall)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = stringResource(R.string.cd_dismiss_error),
+                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.size(spacing.iconSmall)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.medium))
+
+            // Action buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            ) {
+                if (canRetry) {
+                    CoffeeSecondaryButton(
+                        text = stringResource(R.string.text_retry),
+                        onClick = onRetry,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                CoffeePrimaryButton(
+                    text = stringResource(R.string.text_try_again),
+                    onClick = onTryAgain,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
     }
 }
 
@@ -408,6 +524,11 @@ fun PhotoActionSheet(
     onCameraCapture: () -> Unit,
     onGallerySelect: () -> Unit,
     onDismiss: () -> Unit,
+    cameraAvailable: Boolean = true,
+    cameraPermissionGranted: Boolean = true,
+    storagePermissionGranted: Boolean = true,
+    onRequestCameraPermission: () -> Unit = {},
+    onRequestStoragePermission: () -> Unit = {},
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState()
 ) {
@@ -432,20 +553,51 @@ fun PhotoActionSheet(
             )
 
             // Camera option
-            PhotoActionItem(
-                icon = Icons.Default.PhotoCamera,
-                title = stringResource(R.string.text_take_photo),
-                onClick = onCameraCapture
-            )
+            when {
+                !cameraAvailable -> {
+                    PhotoActionItemDisabled(
+                        icon = Icons.Default.PhotoCamera,
+                        title = stringResource(R.string.text_take_photo),
+                        subtitle = stringResource(R.string.error_camera_unavailable)
+                    )
+                }
+                !cameraPermissionGranted -> {
+                    PhotoActionItem(
+                        icon = Icons.Default.PhotoCamera,
+                        title = stringResource(R.string.text_take_photo),
+                        subtitle = stringResource(R.string.text_grant_permission),
+                        onClick = onRequestCameraPermission
+                    )
+                }
+                else -> {
+                    PhotoActionItem(
+                        icon = Icons.Default.PhotoCamera,
+                        title = stringResource(R.string.text_take_photo),
+                        onClick = onCameraCapture
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(spacing.small))
 
             // Gallery option
-            PhotoActionItem(
-                icon = Icons.Default.PhotoLibrary,
-                title = stringResource(R.string.text_choose_from_gallery),
-                onClick = onGallerySelect
-            )
+            when {
+                !storagePermissionGranted -> {
+                    PhotoActionItem(
+                        icon = Icons.Default.PhotoLibrary,
+                        title = stringResource(R.string.text_choose_from_gallery),
+                        subtitle = stringResource(R.string.text_grant_permission),
+                        onClick = onRequestStoragePermission
+                    )
+                }
+                else -> {
+                    PhotoActionItem(
+                        icon = Icons.Default.PhotoLibrary,
+                        title = stringResource(R.string.text_choose_from_gallery),
+                        onClick = onGallerySelect
+                    )
+                }
+            }
 
             // Bottom spacing for navigation
             Spacer(modifier = Modifier.height(spacing.large))
@@ -461,6 +613,7 @@ private fun PhotoActionItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     onClick: () -> Unit,
+    subtitle: String? = null,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -488,11 +641,75 @@ private fun PhotoActionItem(
                 modifier = Modifier.size(spacing.iconMedium)
             )
 
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                subtitle?.let { sub ->
+                    Text(
+                        text = sub,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Disabled action item in the photo action sheet
+ */
+@Composable
+private fun PhotoActionItemDisabled(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(spacing.cornerMedium),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(spacing.medium),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(spacing.iconMedium)
             )
+
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                )
+                
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
         }
     }
 }

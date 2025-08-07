@@ -234,10 +234,15 @@ fun AddEditBeanScreen(
                     pendingPhotoUri = uiState.pendingPhotoUri,
                     isLoading = uiState.isPhotoLoading,
                     error = uiState.photoError,
+                    successMessage = uiState.photoSuccessMessage,
+                    canRetry = uiState.canRetryPhotoOperation,
                     onAddPhoto = ::handlePhotoCapture,
                     onReplacePhoto = ::handlePhotoCapture,
                     onDeletePhoto = viewModel::removePhoto,
-                    onViewPhoto = ::handlePhotoView
+                    onViewPhoto = ::handlePhotoView,
+                    onRetry = viewModel::retryPhotoOperation,
+                    onClearError = viewModel::clearPhotoError,
+                    onClearSuccess = viewModel::clearPhotoSuccessMessage
                 )
 
                 // Active Status (only show in edit mode)

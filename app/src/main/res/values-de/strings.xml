@@ -263,6 +263,9 @@
     <string name="error_photo_file_access_error">Zugriff auf Foto-Datei nicht möglich</string>
     <string name="error_camera_unavailable">Kamera ist nicht verfügbar</string>
     <string name="error_camera_permission_denied">Kamera-Berechtigung ist erforderlich, um Fotos aufzunehmen</string>
+    <string name="error_storage_permission_denied">Speicher-Berechtigung ist erforderlich, um auf Fotos zuzugreifen</string>
+    <string name="error_photo_capture_failed">Foto aufnehmen fehlgeschlagen</string>
+    <string name="error_photo_selection_cancelled">Foto-Auswahl wurde abgebrochen</string>
 
     <!-- Photo UI Strings -->
     <string name="text_bean_photo">Bohnenfoto</string>
@@ -286,6 +289,11 @@
     <string name="text_photo_deleted">Foto erfolgreich gelöscht</string>
     <string name="text_photo_replaced">Foto erfolgreich ersetzt</string>
     <string name="text_photo_will_be_saved">Foto wird erst mit der Bohne gespeichert</string>
+    <string name="text_retry">Wiederholen</string>
+    <string name="text_try_again">Erneut versuchen</string>
+    <string name="text_open_settings">Einstellungen öffnen</string>
+    <string name="text_grant_permission">Berechtigung erteilen</string>
+    <string name="text_use_gallery_instead">Stattdessen Galerie verwenden</string>
 
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Foto löschen?</string>
@@ -303,6 +311,8 @@
     <string name="cd_close_photo_viewer">Foto-Betrachter schließen</string>
     <string name="cd_photo_loading">Foto wird geladen</string>
     <string name="cd_bean_photo_thumbnail">Bohnen Foto</string>
+    <string name="cd_dismiss_success">Erfolgsmeldung schließen</string>
+    <string name="cd_dismiss_error">Fehlermeldung schließen</string>
 
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>

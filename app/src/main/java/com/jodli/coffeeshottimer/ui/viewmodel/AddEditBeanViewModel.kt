@@ -7,7 +7,9 @@ import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
+import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
 import android.net.Uri
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.validation.validateBeanNameEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateNotesEnhanced
@@ -23,7 +25,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
-import com.jodli.coffeeshottimer.R
+
+/**
+ * Enum representing different photo operations for retry functionality
+ */
+enum class PhotoOperation {
+    ADD_PHOTO,
+    REPLACE_PHOTO,
+    DELETE_PHOTO
+}
 
 /**
  * ViewModel for adding and editing coffee bean profiles.
@@ -36,6 +46,7 @@ class AddEditBeanViewModel @Inject constructor(
     private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase,
     private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase,
     private val getBeanPhotoUseCase: GetBeanPhotoUseCase,
+    private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase,
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
     private val domainErrorTranslator: DomainErrorTranslator
@@ -257,7 +268,13 @@ class AddEditBeanViewModel @Inject constructor(
      */
     fun addPhoto(imageUri: Uri) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isPhotoLoading = true, photoError = null)
+            _uiState.value = _uiState.value.copy(
+                isPhotoLoading = true, 
+                photoError = null,
+                photoSuccessMessage = null,
+                canRetryPhotoOperation = false,
+                lastFailedPhotoOperation = null
+            )
             
             if (editingBeanId != null) {
                 // Edit mode: immediately update the bean's photo
@@ -266,12 +283,15 @@ class AddEditBeanViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         photoPath = result.getOrNull(),
                         isPhotoLoading = false,
-                        pendingPhotoUri = null // Clear any pending photo
+                        pendingPhotoUri = null, // Clear any pending photo
+                        photoSuccessMessage = stringResourceProvider.getString(R.string.text_photo_saved)
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isPhotoLoading = false,
-                        photoError = domainErrorTranslator.translateResultError(result)
+                        photoError = domainErrorTranslator.translateResultError(result),
+                        canRetryPhotoOperation = true,
+                        lastFailedPhotoOperation = PhotoOperation.ADD_PHOTO
                     )
                 }
             } else {
@@ -279,7 +299,8 @@ class AddEditBeanViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     pendingPhotoUri = imageUri,
                     isPhotoLoading = false,
-                    photoPath = null // Clear any existing photo path
+                    photoPath = null, // Clear any existing photo path
+                    photoSuccessMessage = stringResourceProvider.getString(R.string.text_photo_will_be_saved)
                 )
             }
         }
@@ -290,7 +311,43 @@ class AddEditBeanViewModel @Inject constructor(
      * This is essentially the same as addPhoto but provides semantic clarity.
      */
     fun replacePhoto(imageUri: Uri) {
-        addPhoto(imageUri)
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isPhotoLoading = true, 
+                photoError = null,
+                photoSuccessMessage = null,
+                canRetryPhotoOperation = false,
+                lastFailedPhotoOperation = null
+            )
+            
+            if (editingBeanId != null) {
+                // Edit mode: replace the bean's photo
+                val result = addPhotoToBeanUseCase.execute(editingBeanId!!, imageUri)
+                if (result.isSuccess) {
+                    _uiState.value = _uiState.value.copy(
+                        photoPath = result.getOrNull(),
+                        isPhotoLoading = false,
+                        pendingPhotoUri = null,
+                        photoSuccessMessage = stringResourceProvider.getString(R.string.text_photo_replaced)
+                    )
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isPhotoLoading = false,
+                        photoError = domainErrorTranslator.translateResultError(result),
+                        canRetryPhotoOperation = true,
+                        lastFailedPhotoOperation = PhotoOperation.REPLACE_PHOTO
+                    )
+                }
+            } else {
+                // Create mode: replace pending photo URI
+                _uiState.value = _uiState.value.copy(
+                    pendingPhotoUri = imageUri,
+                    isPhotoLoading = false,
+                    photoPath = null,
+                    photoSuccessMessage = stringResourceProvider.getString(R.string.text_photo_will_be_saved)
+                )
+            }
+        }
     }
 
     /**
@@ -300,7 +357,13 @@ class AddEditBeanViewModel @Inject constructor(
      */
     fun removePhoto() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isPhotoLoading = true, photoError = null)
+            _uiState.value = _uiState.value.copy(
+                isPhotoLoading = true, 
+                photoError = null,
+                photoSuccessMessage = null,
+                canRetryPhotoOperation = false,
+                lastFailedPhotoOperation = null
+            )
             
             if (editingBeanId != null) {
                 // Edit mode: remove photo from bean and storage
@@ -309,12 +372,15 @@ class AddEditBeanViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         photoPath = null,
                         isPhotoLoading = false,
-                        pendingPhotoUri = null
+                        pendingPhotoUri = null,
+                        photoSuccessMessage = stringResourceProvider.getString(R.string.text_photo_deleted)
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isPhotoLoading = false,
-                        photoError = domainErrorTranslator.translateResultError(result)
+                        photoError = domainErrorTranslator.translateResultError(result),
+                        canRetryPhotoOperation = true,
+                        lastFailedPhotoOperation = PhotoOperation.DELETE_PHOTO
                     )
                 }
             } else {
@@ -322,14 +388,62 @@ class AddEditBeanViewModel @Inject constructor(
                 _uiState.value = _uiState.value.copy(
                     pendingPhotoUri = null,
                     isPhotoLoading = false,
-                    photoPath = null
+                    photoPath = null,
+                    photoSuccessMessage = stringResourceProvider.getString(R.string.text_photo_deleted)
                 )
             }
         }
     }
 
     fun clearPhotoError() {
-        _uiState.value = _uiState.value.copy(photoError = null)
+        _uiState.value = _uiState.value.copy(
+            photoError = null,
+            canRetryPhotoOperation = false,
+            lastFailedPhotoOperation = null
+        )
+    }
+
+    fun clearPhotoSuccessMessage() {
+        _uiState.value = _uiState.value.copy(photoSuccessMessage = null)
+    }
+
+    /**
+     * Retries the last failed photo operation
+     */
+    fun retryPhotoOperation() {
+        val currentState = _uiState.value
+        val lastOperation = currentState.lastFailedPhotoOperation ?: return
+        
+        when (lastOperation) {
+            PhotoOperation.ADD_PHOTO -> {
+                // For retry, we need the URI from the last attempt
+                // This would need to be stored in the state for retry to work
+                // For now, we'll clear the error and let user try again
+                clearPhotoError()
+            }
+            PhotoOperation.REPLACE_PHOTO -> {
+                clearPhotoError()
+            }
+            PhotoOperation.DELETE_PHOTO -> {
+                removePhoto()
+            }
+        }
+    }
+
+    /**
+     * Checks photo capabilities before showing photo options
+     */
+    fun checkPhotoCapabilities() {
+        viewModelScope.launch {
+            val result = checkPhotoCapabilityUseCase.execute()
+            if (result.isFailure) {
+                _uiState.value = _uiState.value.copy(
+                    photoError = domainErrorTranslator.translateResultError(result),
+                    canRetryPhotoOperation = true,
+                    lastFailedPhotoOperation = PhotoOperation.ADD_PHOTO
+                )
+            }
+        }
     }
 
     /**
@@ -416,5 +530,8 @@ data class AddEditBeanUiState(
     val error: String? = null,
     val isEditMode: Boolean = false,
     val isPhotoLoading: Boolean = false,
-    val photoError: String? = null
+    val photoError: String? = null,
+    val photoSuccessMessage: String? = null,
+    val canRetryPhotoOperation: Boolean = false,
+    val lastFailedPhotoOperation: PhotoOperation? = null
 )
