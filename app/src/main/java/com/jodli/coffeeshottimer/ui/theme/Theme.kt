@@ -47,7 +47,8 @@ data class Spacing(
     val fabSizeSmall: Dp = 40.dp,
     val timerButtonSize: Dp = 80.dp,
     val iconButtonSize: Dp = 32.dp,
-    val sliderHeightSmall: Dp = 24.dp
+    val sliderHeightSmall: Dp = 24.dp,
+    val thumbnailSize: Dp = 48.dp
 )
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }

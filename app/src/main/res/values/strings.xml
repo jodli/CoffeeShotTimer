@@ -283,6 +283,7 @@
     <string name="text_photo_saved">Photo saved successfully</string>
     <string name="text_photo_deleted">Photo deleted successfully</string>
     <string name="text_photo_replaced">Photo replaced successfully</string>
+    <string name="text_photo_will_be_saved">Photo will be saved when you save the bean</string>
     
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Delete Photo?</string>
@@ -299,6 +300,7 @@
     <string name="cd_photo_placeholder">No photo available</string>
     <string name="cd_close_photo_viewer">Close photo viewer</string>
     <string name="cd_photo_loading">Photo loading</string>
+    <string name="cd_bean_photo_thumbnail">Bean photo thumbnail</string>
 
     <!-- Validation Messages -->
     <string name="validation_required_field"> *</string>
@@ -470,6 +472,4 @@
     <string name="text_next_steps_based_on_shot">Based on this shot:</string>
     <string name="text_and_more_recommendations">+%1$d more recommendations</string>
     
-    <!-- Photo pending state -->
-    <string name="text_photo_will_be_saved">Photo will be saved when you save the bean</string>
 </resources>

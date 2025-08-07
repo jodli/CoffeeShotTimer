@@ -61,7 +61,6 @@ import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.BeanPhotoSection
 import com.jodli.coffeeshottimer.ui.components.PhotoViewer
-import com.jodli.coffeeshottimer.ui.components.PendingPhotoViewer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
 import java.time.LocalDate
@@ -309,23 +308,11 @@ fun AddEditBeanScreen(
 
     // Photo Viewer
     if (showPhotoViewer) {
-        val photoPath = uiState.photoPath
-        val pendingPhotoUri = uiState.pendingPhotoUri
-        
-        when {
-            photoPath != null -> {
-                PhotoViewer(
-                    photoPath = photoPath,
-                    onDismiss = { showPhotoViewer = false }
-                )
-            }
-            pendingPhotoUri != null -> {
-                PendingPhotoViewer(
-                    photoUri = pendingPhotoUri,
-                    onDismiss = { showPhotoViewer = false }
-                )
-            }
-        }
+        PhotoViewer(
+            photoPath = uiState.photoPath,
+            photoUri = uiState.pendingPhotoUri,
+            onDismiss = { showPhotoViewer = false }
+        )
     }
 }
 
