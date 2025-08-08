@@ -578,6 +578,7 @@ fun triggerHapticFeedback(context: Context, isStartAction: Boolean) {
         } else {
             // Fallback for older Android versions
             val duration = if (isStartAction) 10L else 25L
+            @Suppress("DEPRECATION")
             vib.vibrate(duration)
         }
     }
