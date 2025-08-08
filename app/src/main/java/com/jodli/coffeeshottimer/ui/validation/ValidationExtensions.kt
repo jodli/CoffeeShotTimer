@@ -108,9 +108,6 @@ fun String.validateNotesEnhanced(validationUtils: ValidationUtils): ValidationRe
 
         // Add helpful suggestions for notes
         when {
-            this.trim().isEmpty() ->
-                warnings.add(validationUtils.stringProvider.getNotesHelpfulTip())
-
             this.length > ValidationUtils.MAX_NOTES_LENGTH * 0.8 ->
                 warnings.add(validationUtils.stringProvider.getCharacterLimitNote())
         }
