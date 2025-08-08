@@ -126,7 +126,7 @@
     <string name="label_typical_range">Typical Range</string>
     <string name="label_under_extracted">Under-extracted</string>
     <string name="label_over_extracted">Over-extracted</string>
-    <string name="label_optimal_time_range_short">Optimal (25-30s)</string>
+    <string name="label_optimal_time_range_short">Optimal (25–30s)</string>
     <string name="label_too_fast">Too Fast</string>
     <string name="label_too_slow">Too Slow</string>
 
@@ -268,9 +268,6 @@
     <!-- Photo UI Strings -->
     <string name="text_bean_photo">Bean Photo</string>
     <string name="text_add_photo">Add Photo</string>
-    <string name="text_replace_photo">Replace Photo</string>
-    <string name="text_delete_photo">Delete Photo</string>
-    <string name="text_view_photo">View Photo</string>
     
     <!-- Short photo button text -->
     <string name="text_view_short">View</string>
@@ -281,33 +278,22 @@
     <string name="text_photo_options">Photo Options</string>
     <string name="text_no_photo">No photo added</string>
     <string name="text_loading_photo">Loading photo…</string>
-    <string name="text_saving_photo">Saving photo…</string>
-    <string name="text_deleting_photo">Deleting photo…</string>
     <string name="text_photo_saved">Photo saved successfully</string>
     <string name="text_photo_deleted">Photo deleted successfully</string>
     <string name="text_photo_replaced">Photo replaced successfully</string>
     <string name="text_photo_will_be_saved">Photo will be saved when you save the bean</string>
     <string name="text_retry">Retry</string>
     <string name="text_try_again">Try Again</string>
-    <string name="text_open_settings">Open Settings</string>
     <string name="text_grant_permission">Grant Permission</string>
-    <string name="text_use_gallery_instead">Use Gallery Instead</string>
     
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Delete Photo?</string>
     <string name="dialog_delete_photo_message">Are you sure you want to delete this photo? This action cannot be undone.</string>
-    <string name="dialog_replace_photo_title">Replace Photo?</string>
-    <string name="dialog_replace_photo_message">This will replace the current photo. The old photo will be permanently deleted.</string>
     
     <!-- Photo Content Descriptions -->
     <string name="cd_bean_photo">Bean photo</string>
     <string name="cd_add_photo">Add photo</string>
-    <string name="cd_replace_photo">Replace photo</string>
-    <string name="cd_delete_photo">Delete photo</string>
-    <string name="cd_view_photo">View photo</string>
-    <string name="cd_photo_placeholder">No photo available</string>
     <string name="cd_close_photo_viewer">Close photo viewer</string>
-    <string name="cd_photo_loading">Photo loading</string>
     <string name="cd_bean_photo_thumbnail">Bean photo thumbnail</string>
     <string name="cd_dismiss_success">Dismiss success message</string>
     <string name="cd_dismiss_error">Dismiss error message</string>
@@ -365,7 +351,7 @@
     <string name="validation_success_optimal_time">Great extraction time! This is in the optimal range for espresso</string>
 
     <!-- Bean Age Warnings -->
-    <string name="validation_warning_very_fresh_beans">Very fresh beans – consider waiting 2-4 days for optimal flavor</string>
+    <string name="validation_warning_very_fresh_beans">Very fresh beans – consider waiting 2–4 days for optimal flavor</string>
     <string name="validation_success_fresh_beans">Fresh beans – perfect timing for espresso!</string>
     <string name="validation_warning_aging_beans">Beans are getting older but still good for espresso</string>
     <string name="validation_warning_old_beans">Older beans - flavor may be diminished</string>
