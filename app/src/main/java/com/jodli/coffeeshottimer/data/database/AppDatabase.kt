@@ -43,13 +43,13 @@ abstract class AppDatabase : RoomDatabase() {
          * Migration from version 1 to 2: Add photoPath field to beans table.
          */
         private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 try {
                     // Add photoPath column to beans table
-                    database.execSQL("ALTER TABLE beans ADD COLUMN photoPath TEXT DEFAULT NULL")
+                    db.execSQL("ALTER TABLE beans ADD COLUMN photoPath TEXT DEFAULT NULL")
                     
                     // Add index for photoPath to optimize photo-related queries
-                    database.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
                 } catch (e: Exception) {
                     // Log the error but don't fail the migration - let Room handle it
                     // This prevents app crashes due to database corruption

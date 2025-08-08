@@ -21,7 +21,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class PhotoCaptureManagerImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : PhotoCaptureManager {
     
     companion object {

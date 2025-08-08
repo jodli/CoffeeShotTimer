@@ -20,7 +20,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class PhotoStorageManagerImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : PhotoStorageManager {
     
     companion object {

@@ -127,9 +127,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    // kotlinOptions deprecated: migrate to compilerOptions DSL below
     buildFeatures {
         compose = true
         buildConfig = true
@@ -206,6 +204,13 @@ android {
                 }
             }
         }
+    }
+}
+
+// Migrate Kotlin compiler settings to the new compilerOptions DSL
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
     }
 }
 

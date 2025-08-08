@@ -59,7 +59,7 @@ class ShotRecordingViewModel @Inject constructor(
     private val domainErrorTranslator: DomainErrorTranslator,
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
     // Create validation utils instance

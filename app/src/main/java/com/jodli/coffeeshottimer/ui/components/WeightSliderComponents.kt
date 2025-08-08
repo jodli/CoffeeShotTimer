@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Input
+import androidx.compose.material.icons.automirrored.filled.Input
 import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.Scale
@@ -243,7 +243,7 @@ fun CoffeeWeightInSlider(
         modifier = modifier,
         minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
         maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
-        icon = Icons.Default.Input,
+        icon = Icons.AutoMirrored.Filled.Input,
         errorMessage = errorMessage,
         enabled = enabled
     )
