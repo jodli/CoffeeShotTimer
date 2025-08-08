@@ -8,6 +8,7 @@ import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
+import java.util.Locale
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -249,7 +250,7 @@ class GetShotDetailsUseCase @Inject constructor(
                         priority = RecommendationPriority.MEDIUM,
                         currentValue = shot.brewRatio,
                         targetRange = 1.5..3.0,
-                        context = mapOf("currentRatio" to String.format("%.2f", shot.brewRatio))
+                        context = mapOf("currentRatio" to String.format(java.util.Locale.ROOT, "%.2f", shot.brewRatio))
                     )
                 )
             } else if (shot.brewRatio > 3.0) {
@@ -259,7 +260,7 @@ class GetShotDetailsUseCase @Inject constructor(
                         priority = RecommendationPriority.MEDIUM,
                         currentValue = shot.brewRatio,
                         targetRange = 1.5..3.0,
-                        context = mapOf("currentRatio" to String.format("%.2f", shot.brewRatio))
+                        context = mapOf("currentRatio" to String.format(java.util.Locale.ROOT, "%.2f", shot.brewRatio))
                     )
                 )
             }
@@ -273,8 +274,8 @@ class GetShotDetailsUseCase @Inject constructor(
                     currentValue = shot.brewRatio,
                     targetRange = (avgBrewRatio - 0.3)..(avgBrewRatio + 0.3),
                     context = mapOf(
-                        "deviation" to String.format("%.2f", brewRatioDeviation),
-                        "avgRatio" to String.format("%.2f", avgBrewRatio)
+                        "deviation" to String.format(java.util.Locale.ROOT, "%.2f", brewRatioDeviation),
+                        "avgRatio" to String.format(java.util.Locale.ROOT, "%.2f", avgBrewRatio)
                     )
                 )
             )
@@ -350,12 +351,14 @@ data class ShotComparison(
         return mapOf(
             "weightIn" to "${if (weightInDifference >= 0) "+" else ""}${
                 String.format(
+                    java.util.Locale.ROOT,
                     "%.1f",
                     weightInDifference
                 )
             }g",
             "weightOut" to "${if (weightOutDifference >= 0) "+" else ""}${
                 String.format(
+                    java.util.Locale.ROOT,
                     "%.1f",
                     weightOutDifference
                 )
@@ -363,6 +366,7 @@ data class ShotComparison(
             "extractionTime" to "${if (extractionTimeDifference >= 0) "+" else ""}${extractionTimeDifference}s",
             "brewRatio" to "${if (brewRatioDifference >= 0) "+" else ""}${
                 String.format(
+                    java.util.Locale.ROOT,
                     "%.2f",
                     brewRatioDifference
                 )

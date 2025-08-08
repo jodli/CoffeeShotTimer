@@ -476,7 +476,7 @@ fun formatExtractionTime(timeMs: Long, timer_seconds_suffix: String = "s"): Stri
         else -> {
             val minutes = totalSeconds / 60
             val seconds = totalSeconds % 60
-            String.format("%02d:%02d", minutes, seconds)
+            String.format(java.util.Locale.ROOT, "%02d:%02d", minutes, seconds)
         }
     }
 }

@@ -113,7 +113,7 @@ data class Shot(
      * @return Formatted brew ratio string
      */
     fun getFormattedBrewRatio(): String {
-        return "1:${String.format("%.1f", brewRatio)}"
+        return "1:${String.format(java.util.Locale.ROOT, "%.1f", brewRatio)}"
     }
 
     /**
@@ -128,7 +128,7 @@ data class Shot(
             else -> {
                 val minutes = totalSeconds / 60
                 val seconds = totalSeconds % 60
-                String.format("%02d:%02d", minutes, seconds)
+                String.format(java.util.Locale.ROOT, "%02d:%02d", minutes, seconds)
             }
         }
     }

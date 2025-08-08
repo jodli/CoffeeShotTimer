@@ -680,17 +680,18 @@ private fun ShotTrendsCard(
         ) {
             TrendItem(
                 label = stringResource(R.string.label_shots_per_day),
-                value = String.format("%.1f", trends.shotsPerDay),
+                value = String.format(java.util.Locale.ROOT, "%.1f", trends.shotsPerDay),
                 modifier = Modifier.weight(1f)
             )
             TrendItem(
                 label = stringResource(R.string.label_ratio_trend),
                 value = if (trends.brewRatioTrend >= 0) "+${
                     String.format(
+                        java.util.Locale.ROOT,
                         "%.2f",
                         trends.brewRatioTrend
                     )
-                }" else String.format("%.2f", trends.brewRatioTrend),
+                }" else String.format(java.util.Locale.ROOT, "%.2f", trends.brewRatioTrend),
                 isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
                 modifier = Modifier.weight(1f)
             )
@@ -698,6 +699,7 @@ private fun ShotTrendsCard(
                 label = stringResource(R.string.label_time_trend),
                 value = if (trends.extractionTimeTrend >= 0) "+${
                     String.format(
+                        java.util.Locale.ROOT,
                         "%.1f",
                         trends.extractionTimeTrend
                     )

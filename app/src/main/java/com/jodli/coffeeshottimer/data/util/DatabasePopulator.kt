@@ -223,7 +223,7 @@ class DatabasePopulator @Inject constructor(
         // Calculate grinder setting with skill-level consistency
         val baseGrinderSetting = bean.lastGrinderSetting?.toDoubleOrNull() ?: 3.0
         val grinderVariation = Random.nextDouble(-skillVariations.grinderVariance, skillVariations.grinderVariance)
-        val grinderSetting = String.format("%.1f", (baseGrinderSetting + grinderVariation).coerceIn(1.0, 5.0))
+        val grinderSetting = String.format(java.util.Locale.ROOT, "%.1f", (baseGrinderSetting + grinderVariation).coerceIn(1.0, 5.0))
 
         // Calculate output weight with skill-level appropriate ratio control
         val targetRatio = profile.targetRatio + ratioVariation

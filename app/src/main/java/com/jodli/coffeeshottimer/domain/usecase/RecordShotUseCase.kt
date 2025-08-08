@@ -277,7 +277,7 @@ class RecordShotUseCase @Inject constructor(
      * @return Formatted brew ratio string
      */
     fun formatBrewRatio(brewRatio: Double): String {
-        return "1:${String.format("%.1f", brewRatio)}"
+        return "1:${String.format(java.util.Locale.ROOT, "%.1f", brewRatio)}"
     }
 
     /**
@@ -288,7 +288,7 @@ class RecordShotUseCase @Inject constructor(
     fun formatExtractionTime(extractionTimeSeconds: Int): String {
         val minutes = extractionTimeSeconds / 60
         val seconds = extractionTimeSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
+        return String.format(java.util.Locale.ROOT, "%02d:%02d", minutes, seconds)
     }
 }
 

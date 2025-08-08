@@ -7,7 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
-    alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
 }
 
 // Load keystore properties
@@ -135,12 +135,7 @@ android {
         buildConfig = true
     }
 
-    // Room schema export configuration
-    kapt {
-        arguments {
-            arg("room.schemaLocation", "$projectDir/schemas")
-        }
-    }
+    // Room schema export configuration now via KSP
 
     // Test configuration
     testOptions {
@@ -173,6 +168,11 @@ android {
                 }
             }
         }
+    }
+
+    // KSP arguments
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     // Configure AAB naming for bundle tasks
@@ -220,14 +220,17 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    // Media/EXIF support
+    implementation("androidx.exifinterface:exifinterface:1.4.1")
+
     // Room dependencies
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
 
     // Hilt dependencies
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Navigation Compose
@@ -246,13 +249,13 @@ dependencies {
     implementation(libs.coil.base)
 
     // Core library desugaring for Java 8 time APIs
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 
     // Material Icons Extended
-    implementation("androidx.compose.material:material-icons-extended:1.5.4")
+    implementation("androidx.compose.material:material-icons-extended")
 
     // Pull to refresh
-    implementation("androidx.compose.material:material:1.5.4")
+    implementation("androidx.compose.material:material")
 
     // Splash Screen API
     implementation("androidx.core:core-splashscreen:1.0.1")
