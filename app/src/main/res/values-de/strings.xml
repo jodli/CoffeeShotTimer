@@ -65,7 +65,7 @@
     <string name="text_search_beans_hint">Versuche deine Such- oder Filtereinstellungen anzupassen</string>
     <string name="text_start_date">Startdatum</string>
     <string name="text_end_date">Enddatum</string>
-    <string name="text_date_range_format">Datum: %1$s - %2$s</string>
+    <string name="text_date_range_format">Datum: %1$s – %2$s</string>
     <string name="text_add_first_bean">Füge deine erste Kaffeebohne hinzu, um Shots zu verfolgen</string>
     <string name="text_add_some_beans">Füge einige Bohnen in der Bohnenverwaltung hinzu, um zu beginnen</string>
     <string name="text_record_shots_analysis">Nimm einige Shots auf, um Analysen und Einblicke zu sehen</string>
@@ -356,8 +356,8 @@
     <string name="validation_tip_long_extraction_bitter">Tipp: Sehr lange Extraktionen schmecken oft bitter</string>
 
     <!-- Brew Ratio Warnings -->
-    <string name="validation_warning_ratio_concentrated">Dieses Verhältnis ist ziemlich konzentriert - es könnte sehr stark schmecken</string>
-    <string name="validation_warning_ratio_diluted">Dieses Verhältnis ist ziemlich verdünnt - es könnte schwach schmecken</string>
+    <string name="validation_warning_ratio_concentrated">Dieses Verhältnis ist ziemlich konzentriert – es könnte sehr stark schmecken</string>
+    <string name="validation_warning_ratio_diluted">Dieses Verhältnis ist ziemlich verdünnt – es könnte schwach schmecken</string>
     <string name="validation_warning_ratio_higher">Erwäge ein etwas höheres Verhältnis für bessere Balance</string>
     <string name="validation_warning_ratio_lower">Erwäge ein etwas niedrigeres Verhältnis für mehr Intensität</string>
 
@@ -368,7 +368,7 @@
 
     <!-- Bean Age Warnings -->
     <string name="validation_warning_very_fresh_beans">Sehr frische Bohnen – erwäge 2-4 Tage zu warten für optimalen Geschmack</string>
-    <string name="validation_success_fresh_beans">Frische Bohnen - perfektes Timing für Espresso!</string>
+    <string name="validation_success_fresh_beans">Frische Bohnen – perfektes Timing für Espresso!</string>
     <string name="validation_warning_aging_beans">Bohnen werden älter, aber noch gut für Espresso</string>
     <string name="validation_warning_old_beans">Ältere Bohnen - Geschmack könnte vermindert sein</string>
 
@@ -405,7 +405,7 @@
     <string name="format_shot_trends">Shot-Trends (%1$d Tage)</string>
     <string name="format_use_suggested">Vorschlag verwenden: %1$s</string>
     <string name="format_suggested_setting">Vorschlag: %1$s (basierend auf letzter Verwendung mit dieser Bohne)</string>
-    <string name="format_brew_ratio_range_long">Brühverhältnis: 1:%1$s - 1:%2$s</string>
+    <string name="format_brew_ratio_range_long">Brühverhältnis: 1:%1$s – 1:%2$s</string>
     <string name="format_previous_shot">Vorheriger Shot: %1$s (%2$s)</string>
     <string name="format_next_shot">Nächster Shot: %1$s (%2$s)</string>
     <string name="format_shot_context">Das ist Shot %1$d von %2$d mit %3$s</string>
@@ -440,7 +440,7 @@
     <string name="format_weight_display_min_g">%1$dg</string>
     <string name="format_weight_display_max_g">%1$dg</string>
     <string name="format_weight_display_int">%1$d</string>
-    <string name="format_time_filter_display">Zeit: %1$ds - %2$ds</string>
+    <string name="format_time_filter_display">Zeit: %1$ds – %2$ds</string>
     <string name="format_extraction_time_with_target">/ %1$s</string>
 
     <!-- Format strings for statistics -->
@@ -450,12 +450,12 @@
     <string name="format_optimal_extraction_percentage">%1$.0f%%</string>
     <string name="format_typical_ratio_percentage">%1$.0f%%</string>
     <string name="format_extraction_time_trend_display">%1$.1fs</string>
-    <string name="format_time_range_display">%1$ds - %2$ds</string>
+    <string name="format_time_range_display">%1$ds – %2$ds</string>
     <string name="format_under_extracted_percentage">%1$.0f%%</string>
     <string name="format_over_extracted_percentage">%1$.0f%%</string>
     <string name="format_too_fast_percentage">%1$.0f%%</string>
     <string name="format_too_slow_percentage">%1$.0f%%</string>
-    <string name="format_brew_ratio_range">1:%1$.1f - 1:%2$.1f</string>
+    <string name="format_brew_ratio_range">1:%1$.1f – 1:%2$.1f</string>
 
     <!-- Timer display suffixes -->
     <string name="timer_seconds_suffix">s</string>

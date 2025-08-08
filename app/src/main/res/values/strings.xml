@@ -57,13 +57,13 @@
     <string name="text_grinder_setting">Grinder Setting</string>
     <string name="text_bean_status">Bean Status</string>
     <string name="text_select_roast_date">Select Roast Date</string>
-    <string name="text_active_long">Active - visible in bean lists</string>
+    <string name="text_active_long">Active – visible in bean lists</string>
     <string name="text_inactive">Inactive</string>
     <string name="text_bean_name_already_exists_tip">Bean name already exists\nTip: Try adding the roaster name or roast level to make it unique</string>
     <string name="text_search_beans_hint">Try adjusting your search or filter settings</string>
     <string name="text_start_date">Start Date</string>
     <string name="text_end_date">End Date</string>
-    <string name="text_date_range_format">Date: %1$s - %2$s</string>
+    <string name="text_date_range_format">Date: %1$s – %2$s</string>
     <string name="text_add_first_bean">Add your first coffee bean to start tracking shots</string>
     <string name="text_add_some_beans">Add some beans in Bean Management to get started</string>
     <string name="text_record_shots_analysis">Record some shots to see analysis and insights</string>
@@ -256,7 +256,7 @@
     <string name="error_photo_delete_failed">Failed to delete photo</string>
     <string name="error_photo_not_found">Photo not found</string>
     <string name="error_photo_compression_failed">Failed to compress photo</string>
-    <string name="error_photo_storage_full">Storage is full - cannot save photo</string>
+    <string name="error_photo_storage_full">Storage is full – cannot save photo</string>
     <string name="error_photo_invalid_uri">Invalid photo selected</string>
     <string name="error_photo_file_access_error">Cannot access photo file</string>
     <string name="error_camera_unavailable">Camera is not available</string>
@@ -354,8 +354,8 @@
     <string name="validation_tip_long_extraction_bitter">Tip: Very long extractions often taste bitter</string>
 
     <!-- Brew Ratio Warnings -->
-    <string name="validation_warning_ratio_concentrated">This ratio is quite concentrated - it might taste very strong</string>
-    <string name="validation_warning_ratio_diluted">This ratio is quite diluted - it might taste weak</string>
+    <string name="validation_warning_ratio_concentrated">This ratio is quite concentrated – it might taste very strong</string>
+    <string name="validation_warning_ratio_diluted">This ratio is quite diluted – it might taste weak</string>
     <string name="validation_warning_ratio_higher">Consider a slightly higher ratio for better balance</string>
     <string name="validation_warning_ratio_lower">Consider a slightly lower ratio for more intensity</string>
 
@@ -366,7 +366,7 @@
 
     <!-- Bean Age Warnings -->
     <string name="validation_warning_very_fresh_beans">Very fresh beans – consider waiting 2-4 days for optimal flavor</string>
-    <string name="validation_success_fresh_beans">Fresh beans - perfect timing for espresso!</string>
+    <string name="validation_success_fresh_beans">Fresh beans – perfect timing for espresso!</string>
     <string name="validation_warning_aging_beans">Beans are getting older but still good for espresso</string>
     <string name="validation_warning_old_beans">Older beans - flavor may be diminished</string>
 
@@ -403,7 +403,7 @@
     <string name="format_shot_trends">Shot Trends (%1$d days)</string>
     <string name="format_use_suggested">Use Suggested: %1$s</string>
     <string name="format_suggested_setting">Suggested: %1$s (based on last use with this bean)</string>
-    <string name="format_brew_ratio_range_long">Brew Ratio: 1:%1$s - 1:%2$s</string>
+    <string name="format_brew_ratio_range_long">Brew Ratio: 1:%1$s – 1:%2$s</string>
     <string name="format_previous_shot">Previous shot: %1$s (%2$s)</string>
     <string name="format_next_shot">Next shot: %1$s (%2$s)</string>
     <string name="format_shot_context">This is shot %1$d of %2$d with %3$s</string>
@@ -438,7 +438,7 @@
     <string name="format_weight_display_min_g">%1$dg</string>
     <string name="format_weight_display_max_g">%1$dg</string>
     <string name="format_weight_display_int">%1$d</string>
-    <string name="format_time_filter_display">Time: %1$ds - %2$ds</string>
+    <string name="format_time_filter_display">Time: %1$ds – %2$ds</string>
     <string name="format_extraction_time_with_target">/ %1$s</string>
 
     <!-- Format strings for statistics -->
@@ -448,12 +448,12 @@
     <string name="format_optimal_extraction_percentage">%1$.0f%%</string>
     <string name="format_typical_ratio_percentage">%1$.0f%%</string>
     <string name="format_extraction_time_trend_display">%1$.1fs</string>
-    <string name="format_time_range_display">%1$ds - %2$ds</string>
+    <string name="format_time_range_display">%1$ds – %2$ds</string>
     <string name="format_under_extracted_percentage">%1$.0f%%</string>
     <string name="format_over_extracted_percentage">%1$.0f%%</string>
     <string name="format_too_fast_percentage">%1$.0f%%</string>
     <string name="format_too_slow_percentage">%1$.0f%%</string>
-    <string name="format_brew_ratio_range">1:%1$.1f - 1:%2$.1f</string>
+    <string name="format_brew_ratio_range">1:%1$.1f – 1:%2$.1f</string>
 
     <!-- Timer display suffixes -->
     <string name="timer_seconds_suffix">s</string>
