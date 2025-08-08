@@ -1,0 +1,41 @@
+# Enforce consistent line endings for text files
+# "text=auto" lets Git detect text files; "eol=lf" ensures LF in working tree
+* text=auto eol=lf
+
+# Treat these as binary (no line-ending conversions)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.svg binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.gz binary
+*.bz2 binary
+*.7z binary
+*.jar binary
+*.exe binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.a binary
+*.bin binary
+*.mp3 binary
+*.mp4 binary
+*.mov binary
+*.avi binary
+*.wav binary
+*.ogg binary
+*.webm binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+*.ttf binary
+*.otf binary
+
+# Optional: keep shell/batch files with expected endings if you use them
+# Uncomment if needed
+# *.bat text eol=crlf
+# *.cmd text eol=crlf
+
