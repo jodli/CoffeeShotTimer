@@ -68,32 +68,6 @@ class PhotoCaptureManagerTest {
                   tempFile.parentFile?.name == "temp_photos")
     }
 
-    @Test
-    fun `createImagePickerIntent should return gallery picker intent`() {
-        // Arrange
-        every { context.packageManager.resolveActivity(any<Intent>(), any<Int>()) } returns mockk()
-        
-        // Act
-        val intent = photoCaptureManager.createImagePickerIntent()
-        
-        // Assert
-        assertEquals(Intent.ACTION_PICK, intent.action)
-        assertEquals("image/*", intent.type)
-    }
-
-    @Test
-    fun `createImagePickerIntent should fallback to GET_CONTENT when PICK not available`() {
-        // Arrange
-        every { context.packageManager.resolveActivity(any<Intent>(), any<Int>()) } returns null
-        
-        // Act
-        val intent = photoCaptureManager.createImagePickerIntent()
-        
-        // Assert
-        assertEquals(Intent.ACTION_GET_CONTENT, intent.action)
-        assertEquals("image/*", intent.type)
-        assertTrue(intent.categories?.contains(Intent.CATEGORY_OPENABLE) == true)
-    }
 
     @Test
     fun `isCameraPermissionGranted should return true when permission granted`() {
@@ -159,29 +133,6 @@ class PhotoCaptureManagerTest {
         assertFalse(result)
     }
 
-    @Test
-    @Config(sdk = [Build.VERSION_CODES.TIRAMISU])
-    fun `getRequiredPermissions should return API 33+ permissions on Android 13+`() {
-        // Act
-        val permissions = photoCaptureManager.getRequiredPermissions()
-        
-        // Assert
-        assertEquals(2, permissions.size)
-        assertTrue(permissions.contains(Manifest.permission.CAMERA))
-        assertTrue(permissions.contains(Manifest.permission.READ_MEDIA_IMAGES))
-    }
-
-    @Test
-    @Config(sdk = [Build.VERSION_CODES.S])
-    fun `getRequiredPermissions should return legacy permissions on Android 12 and below`() {
-        // Act
-        val permissions = photoCaptureManager.getRequiredPermissions()
-        
-        // Assert
-        assertEquals(2, permissions.size)
-        assertTrue(permissions.contains(Manifest.permission.CAMERA))
-        assertTrue(permissions.contains(Manifest.permission.READ_EXTERNAL_STORAGE))
-    }
 
     @Test
     fun `cleanupTempFile should delete temp file when it exists`() = runTest {

@@ -520,24 +520,6 @@ class AddEditBeanViewModel @Inject constructor(
         return photoCaptureManager.isCameraPermissionGranted(context)
     }
 
-    /**
-     * Checks if storage permission is granted for accessing gallery images.
-     */
-    fun isStoragePermissionGranted(context: Context): Boolean {
-        val permissions = photoCaptureManager.getRequiredPermissions()
-        return permissions.any { permission ->
-            when (permission) {
-                android.Manifest.permission.READ_MEDIA_IMAGES,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                    androidx.core.content.ContextCompat.checkSelfPermission(
-                        context,
-                        permission
-                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                }
-                else -> true // Camera permission is checked separately
-            }
-        }
-    }
 
     /**
      * Creates a camera capture intent with a temporary file URI.
@@ -550,12 +532,6 @@ class AddEditBeanViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Creates a gallery selection intent.
-     */
-    fun createGalleryIntent(): Intent {
-        return photoCaptureManager.createImagePickerIntent()
-    }
 
     /**
      * Cleans up a temporary camera file.
@@ -573,12 +549,6 @@ class AddEditBeanViewModel @Inject constructor(
         return photoCaptureManager.isCameraAvailable(context)
     }
 
-    /**
-     * Gets the list of required permissions for camera functionality.
-     */
-    fun getRequiredPermissions(): Array<String> {
-        return photoCaptureManager.getRequiredPermissions()
-    }
 
 }
 

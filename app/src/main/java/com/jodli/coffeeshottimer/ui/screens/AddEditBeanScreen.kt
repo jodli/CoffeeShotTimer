@@ -83,7 +83,6 @@ fun AddEditBeanScreen(
     var showPhotoActionSheet by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
     var cameraPermissionGranted by remember { mutableStateOf(viewModel.isCameraPermissionGranted(context)) }
-    var storagePermissionGranted by remember { mutableStateOf(viewModel.isStoragePermissionGranted(context)) }
 
     // Camera launcher
     val cameraLauncher = rememberLauncherForActivityResult(
@@ -99,23 +98,19 @@ fun AddEditBeanScreen(
         tempCameraUri = null
     }
 
-    // Gallery launcher
-    val galleryLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+    // Photo Picker launcher (single image)
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         uri?.let { viewModel.addPhoto(it) }
     }
 
-    // Permission launcher
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        val cameraGranted = permissions[android.Manifest.permission.CAMERA] ?: false
-
-        cameraPermissionGranted = cameraGranted
-        storagePermissionGranted = viewModel.isStoragePermissionGranted(context) // Re-check storage permission
-
-        if (cameraGranted) {
+    // Camera permission launcher (CAMERA only)
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        cameraPermissionGranted = isGranted
+        if (isGranted) {
             // Permission granted, launch camera directly
             try {
                 val cameraResult = viewModel.createCameraIntent(context)
@@ -124,23 +119,28 @@ fun AddEditBeanScreen(
                     tempCameraUri = uri
                     cameraLauncher.launch(uri)
                 } else {
-                    // Camera intent creation failed, fallback to gallery
-                    if (storagePermissionGranted) {
-                        galleryLauncher.launch("image/*")
-                    }
+                    // Camera intent creation failed, fallback to photo picker
+                    photoPickerLauncher.launch(
+                        androidx.activity.result.PickVisualMediaRequest(
+                            androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
                 }
             } catch (e: Exception) {
-                // Camera intent creation failed, fallback to gallery
-                if (storagePermissionGranted) {
-                    galleryLauncher.launch("image/*")
-                }
+                // Camera intent creation failed, fallback to photo picker
+                photoPickerLauncher.launch(
+                    androidx.activity.result.PickVisualMediaRequest(
+                        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
             }
-        } else if (storagePermissionGranted) {
-            // Camera permission denied but storage granted, use gallery
-            galleryLauncher.launch("image/*")
         } else {
-            // Both permissions denied
-            viewModel.clearPhotoError()
+            // Camera permission denied, allow user to pick from gallery without permissions
+            photoPickerLauncher.launch(
+                androidx.activity.result.PickVisualMediaRequest(
+                    androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
         }
     }
 
@@ -154,35 +154,32 @@ fun AddEditBeanScreen(
                     tempCameraUri = uri
                     cameraLauncher.launch(uri)
                 } else {
-                    // Camera intent creation failed, fallback to gallery
-                    if (storagePermissionGranted) {
-                        galleryLauncher.launch("image/*")
-                    } else {
-                        // Need to request storage permission for gallery fallback
-                        permissionLauncher.launch(viewModel.getRequiredPermissions())
-                    }
+                    // Camera intent creation failed, fallback to photo picker
+                    photoPickerLauncher.launch(
+                        androidx.activity.result.PickVisualMediaRequest(
+                            androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                        )
+                    )
                 }
             } catch (e: Exception) {
-                // Camera intent creation failed, fallback to gallery
-                if (storagePermissionGranted) {
-                    galleryLauncher.launch("image/*")
-                } else {
-                    // Need to request storage permission for gallery fallback
-                    permissionLauncher.launch(viewModel.getRequiredPermissions())
-                }
+                // Camera intent creation failed, fallback to photo picker
+                photoPickerLauncher.launch(
+                    androidx.activity.result.PickVisualMediaRequest(
+                        androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
             }
         }
     }
 
-    // Function to launch gallery
+    // Function to launch gallery (Photo Picker)
     val launchGallery = remember {
         {
-            if (storagePermissionGranted) {
-                galleryLauncher.launch("image/*")
-            } else {
-                // Request storage permission first
-                permissionLauncher.launch(viewModel.getRequiredPermissions())
-            }
+            photoPickerLauncher.launch(
+                androidx.activity.result.PickVisualMediaRequest(
+                    androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
         }
     }
 
@@ -194,7 +191,7 @@ fun AddEditBeanScreen(
                     launchCamera()
                 } else {
                     // Request camera permission
-                    permissionLauncher.launch(viewModel.getRequiredPermissions())
+                    cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
                 }
             } else {
                 // Camera not available, fallback to gallery
@@ -434,14 +431,13 @@ fun AddEditBeanScreen(
             onDismiss = { showPhotoActionSheet = false },
             cameraAvailable = viewModel.isCameraAvailable(context),
             cameraPermissionGranted = cameraPermissionGranted,
-            storagePermissionGranted = storagePermissionGranted,
+            storagePermissionGranted = true,
             onRequestCameraPermission = {
                 showPhotoActionSheet = false
-                permissionLauncher.launch(viewModel.getRequiredPermissions())
+                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
             },
             onRequestStoragePermission = {
-                showPhotoActionSheet = false
-                permissionLauncher.launch(viewModel.getRequiredPermissions())
+                // No storage permission needed for Photo Picker
             }
         )
     }

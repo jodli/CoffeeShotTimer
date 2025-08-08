@@ -23,9 +23,7 @@ class CheckPhotoCapabilityUseCase @Inject constructor(
      */
     data class PhotoCapability(
         val canUseCamera: Boolean,
-        val canUseGallery: Boolean,
         val cameraPermissionGranted: Boolean,
-        val storagePermissionGranted: Boolean,
         val cameraAvailable: Boolean,
         val errorCode: DomainErrorCode? = null,
         val errorMessage: String? = null
@@ -41,28 +39,20 @@ class CheckPhotoCapabilityUseCase @Inject constructor(
             val cameraAvailable = photoCaptureManager.isCameraAvailable(context)
             val cameraPermissionGranted = photoCaptureManager.isCameraPermissionGranted(context)
 
-            // For gallery access, we need storage permission
-            val storagePermissionGranted = checkStoragePermission()
-
             val canUseCamera = cameraAvailable && cameraPermissionGranted
-            val canUseGallery = storagePermissionGranted
 
             // Determine if any photo functionality is available
-            if (!canUseCamera && !canUseGallery) {
+            if (!canUseCamera) {
                 val errorCode = when {
                     !cameraAvailable -> DomainErrorCode.CAMERA_UNAVAILABLE
-                    !cameraPermissionGranted && !storagePermissionGranted -> DomainErrorCode.CAMERA_PERMISSION_DENIED
                     !cameraPermissionGranted -> DomainErrorCode.CAMERA_PERMISSION_DENIED
-                    !storagePermissionGranted -> DomainErrorCode.STORAGE_PERMISSION_DENIED
                     else -> DomainErrorCode.CAMERA_UNAVAILABLE
                 }
 
                 return Result.success(
                     PhotoCapability(
                         canUseCamera = false,
-                        canUseGallery = false,
                         cameraPermissionGranted = cameraPermissionGranted,
-                        storagePermissionGranted = storagePermissionGranted,
                         cameraAvailable = cameraAvailable,
                         errorCode = errorCode
                     )
@@ -72,9 +62,7 @@ class CheckPhotoCapabilityUseCase @Inject constructor(
             Result.success(
                 PhotoCapability(
                     canUseCamera = canUseCamera,
-                    canUseGallery = canUseGallery,
                     cameraPermissionGranted = cameraPermissionGranted,
-                    storagePermissionGranted = storagePermissionGranted,
                     cameraAvailable = cameraAvailable
                 )
             )
@@ -117,56 +105,5 @@ class CheckPhotoCapabilityUseCase @Inject constructor(
         }
     }
 
-    /**
-     * Checks specifically for gallery capability.
-     *
-     * @return Result indicating if gallery can be used
-     */
-    suspend fun canUseGallery(): Result<Boolean> {
-        return try {
-            val permitted = checkStoragePermission()
-
-            if (!permitted) {
-                Result.failure(DomainException(DomainErrorCode.STORAGE_PERMISSION_DENIED))
-            } else {
-                Result.success(true)
-            }
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.UNKNOWN_ERROR,
-                    "Error checking gallery capability",
-                    exception
-                )
-            )
-        }
-    }
-
-    /**
-     * Gets the required permissions for photo operations.
-     *
-     * @return Array of permission strings
-     */
-    fun getRequiredPermissions(): Array<String> {
-        return photoCaptureManager.getRequiredPermissions()
-    }
-
-    private fun checkStoragePermission(): Boolean {
-        // For Android 13+ (API 33+), we need READ_MEDIA_IMAGES
-        // For older versions, we need READ_EXTERNAL_STORAGE
-        val permissions = photoCaptureManager.getRequiredPermissions()
-        return permissions.any { permission ->
-            when (permission) {
-                android.Manifest.permission.READ_MEDIA_IMAGES,
-                android.Manifest.permission.READ_EXTERNAL_STORAGE -> {
-                    androidx.core.content.ContextCompat.checkSelfPermission(
-                        context,
-                        permission
-                    ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                }
-                android.Manifest.permission.CAMERA -> true // Camera permission is checked separately
-                else -> true // Unknown permission, assume granted to avoid blocking
-            }
-        }
-    }
+    // Gallery (Photo Picker) requires no storage permission; no explicit check needed.
 }

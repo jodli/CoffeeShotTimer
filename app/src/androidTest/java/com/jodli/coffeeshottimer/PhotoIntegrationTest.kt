@@ -213,8 +213,6 @@ class PhotoIntegrationTest {
             assertNotNull("Camera intent should be created", cameraIntent.first)
             assertNotNull("Temp URI should be created", cameraIntent.second)
             
-            val galleryIntent = photoCaptureManager.createImagePickerIntent()
-            assertNotNull("Gallery intent should be created", galleryIntent)
         } catch (e: Exception) {
             // In test environment, this might fail due to missing camera app
             // This is acceptable as long as it doesn't crash the app

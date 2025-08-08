@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.provider.MediaStore
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -86,22 +85,6 @@ class PhotoCaptureManagerImpl @Inject constructor(
         return Pair(intent, tempUri)
     }
     
-    override fun createImagePickerIntent(): Intent {
-        val pickIntent = Intent(Intent.ACTION_PICK).apply {
-            type = "image/*"
-        }
-        
-        // Alternative for devices that don't support ACTION_PICK
-        return if (pickIntent.resolveActivity(context.packageManager) == null) {
-            Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "image/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            }
-        } else {
-            pickIntent
-        }
-    }
-    
     override fun isCameraPermissionGranted(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
@@ -111,20 +94,6 @@ class PhotoCaptureManagerImpl @Inject constructor(
     
     override fun isCameraAvailable(context: Context): Boolean {
         return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-    }
-    
-    override fun getRequiredPermissions(): Array<String> {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_MEDIA_IMAGES
-            )
-        } else {
-            arrayOf(
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            )
-        }
     }
     
     override suspend fun cleanupTempFile(tempUri: Uri) = withContext(Dispatchers.IO) {

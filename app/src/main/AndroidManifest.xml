@@ -11,23 +11,11 @@
     <!-- Camera hardware feature (not required for Chrome OS compatibility) -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
-    <!-- Read external storage for gallery photo selection -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-        android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
 
     <!-- Package visibility for camera apps on Android 11+ -->
     <queries>
         <intent>
             <action android:name="android.media.action.IMAGE_CAPTURE" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.PICK" />
-            <data android:mimeType="image/*" />
-        </intent>
-        <intent>
-            <action android:name="android.intent.action.GET_CONTENT" />
-            <data android:mimeType="image/*" />
         </intent>
     </queries>
 
@@ -72,6 +60,20 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Prompt Google Play services to install the backported photo picker module -->
+        <service
+            android:name="com.google.android.gms.metadata.ModuleDependencies"
+            android:enabled="false"
+            android:exported="false"
+            tools:ignore="MissingClass">
+            <intent-filter>
+                <action android:name="com.google.android.gms.metadata.MODULE_DEPENDENCIES" />
+            </intent-filter>
+            <meta-data
+                android:name="photopicker_activity:0:required"
+                android:value="" />
+        </service>
 
         <!-- Disable unused components to reduce app size -->
         <service
