@@ -28,7 +28,6 @@ class PhotoCaptureManagerImpl @Inject constructor(
         private const val TEMP_PHOTOS_DIR = "temp_photos"
         private const val TEMP_PHOTO_PREFIX = "temp_photo_"
         private const val PHOTO_EXTENSION = ".jpg"
-        private const val FILE_PROVIDER_AUTHORITY = "com.jodli.coffeeshottimer.fileprovider"
     }
     
     private val tempPhotosDir: File by lazy {
@@ -58,9 +57,10 @@ class PhotoCaptureManagerImpl @Inject constructor(
         
         // Create URI using FileProvider for security
         val tempUri = try {
+            val authority = "${context.packageName}.fileprovider"
             FileProvider.getUriForFile(
                 context,
-                FILE_PROVIDER_AUTHORITY,
+                authority,
                 tempFile
             )
         } catch (e: IllegalArgumentException) {
