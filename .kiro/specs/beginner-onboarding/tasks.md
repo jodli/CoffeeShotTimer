@@ -15,7 +15,7 @@
   - Write unit tests for onboarding state persistence and retrieval
   - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 2. Implement first-time user detection in MainActivity
+- [x] 2. Implement first-time user detection in MainActivity
   - Add onboarding check logic to MainActivity onCreate
   - Create routing logic to direct first-time users to onboarding flow
   - Ensure existing users continue to normal RecordShotScreen

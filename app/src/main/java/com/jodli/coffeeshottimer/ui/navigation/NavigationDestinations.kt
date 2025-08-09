@@ -8,6 +8,10 @@ sealed class NavigationDestinations(val route: String) {
     object ShotHistory : NavigationDestinations("shot_history")
     object BeanManagement : NavigationDestinations("bean_management")
 
+    // Onboarding destinations
+    object OnboardingIntroduction : NavigationDestinations("onboarding_introduction")
+    object OnboardingEquipmentSetup : NavigationDestinations("onboarding_equipment_setup")
+
     // Modal destinations
     object ShotDetails : NavigationDestinations("shot_details/{shotId}") {
         fun createRoute(shotId: String) = "shot_details/$shotId"

@@ -1,6 +1,11 @@
 package com.jodli.coffeeshottimer.ui.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -14,11 +19,12 @@ import com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    startDestination: String = NavigationDestinations.RecordShot.route
 ) {
     NavHost(
         navController = navController,
-        startDestination = NavigationDestinations.RecordShot.route,
+        startDestination = startDestination,
         modifier = modifier
     ) {
         // Main bottom navigation screens
@@ -51,6 +57,29 @@ fun AppNavigation(
                 },
                 onNavigateToRecordShot = {
                     navController.navigate(NavigationDestinations.RecordShot.route)
+                }
+            )
+        }
+
+        // Onboarding screens (placeholder implementations)
+        composable(NavigationDestinations.OnboardingIntroduction.route) {
+            OnboardingIntroductionScreen(
+                onComplete = {
+                    navController.navigate(NavigationDestinations.OnboardingEquipmentSetup.route)
+                },
+                onSkip = {
+                    navController.navigate(NavigationDestinations.RecordShot.route)
+                }
+            )
+        }
+
+        composable(NavigationDestinations.OnboardingEquipmentSetup.route) {
+            OnboardingEquipmentSetupScreen(
+                onComplete = {
+                    navController.navigate(NavigationDestinations.RecordShot.route)
+                },
+                onBack = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -96,5 +125,40 @@ fun AppNavigation(
                 }
             )
         }
+    }
+}
+
+// Placeholder composables for onboarding screens
+// These will be replaced with actual implementations in future tasks
+
+@Composable
+private fun OnboardingIntroductionScreen(
+    onComplete: () -> Unit,
+    onSkip: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Onboarding Introduction Screen (Placeholder)",
+            style = MaterialTheme.typography.headlineMedium
+        )
+    }
+}
+
+@Composable
+private fun OnboardingEquipmentSetupScreen(
+    onComplete: () -> Unit,
+    onBack: () -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "Onboarding Equipment Setup Screen (Placeholder)",
+            style = MaterialTheme.typography.headlineMedium
+        )
     }
 }
