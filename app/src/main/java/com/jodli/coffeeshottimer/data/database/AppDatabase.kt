@@ -45,14 +45,39 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
-                    // Add photoPath column to beans table
-                    db.execSQL("ALTER TABLE beans ADD COLUMN photoPath TEXT DEFAULT NULL")
-                    
-                    // Add index for photoPath to optimize photo-related queries
+                    // 1) Add photoPath column to beans table (nullable, no explicit default)
+                    //    Room expects no explicit default for nullable columns.
+                    db.execSQL("ALTER TABLE beans ADD COLUMN photoPath TEXT")
+
+                    // 2) Ensure indexes match Room's expected (canonical) names.
+                    //    Drop any legacy/custom indexes if they exist, then (re)create the expected ones.
+                    //    These drops are safe as IF EXISTS and no-ops if not present.
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
+
+                    // 3) Create canonical indexes with the names Room generated from @Entity(indices=...)
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
+                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
+
+                    // 4) Add index for photoPath to optimize photo-related queries
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
+
+                    // 5) Normalize legacy index names on 'shots' table to match Room's expected schema
+                    //    Drop old custom names (if they exist) and create canonical ones.
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
+
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
                 } catch (e: Exception) {
-                    // Log the error but don't fail the migration - let Room handle it
-                    // This prevents app crashes due to database corruption
+                    // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 1->2 failed: ${e.message}", e)
                 }
             }
