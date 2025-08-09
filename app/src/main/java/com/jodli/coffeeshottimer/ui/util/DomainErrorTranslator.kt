@@ -1,6 +1,7 @@
 package com.jodli.coffeeshottimer.ui.util
 
 import android.content.Context
+import android.util.Log
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
@@ -17,6 +18,9 @@ import javax.inject.Singleton
 class DomainErrorTranslator @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) {
+    private companion object {
+        private const val TAG = "DomainErrorTranslator"
+    }
 
     /**
      * Translate a domain error code to a localized string.
@@ -81,6 +85,9 @@ class DomainErrorTranslator @Inject constructor(
             }
 
             DomainErrorCode.UNKNOWN_ERROR -> {
+                // Log unknown error details for diagnostics
+                val extra = if (!details.isNullOrBlank()) ": $details" else ""
+                Log.e(TAG, "Unknown error encountered$extra")
                 if (details != null) {
                     context.getString(R.string.error_unknown_error_occurred) + ": $details"
                 } else {
@@ -97,10 +104,14 @@ class DomainErrorTranslator @Inject constructor(
     fun translateError(exception: Throwable?): String {
         return when (exception) {
             is DomainException -> translate(exception.errorCode, exception.details)
-            null -> context.getString(R.string.error_unknown_error_occurred)
+            null -> {
+                Log.e(TAG, "Unknown error: exception is null")
+                context.getString(R.string.error_unknown_error_occurred)
+            }
             else -> {
                 // For non-domain exceptions, provide a generic error message
-                // You might want to log the actual exception for debugging
+                // Log the actual exception for debugging
+                Log.e(TAG, "Unknown non-domain exception", exception)
                 context.getString(R.string.error_unknown_error_occurred)
             }
         }
