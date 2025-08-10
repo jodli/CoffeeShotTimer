@@ -1,13 +1,16 @@
 package com.jodli.coffeeshottimer.ui.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -20,10 +23,12 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import java.text.DecimalFormat
 import java.time.LocalDate
@@ -218,6 +223,146 @@ class ValidationUtils(
         }
     }
 
+}
+
+/**
+ * Gentle validation message component that provides helpful feedback with suggestions.
+ * Used for onboarding and user-friendly error messaging.
+ */
+@Composable
+fun GentleValidationMessage(
+    message: String,
+    suggestion: String,
+    onFixClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    
+    CoffeeCard(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+        )
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Warning,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
+                
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
+                ) {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    
+                    if (suggestion.isNotBlank()) {
+                        Text(
+                            text = suggestion,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+            
+            if (onFixClick != null) {
+                CoffeeSecondaryButton(
+                    text = stringResource(R.string.text_try_again),
+                    onClick = onFixClick,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Onboarding error card with retry and skip options for setup failures.
+ * Provides graceful error recovery during the onboarding process.
+ */
+@Composable
+fun OnboardingErrorCard(
+    title: String,
+    message: String,
+    onRetry: () -> Unit,
+    onSkip: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    
+    CoffeeCard(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
+        )
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                verticalAlignment = Alignment.Top
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Error,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(24.dp)
+                )
+                
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
+                ) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+                    
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = if (onSkip != null) {
+                    Arrangement.spacedBy(spacing.medium)
+                } else {
+                    Arrangement.End
+                }
+            ) {
+                if (onSkip != null) {
+                    CoffeeSecondaryButton(
+                        text = stringResource(R.string.button_skip),
+                        onClick = onSkip,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                
+                CoffeePrimaryButton(
+                    text = stringResource(R.string.text_retry),
+                    onClick = onRetry,
+                    modifier = if (onSkip != null) Modifier.weight(1f) else Modifier
+                )
+            }
+        }
+    }
 }
 
 /**

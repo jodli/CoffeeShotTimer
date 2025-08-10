@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,7 +35,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.ui.components.CardHeader
@@ -42,8 +43,12 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
+import com.jodli.coffeeshottimer.ui.components.GentleValidationMessage
+import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.OnboardingErrorCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.viewmodel.EquipmentSetupViewModel
 
 /**
  * Equipment setup screen for configuring grinder scale settings during onboarding.
@@ -54,48 +59,15 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 fun EquipmentSetupScreen(
     onComplete: (GrinderConfiguration) -> Unit,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: EquipmentSetupViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
+    val uiState by viewModel.uiState.collectAsState()
     
-    // Form state
-    var scaleMin by remember { mutableStateOf("") }
-    var scaleMax by remember { mutableStateOf("") }
-    var minError by remember { mutableStateOf<String?>(null) }
-    var maxError by remember { mutableStateOf<String?>(null) }
-    var generalError by remember { mutableStateOf<String?>(null) }
-    
-    // Validate form and create configuration
-    fun validateAndCreateConfig(): GrinderConfiguration? {
-        // Clear previous errors
-        minError = null
-        maxError = null
-        generalError = null
-        
-        val minValue = scaleMin.toIntOrNull()
-        val maxValue = scaleMax.toIntOrNull()
-        
-        // Individual field validation
-        if (scaleMin.isNotBlank() && minValue == null) {
-            minError = "Please enter a valid number"
-        }
-        if (scaleMax.isNotBlank() && maxValue == null) {
-            maxError = "Please enter a valid number"
-        }
-        
-        // If both values are valid, validate the configuration
-        if (minValue != null && maxValue != null) {
-            val config = GrinderConfiguration(scaleMin = minValue, scaleMax = maxValue)
-            val validation = config.validate()
-            if (!validation.isValid) {
-                generalError = validation.errors.firstOrNull()
-            } else {
-                return config
-            }
-        }
-        
-        return null
-    }
+    // Handle error display
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
     
     Column(
         modifier = modifier.fillMaxSize()
@@ -127,58 +99,96 @@ fun EquipmentSetupScreen(
                 .padding(spacing.screenPadding),
             verticalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
-            // Introduction text
-            Text(
-                text = stringResource(R.string.text_equipment_setup_description),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-            
-            // Grinder scale setup card
-            GrinderScaleSetup(
-                scaleMin = scaleMin,
-                scaleMax = scaleMax,
-                onScaleMinChange = { 
-                    scaleMin = it
-                    minError = null // Clear error on input
-                    generalError = null
-                },
-                onScaleMaxChange = { 
-                    scaleMax = it
-                    maxError = null // Clear error on input
-                    generalError = null
-                },
-                minError = minError,
-                maxError = maxError,
-                generalError = generalError
-            )
-            
-            // Action buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-            ) {
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.button_skip),
-                    onClick = {
-                        // Use default configuration when skipping
-                        onComplete(GrinderConfiguration.DEFAULT_CONFIGURATION)
-                    },
-                    modifier = Modifier.weight(1f)
+            // Show loading indicator when saving
+            if (uiState.isLoading) {
+                LoadingIndicator(
+                    message = stringResource(R.string.text_saving_configuration),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                // Introduction text
+                Text(
+                    text = stringResource(R.string.text_equipment_setup_description),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 
-                CoffeePrimaryButton(
-                    text = stringResource(R.string.button_continue),
-                    onClick = {
-                        val config = validateAndCreateConfig()
-                        if (config != null) {
-                            onComplete(config)
+                // Show error card if there's a general error
+                uiState.error?.let { error ->
+                    OnboardingErrorCard(
+                        title = stringResource(R.string.text_equipment_setup_failed),
+                        message = error,
+                        onRetry = {
+                            viewModel.retry(
+                                onSuccess = onComplete,
+                                onError = { error ->
+                                    errorMessage = error
+                                    showErrorDialog = true
+                                }
+                            )
+                        },
+                        onSkip = {
+                            viewModel.skipSetup(
+                                onSuccess = onComplete,
+                                onError = { error ->
+                                    errorMessage = error
+                                    showErrorDialog = true
+                                }
+                            )
                         }
-                    },
-                    modifier = Modifier.weight(1f)
-                )
+                    )
+                } ?: run {
+                    // Grinder scale setup card
+                    GrinderScaleSetup(
+                        scaleMin = uiState.scaleMin,
+                        scaleMax = uiState.scaleMax,
+                        onScaleMinChange = viewModel::updateScaleMin,
+                        onScaleMaxChange = viewModel::updateScaleMax,
+                        onPresetSelected = viewModel::setPreset,
+                        minError = uiState.minError,
+                        maxError = uiState.maxError,
+                        generalError = uiState.generalError,
+                        validationSuggestion = uiState.generalError?.let { viewModel.getValidationSuggestion(it) }
+                    )
+                    
+                    // Action buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+                    ) {
+                        CoffeeSecondaryButton(
+                            text = stringResource(R.string.button_skip),
+                            onClick = {
+                                viewModel.skipSetup(
+                                    onSuccess = onComplete,
+                                    onError = { error ->
+                                        errorMessage = error
+                                        showErrorDialog = true
+                                    }
+                                )
+                            },
+                            enabled = !uiState.isLoading,
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        CoffeePrimaryButton(
+                            text = stringResource(R.string.button_continue),
+                            onClick = {
+                                viewModel.saveConfiguration(
+                                    onSuccess = onComplete,
+                                    onError = { error ->
+                                        errorMessage = error
+                                        showErrorDialog = true
+                                    }
+                                )
+                            },
+                            enabled = uiState.isFormValid && !uiState.isLoading,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
             }
             
             // Bottom padding for scrolling
@@ -196,9 +206,11 @@ private fun GrinderScaleSetup(
     scaleMax: String,
     onScaleMinChange: (String) -> Unit,
     onScaleMaxChange: (String) -> Unit,
+    onPresetSelected: (Int, Int) -> Unit,
     minError: String?,
     maxError: String?,
     generalError: String?,
+    validationSuggestion: String?,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -244,10 +256,7 @@ private fun GrinderScaleSetup(
             presets.take(2).forEach { (min, max) ->
                 CoffeeSecondaryButton(
                     text = "$min-$max",
-                    onClick = {
-                        onScaleMinChange(min.toString())
-                        onScaleMaxChange(max.toString())
-                    },
+                    onClick = { onPresetSelected(min, max) },
                     modifier = Modifier.weight(1f),
                     fillMaxWidth = false
                 )
@@ -263,10 +272,7 @@ private fun GrinderScaleSetup(
             presets.drop(2).forEach { (min, max) ->
                 CoffeeSecondaryButton(
                     text = "$min-$max",
-                    onClick = {
-                        onScaleMinChange(min.toString())
-                        onScaleMaxChange(max.toString())
-                    },
+                    onClick = { onPresetSelected(min, max) },
                     modifier = Modifier.weight(1f),
                     fillMaxWidth = false
                 )
@@ -324,24 +330,11 @@ private fun GrinderScaleSetup(
         if (generalError != null) {
             Spacer(modifier = Modifier.height(spacing.small))
             
-            Text(
-                text = generalError,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+            GentleValidationMessage(
+                message = generalError,
+                suggestion = validationSuggestion ?: "",
                 modifier = Modifier.fillMaxWidth()
             )
-            
-            // Provide helpful suggestion
-            val suggestion = getValidationSuggestion(generalError)
-            if (suggestion.isNotBlank()) {
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-                Text(
-                    text = suggestion,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
         } else if (scaleMin.isNotBlank() && scaleMax.isNotBlank()) {
             // Show positive feedback when range is valid
             val minValue = scaleMin.toIntOrNull()
@@ -363,20 +356,7 @@ private fun GrinderScaleSetup(
 
 
 
-/**
- * Provides helpful suggestions for validation errors.
- */
-private fun getValidationSuggestion(error: String): String {
-    return when {
-        error.contains("must be less than") -> "Try increasing the maximum value or decreasing the minimum value."
-        error.contains("cannot be negative") -> "Grinder scales typically start at 0 or 1."
-        error.contains("cannot exceed 1000") -> "Most grinder scales don't go above 100."
-        error.contains("at least 3 steps") -> "A range of at least 3 steps gives you room to adjust your grind."
-        error.contains("cannot exceed 100 steps") -> "A smaller range is usually easier to work with."
-        error.contains("valid number") -> "Please enter whole numbers only (e.g., 1, 10, 50)."
-        else -> ""
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable
@@ -398,9 +378,11 @@ private fun GrinderScaleSetupPreview() {
             scaleMax = "10",
             onScaleMinChange = { },
             onScaleMaxChange = { },
+            onPresetSelected = { _, _ -> },
             minError = null,
             maxError = null,
             generalError = null,
+            validationSuggestion = null,
             modifier = Modifier.padding(16.dp)
         )
     }
@@ -415,9 +397,11 @@ private fun GrinderScaleSetupWithErrorsPreview() {
             scaleMax = "5",
             onScaleMinChange = { },
             onScaleMaxChange = { },
+            onPresetSelected = { _, _ -> },
             minError = null,
             maxError = null,
             generalError = "Minimum scale value must be less than maximum scale value",
+            validationSuggestion = "Try increasing the maximum value or decreasing the minimum value.",
             modifier = Modifier.padding(16.dp)
         )
     }

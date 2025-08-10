@@ -83,7 +83,7 @@
   - Add real-time validation feedback for scale ranges
   - _Requirements: 2.1, 2.2, 2.4_
 
-- [ ] 9. Implement equipment setup logic and validation
+- [x] 9. Implement equipment setup logic and validation
   - Create EquipmentSetupViewModel with form state management
   - Add validation logic for grinder scale ranges (min < max, reasonable bounds)
   - Add form submission logic that saves configuration to database
