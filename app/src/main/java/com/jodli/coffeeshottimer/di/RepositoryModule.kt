@@ -1,8 +1,10 @@
 package com.jodli.coffeeshottimer.di
 
 import com.jodli.coffeeshottimer.data.dao.BeanDao
+import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
 import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManagerImpl
@@ -58,6 +60,21 @@ abstract class RepositoryModule {
             beanDao: BeanDao
         ): ShotRepository {
             return ShotRepository(shotDao, beanDao)
+        }
+
+        /**
+         * Provides the GrinderConfigRepository instance.
+         * Uses singleton scope to ensure consistent data access.
+         *
+         * @param grinderConfigDao The GrinderConfigDao dependency
+         * @return GrinderConfigRepository instance
+         */
+        @Provides
+        @Singleton
+        fun provideGrinderConfigRepository(
+            grinderConfigDao: GrinderConfigDao
+        ): GrinderConfigRepository {
+            return GrinderConfigRepository(grinderConfigDao)
         }
 
         /**

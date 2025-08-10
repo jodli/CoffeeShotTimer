@@ -455,7 +455,7 @@
     <string name="text_bean_name_exists">Bohnenname existiert bereits</string>
 
     <!-- Introduction Screen Content -->
-    <string name="intro_welcome_title">Willkommen bei Coffee Shot Timer</string>
+    <string name="intro_welcome_title">Willkommen bei\nCoffee Shot Timer</string>
     <string name="intro_welcome_description">Verwandle dein Espresso-Brühen in eine systematische Reise der Verbesserung mit präzisem Timing und detaillierter Verfolgung.</string>
     
     <string name="intro_main_screens_title">Hauptfunktionen</string>
@@ -474,10 +474,10 @@
     <string name="intro_flexible_workflow_description">Fülle Messungen in beliebiger Reihenfolge aus, die zu deinem Brühstil passt. Kaffee rein, Mahlgrad, Extraktionszeit und Kaffee raus können alle während des Brühens erfasst werden.</string>
     
     <string name="intro_timer_usage_title">Intelligenter Timer</string>
-    <string name="intro_timer_usage_description">Starte den Timer vor, während oder nach anderen Messungen. Der flexible Timer passt sich deinem Brühprozess an, nicht umgekehrt.</string>
+    <string name="intro_timer_usage_description">Starte den Timer vor, während oder nach anderen Messungen. Der flexible Timer passt sich deiner Brühroutine an und bietet farbkodiertes Feedback für optimale Extraktionszeiten.</string>
     
-    <string name="intro_get_started_title">Bereit zum Brühen!</string>
-    <string name="intro_get_started_description">Du bist bereit, deine Espresso-Shots zu verfolgen. Lass uns deine Ausrüstung konfigurieren, um dein Brüherlebnis zu personalisieren.</string>
+    <string name="intro_get_started_title">Bereit zum Beginnen</string>
+    <string name="intro_get_started_description">Lass uns deine Ausrüstung einrichten und deinen ersten Shot aufnehmen. Du wirst Schritt für Schritt durch den Prozess geführt.</string>
 
     <!-- Shot Recommendations -->
     <string name="recommendation_grind_finer">Erwäge feiner zu mahlen, um die Extraktion zu verlangsamen (aktuell: %1$ss)</string>
@@ -498,4 +498,5 @@
     <string name="text_recommendations_for_next_shot">Empfehlungen für nächsten Shot</string>
     <string name="text_next_steps_based_on_shot">Basierend auf diesem Shot:</string>
     <string name="text_and_more_recommendations">+%1$d weitere Empfehlungen</string>
+    
 </resources>

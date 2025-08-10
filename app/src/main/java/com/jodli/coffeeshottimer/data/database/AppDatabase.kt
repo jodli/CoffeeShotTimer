@@ -6,8 +6,10 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.jodli.coffeeshottimer.data.dao.BeanDao
+import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.Shot
 
 /**
@@ -17,8 +19,8 @@ import com.jodli.coffeeshottimer.data.model.Shot
  * relationships and performance optimizations.
  */
 @Database(
-    entities = [Bean::class, Shot::class],
-    version = 2,
+    entities = [Bean::class, Shot::class, GrinderConfiguration::class],
+    version = 3,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -26,6 +28,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun beanDao(): BeanDao
     abstract fun shotDao(): ShotDao
+    abstract fun grinderConfigDao(): GrinderConfigDao
 
     companion object {
         const val DATABASE_NAME = "espresso_tracker_database"
@@ -35,7 +38,8 @@ abstract class AppDatabase : RoomDatabase() {
          */
         fun getAllMigrations(): Array<Migration> {
             return arrayOf(
-                MIGRATION_1_2
+                MIGRATION_1_2,
+                MIGRATION_2_3
             )
         }
 
@@ -79,6 +83,56 @@ abstract class AppDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 1->2 failed: ${e.message}", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 2 to 3: Add grinder_configuration table.
+         */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Ensure legacy indices from older 2.x schemas are cleaned up so schema matches Room expectations
+                    // Drop old/custom bean indices if present
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
+
+                    // Recreate canonical bean indices that Room expects (idempotent)
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
+                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
+
+                    // Also normalize legacy index names on 'shots' table to match Room's expected schema
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
+
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
+
+                    // Create grinder_configuration table
+                    db.execSQL("""
+                        CREATE TABLE IF NOT EXISTS grinder_configuration (
+                            id TEXT NOT NULL PRIMARY KEY,
+                            scaleMin INTEGER NOT NULL,
+                            scaleMax INTEGER NOT NULL,
+                            createdAt TEXT NOT NULL
+                        )
+                    """)
+
+                    // Create index for createdAt to optimize queries for most recent configuration
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_grinder_configuration_createdAt ON grinder_configuration (createdAt)")
+
+                } catch (e: Exception) {
+                    // Surface the failure so Room can handle it and report clearly
+                    throw RuntimeException("Migration 2->3 failed: ${e.message}", e)
                 }
             }
         }

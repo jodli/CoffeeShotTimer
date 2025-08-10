@@ -43,7 +43,7 @@
   - Add navigation buttons (Skip, Previous, Next, Get Started)
   - _Requirements: 1.1, 1.2_
 
-- [-] 5. Implement introduction content and slides
+- [x] 5. Implement introduction content and slides
   - Create welcome slide explaining app purpose and benefits
   - Add main screens overview slide with feature highlights
   - Implement flexible workflow explanation slide
@@ -51,7 +51,7 @@
   - Add final "Get Started" slide with transition to equipment setup
   - _Requirements: 1.3, 1.6_
 
-- [ ] 6. Add introduction screen interactions and navigation
+- [x] 6. Add introduction screen interactions and navigation
   - Implement slide navigation with swipe gestures and buttons
   - Add skip functionality that bypasses remaining slides
   - Create smooth transitions between slides with animations
@@ -67,7 +67,7 @@
 
 **Deliverable**: Complete equipment setup screen that captures grinder scale settings and integrates with shot recording.
 
-- [ ] 7. Create grinder configuration data models and storage
+- [x] 7. Create grinder configuration data models and storage
   - Implement GrinderConfiguration data class and entity
   - Add GrinderConfigDao to Room database with CRUD operations
   - Create database migration for grinder configuration table

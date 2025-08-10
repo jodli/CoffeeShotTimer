@@ -1,5 +1,11 @@
 package com.jodli.coffeeshottimer.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +28,7 @@ import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.AltRoute
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,10 +36,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +53,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlinx.coroutines.launch
@@ -78,6 +92,10 @@ fun IntroductionScreen(
     val slides = getIntroductionSlides()
     val pagerState = rememberPagerState(pageCount = { slides.size })
     val coroutineScope = rememberCoroutineScope()
+    
+    // State for navigation operations and error handling
+    var isNavigating by remember { mutableStateOf(false) }
+    var navigationError by remember { mutableStateOf<String?>(null) }
 
     Surface(
         modifier = modifier.fillMaxSize(),
@@ -86,50 +104,184 @@ fun IntroductionScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(spacing.screenPadding)
+                .padding(horizontal = spacing.screenPadding, vertical = spacing.small)
         ) {
-            // Skip button
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+            // Skip button with animation - reduced top padding
+            AnimatedVisibility(
+                visible = !isNavigating,
+                enter = fadeIn(animationSpec = tween(300)),
+                exit = fadeOut(animationSpec = tween(300))
             ) {
-                TextButton(onClick = onSkip) {
-                    Text(
-                        text = stringResource(R.string.button_skip),
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = spacing.small),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = {
+                            try {
+                                isNavigating = true
+                                onSkip()
+                            } catch (e: Exception) {
+                                navigationError = "Failed to skip introduction: ${e.message}"
+                                isNavigating = false
+                            }
+                        }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.button_skip),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+
+            // Loading indicator during navigation
+            if (isNavigating) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(spacing.touchTarget),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingIndicator(
+                        message = "Loading...",
+                        modifier = Modifier.size(spacing.iconMedium)
                     )
                 }
             }
 
-            // Walkthrough pager
+            // Error message display
+            navigationError?.let { error ->
+                IntroductionErrorCard(
+                    message = error,
+                    onRetry = {
+                        navigationError = null
+                        isNavigating = false
+                    },
+                    onDismiss = {
+                        navigationError = null
+                        isNavigating = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = spacing.small)
+                )
+            }
+
+            // Walkthrough pager with enhanced animations - better space utilization
             WalkthroughPager(
                 slides = slides,
                 pagerState = pagerState,
+                isNavigating = isNavigating,
                 modifier = Modifier.weight(1f)
             )
 
-            Spacer(modifier = Modifier.height(spacing.large))
-
-            // Navigation buttons
+            // Navigation buttons with error handling - reduced spacing
             IntroductionNavigationButtons(
                 currentPage = pagerState.currentPage,
                 totalPages = slides.size,
+                isNavigating = isNavigating,
                 onPrevious = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                        try {
+                            pagerState.animateScrollToPage(
+                                page = pagerState.currentPage - 1,
+                                animationSpec = tween(durationMillis = 500)
+                            )
+                        } catch (e: Exception) {
+                            navigationError = "Failed to navigate to previous slide: ${e.message}"
+                        }
                     }
                 },
                 onNext = {
                     coroutineScope.launch {
-                        pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                        try {
+                            pagerState.animateScrollToPage(
+                                page = pagerState.currentPage + 1,
+                                animationSpec = tween(durationMillis = 500)
+                            )
+                        } catch (e: Exception) {
+                            navigationError = "Failed to navigate to next slide: ${e.message}"
+                        }
                     }
                 },
-                onGetStarted = onComplete,
-                modifier = Modifier.fillMaxWidth()
+                onGetStarted = {
+                    try {
+                        isNavigating = true
+                        onComplete()
+                    } catch (e: Exception) {
+                        navigationError = "Failed to complete introduction: ${e.message}"
+                        isNavigating = false
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = spacing.medium)
             )
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(spacing.medium))
+/**
+ * Error card component for introduction screen navigation failures
+ */
+@Composable
+fun IntroductionErrorCard(
+    message: String,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.errorContainer,
+        shape = MaterialTheme.shapes.medium,
+        tonalElevation = spacing.elevationCard
+    ) {
+        Column(
+            modifier = Modifier.padding(spacing.medium),
+            verticalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            Text(
+                text = "Navigation Error",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer
+            )
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(onClick = onDismiss) {
+                    Text(
+                        text = stringResource(R.string.button_dismiss),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(spacing.small))
+                
+                TextButton(onClick = onRetry) {
+                    Text(
+                        text = stringResource(R.string.text_retry),
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
         }
     }
 }
@@ -142,6 +294,7 @@ fun IntroductionScreen(
 fun WalkthroughPager(
     slides: List<IntroSlide>,
     pagerState: PagerState,
+    isNavigating: Boolean,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -150,94 +303,175 @@ fun WalkthroughPager(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Horizontal pager for slides
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.weight(1f)
-        ) { page ->
-            IntroSlideContent(
-                slide = slides[page],
-                modifier = Modifier.fillMaxSize()
+        // Horizontal pager for slides with enhanced animations
+        AnimatedVisibility(
+            visible = !isNavigating,
+            enter = fadeIn(animationSpec = tween(300)) + slideInHorizontally(
+                animationSpec = tween(300),
+                initialOffsetX = { it / 4 }
+            ),
+            exit = fadeOut(animationSpec = tween(300)) + slideOutHorizontally(
+                animationSpec = tween(300),
+                targetOffsetX = { -it / 4 }
             )
+        ) {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.weight(1f),
+                pageSpacing = spacing.medium
+            ) { page ->
+                IntroSlideContent(
+                    slide = slides[page],
+                    isActive = page == pagerState.currentPage,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Page indicators
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            repeat(slides.size) { index ->
-                PageIndicator(
-                    isActive = index == pagerState.currentPage,
-                    modifier = Modifier.size(spacing.small)
+        // Loading state during navigation
+        if (isNavigating) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingIndicator(
+                    message = "Preparing next step...",
+                    modifier = Modifier.size(spacing.iconLarge)
                 )
+            }
+        }
+
+        // Page indicators with animation - reduced spacing
+        AnimatedVisibility(
+            visible = !isNavigating,
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300))
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(vertical = spacing.small)
+            ) {
+                repeat(slides.size) { index ->
+                    PageIndicator(
+                        isActive = index == pagerState.currentPage,
+                        modifier = Modifier.size(spacing.small)
+                    )
+                }
             }
         }
     }
 }
 
 /**
- * Individual slide content component
+ * Individual slide content component with enhanced animations
  */
 @Composable
 fun IntroSlideContent(
     slide: IntroSlide,
+    isActive: Boolean,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(spacing.medium),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    // Animate content when slide becomes active
+    AnimatedVisibility(
+        visible = isActive,
+        enter = fadeIn(animationSpec = tween(600, delayMillis = 200)) + slideInHorizontally(
+            animationSpec = tween(600, delayMillis = 200),
+            initialOffsetX = { it / 8 }
+        ),
+        exit = fadeOut(animationSpec = tween(300))
     ) {
-        // Illustration
-        Icon(
-            imageVector = slide.illustration,
-            contentDescription = null,
-            modifier = Modifier.size(spacing.iconEmptyState * 1.5f),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(spacing.large))
-
-        // Title
-        Text(
-            text = slide.title,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Description
-        Text(
-            text = slide.description,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.2f
-        )
-
-        // Feature highlights (if any)
-        if (slide.highlights.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(spacing.large))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(spacing.medium),
-                horizontalAlignment = Alignment.Start
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = spacing.large, vertical = spacing.medium),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // Illustration with entrance animation - enhanced with background circle
+            Box(
+                modifier = Modifier.size(160.dp),
+                contentAlignment = Alignment.Center
             ) {
-                slide.highlights.forEach { highlight ->
-                    FeatureHighlightItem(
-                        highlight = highlight,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                // Background circle for better visual impact
+                Surface(
+                    modifier = Modifier.size(140.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                    tonalElevation = 2.dp
+                ) {}
+                
+                Icon(
+                    imageVector = slide.illustration,
+                    contentDescription = slide.title,
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Spacer(modifier = Modifier.height(spacing.medium))
+
+            // Content section with better spacing
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(spacing.medium)
+            ) {
+                // Title with improved typography - more prominent and better fitting
+                Text(
+                    text = slide.title,
+                    style = MaterialTheme.typography.headlineLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Center,
+                    lineHeight = MaterialTheme.typography.headlineLarge.lineHeight * 1.1f,
+                    modifier = Modifier.padding(horizontal = spacing.small)
+                )
+
+                // Description with better styling
+                Text(
+                    text = slide.description,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                    lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.4f,
+                    modifier = Modifier.padding(horizontal = spacing.large)
+                )
+            }
+
+            // Feature highlights with staggered animations - increased spacing from text
+            if (slide.highlights.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(spacing.extraLarge))
+                
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(spacing.small),
+                    horizontalAlignment = Alignment.Start,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    slide.highlights.forEachIndexed { index, highlight ->
+                        // Stagger the animation of each highlight
+                        LaunchedEffect(isActive) {
+                            if (isActive) {
+                                kotlinx.coroutines.delay(300L + (index * 100L))
+                            }
+                        }
+                        
+                        AnimatedVisibility(
+                            visible = isActive,
+                            enter = fadeIn(
+                                animationSpec = tween(400, delayMillis = 300 + (index * 100))
+                            ) + slideInHorizontally(
+                                animationSpec = tween(400, delayMillis = 300 + (index * 100)),
+                                initialOffsetX = { it / 4 }
+                            )
+                        ) {
+                            FeatureHighlightItem(
+                                highlight = highlight,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -254,71 +488,90 @@ fun FeatureHighlightItem(
 ) {
     val spacing = LocalSpacing.current
 
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+    Surface(
+        modifier = modifier.padding(vertical = spacing.extraSmall),
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp
     ) {
-        Icon(
-            imageVector = highlight.icon,
-            contentDescription = null,
-            modifier = Modifier.size(spacing.iconMedium),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier.padding(spacing.medium),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
-            Text(
-                text = highlight.title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            // Icon with background circle
+            Box(
+                modifier = Modifier.size(32.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    modifier = Modifier.size(28.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                ) {}
+                
+                Icon(
+                    imageVector = highlight.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
 
-            Spacer(modifier = Modifier.height(spacing.extraSmall))
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = highlight.title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-            Text(
-                text = highlight.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+                Text(
+                    text = highlight.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.3f,
+                    modifier = Modifier.padding(top = spacing.extraSmall)
+                )
+            }
         }
     }
 }
 
 /**
- * Page indicator component for the pager
+ * Enhanced page indicator component for the pager
  */
 @Composable
 fun PageIndicator(
     isActive: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .size(8.dp)
-            .padding(2.dp)
-    ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            shape = CircleShape,
-            color = if (isActive) {
-                MaterialTheme.colorScheme.primary
-            } else {
-                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
-            }
-        ) {}
+    val width = if (isActive) 24.dp else 8.dp
+    val color = if (isActive) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
     }
+    
+    Surface(
+        modifier = modifier
+            .width(width)
+            .height(8.dp),
+        shape = CircleShape,
+        color = color
+    ) {}
 }
 
 /**
- * Navigation buttons for the introduction screen
+ * Navigation buttons for the introduction screen with loading states
  */
 @Composable
 fun IntroductionNavigationButtons(
     currentPage: Int,
     totalPages: Int,
+    isNavigating: Boolean,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onGetStarted: () -> Unit,
@@ -328,38 +581,47 @@ fun IntroductionNavigationButtons(
     val isFirstPage = currentPage == 0
     val isLastPage = currentPage == totalPages - 1
 
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+    AnimatedVisibility(
+        visible = !isNavigating,
+        enter = fadeIn(animationSpec = tween(300)),
+        exit = fadeOut(animationSpec = tween(300))
     ) {
-        // Previous button (invisible on first page to maintain layout)
-        if (isFirstPage) {
-            Spacer(modifier = Modifier.width(spacing.buttonMaxWidth / 2))
-        } else {
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.button_previous),
-                onClick = onPrevious,
-                modifier = Modifier.width(spacing.buttonMaxWidth / 2),
-                fillMaxWidth = false
-            )
-        }
+        Row(
+            modifier = modifier.padding(horizontal = spacing.medium),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Previous button (invisible on first page to maintain layout)
+            if (isFirstPage) {
+                Spacer(modifier = Modifier.width(120.dp))
+            } else {
+                CoffeeSecondaryButton(
+                    text = stringResource(R.string.button_previous),
+                    onClick = onPrevious,
+                    enabled = !isNavigating,
+                    modifier = Modifier.width(120.dp),
+                    fillMaxWidth = false
+                )
+            }
 
-        // Next/Get Started button
-        if (isLastPage) {
-            CoffeePrimaryButton(
-                text = stringResource(R.string.button_get_started),
-                onClick = onGetStarted,
-                modifier = Modifier.width(spacing.buttonMaxWidth / 2),
-                fillMaxWidth = false
-            )
-        } else {
-            CoffeePrimaryButton(
-                text = stringResource(R.string.button_next),
-                onClick = onNext,
-                modifier = Modifier.width(spacing.buttonMaxWidth / 2),
-                fillMaxWidth = false
-            )
+            // Next/Get Started button
+            if (isLastPage) {
+                CoffeePrimaryButton(
+                    text = stringResource(R.string.button_get_started),
+                    onClick = onGetStarted,
+                    enabled = !isNavigating,
+                    modifier = Modifier.width(140.dp),
+                    fillMaxWidth = false
+                )
+            } else {
+                CoffeePrimaryButton(
+                    text = stringResource(R.string.button_next),
+                    onClick = onNext,
+                    enabled = !isNavigating,
+                    modifier = Modifier.width(120.dp),
+                    fillMaxWidth = false
+                )
+            }
         }
     }
 }
@@ -405,7 +667,7 @@ private fun getIntroductionSlides(): List<IntroSlide> {
         IntroSlide(
             title = stringResource(R.string.intro_flexible_workflow_title),
             description = stringResource(R.string.intro_flexible_workflow_description),
-            illustration = Icons.Default.Settings
+            illustration = Icons.Default.AltRoute
         ),
         
         // Timer usage slide
@@ -419,7 +681,7 @@ private fun getIntroductionSlides(): List<IntroSlide> {
         IntroSlide(
             title = stringResource(R.string.intro_get_started_title),
             description = stringResource(R.string.intro_get_started_description),
-            illustration = Icons.Default.Coffee
+            illustration = ImageVector.vectorResource(R.drawable.coffee_bean_icon)
         )
     )
 }
@@ -456,7 +718,8 @@ fun IntroSlideContentPreview() {
                         icon = Icons.Default.History
                     )
                 )
-            )
+            ),
+            isActive = true
         )
     }
 }

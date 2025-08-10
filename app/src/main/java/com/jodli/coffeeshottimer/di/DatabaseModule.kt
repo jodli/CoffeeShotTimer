@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.dao.BeanDao
+import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.database.AppDatabase
 import com.jodli.coffeeshottimer.data.util.DatabasePopulator
@@ -109,6 +110,17 @@ object DatabaseModule {
     @Provides
     fun provideShotDao(database: AppDatabase): ShotDao {
         return database.shotDao()
+    }
+
+    /**
+     * Provides the GrinderConfigDao instance.
+     *
+     * @param database The AppDatabase instance
+     * @return GrinderConfigDao instance
+     */
+    @Provides
+    fun provideGrinderConfigDao(database: AppDatabase): GrinderConfigDao {
+        return database.grinderConfigDao()
     }
 
     /**
