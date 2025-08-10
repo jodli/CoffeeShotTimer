@@ -201,4 +201,105 @@ class OnboardingRoutingIntegrationTest {
         assertEquals(NavigationDestinations.RecordShot.route, (forcedState as RoutingState.Success).route)
         assertTrue(!forcedState.isFirstTimeUser)
     }
+
+    @Test
+    fun `onboarding navigation flow handles back navigation correctly`() = runTest {
+        // Test scenario: User navigates back during onboarding flow
+        
+        // Step 1: Start at introduction
+        coEvery { onboardingManager.isFirstTimeUser() } returns true
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        val introState = viewModel.routingState.first()
+        assertTrue(introState is RoutingState.Success)
+        assertEquals(NavigationDestinations.OnboardingIntroduction.route, (introState as RoutingState.Success).route)
+
+        // Step 2: Progress to equipment setup
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true
+        )
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        val equipmentState = viewModel.routingState.first()
+        assertTrue(equipmentState is RoutingState.Success)
+        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (equipmentState as RoutingState.Success).route)
+
+        // Step 3: User goes back to introduction (should be allowed)
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        val backToIntroState = viewModel.routingState.first()
+        assertTrue(backToIntroState is RoutingState.Success)
+        assertEquals(NavigationDestinations.OnboardingIntroduction.route, (backToIntroState as RoutingState.Success).route)
+    }
+
+    @Test
+    fun `onboarding skip functionality routes correctly`() = runTest {
+        // Test scenario: User skips onboarding at introduction screen
+        
+        // Given: User is at introduction screen
+        coEvery { onboardingManager.isFirstTimeUser() } returns true
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
+        coEvery { onboardingManager.markOnboardingComplete() } returns Unit
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        val introState = viewModel.routingState.first()
+        assertTrue(introState is RoutingState.Success)
+        assertEquals(NavigationDestinations.OnboardingIntroduction.route, (introState as RoutingState.Success).route)
+
+        // When: User skips onboarding (simulated by marking complete and forcing normal flow)
+        viewModel.forceNormalFlow()
+
+        // Then: Should route directly to normal app flow
+        val skippedState = viewModel.routingState.first()
+        assertTrue(skippedState is RoutingState.Success)
+        assertEquals(NavigationDestinations.RecordShot.route, (skippedState as RoutingState.Success).route)
+        assertTrue(!skippedState.isFirstTimeUser)
+    }
+
+    @Test
+    fun `onboarding completion clears navigation stack correctly`() = runTest {
+        // Test scenario: User completes onboarding and should not be able to navigate back
+        
+        // Given: User completes equipment setup
+        coEvery { onboardingManager.isFirstTimeUser() } returns true
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true
+        )
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        val firstShotState = viewModel.routingState.first()
+        assertTrue(firstShotState is RoutingState.Success)
+        assertEquals(NavigationDestinations.RecordShot.route, (firstShotState as RoutingState.Success).route)
+        assertTrue(firstShotState.isFirstTimeUser)
+
+        // When: User completes first shot
+        coEvery { onboardingManager.isFirstTimeUser() } returns false
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasRecordedFirstShot = true
+        )
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        // Then: Should be in normal flow with no way to navigate back to onboarding
+        val completedState = viewModel.routingState.first()
+        assertTrue(completedState is RoutingState.Success)
+        assertEquals(NavigationDestinations.RecordShot.route, (completedState as RoutingState.Success).route)
+        assertTrue(!completedState.isFirstTimeUser)
+    }
 }
