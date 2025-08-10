@@ -106,14 +106,10 @@ class GrinderConfigRepository @Inject constructor(
                 )
             }
 
-            // Check for duplicate range configuration
+            // Treat duplicate range configuration as idempotent success (no-op)
             val existingConfig = grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
-            if (existingConfig != null && existingConfig.id != config.id) {
-                return Result.failure(
-                    RepositoryException.ValidationError(
-                        "A configuration with range ${config.scaleMin}-${config.scaleMax} already exists"
-                    )
-                )
+            if (existingConfig != null) {
+                return Result.success(Unit)
             }
 
             executeWithRetry(
