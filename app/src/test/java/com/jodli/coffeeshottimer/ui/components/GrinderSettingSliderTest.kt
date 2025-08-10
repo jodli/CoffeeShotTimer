@@ -30,7 +30,9 @@ class GrinderSettingSliderTest {
                     value = currentValue,
                     onValueChange = { currentValue = it },
                     suggestedSetting = "4.5",
-                    previousSuccessfulSettings = listOf("4.0", "5.5", "6.0")
+                    previousSuccessfulSettings = listOf("4.0", "5.5", "6.0"),
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
@@ -52,7 +54,9 @@ class GrinderSettingSliderTest {
                     value = currentValue,
                     onValueChange = { currentValue = it },
                     suggestedSetting = "4.5",
-                    previousSuccessfulSettings = listOf("4.0", "5.5")
+                    previousSuccessfulSettings = listOf("4.0", "5.5"),
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
@@ -74,7 +78,9 @@ class GrinderSettingSliderTest {
                     onValueChange = { 
                         currentValue = it
                         valueChanged = true
-                    }
+                    },
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
@@ -93,7 +99,9 @@ class GrinderSettingSliderTest {
                 GrinderSettingSlider(
                     value = "invalid",
                     onValueChange = { },
-                    errorMessage = "Invalid grinder setting"
+                    errorMessage = "Invalid grinder setting",
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
@@ -110,7 +118,9 @@ class GrinderSettingSliderTest {
                 GrinderSettingSlider(
                     value = "5.0",
                     onValueChange = { },
-                    enabled = false
+                    enabled = false,
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
@@ -125,7 +135,9 @@ class GrinderSettingSliderTest {
             CoffeeShotTimerTheme {
                 GrinderSettingSlider(
                     value = "5.0",
-                    onValueChange = { }
+                    onValueChange = { },
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
@@ -140,7 +152,9 @@ class GrinderSettingSliderTest {
             CoffeeShotTimerTheme {
                 GrinderSettingSlider(
                     value = "5.5",
-                    onValueChange = { }
+                    onValueChange = { },
+                    minSetting = 1f,
+                    maxSetting = 10f
                 )
             }
         }
