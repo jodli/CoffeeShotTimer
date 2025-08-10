@@ -3,6 +3,8 @@ package com.jodli.coffeeshottimer.ui.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
@@ -234,7 +236,8 @@ fun GentleValidationMessage(
     message: String,
     suggestion: String,
     onFixClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    extraContentPadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp)
 ) {
     val spacing = LocalSpacing.current
     
@@ -245,6 +248,7 @@ fun GentleValidationMessage(
         )
     ) {
         Column(
+            modifier = Modifier.padding(extraContentPadding),
             verticalArrangement = Arrangement.spacedBy(spacing.small)
         ) {
             Row(

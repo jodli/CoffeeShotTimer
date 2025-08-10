@@ -294,7 +294,7 @@ private fun GrinderScaleSetup(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.medium),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             CoffeeTextField(
                 value = scaleMin,
@@ -310,8 +310,7 @@ private fun GrinderScaleSetup(
             Text(
                 text = "to",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = spacing.medium)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
             CoffeeTextField(
@@ -328,13 +327,18 @@ private fun GrinderScaleSetup(
         
         // General validation error (for range validation)
         if (generalError != null) {
-            Spacer(modifier = Modifier.height(spacing.small))
+            Spacer(modifier = Modifier.height(spacing.medium))
             
             GentleValidationMessage(
                 message = generalError,
                 suggestion = validationSuggestion ?: "",
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                extraContentPadding = androidx.compose.foundation.layout.PaddingValues(
+                    horizontal = spacing.medium,
+                    vertical = spacing.small
+                )
             )
+            Spacer(modifier = Modifier.height(spacing.small))
         } else if (scaleMin.isNotBlank() && scaleMax.isNotBlank()) {
             // Show positive feedback when range is valid
             val minValue = scaleMin.toIntOrNull()
