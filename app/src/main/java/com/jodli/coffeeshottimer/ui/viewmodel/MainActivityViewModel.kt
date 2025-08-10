@@ -93,6 +93,19 @@ class MainActivityViewModel @Inject constructor(
     }
 
     /**
+     * Marks onboarding as complete explicitly (used when user skips onboarding).
+     */
+    fun completeOnboarding() {
+        viewModelScope.launch {
+            try {
+                onboardingManager.markOnboardingComplete()
+            } catch (_: Exception) {
+                // Ignore and let routing logic handle on next launch
+            }
+        }
+    }
+
+    /**
      * Handles edge cases like app updates and data clearing.
      * This method can be called when the app detects inconsistent state.
      */
