@@ -450,6 +450,7 @@
 
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unknown error occurred</string>
+    <string name="text_inactive_bean">Inactive Bean</string>
     <string name="text_bean_name_exists">Bean name already exists</string>
 
     <!-- Introduction Screen Content -->

@@ -452,6 +452,7 @@
 
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unbekannter Fehler aufgetreten</string>
+    <string name="text_inactive_bean">Inaktive Bohne</string>
     <string name="text_bean_name_exists">Bohnenname existiert bereits</string>
 
     <!-- Introduction Screen Content -->
