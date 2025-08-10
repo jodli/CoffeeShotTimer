@@ -129,6 +129,24 @@ CoffeeCard(
 - `spacing.small` internal spacing
 - Clickable with ripple effect
 
+### Management Screens (More)
+Purpose: Central place for non-core features (settings, data management, legal, about, etc.).
+Structure:
+- Screen title using `headlineMedium` bold
+- Each management feature in its own `CoffeeCard` that leads to a sub-screen
+- Rows inside cards are touch-target height (`spacing.touchTarget`), with:
+  - Leading icon (primary tint)
+  - Title (titleMedium) and optional supporting text (bodySmall, onSurfaceVariant)
+  - Trailing chevron (AutoMirrored ArrowForward, onSurfaceVariant)
+Spacing:
+- Screen padding: `spacing.screenPadding`
+- Vertical spacing between cards: `spacing.medium`
+- Row padding inside cards: horizontal `spacing.cardPadding`, vertical `spacing.small`
+Behavior:
+- Entire card is clickable with ripple effect (use `CoffeeCard(onClick = ...)`)
+- Use concise labels; keep supporting text short
+- No section headers - each management feature is a standalone card
+
 ## Interactive Elements
 
 ### Touch Targets

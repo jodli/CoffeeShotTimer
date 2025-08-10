@@ -74,7 +74,8 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 val showBottomNavigation = when (currentRoute) {
                     NavigationDestinations.RecordShot.route,
                     NavigationDestinations.ShotHistory.route,
-                    NavigationDestinations.BeanManagement.route -> true
+                    NavigationDestinations.BeanManagement.route,
+                    NavigationDestinations.More.route -> true
                     // Hide bottom navigation during onboarding
                     NavigationDestinations.OnboardingIntroduction.route,
                     NavigationDestinations.OnboardingEquipmentSetup.route -> false
@@ -108,7 +109,8 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 val showBottomNavigation = when (currentRoute) {
                     NavigationDestinations.RecordShot.route,
                     NavigationDestinations.ShotHistory.route,
-                    NavigationDestinations.BeanManagement.route -> true
+                    NavigationDestinations.BeanManagement.route,
+                    NavigationDestinations.More.route -> true
                     NavigationDestinations.OnboardingIntroduction.route,
                     NavigationDestinations.OnboardingEquipmentSetup.route -> false
                     else -> false

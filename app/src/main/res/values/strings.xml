@@ -7,9 +7,10 @@
     <string name="view_history_short">History</string>
     <string name="view_history_long">View shot history</string>
 
-    <string name="view_new_shot">New Shot</string>
+    <string name="view_home">Home</string>
     <string name="view_history">History</string>
     <string name="view_beans">Beans</string>
+    <string name="view_more">More</string>
 
     <!-- Loading messages -->
     <string name="loading_bean_details">Loading bean details…</string>
@@ -200,6 +201,7 @@
     <string name="cd_saving">Saving…</string>
     <string name="cd_save_shot">Save Shot</string>
     <string name="cd_save">Save</string>
+    <string name="button_save">Save</string>
     <string name="cd_close">Close</string>
     <string name="cd_pause">Pause</string>
     <string name="cd_start">Start</string>
@@ -501,6 +503,11 @@
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Equipment Setup</string>
     <string name="text_equipment_setup_description">Configure your grinder settings to personalize your brewing experience.</string>
+    
+    <!-- Equipment Settings (non-onboarding) -->
+    <string name="title_equipment_settings">Grinder Settings</string>
+    <string name="text_equipment_settings_description">Set the minimum and maximum values that your grinder\'s scale supports. This is used across the app to validate and guide grinder inputs.</string>
+    <string name="title_more">More</string>
     <string name="text_grinder_scale_range">Grinder Scale Range</string>
     <string name="text_grinder_scale_description">Set the minimum and maximum values on your grinder\'s scale. This helps the app provide relevant guidance for your specific equipment.</string>
     <string name="text_common_presets">Common Presets</string>
