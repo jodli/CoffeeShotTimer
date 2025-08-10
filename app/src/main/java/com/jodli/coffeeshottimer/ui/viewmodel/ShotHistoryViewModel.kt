@@ -269,7 +269,10 @@ class ShotHistoryViewModel @Inject constructor(
 
 
     fun getBeanName(beanId: String): String {
-        return _uiState.value.availableBeans.find { it.id == beanId }?.name ?: stringResourceProvider.getString(R.string.text_unknown_error)
+        // If the bean isn't in availableBeans (which lists active beans), it may be inactive.
+        // Show a friendly placeholder instead of a generic error.
+        return _uiState.value.availableBeans.find { it.id == beanId }?.name
+            ?: stringResourceProvider.getString(R.string.text_inactive_bean)
     }
 
     fun toggleAnalysisView() {

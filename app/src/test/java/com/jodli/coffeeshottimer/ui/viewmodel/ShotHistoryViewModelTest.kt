@@ -69,6 +69,7 @@ class ShotHistoryViewModelTest {
         // Setup string resource provider mocks
         every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_unknown_error) } returns "Unknown error occurred"
         every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.error_failed_to_load_analysis, any()) } returns "Failed to load analysis: Unknown error occurred"
+        every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_inactive_bean) } returns "Inactive Bean"
         
         viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
     }
@@ -177,7 +178,7 @@ class ShotHistoryViewModelTest {
     @Test
     fun `getBeanName returns unknown for non-existing bean`() {
         val beanName = viewModel.getBeanName("non-existing-id")
-        assertEquals("Unknown error occurred", beanName)
+        assertEquals("Inactive Bean", beanName)
     }
 
     @Test
