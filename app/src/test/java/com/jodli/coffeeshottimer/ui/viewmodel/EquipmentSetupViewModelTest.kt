@@ -4,6 +4,7 @@ import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
 import com.jodli.coffeeshottimer.data.repository.RepositoryException
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -25,6 +26,7 @@ class EquipmentSetupViewModelTest {
     private lateinit var viewModel: EquipmentSetupViewModel
     private lateinit var mockRepository: GrinderConfigRepository
     private lateinit var mockErrorTranslator: DomainErrorTranslator
+    private lateinit var mockOnboardingManager: OnboardingManager
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -32,12 +34,13 @@ class EquipmentSetupViewModelTest {
         Dispatchers.setMain(testDispatcher)
         mockRepository = mockk()
         mockErrorTranslator = mockk()
+        mockOnboardingManager = mockk()
         
         // Setup common mock responses for error translator
         every { mockErrorTranslator.getString(any()) } returns "Mock error message"
         every { mockErrorTranslator.getString(any(), any()) } returns "Mock error message"
         
-        viewModel = EquipmentSetupViewModel(mockRepository, mockErrorTranslator)
+        viewModel = EquipmentSetupViewModel(mockRepository, mockErrorTranslator, mockOnboardingManager)
     }
 
     @Test
@@ -144,6 +147,7 @@ class EquipmentSetupViewModelTest {
     fun `saveConfiguration succeeds with valid data`() = runTest {
         val config = GrinderConfiguration(scaleMin = 1, scaleMax = 10)
         coEvery { mockRepository.saveConfig(any()) } returns Result.success(Unit)
+        coEvery { mockOnboardingManager.markOnboardingComplete() } returns Unit
         
         var successCalled = false
         var errorCalled = false
@@ -169,6 +173,7 @@ class EquipmentSetupViewModelTest {
         assertEquals(10, savedConfig?.scaleMax)
         
         coVerify { mockRepository.saveConfig(any()) }
+        coVerify { mockOnboardingManager.markOnboardingComplete() }
     }
 
     @Test
@@ -256,7 +261,9 @@ class EquipmentSetupViewModelTest {
 
     @Test
     fun `skipSetup saves default configuration`() = runTest {
-        coEvery { mockRepository.saveConfig(any()) } returns Result.success(Unit)
+        // ViewModel calls repository.getOrCreateDefaultConfig()
+        coEvery { mockRepository.getOrCreateDefaultConfig() } returns Result.success(GrinderConfiguration.DEFAULT_CONFIGURATION)
+        coEvery { mockOnboardingManager.markOnboardingComplete() } returns Unit
         
         var successCalled = false
         var errorCalled = false
@@ -277,7 +284,7 @@ class EquipmentSetupViewModelTest {
         assertEquals(GrinderConfiguration.DEFAULT_CONFIGURATION.scaleMin, savedConfig?.scaleMin)
         assertEquals(GrinderConfiguration.DEFAULT_CONFIGURATION.scaleMax, savedConfig?.scaleMax)
         
-        coVerify { mockRepository.saveConfig(GrinderConfiguration.DEFAULT_CONFIGURATION) }
+        coVerify { mockOnboardingManager.markOnboardingComplete() }
     }
 
     @Test
