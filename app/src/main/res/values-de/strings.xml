@@ -521,6 +521,20 @@
     <string name="text_range_validation_success">✓ Bereich sieht gut aus! Du hast %1$d Schritte zur Verfügung.</string>
     <string name="button_continue">Weiter</string>
 
+    <!-- More / About -->
+    <string name="title_about">Über</string>
+    <string name="text_about_app">Coffee Shot Timer hilft Home-Baristas, konsistente Espresso-Shots mit einem präzisen Timer und einer einfachen, ablenkungsfreien Bedienung zu ziehen.</string>
+    <string name="text_about_philosophy">Verwandle Espresso von Raterei zu ruhiger, präziser Handwerkskunst.</string>
+    <string name="text_version_format">Version %1$s (Build %2$d)</string>
+    <string name="text_links">Links</string>
+    <string name="link_github_repo">GitHub-Repository</string>
+    <string name="link_github_repo_description">Quellcode und Projektdetails anzeigen</string>
+    <string name="link_privacy_policy">Datenschutzerklärung</string>
+    <string name="link_privacy_policy_description">Erfahre, wie wir deine Daten schützen</string>
+    <string name="button_send_feedback">Feedback senden</string>
+    <string name="feedback_email_subject">Coffee Shot Timer Feedback</string>
+    <string name="text_made_with_love">Hergestellt mit ☕ für die Home‑Barista‑Community</string>
+
     <!-- Equipment Setup Validation and Errors -->
     <string name="text_equipment_setup_failed">Einrichtung fehlgeschlagen</string>
     <string name="text_saving_configuration">Speichere Konfiguration…</string>

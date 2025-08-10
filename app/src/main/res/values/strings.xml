@@ -519,6 +519,20 @@
     <string name="text_range_validation_success">✓ Range looks good! You\'ll have %1$d steps to work with.</string>
     <string name="button_continue">Continue</string>
 
+    <!-- More / About -->
+    <string name="title_about">About</string>
+    <string name="text_about_app">Coffee Shot Timer helps home baristas pull consistent espresso shots with a precise timer and simple, distraction-free controls.</string>
+    <string name="text_about_philosophy">Turn espresso from guesswork into calm, precise craftsmanship.</string>
+    <string name="text_version_format">Version %1$s (build %2$d)</string>
+    <string name="text_links">Links</string>
+    <string name="link_github_repo">GitHub repository</string>
+    <string name="link_github_repo_description">View source code and project details</string>
+    <string name="link_privacy_policy">Privacy Policy</string>
+    <string name="link_privacy_policy_description">Learn how we protect your data</string>
+    <string name="button_send_feedback">Send feedback</string>
+    <string name="feedback_email_subject">Coffee Shot Timer feedback</string>
+    <string name="text_made_with_love">Made with ☕ for the home barista community</string>
+
     <!-- Equipment Setup Validation and Errors -->
     <string name="text_equipment_setup_failed">Setup Failed</string>
     <string name="text_saving_configuration">Saving configuration…</string>
