@@ -49,49 +49,9 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
-    val navController = rememberNavController()
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
     val routingState by mainActivityViewModel.routingState.collectAsState()
 
-    // Handle initial routing based on onboarding state
-    LaunchedEffect(routingState) {
-        when (val state = routingState) {
-            is RoutingState.Success -> {
-                // Navigate to the determined route if it's different from current
-                if (currentRoute != state.route) {
-                    navController.navigate(state.route) {
-                        // Clear the back stack to prevent going back to loading state
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            }
-            is RoutingState.Error -> {
-                // On error, navigate to fallback route (normal app flow)
-                if (currentRoute != state.fallbackRoute) {
-                    navController.navigate(state.fallbackRoute) {
-                        popUpTo(0) { inclusive = true }
-                    }
-                }
-            }
-            is RoutingState.Loading -> {
-                // Show loading state - handled in UI below
-            }
-        }
-    }
-
-    // Determine if bottom navigation should be shown
-    val showBottomNavigation = when (currentRoute) {
-        NavigationDestinations.RecordShot.route,
-        NavigationDestinations.ShotHistory.route,
-        NavigationDestinations.BeanManagement.route -> true
-        // Hide bottom navigation during onboarding
-        NavigationDestinations.OnboardingIntroduction.route,
-        NavigationDestinations.OnboardingEquipmentSetup.route -> false
-        else -> false
-    }
-
-    when (routingState) {
+    when (val state = routingState) {
         is RoutingState.Loading -> {
             // Show loading indicator while determining route
             Box(
@@ -103,20 +63,71 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 )
             }
         }
-        is RoutingState.Success, is RoutingState.Error -> {
-            // Show main app content
-            Scaffold(
-                modifier = Modifier.fillMaxSize(),
-                bottomBar = {
-                    if (showBottomNavigation) {
-                        BottomNavigationBar(navController = navController)
-                    }
+        is RoutingState.Success -> {
+            // Create a fresh NavController keyed by the start destination to avoid unwanted transitions
+            androidx.compose.runtime.key(state.route) {
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                // Determine if bottom navigation should be shown
+                val showBottomNavigation = when (currentRoute) {
+                    NavigationDestinations.RecordShot.route,
+                    NavigationDestinations.ShotHistory.route,
+                    NavigationDestinations.BeanManagement.route -> true
+                    // Hide bottom navigation during onboarding
+                    NavigationDestinations.OnboardingIntroduction.route,
+                    NavigationDestinations.OnboardingEquipmentSetup.route -> false
+                    else -> false
                 }
-            ) { innerPadding ->
-                AppNavigation(
-                    navController = navController,
-                    modifier = Modifier.padding(innerPadding)
-                )
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        if (showBottomNavigation) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
+                ) { innerPadding ->
+                    AppNavigation(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        startDestination = state.route
+                    )
+                }
+            }
+        }
+        is RoutingState.Error -> {
+            // On error, show app with fallback route without transitions
+            val fallback = state.fallbackRoute
+            androidx.compose.runtime.key(fallback) {
+                val navController = rememberNavController()
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
+                val currentRoute = navBackStackEntry?.destination?.route
+
+                val showBottomNavigation = when (currentRoute) {
+                    NavigationDestinations.RecordShot.route,
+                    NavigationDestinations.ShotHistory.route,
+                    NavigationDestinations.BeanManagement.route -> true
+                    NavigationDestinations.OnboardingIntroduction.route,
+                    NavigationDestinations.OnboardingEquipmentSetup.route -> false
+                    else -> false
+                }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        if (showBottomNavigation) {
+                            BottomNavigationBar(navController = navController)
+                        }
+                    }
+                ) { innerPadding ->
+                    AppNavigation(
+                        navController = navController,
+                        modifier = Modifier.padding(innerPadding),
+                        startDestination = fallback
+                    )
+                }
             }
         }
     }
