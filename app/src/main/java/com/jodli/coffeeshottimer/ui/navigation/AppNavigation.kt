@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.ui.screens.AddEditBeanScreen
 import com.jodli.coffeeshottimer.ui.screens.BeanManagementScreen
 import com.jodli.coffeeshottimer.ui.screens.IntroductionScreen
@@ -24,6 +25,9 @@ fun AppNavigation(
     modifier: Modifier = Modifier,
     startDestination: String = NavigationDestinations.RecordShot.route
 ) {
+    // Root-scoped view model to update onboarding state when skipping
+    val mainActivityViewModel: com.jodli.coffeeshottimer.ui.viewmodel.MainActivityViewModel = hiltViewModel()
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -71,6 +75,8 @@ fun AppNavigation(
                     navController.navigate(NavigationDestinations.OnboardingEquipmentSetup.route)
                 },
                 onSkip = {
+                    // Mark onboarding as complete when skipping from introduction
+                    mainActivityViewModel.completeOnboarding()
                     navController.navigate(NavigationDestinations.RecordShot.route) {
                         // Clear onboarding from back stack when skipping
                         popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
