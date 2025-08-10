@@ -15,6 +15,10 @@ class NavigationTest {
         assertEquals("bean_management", NavigationDestinations.BeanManagement.route)
         assertEquals("shot_details/{shotId}", NavigationDestinations.ShotDetails.route)
         assertEquals("add_edit_bean?beanId={beanId}", NavigationDestinations.AddEditBean.route)
+        
+        // Onboarding destinations
+        assertEquals("onboarding_introduction", NavigationDestinations.OnboardingIntroduction.route)
+        assertEquals("onboarding_equipment_setup", NavigationDestinations.OnboardingEquipmentSetup.route)
     }
 
     @Test
@@ -41,5 +45,12 @@ class NavigationTest {
         assertEquals("record_shot", NavigationDestinations.RecordShot.route)
         assertEquals("shot_history", NavigationDestinations.ShotHistory.route)
         assertEquals("bean_management", NavigationDestinations.BeanManagement.route)
+    }
+
+    @Test
+    fun `onboarding destinations are properly defined`() {
+        // Test that onboarding destinations are correctly defined
+        assertEquals("onboarding_introduction", NavigationDestinations.OnboardingIntroduction.route)
+        assertEquals("onboarding_equipment_setup", NavigationDestinations.OnboardingEquipmentSetup.route)
     }
 }

@@ -65,10 +65,14 @@ fun AppNavigation(
         composable(NavigationDestinations.OnboardingIntroduction.route) {
             OnboardingIntroductionScreen(
                 onComplete = {
+                    // Allow normal navigation to equipment setup, keeping introduction in back stack
                     navController.navigate(NavigationDestinations.OnboardingEquipmentSetup.route)
                 },
                 onSkip = {
-                    navController.navigate(NavigationDestinations.RecordShot.route)
+                    navController.navigate(NavigationDestinations.RecordShot.route) {
+                        // Clear onboarding from back stack when skipping
+                        popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
+                    }
                 }
             )
         }
@@ -76,9 +80,13 @@ fun AppNavigation(
         composable(NavigationDestinations.OnboardingEquipmentSetup.route) {
             OnboardingEquipmentSetupScreen(
                 onComplete = {
-                    navController.navigate(NavigationDestinations.RecordShot.route)
+                    navController.navigate(NavigationDestinations.RecordShot.route) {
+                        // Clear all onboarding screens from back stack after completion
+                        popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
+                    }
                 },
                 onBack = {
+                    // Allow going back to introduction if user wants to review
                     navController.popBackStack()
                 }
             )

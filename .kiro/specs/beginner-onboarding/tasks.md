@@ -23,7 +23,7 @@
   - Add error handling for routing failures with graceful fallback to normal flow
   - _Requirements: 1.1, 7.1_
 
-- [ ] 3. Add onboarding navigation destinations
+- [x] 3. Add onboarding navigation destinations
   - Extend NavigationDestinations with onboarding routes
   - Update AppNavigation composable with onboarding screens
   - Implement proper back navigation handling during onboarding
