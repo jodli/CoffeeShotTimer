@@ -6,8 +6,21 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Added
+
+- App introduction and beginner-friendly onboarding for a smoother first run.
+- Grinder scale setup to tailor your equipment.
+- About screen with project information.
+- Feedback button to share your thoughts.
+
 ### Changed
+
+- Navigation reworked to accommodate additional app settings.
 - Expanded Coffee In slider range to support single-shot baskets (min lowered to 5g).
+
+### Fixed
+
+- Inactive beans now appear in shot history.
 
 ## [1.2.1]
 
