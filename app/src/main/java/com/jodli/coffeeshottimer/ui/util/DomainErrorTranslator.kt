@@ -146,4 +146,20 @@ class DomainErrorTranslator @Inject constructor(
     fun getDeleteError(): String {
         return context.getString(R.string.error_deleting_data)
     }
+
+    /**
+     * Get string resource by ID.
+     * Helper method for ViewModels to access string resources.
+     */
+    fun getString(stringResId: Int): String {
+        return context.getString(stringResId)
+    }
+
+    /**
+     * Get string resource by ID with format arguments.
+     * Helper method for ViewModels to access string resources.
+     */
+    fun getString(stringResId: Int, vararg formatArgs: Any): String {
+        return context.getString(stringResId, *formatArgs)
+    }
 }

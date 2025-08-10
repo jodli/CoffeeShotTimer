@@ -498,5 +498,37 @@
     <string name="text_recommendations_for_next_shot">Empfehlungen für nächsten Shot</string>
     <string name="text_next_steps_based_on_shot">Basierend auf diesem Shot:</string>
     <string name="text_and_more_recommendations">+%1$d weitere Empfehlungen</string>
+
+    <!-- Equipment Setup Screen -->
+    <string name="title_equipment_setup">Ausrüstung einrichten</string>
+    <string name="text_equipment_setup_description">Konfiguriere deine Mühleneinstellungen, um dein Brüherlebnis zu personalisieren.</string>
+    <string name="text_grinder_scale_range">Mühlen-Skalenbereich</string>
+    <string name="text_grinder_scale_description">Stelle die Minimal- und Maximalwerte auf der Skala deiner Mühle ein. Dies hilft der App, relevante Anleitungen für deine spezifische Ausrüstung zu geben.</string>
+    <string name="text_common_presets">Häufige Voreinstellungen</string>
+    <string name="text_custom_range">Benutzerdefinierter Bereich</string>
+    <string name="label_grinder_minimum">Minimum</string>
+    <string name="label_grinder_maximum">Maximum</string>
+    <string name="placeholder_grinder_min">z.B. 1</string>
+    <string name="placeholder_grinder_max">z.B. 10</string>
+    <string name="text_range_validation_success">✓ Bereich sieht gut aus! Du hast %1$d Schritte zur Verfügung.</string>
+    <string name="button_continue">Weiter</string>
+
+    <!-- Equipment Setup Validation and Errors -->
+    <string name="text_equipment_setup_failed">Einrichtung fehlgeschlagen</string>
+    <string name="text_saving_configuration">Speichere Konfiguration…</string>
+    <string name="error_fix_validation_errors">Bitte behebe die Validierungsfehler bevor du fortfährst</string>
+    <string name="error_enter_valid_numbers">Bitte gib gültige Zahlen für Minimum und Maximum ein</string>
+    <string name="error_failed_to_save_configuration">Konfiguration konnte nicht gespeichert werden. Bitte versuche es erneut.</string>
+    <string name="error_failed_to_save_default_configuration">Standard-Konfiguration konnte nicht gespeichert werden. Bitte versuche es erneut.</string>
+    <string name="error_validation_failed_generic">Validierung fehlgeschlagen</string>
+    <string name="error_unexpected_error">Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.</string>
+
+    <!-- Equipment Setup Validation Suggestions -->
+    <string name="suggestion_increase_max_or_decrease_min">Versuche den Maximalwert zu erhöhen oder den Minimalwert zu verringern.</string>
+    <string name="suggestion_grinder_scales_start_at_zero_or_one">Mühlenskalen beginnen typischerweise bei 0 oder 1.</string>
+    <string name="suggestion_most_grinder_scales_dont_go_above_100">Die meisten Mühlenskalen gehen nicht über 100.</string>
+    <string name="suggestion_range_of_at_least_3_steps">Ein Bereich von mindestens 3 Schritten gibt dir Raum, deinen Mahlgrad anzupassen.</string>
+    <string name="suggestion_smaller_range_is_easier">Ein kleinerer Bereich ist normalerweise einfacher zu handhaben.</string>
+    <string name="suggestion_enter_whole_numbers_only">Bitte gib nur ganze Zahlen ein (z.B. 1, 10, 50).</string>
     
 </resources>
