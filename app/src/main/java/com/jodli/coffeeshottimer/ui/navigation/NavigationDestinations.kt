@@ -7,10 +7,14 @@ sealed class NavigationDestinations(val route: String) {
     object RecordShot : NavigationDestinations("record_shot")
     object ShotHistory : NavigationDestinations("shot_history")
     object BeanManagement : NavigationDestinations("bean_management")
+    object More : NavigationDestinations("more")
 
     // Onboarding destinations
     object OnboardingIntroduction : NavigationDestinations("onboarding_introduction")
     object OnboardingEquipmentSetup : NavigationDestinations("onboarding_equipment_setup")
+
+    // Settings destinations
+    object EquipmentSettings : NavigationDestinations("settings_equipment")
 
     // Modal destinations
     object ShotDetails : NavigationDestinations("shot_details/{shotId}") {

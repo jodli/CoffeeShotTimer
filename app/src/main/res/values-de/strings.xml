@@ -9,9 +9,10 @@
     <string name="view_history_short">Verlauf</string>
     <string name="view_history_long">Shot-Verlauf anzeigen</string>
 
-    <string name="view_new_shot">Neuer Shot</string>
+    <string name="view_home">Start</string>
     <string name="view_history">Verlauf</string>
     <string name="view_beans">Bohnen</string>
+    <string name="view_more">Mehr</string>
 
     <!-- Loading messages -->
     <string name="loading_bean_details">Lade Bohnendetails…</string>
@@ -202,6 +203,7 @@
     <string name="cd_saving">Speichere…</string>
     <string name="cd_save_shot">Shot speichern</string>
     <string name="cd_save">Speichern</string>
+    <string name="button_save">Speichern</string>
     <string name="cd_close">Schließen</string>
     <string name="cd_pause">Pausieren</string>
     <string name="cd_start">Starten</string>
@@ -503,6 +505,11 @@
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Ausrüstung einrichten</string>
     <string name="text_equipment_setup_description">Konfiguriere deine Mühleneinstellungen, um dein Brüherlebnis zu personalisieren.</string>
+    
+    <!-- Equipment Settings (non-onboarding) -->
+    <string name="title_equipment_settings">Mühleneinstellungen</string>
+    <string name="text_equipment_settings_description">Stelle die minimalen und maximalen Werte ein, die die Skala deiner Mühle unterstützt. Dies wird in der App zur Validierung und als Leitfaden verwendet.</string>
+    <string name="title_more">Mehr</string>
     <string name="text_grinder_scale_range">Mühlen-Skalenbereich</string>
     <string name="text_grinder_scale_description">Stelle die Minimal- und Maximalwerte auf der Skala deiner Mühle ein. Dies hilft der App, relevante Anleitungen für deine spezifische Ausrüstung zu geben.</string>
     <string name="text_common_presets">Häufige Voreinstellungen</string>

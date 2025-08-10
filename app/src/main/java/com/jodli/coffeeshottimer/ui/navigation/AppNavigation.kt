@@ -94,6 +94,22 @@ fun AppNavigation(
             )
         }
 
+        // More tab
+        composable(NavigationDestinations.More.route) {
+            com.jodli.coffeeshottimer.ui.screens.MoreScreen(
+                onNavigateToEquipmentSettings = {
+                    navController.navigate(NavigationDestinations.EquipmentSettings.route)
+                }
+            )
+        }
+
+        // Equipment settings (accessible outside onboarding)
+        composable(NavigationDestinations.EquipmentSettings.route) {
+            com.jodli.coffeeshottimer.ui.screens.EquipmentSettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
         // Modal screens
         composable(
             route = NavigationDestinations.ShotDetails.route,
