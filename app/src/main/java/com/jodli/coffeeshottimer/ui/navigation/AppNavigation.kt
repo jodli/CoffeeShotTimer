@@ -105,6 +105,9 @@ fun AppNavigation(
             com.jodli.coffeeshottimer.ui.screens.MoreScreen(
                 onNavigateToEquipmentSettings = {
                     navController.navigate(NavigationDestinations.EquipmentSettings.route)
+                },
+                onNavigateToAbout = {
+                    navController.navigate(NavigationDestinations.About.route)
                 }
             )
         }
@@ -112,6 +115,13 @@ fun AppNavigation(
         // Equipment settings (accessible outside onboarding)
         composable(NavigationDestinations.EquipmentSettings.route) {
             com.jodli.coffeeshottimer.ui.screens.EquipmentSettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // About screen
+        composable(NavigationDestinations.About.route) {
+            com.jodli.coffeeshottimer.ui.screens.AboutScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

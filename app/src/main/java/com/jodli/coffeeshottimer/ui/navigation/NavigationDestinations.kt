@@ -15,6 +15,7 @@ sealed class NavigationDestinations(val route: String) {
 
     // Settings destinations
     object EquipmentSettings : NavigationDestinations("settings_equipment")
+    object About : NavigationDestinations("about")
 
     // Modal destinations
     object ShotDetails : NavigationDestinations("shot_details/{shotId}") {
