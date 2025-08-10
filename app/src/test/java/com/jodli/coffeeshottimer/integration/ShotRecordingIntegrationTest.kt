@@ -5,8 +5,10 @@ import android.content.SharedPreferences
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
@@ -47,6 +49,7 @@ class ShotRecordingIntegrationTest {
     private lateinit var stringResourceProvider: StringResourceProvider
     private lateinit var domainErrorTranslator: DomainErrorTranslator
     private lateinit var validationStringProvider: ValidationStringProvider
+    private lateinit var grinderConfigRepository: GrinderConfigRepository
     private lateinit var context: Context
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
@@ -64,6 +67,7 @@ class ShotRecordingIntegrationTest {
         stringResourceProvider = mockk(relaxed = true)
         domainErrorTranslator = mockk(relaxed = true)
         validationStringProvider = mockk(relaxed = true)
+        grinderConfigRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
         sharedPreferences = mockk(relaxed = true)
         editor = mockk(relaxed = true)
@@ -104,6 +108,9 @@ class ShotRecordingIntegrationTest {
         
         // Mock the new grinder setting suggestion method I added
         coEvery { recordShotUseCase.getSuggestedGrinderSetting(any()) } returns Result.success("15")
+
+        // Mock grinder configuration repository to return default config
+        coEvery { grinderConfigRepository.getOrCreateDefaultConfig() } returns Result.success(GrinderConfiguration.DEFAULT_CONFIGURATION)
         
         // Mock timer update method
         coEvery { recordShotUseCase.updateTimer() } just Runs
@@ -122,7 +129,17 @@ class ShotRecordingIntegrationTest {
             Result.success(testShot)
             
         // Create ViewModel
-        viewModel = ShotRecordingViewModel(recordShotUseCase, getShotDetailsUseCase, beanRepository, shotRepository, domainErrorTranslator, stringResourceProvider, validationStringProvider, context)
+        viewModel = ShotRecordingViewModel(
+            recordShotUseCase,
+            getShotDetailsUseCase,
+            beanRepository,
+            shotRepository,
+            domainErrorTranslator,
+            stringResourceProvider,
+            validationStringProvider,
+            grinderConfigRepository,
+            context
+        )
     }
     
     @After

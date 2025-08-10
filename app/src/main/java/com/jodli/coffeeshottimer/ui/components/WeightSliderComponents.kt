@@ -60,6 +60,14 @@ object WeightSliderConstants {
 }
 
 /**
+ * Constants for grinder setting slider bounds
+ */
+object GrinderSliderConstants {
+    const val GRINDER_MIN_SETTING = 0.5f
+    const val GRINDER_MAX_SETTING = 20.0f
+}
+
+/**
  * Parse a float value that may use either decimal point (.) or comma (,) as decimal separator.
  * This handles locale differences where some locales use comma as decimal separator.
  */
@@ -284,19 +292,32 @@ fun GrinderSettingSlider(
     errorMessage: String? = null,
     enabled: Boolean = true,
     suggestedSetting: String? = null,
-    previousSuccessfulSettings: List<String> = emptyList()
+    previousSuccessfulSettings: List<String> = emptyList(),
+    minSetting: Float = GrinderSliderConstants.GRINDER_MIN_SETTING,
+    maxSetting: Float = GrinderSliderConstants.GRINDER_MAX_SETTING
 ) {
     val spacing = LocalSpacing.current
     val hapticFeedback = LocalHapticFeedback.current
 
+    val safeMin = if (minSetting < 0f) 0f else minSetting
+    val safeMax = if (maxSetting <= safeMin) safeMin + 1f else maxSetting
+    val defaultValue = (safeMin + safeMax) / 2f
+
     // Convert string value to float, supporting both decimal point and comma
-    val currentValue = parseLocaleAwareFloat(value)?.coerceIn(0.5f, 20.0f) ?: 5.0f
+    val currentValue = parseLocaleAwareFloat(value)?.coerceIn(safeMin, safeMax) ?: defaultValue
 
     // Ensure the value follows 0.5 increment steps
     val displayValue = (currentValue * 2).roundToInt() / 2.0f
 
     // Track previous value for haptic feedback
     var previousValue by remember { mutableStateOf(currentValue) }
+
+    // Formatter for min/max labels and current value
+    fun formatValue(v: Float): String = if (v == v.toInt().toFloat()) {
+        v.toInt().toString()
+    } else {
+        String.format(Locale.US, "%.1f", v)
+    }
 
     Column(modifier = modifier) {
         // Header with label and current value
@@ -330,12 +351,7 @@ fun GrinderSettingSlider(
                 modifier = Modifier.padding(start = spacing.small)
             ) {
                 Text(
-                    text = if (displayValue == displayValue.toInt().toFloat()) {
-                        stringResource(R.string.format_weight_display_int, displayValue.toInt())
-                    } else {
-                        // Use locale-independent formatting for consistency
-                        String.format(Locale.US, "%.1f", displayValue)
-                    },
+                    text = formatValue(displayValue),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -352,8 +368,8 @@ fun GrinderSettingSlider(
         // Grinder setting range indicators
         GrinderSettingRangeIndicator(
             currentValue = displayValue,
-            minSetting = 0.5f,
-            maxSetting = 20.0f,
+            minSetting = safeMin,
+            maxSetting = safeMax,
             suggestedSetting = suggestedSetting?.toFloatOrNull(),
             previousSuccessfulSettings = previousSuccessfulSettings.mapNotNull { it.toFloatOrNull() },
             enabled = enabled
@@ -384,8 +400,8 @@ fun GrinderSettingSlider(
 
                 onValueChange(formattedValue)
             },
-            valueRange = 0.5f..20.0f,
-            steps = 39, // (20.0 - 0.5) / 0.5 - 1 = 39 steps for 0.5 increments
+            valueRange = safeMin..safeMax,
+            steps = (kotlin.math.max(0, (((safeMax - safeMin) / 0.5f).roundToInt() - 1))),
             enabled = enabled,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,
@@ -401,12 +417,12 @@ fun GrinderSettingSlider(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = stringResource(R.string.weight_min_value),
+                text = formatValue(safeMin),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
-                text = stringResource(R.string.weight_max_value),
+                text = formatValue(safeMax),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

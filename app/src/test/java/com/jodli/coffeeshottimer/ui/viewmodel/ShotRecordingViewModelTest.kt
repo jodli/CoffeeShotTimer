@@ -50,9 +50,20 @@ class ShotRecordingViewModelTest {
         stringResourceProvider = mockk<StringResourceProvider>(relaxed = true)
         domainErrorTranslator = mockk<DomainErrorTranslator>(relaxed = true)
         validationStringProvider = mockk<ValidationStringProvider>(relaxed = true)
+        val grinderConfigRepository = mockk<com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository>(relaxed = true)
 
         // Create ViewModel with injected dependencies
-        viewModel = ShotRecordingViewModel(recordShotUseCase, getShotDetailsUseCase, beanRepository, shotRepository, domainErrorTranslator, stringResourceProvider, validationStringProvider, context)
+        viewModel = ShotRecordingViewModel(
+            recordShotUseCase,
+            getShotDetailsUseCase,
+            beanRepository,
+            shotRepository,
+            domainErrorTranslator,
+            stringResourceProvider,
+            validationStringProvider,
+            grinderConfigRepository,
+            context
+        )
     }
     
     @After

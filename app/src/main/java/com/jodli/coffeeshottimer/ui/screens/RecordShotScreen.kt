@@ -210,6 +210,8 @@ fun RecordShotScreen(
             onUseSuggestion = { suggestion ->
                 viewModel.updateGrinderSetting(suggestion)
             },
+            minSetting = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
+            maxSetting = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -486,6 +488,8 @@ private fun GrinderSettingSection(
     suggestedSetting: String?,
     previousSuccessfulSettings: List<String>,
     onUseSuggestion: (String) -> Unit,
+    minSetting: Float,
+    maxSetting: Float,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -518,6 +522,8 @@ private fun GrinderSettingSection(
             errorMessage = grinderSettingError,
             suggestedSetting = suggestedSetting,
             previousSuccessfulSettings = previousSuccessfulSettings,
+            minSetting = minSetting,
+            maxSetting = maxSetting,
             modifier = Modifier.fillMaxWidth()
         )
     }

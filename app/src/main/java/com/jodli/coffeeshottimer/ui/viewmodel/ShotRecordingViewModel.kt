@@ -59,6 +59,7 @@ class ShotRecordingViewModel @Inject constructor(
     private val domainErrorTranslator: DomainErrorTranslator,
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
+    private val grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository,
     @param:ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -130,6 +131,13 @@ class ShotRecordingViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
+    // Grinder scale range from user configuration (with fallbacks)
+    private val _grinderScaleMin = MutableStateFlow(0.5f)
+    val grinderScaleMin: StateFlow<Float> = _grinderScaleMin.asStateFlow()
+
+    private val _grinderScaleMax = MutableStateFlow(20.0f)
+    val grinderScaleMax: StateFlow<Float> = _grinderScaleMax.asStateFlow()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
 
@@ -167,6 +175,7 @@ class ShotRecordingViewModel @Inject constructor(
     init {
         loadActiveBeans()
         loadCurrentBean()
+        loadGrinderConfiguration()
         startTimerUpdates()
         observeRecordingState()
         startAutoSaveDraft()
@@ -213,6 +222,27 @@ class ShotRecordingViewModel @Inject constructor(
                 },
                 onFailure = { exception ->
                     // Silently handle error - current bean is optional
+                }
+            )
+        }
+    }
+
+    /**
+     * Load grinder scale configuration and expose min/max values with fallbacks.
+     */
+    private fun loadGrinderConfiguration() {
+        viewModelScope.launch {
+            // Try to get current config; if none exists, create default
+            val result = grinderConfigRepository.getOrCreateDefaultConfig()
+            result.fold(
+                onSuccess = { config ->
+                    _grinderScaleMin.value = config.scaleMin.toFloat()
+                    _grinderScaleMax.value = config.scaleMax.toFloat()
+                },
+                onFailure = {
+                    // Fallback to defaults if repository fails
+                    _grinderScaleMin.value = com.jodli.coffeeshottimer.data.model.GrinderConfiguration.DEFAULT_CONFIGURATION.scaleMin.toFloat()
+                    _grinderScaleMax.value = com.jodli.coffeeshottimer.data.model.GrinderConfiguration.DEFAULT_CONFIGURATION.scaleMax.toFloat()
                 }
             )
         }
