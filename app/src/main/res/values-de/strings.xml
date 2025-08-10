@@ -180,6 +180,10 @@
     <string name="button_permanently_delete_bean">Bohne endgültig löschen</string>
     <string name="button_delete_shot">Shot löschen</string>
     <string name="button_view_details">Details anzeigen</string>
+    <string name="button_skip">Überspringen</string>
+    <string name="button_previous">Zurück</string>
+    <string name="button_next">Weiter</string>
+    <string name="button_get_started">Los geht\'s</string>
 
     <!-- Debug Dialog -->
     <string name="text_debug_description">Entwickler-Tools für Tests und Screenshots</string>
@@ -449,6 +453,31 @@
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unbekannter Fehler aufgetreten</string>
     <string name="text_bean_name_exists">Bohnenname existiert bereits</string>
+
+    <!-- Introduction Screen Content -->
+    <string name="intro_welcome_title">Willkommen bei Coffee Shot Timer</string>
+    <string name="intro_welcome_description">Verwandle dein Espresso-Brühen in eine systematische Reise der Verbesserung mit präzisem Timing und detaillierter Verfolgung.</string>
+    
+    <string name="intro_main_screens_title">Hauptfunktionen</string>
+    <string name="intro_main_screens_description">Entdecke die drei Hauptbereiche der App, die deinen Brühworkflow unterstützen:</string>
+    
+    <string name="intro_record_shot_title">Shots aufnehmen</string>
+    <string name="intro_record_shot_description">Verfolge deine Espresso-Shots mit präzisen Messungen und Timing</string>
+    
+    <string name="intro_shot_history_title">Shot-Verlauf</string>
+    <string name="intro_shot_history_description">Analysiere deine Brühmuster und Verbesserungen über die Zeit</string>
+    
+    <string name="intro_bean_management_title">Bohnenverwaltung</string>
+    <string name="intro_bean_management_description">Organisiere deine Kaffeebohnen und verfolge ihre Frische</string>
+    
+    <string name="intro_flexible_workflow_title">Flexibler Workflow</string>
+    <string name="intro_flexible_workflow_description">Fülle Messungen in beliebiger Reihenfolge aus, die zu deinem Brühstil passt. Kaffee rein, Mahlgrad, Extraktionszeit und Kaffee raus können alle während des Brühens erfasst werden.</string>
+    
+    <string name="intro_timer_usage_title">Intelligenter Timer</string>
+    <string name="intro_timer_usage_description">Starte den Timer vor, während oder nach anderen Messungen. Der flexible Timer passt sich deinem Brühprozess an, nicht umgekehrt.</string>
+    
+    <string name="intro_get_started_title">Bereit zum Brühen!</string>
+    <string name="intro_get_started_description">Du bist bereit, deine Espresso-Shots zu verfolgen. Lass uns deine Ausrüstung konfigurieren, um dein Brüherlebnis zu personalisieren.</string>
 
     <!-- Shot Recommendations -->
     <string name="recommendation_grind_finer">Erwäge feiner zu mahlen, um die Extraktion zu verlangsamen (aktuell: %1$ss)</string>
