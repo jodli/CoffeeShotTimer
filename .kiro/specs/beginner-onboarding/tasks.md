@@ -77,17 +77,15 @@
   - Write unit tests for grinder configuration data persistence
   - _Requirements: 2.3, 2.6, 7.4_
 
-- [ ] 8. Build equipment setup screen UI
+- [x] 8. Build equipment setup screen UI
   - Create EquipmentSetupScreen composable with form layout
   - Implement GrinderScaleSetup component with min/max input fields
-  - Add CommonPresets component with quick setup buttons (1-10, 30-60, 70-100)
   - Add real-time validation feedback for scale ranges
   - _Requirements: 2.1, 2.2, 2.4_
 
 - [ ] 9. Implement equipment setup logic and validation
   - Create EquipmentSetupViewModel with form state management
   - Add validation logic for grinder scale ranges (min < max, reasonable bounds)
-  - Implement preset selection functionality with one-click setup
   - Add form submission logic that saves configuration to database
   - Create GentleValidationMessage component for helpful feedback
   - Add OnboardingErrorCard with retry and skip options for setup failures

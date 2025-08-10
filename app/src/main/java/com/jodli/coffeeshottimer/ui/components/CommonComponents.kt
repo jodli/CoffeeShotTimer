@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
@@ -175,7 +176,8 @@ fun CoffeeTextField(
     trailingIcon: ImageVector? = null,
     onTrailingIconClick: (() -> Unit)? = null,
     singleLine: Boolean = true,
-    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    keyboardOptions: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default
 ) {
     val spacing = LocalSpacing.current
 
@@ -202,6 +204,7 @@ fun CoffeeTextField(
             isError = isError,
             singleLine = singleLine,
             maxLines = maxLines,
+            keyboardOptions = keyboardOptions,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(spacing.cornerMedium)
         )

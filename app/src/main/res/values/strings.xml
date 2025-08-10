@@ -496,5 +496,19 @@
     <string name="text_recommendations_for_next_shot">Recommendations for next shot</string>
     <string name="text_next_steps_based_on_shot">Based on this shot:</string>
     <string name="text_and_more_recommendations">+%1$d more recommendations</string>
+
+    <!-- Equipment Setup Screen -->
+    <string name="title_equipment_setup">Equipment Setup</string>
+    <string name="text_equipment_setup_description">Configure your grinder settings to personalize your brewing experience.</string>
+    <string name="text_grinder_scale_range">Grinder Scale Range</string>
+    <string name="text_grinder_scale_description">Set the minimum and maximum values on your grinder\'s scale. This helps the app provide relevant guidance for your specific equipment.</string>
+    <string name="text_common_presets">Common Presets</string>
+    <string name="text_custom_range">Custom Range</string>
+    <string name="label_grinder_minimum">Minimum</string>
+    <string name="label_grinder_maximum">Maximum</string>
+    <string name="placeholder_grinder_min">e.g., 1</string>
+    <string name="placeholder_grinder_max">e.g., 10</string>
+    <string name="text_range_validation_success">✓ Range looks good! You\'ll have %1$d steps to work with.</string>
+    <string name="button_continue">Continue</string>
     
 </resources>
