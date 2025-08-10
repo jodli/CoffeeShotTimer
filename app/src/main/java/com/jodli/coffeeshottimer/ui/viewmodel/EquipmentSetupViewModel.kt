@@ -21,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EquipmentSetupViewModel @Inject constructor(
     private val grinderConfigRepository: GrinderConfigRepository,
-    private val errorTranslator: DomainErrorTranslator
+    private val errorTranslator: DomainErrorTranslator,
+    private val onboardingManager: com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(EquipmentSetupUiState())
@@ -134,6 +135,8 @@ class EquipmentSetupViewModel @Inject constructor(
                 
                 result.fold(
                     onSuccess = {
+                        // Mark onboarding as complete after successful equipment setup
+                        onboardingManager.markOnboardingComplete()
                         _uiState.value = currentState.copy(isLoading = false)
                         onSuccess(config)
                     },
@@ -174,6 +177,8 @@ class EquipmentSetupViewModel @Inject constructor(
 
                 result.fold(
                     onSuccess = { config ->
+                        // Mark onboarding as complete when skipping setup using default config
+                        onboardingManager.markOnboardingComplete()
                         _uiState.value = _uiState.value.copy(isLoading = false)
                         onSuccess(config)
                     },
