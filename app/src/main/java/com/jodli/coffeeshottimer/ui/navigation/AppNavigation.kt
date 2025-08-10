@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.jodli.coffeeshottimer.ui.screens.AddEditBeanScreen
 import com.jodli.coffeeshottimer.ui.screens.BeanManagementScreen
+import com.jodli.coffeeshottimer.ui.screens.IntroductionScreen
 import com.jodli.coffeeshottimer.ui.screens.RecordShotScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotDetailsScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen
@@ -61,9 +62,9 @@ fun AppNavigation(
             )
         }
 
-        // Onboarding screens (placeholder implementations)
+        // Onboarding screens
         composable(NavigationDestinations.OnboardingIntroduction.route) {
-            OnboardingIntroductionScreen(
+            IntroductionScreen(
                 onComplete = {
                     // Allow normal navigation to equipment setup, keeping introduction in back stack
                     navController.navigate(NavigationDestinations.OnboardingEquipmentSetup.route)
@@ -138,22 +139,6 @@ fun AppNavigation(
 
 // Placeholder composables for onboarding screens
 // These will be replaced with actual implementations in future tasks
-
-@Composable
-private fun OnboardingIntroductionScreen(
-    onComplete: () -> Unit,
-    onSkip: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Onboarding Introduction Screen (Placeholder)",
-            style = MaterialTheme.typography.headlineMedium
-        )
-    }
-}
 
 @Composable
 private fun OnboardingEquipmentSetupScreen(

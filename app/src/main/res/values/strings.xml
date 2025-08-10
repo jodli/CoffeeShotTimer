@@ -453,7 +453,7 @@
     <string name="text_bean_name_exists">Bean name already exists</string>
 
     <!-- Introduction Screen Content -->
-    <string name="intro_welcome_title">Welcome to Coffee Shot Timer</string>
+    <string name="intro_welcome_title">Welcome to\nCoffee Shot Timer</string>
     <string name="intro_welcome_description">Transform your espresso brewing into a systematic journey of improvement with precise timing and detailed tracking.</string>
     
     <string name="intro_main_screens_title">Main Features</string>
@@ -472,10 +472,10 @@
     <string name="intro_flexible_workflow_description">Fill in measurements in any order that matches your brewing style. Coffee in, grind setting, extraction time, and coffee out can all be recorded as you go.</string>
     
     <string name="intro_timer_usage_title">Smart Timer</string>
-    <string name="intro_timer_usage_description">Start the timer before, during, or after other measurements. The flexible timer adapts to your brewing process, not the other way around.</string>
+    <string name="intro_timer_usage_description">Start the timer before, during, or after other measurements. The flexible timer adapts to your brewing workflow and provides optimal extraction guidance.</string>
     
-    <string name="intro_get_started_title">Ready to Brew!</string>
-    <string name="intro_get_started_description">You\'re all set to start tracking your espresso shots. Let\'s configure your equipment to personalize your brewing experience.</string>
+    <string name="intro_get_started_title">Ready to Begin</string>
+    <string name="intro_get_started_description">Let\'s set up your equipment and record your first shot. You\'ll be brewing better espresso in no time!</string>
 
     <!-- Shot Recommendations -->
     <string name="recommendation_grind_finer">Consider using a finer grind to slow extraction (current: %1$ss)</string>
