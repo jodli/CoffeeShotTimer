@@ -166,25 +166,24 @@ class EquipmentSetupViewModel @Inject constructor(
      * Skips the equipment setup and uses the default configuration.
      */
     fun skipSetup(onSuccess: (GrinderConfiguration) -> Unit, onError: (String) -> Unit) {
-        val defaultConfig = GrinderConfiguration.DEFAULT_CONFIGURATION
-        
         _uiState.value = _uiState.value.copy(isLoading = true, error = null)
-        
+
         viewModelScope.launch {
             try {
-                val result = grinderConfigRepository.saveConfig(defaultConfig)
-                
+                val result = grinderConfigRepository.getOrCreateDefaultConfig()
+
                 result.fold(
-                    onSuccess = {
+                    onSuccess = { config ->
                         _uiState.value = _uiState.value.copy(isLoading = false)
-                        onSuccess(defaultConfig)
+                        onSuccess(config)
                     },
                     onFailure = { exception ->
                         val errorMessage = when (exception) {
                             is RepositoryException.DatabaseError -> getFailedToSaveDefaultConfigurationMessage()
+                            is RepositoryException.ValidationError -> getFailedToSaveDefaultConfigurationMessage()
                             else -> getUnexpectedErrorMessage()
                         }
-                        
+
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             error = errorMessage

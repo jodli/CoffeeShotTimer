@@ -16,6 +16,7 @@ import com.jodli.coffeeshottimer.ui.screens.IntroductionScreen
 import com.jodli.coffeeshottimer.ui.screens.RecordShotScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotDetailsScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen
+import com.jodli.coffeeshottimer.ui.screens.EquipmentSetupScreen
 
 @Composable
 fun AppNavigation(
@@ -79,8 +80,8 @@ fun AppNavigation(
         }
 
         composable(NavigationDestinations.OnboardingEquipmentSetup.route) {
-            OnboardingEquipmentSetupScreen(
-                onComplete = {
+            EquipmentSetupScreen(
+                onComplete = { _ ->
                     navController.navigate(NavigationDestinations.RecordShot.route) {
                         // Clear all onboarding screens from back stack after completion
                         popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
@@ -137,21 +138,3 @@ fun AppNavigation(
     }
 }
 
-// Placeholder composables for onboarding screens
-// These will be replaced with actual implementations in future tasks
-
-@Composable
-private fun OnboardingEquipmentSetupScreen(
-    onComplete: () -> Unit,
-    onBack: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Onboarding Equipment Setup Screen (Placeholder)",
-            style = MaterialTheme.typography.headlineMedium
-        )
-    }
-}
