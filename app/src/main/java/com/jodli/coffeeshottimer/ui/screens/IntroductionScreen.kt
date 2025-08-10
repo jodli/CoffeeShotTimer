@@ -57,6 +57,7 @@ import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.CancellationException
 
 /**
  * Data model for introduction slides
@@ -191,6 +192,8 @@ fun IntroductionScreen(
                                 page = pagerState.currentPage - 1,
                                 animationSpec = tween(durationMillis = 500)
                             )
+                        } catch (e: CancellationException) {
+                            // Ignore rapid-tap interruption; pager state still updates
                         } catch (e: Exception) {
                             navigationError = "Failed to navigate to previous slide: ${e.message}"
                         }
@@ -203,6 +206,8 @@ fun IntroductionScreen(
                                 page = pagerState.currentPage + 1,
                                 animationSpec = tween(durationMillis = 500)
                             )
+                        } catch (e: CancellationException) {
+                            // Ignore rapid-tap interruption; pager state still updates
                         } catch (e: Exception) {
                             navigationError = "Failed to navigate to next slide: ${e.message}"
                         }
