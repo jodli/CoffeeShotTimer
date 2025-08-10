@@ -53,9 +53,9 @@ import java.util.Locale
  * Constants for weight slider bounds
  */
 object WeightSliderConstants {
-    const val COFFEE_IN_MIN_WEIGHT = 15f
+    const val COFFEE_IN_MIN_WEIGHT = 5f
     const val COFFEE_IN_MAX_WEIGHT = 20f
-    const val COFFEE_OUT_MIN_WEIGHT = 25f
+    const val COFFEE_OUT_MIN_WEIGHT = 10f
     const val COFFEE_OUT_MAX_WEIGHT = 55f
 }
 
@@ -84,7 +84,7 @@ private fun parseLocaleAwareFloat(value: String): Float? {
  *
  * Features implemented:
  * - Custom slider component with whole gram increments (no decimal places)
- * - Visual indicators for typical weight ranges (15-20g for input, 25-40g for output)
+ * - Visual indicators for typical weight ranges (5-20g for input, 10-55g for output)
  * - Haptic feedback on value changes using HapticFeedbackType.TextHandleMove
  * - Proper validation integration with existing ViewModel methods
  * - Responsive design that works on different screen sizes using BoxWithConstraints

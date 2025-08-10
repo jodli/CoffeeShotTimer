@@ -71,7 +71,7 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateCoffeeWeightIn should fail for weight too low`() {
-        val result = "10.0".validateCoffeeWeightIn(validationUtils)
+        val result = "4.0".validateCoffeeWeightIn(validationUtils)
         assertFalse("Weight too low should fail validation", result.isValid)
         assertTrue("Should have minimum weight error",
             result.errors.any { it.contains("at least", ignoreCase = true) })
@@ -87,12 +87,12 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateCoffeeWeightIn should provide helpful tips for unusual weights`() {
-        val lowResult = "5.0".validateCoffeeWeightIn(validationUtils) // Below 10.0 threshold
+        val lowResult = "4.0".validateCoffeeWeightIn(validationUtils) // Below new 5.0 minimum
         assertFalse("Weight below minimum should fail", lowResult.isValid)
         assertTrue("Should have minimum weight error",
             lowResult.errors.any { it.contains("at least", ignoreCase = true) })
 
-        val highResult = "35.0".validateCoffeeWeightIn(validationUtils) // Above 30.0 threshold
+        val highResult = "35.0".validateCoffeeWeightIn(validationUtils) // Above 20.0 maximum
         assertFalse("Weight above maximum should fail", highResult.isValid)
         assertTrue("Should have maximum weight error",
             highResult.errors.any { it.contains("exceed", ignoreCase = true) })
@@ -107,12 +107,12 @@ class ValidationExtensionsTest {
 
     @Test
     fun `validateCoffeeWeightOut should provide helpful tips for unusual weights`() {
-        val lowResult = "15.0".validateCoffeeWeightOut(validationUtils) // Below 25.0 threshold
+        val lowResult = "9.0".validateCoffeeWeightOut(validationUtils) // Below new 10.0 minimum
         assertFalse("Weight below minimum should fail", lowResult.isValid)
         assertTrue("Should have minimum weight error",
             lowResult.errors.any { it.contains("at least", ignoreCase = true) })
 
-        val highResult = "60.0".validateCoffeeWeightOut(validationUtils) // Above 50.0 threshold
+        val highResult = "60.0".validateCoffeeWeightOut(validationUtils) // Above 55.0 maximum
         assertFalse("Weight above maximum should fail", highResult.isValid)
         assertTrue("Should have maximum weight error",
             highResult.errors.any { it.contains("exceed", ignoreCase = true) })
@@ -314,11 +314,11 @@ class ValidationExtensionsTest {
     fun `Weight slider constants should be reasonable for espresso`() {
         // Test that our weight slider constants make sense for espresso
         assertTrue("Coffee in min weight should be reasonable",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MIN_WEIGHT >= 10.0f)
+            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MIN_WEIGHT >= 5.0f)
         assertTrue("Coffee in max weight should be reasonable",
             com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MAX_WEIGHT <= 25.0f)
         assertTrue("Coffee out min weight should be reasonable",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT >= 20.0f)
+            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT >= 10.0f)
         assertTrue("Coffee out max weight should be reasonable",
             com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT <= 60.0f)
         assertTrue("Coffee in range should be valid",
