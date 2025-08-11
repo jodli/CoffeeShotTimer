@@ -16,7 +16,7 @@ import javax.inject.Singleton
  */
 @Singleton
 class OnboardingPreferences @Inject constructor(
-    @OnboardingPrefs private val sharedPreferences: SharedPreferences
+    @param:OnboardingPrefs private val sharedPreferences: SharedPreferences
 ) : OnboardingManager {
     
     private val json = Json {
