@@ -168,15 +168,14 @@ fun BeanManagementScreen(
 
             uiState.beans.isEmpty() -> {
                 EmptyState(
-                    icon = Icons.Default.Add,
+										icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
                     title = stringResource(R.string.text_no_beans_available),
                     description = if (searchQuery.isNotEmpty()) {
                         stringResource(R.string.text_search_beans_hint)
                     } else {
                         stringResource(R.string.text_add_first_bean)
                     },
-                    actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null,
-                    onActionClick = if (searchQuery.isEmpty()) onAddBeanClick else null
+                    actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null
                 )
             }
 

@@ -173,7 +173,7 @@ fun ShotHistoryScreen(
 
                 uiState.isEmpty -> {
                     EmptyState(
-                        icon = Icons.Default.Home,
+                        icon = Icons.AutoMirrored.Filled.List,
                         title = if (currentFilter.hasFilters()) stringResource(R.string.cd_no_shots) else stringResource(R.string.cd_no_shots_recorded),
                         description = if (currentFilter.hasFilters()) {
                             stringResource(R.string.text_search_beans_hint)
