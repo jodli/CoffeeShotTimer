@@ -25,18 +25,18 @@ Coffee Shot Timer is a precision Android app designed specifically for espresso 
 ## Screenshots
 
 <p align="center">
-  <img src="docs/main_screen.png" alt="Main Screen" width="200">
-  <img src="docs/light_mode.png" alt="Light Mode" width="200">
-  <img src="docs/shot_history.png" alt="Shot History" width="200">
-  <img src="docs/shot_details.png" alt="Shot Details" width="200">
+  <img src="docs/en-US/main_screen.png" alt="Main Screen" width="200">
+  <img src="docs/en-US/light_mode.png" alt="Light Mode" width="200">
+  <img src="docs/en-US/shot_history.png" alt="Shot History" width="200">
+  <img src="docs/en-US/shot_details.png" alt="Shot Details" width="200">
 </p>
 
 <p align="center">
-  <img src="docs/shot_analysis.png" alt="Shot Analysis" width="200">
-  <img src="docs/filter_shots.png" alt="Filter Shots" width="200">
-  <img src="docs/bean_management.png" alt="Bean Management" width="200">
-  <img src="docs/grinder_settings.png" alt="Grinder Settings" width="200">
-  <img src="docs/bean_photo.png" alt="Bean Package Photo" width="200">
+  <img src="docs/en-US/shot_analysis.png" alt="Shot Analysis" width="200">
+  <img src="docs/en-US/filter_shots.png" alt="Filter Shots" width="200">
+  <img src="docs/en-US/bean_management.png" alt="Bean Management" width="200">
+  <img src="docs/en-US/grinder_settings.png" alt="Grinder Settings" width="200">
+  <img src="docs/en-US/bean_photo.png" alt="Bean Package Photo" width="200">
 </p>
 
 ## Perfect For
@@ -50,6 +50,7 @@ Coffee Shot Timer is a precision Android app designed specifically for espresso 
 ## Technology Stack
 
 This is an Android application built with:
+
 - **Kotlin** — primary programming language
 - **Android Gradle Plugin** — build system
 - **Hilt** — dependency injection
@@ -58,6 +59,7 @@ This is an Android application built with:
 ## Getting Started
 
 ### Prerequisites
+
 - Android Studio
 - Android SDK
 - Gradle
@@ -65,6 +67,7 @@ This is an Android application built with:
 ### Building the Project
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/jodli/CoffeeShotTimer.git
 cd CoffeeShotTimer
@@ -73,11 +76,13 @@ cd CoffeeShotTimer
 2. Open the project in Android Studio.
 
 3. Build the project:
+
 ```bash
 ./gradlew build
 ```
 
 4. Run on a device or emulator:
+
 ```bash
 ./gradlew installDevDebug
 ```
