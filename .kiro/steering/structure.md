@@ -16,11 +16,23 @@ app/
 ├── src/
 │   ├── main/              # Main source code
 │   │   ├── java/          # Kotlin source files
+│   │   │   └── com/jodli/coffeeshottimer/
+│   │   │       ├── data/          # Data layer (Room, repositories)
+│   │   │       ├── debug/         # Debug utilities
+│   │   │       ├── di/            # Dependency injection modules
+│   │   │       ├── domain/        # Domain layer (use cases, models)
+│   │   │       ├── ui/            # UI layer (Compose screens, components)
+│   │   │       ├── CoffeeShotTimerApplication.kt
+│   │   │       └── MainActivity.kt
 │   │   ├── res/           # Android resources
+│   │   │   ├── values/    # Default strings, colors, dimensions
+│   │   │   ├── values-de/ # German localization
+│   │   │   ├── drawable/  # Vector drawables and images
+│   │   │   └── mipmap-*/  # App icons for different densities
 │   │   └── AndroidManifest.xml
 │   ├── test/              # Unit tests
 │   └── androidTest/       # Instrumentation tests
-├── schemas/               # Room database schemas
+├── schemas/               # Room database schemas (KSP generated)
 ├── release/               # Pre-built release artifacts
 └── build.gradle.kts       # Module build configuration
 ```
@@ -35,10 +47,13 @@ app/
 ## Package Structure Conventions
 - Use `com.jodli.coffeeshottimer` as base package
 - Follow standard Android architecture patterns with clear separation:
-  - UI layer (Compose screens and components)
-  - Domain layer (use cases and business logic)
-  - Data layer (repositories, Room entities, DAOs)
+  - **UI layer** (`ui/`): Compose screens, components, and view models
+  - **Domain layer** (`domain/`): Use cases, business logic, and domain models
+  - **Data layer** (`data/`): Repositories, Room entities, DAOs, and data sources
+  - **Dependency Injection** (`di/`): Hilt modules and dependency configuration
+  - **Debug utilities** (`debug/`): Development and debugging tools
 - Organize by feature when possible, not by layer
+- Use clear, descriptive package names that reflect functionality
 
 ## Resource Organization
 - `res/values/` - Strings, colors, dimensions, styles

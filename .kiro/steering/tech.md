@@ -1,24 +1,28 @@
 # Technology Stack
 
 ## Core Technologies
-- **Language**: Kotlin (primary)
+- **Language**: Kotlin 2.2.0 (primary)
 - **Platform**: Android (minSdk 24, targetSdk 36, compileSdk 36)
-- **Build System**: Gradle with Kotlin DSL
-- **UI Framework**: Jetpack Compose with Material 3
+- **Build System**: Gradle 8.12.0 with Kotlin DSL
+- **UI Framework**: Jetpack Compose with Material 3 (BOM 2025.07.00)
 - **Architecture**: MVVM with Hilt dependency injection
 
 ## Key Libraries & Frameworks
-- **Database**: Room (local SQLite with coroutines support)
-- **Dependency Injection**: Hilt (Dagger-based)
-- **Navigation**: Navigation Compose
+- **Database**: Room 2.7.2 (local SQLite with coroutines support)
+- **Dependency Injection**: Hilt 2.57 (Dagger-based)
+- **Navigation**: Navigation Compose 2.9.3
 - **Lifecycle**: ViewModel and LiveData with Compose integration
-- **Serialization**: Kotlinx Serialization JSON
-- **Testing**: JUnit, MockK, Robolectric, Espresso
+- **Serialization**: Kotlinx Serialization JSON 1.9.0
+- **Image Loading**: Coil 2.7.0 for Compose
+- **Testing**: JUnit, MockK 1.14.5, Robolectric 4.15.1, Espresso
 
 ## Build Configuration
 - **Java Version**: 11 (source and target compatibility)
 - **Build Variants**: devDebug, prodDebug, devRelease, prodRelease
 - **Signing**: Supports both local keystore and CI/CD environment variables
+- **Code Processing**: KSP 2.2.0-2.0.2 (replaces KAPT for Room and Hilt)
+- **Localization**: English and German support
+- **Core Library Desugaring**: Enabled for Java 8+ APIs on older Android versions
 
 ## Common Commands
 ```bash

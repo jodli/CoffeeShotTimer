@@ -230,6 +230,47 @@ fun CardHeader(
 
 **Impact**: Successfully standardized 8 raw Card instances across 3 screens with consistent styling, spacing, and header patterns.
 
+## Modern Android Development Considerations
+
+### 1. KSP Migration from KAPT
+
+**Context**: The project has migrated from KAPT to KSP for annotation processing (Room, Hilt).
+
+**Benefits**:
+- Faster build times (2x improvement typical)
+- Better Kotlin multiplatform support
+- More efficient memory usage during compilation
+
+**Implementation Notes**:
+- Room schema location configured via KSP arguments: `ksp { arg("room.schemaLocation", "$projectDir/schemas") }`
+- All annotation processors now use `ksp()` instead of `kapt()`
+- Maintains same functionality with better performance
+
+### 2. Compose Compiler Plugin
+
+**Modern Setup**: Using the new Kotlin Compose Compiler Plugin instead of the legacy approach.
+
+**Configuration**:
+```kotlin
+plugins {
+    alias(libs.plugins.kotlin.compose)
+}
+```
+
+**Benefits**:
+- Better integration with Kotlin compiler
+- Improved build performance
+- Simplified configuration
+
+### 3. Build Optimization Patterns
+
+**Multi-Flavor Support**: The project supports dev/prod flavors with proper APK/AAB naming.
+
+**Key Patterns**:
+- Automatic output file naming based on flavor and version
+- Proper resource configuration per flavor
+- CI/CD friendly signing configuration with fallback to local development
+
 ## Future Considerations
 
 ### 1. Automated Refactoring Tools
@@ -238,6 +279,7 @@ Consider developing or using tools that can:
 - Automatically adjust indentation when removing wrapper components
 - Validate Compose component structure
 - Detect common refactoring pitfalls
+- Assist with KSP migration patterns
 
 ### 2. Component Library Documentation
 
@@ -245,6 +287,7 @@ Maintain clear documentation for:
 - Proper usage patterns for standardized components
 - Migration guides when updating component APIs
 - Common pitfalls and how to avoid them
+- KSP-specific considerations for custom annotations
 
 ### 3. Code Review Checklist
 
@@ -254,3 +297,5 @@ For Compose refactoring PRs, verify:
 - [ ] Backward compatibility maintained for enhanced components
 - [ ] Consistent usage of standardized components
 - [ ] Build passes without compilation errors
+- [ ] KSP annotations properly configured if using custom processors
+- [ ] Flavor-specific resources correctly configured

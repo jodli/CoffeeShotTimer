@@ -54,3 +54,10 @@ Coffee Shot Timer is a precision Android app for espresso enthusiasts focused on
 - Use Room database relationships to enforce bean-centric data integrity
 - Consider battery optimization - timer should work reliably even with aggressive power management
 - Test thoroughly on various screen sizes and orientations common in kitchen use
+
+## Localization & Accessibility
+- **Multi-language Support**: Currently supports English (default) and German localization
+- **Resource Management**: Use string resources for all user-facing text to support localization
+- **Cultural Considerations**: Coffee terminology and brewing preferences may vary by region
+- **Accessibility**: Ensure all interactive elements have proper content descriptions and support screen readers
+- **Time/Date Formats**: Use locale-appropriate formatting for dates and times (roast dates, shot timestamps)
