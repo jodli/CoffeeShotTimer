@@ -2,8 +2,10 @@ package com.jodli.coffeeshottimer.data.util
 
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.dao.BeanDao
+import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.Shot
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -22,7 +24,8 @@ import kotlin.random.Random
 @Singleton
 class DatabasePopulator @Inject constructor(
     private val beanDao: BeanDao,
-    private val shotDao: ShotDao
+    private val shotDao: ShotDao,
+    private val grinderConfigDao: GrinderConfigDao
 ) {
 
     /**
@@ -38,6 +41,13 @@ class DatabasePopulator @Inject constructor(
         }
 
         try {
+            // Create realistic grinder configuration if none exists
+            val existingConfig = grinderConfigDao.getCurrentConfig()
+            if (existingConfig == null) {
+                val grinderConfig = createRealisticGrinderConfiguration()
+                grinderConfigDao.insertConfig(grinderConfig)
+            }
+
             // Create realistic coffee beans
             val beans = createRealisticBeans()
 
@@ -106,9 +116,10 @@ class DatabasePopulator @Inject constructor(
         }
 
         try {
-            // Get all beans and shots
+            // Get all data
             val allBeans = beanDao.getAllBeans().first()
             val allShots = shotDao.getAllShots().first()
+            val currentConfig = grinderConfigDao.getCurrentConfig()
 
             // Delete all shots first (due to foreign key constraints)
             allShots.forEach { shot ->
@@ -120,9 +131,33 @@ class DatabasePopulator @Inject constructor(
                 beanDao.deleteBean(bean)
             }
 
+            // Finally delete the grinder configuration if it exists
+            currentConfig?.let { config ->
+                grinderConfigDao.deleteConfig(config)
+            }
+
         } catch (e: Exception) {
             throw Exception("Failed to clear database: ${e.message}", e)
         }
+    }
+
+    /**
+     * Creates a realistic grinder configuration for test data.
+     * Randomly selects from common grinder scale ranges.
+     */
+    private fun createRealisticGrinderConfiguration(): GrinderConfiguration {
+        val commonConfigs = listOf(
+            GrinderConfiguration(scaleMin = 1, scaleMax = 10),   // Baratza Encore style
+            GrinderConfiguration(scaleMin = 30, scaleMax = 80),  // Comandante style
+            GrinderConfiguration(scaleMin = 0, scaleMax = 100),  // Generic percentage
+            GrinderConfiguration(scaleMin = 5, scaleMax = 15),   // Fine adjustment range
+            GrinderConfiguration(scaleMin = 20, scaleMax = 60)   // Mid-range burr grinder
+        )
+        
+        return commonConfigs.random().copy(
+            id = UUID.randomUUID().toString(),
+            createdAt = LocalDateTime.now().minusDays(Random.nextLong(1, 30))
+        )
     }
 
     /**

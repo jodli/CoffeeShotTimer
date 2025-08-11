@@ -45,6 +45,7 @@ import kotlinx.coroutines.delay
  *
  * Features:
  * - Fill database with realistic test data for screenshots
+ * - Add more shots for testing data volume
  * - Clear all database data for clean testing
  * - Loading states and result feedback
  * - Confirmation dialogs for destructive operations
@@ -283,7 +284,7 @@ fun DebugDialog(
             },
             dismissButton = {
                 TextButton(onClick = onHideConfirmation) {
-                    Text(stringResource(R.string.text_dialog_cancel))
+                    Text(stringResource(R.string.button_cancel))
                 }
             },
             containerColor = MaterialTheme.colorScheme.surface,

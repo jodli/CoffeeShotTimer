@@ -185,7 +185,7 @@
     <string name="button_get_started">Get Started</string>
 
     <!-- Debug Dialog -->
-    <string name="text_debug_description">Developer utilities for testing and screenshots</string>
+    <string name="text_debug_description">Debug tools for development and testing. Only available in debug builds.</string>
     <string name="button_fill_database">Fill Database</string>
     <string name="text_fill_database_description">Populates database with realistic coffee beans and shot records for testing and screenshots</string>
     <string name="button_add_more_shots">Add More Shots</string>
