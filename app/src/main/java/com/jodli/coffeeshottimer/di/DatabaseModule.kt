@@ -139,10 +139,11 @@ object DatabaseModule {
     @Singleton
     fun provideDatabasePopulator(
         beanDao: BeanDao,
-        shotDao: ShotDao
+        shotDao: ShotDao,
+        grinderConfigDao: GrinderConfigDao
     ): DatabasePopulator? {
         return if (BuildConfig.DEBUG) {
-            DatabasePopulator(beanDao, shotDao)
+            DatabasePopulator(beanDao, shotDao, grinderConfigDao)
         } else {
             null
         }

@@ -28,6 +28,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,19 +37,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
+import com.jodli.coffeeshottimer.ui.components.DebugDialog
+import com.jodli.coffeeshottimer.ui.components.DebugTapDetector
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    debugViewModel: DebugViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
+    val debugUiState by debugViewModel.uiState.collectAsState()
 
     Scaffold(
         topBar = {
@@ -109,12 +117,16 @@ fun AboutScreen(
                         textAlign = TextAlign.Center
                     )
                     
-                    Text(
-                        text = stringResource(id = R.string.text_version_format, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center
-                    )
+                    DebugTapDetector(
+                        onDebugActivated = { debugViewModel.showDialog() }
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.text_version_format, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
 
@@ -251,4 +263,18 @@ fun AboutScreen(
             Spacer(modifier = Modifier.height(spacing.large))
         }
     }
+
+    // Debug dialog (only available in debug builds)
+    DebugDialog(
+        isVisible = debugUiState.isDialogVisible,
+        onDismiss = { debugViewModel.hideDialog() },
+        onFillDatabase = { debugViewModel.fillDatabase() },
+        onAddMoreShots = { debugViewModel.addMoreShots() },
+        onClearDatabase = { debugViewModel.clearDatabase() },
+        isLoading = debugUiState.isLoading,
+        operationResult = debugUiState.operationResult,
+        showConfirmation = debugUiState.showConfirmation,
+        onShowConfirmation = { debugViewModel.showConfirmation() },
+        onHideConfirmation = { debugViewModel.hideConfirmation() }
+    )
 }

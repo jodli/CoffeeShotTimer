@@ -2,8 +2,10 @@ package com.jodli.coffeeshottimer.data.util
 
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.dao.BeanDao
+import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.Shot
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -28,6 +30,7 @@ class DatabasePopulatorTest {
 
     private lateinit var beanDao: BeanDao
     private lateinit var shotDao: ShotDao
+    private lateinit var grinderConfigDao: GrinderConfigDao
     private lateinit var databasePopulator: DatabasePopulator
 
     @Before
@@ -37,7 +40,8 @@ class DatabasePopulatorTest {
 
         beanDao = mockk(relaxed = true)
         shotDao = mockk(relaxed = true)
-        databasePopulator = DatabasePopulator(beanDao, shotDao)
+        grinderConfigDao = mockk(relaxed = true)
+        databasePopulator = DatabasePopulator(beanDao, shotDao, grinderConfigDao)
     }
 
     // Note: BuildConfig.DEBUG tests are handled in ConditionalCompilationTest
@@ -45,6 +49,8 @@ class DatabasePopulatorTest {
     @Test
     fun `populateForScreenshots should create realistic beans and shots`() = runTest {
         // Given
+        coEvery { grinderConfigDao.getCurrentConfig() } returns null
+        coEvery { grinderConfigDao.insertConfig(any()) } returns Unit
         coEvery { beanDao.insertBean(any()) } returns Unit
         coEvery { shotDao.insertShot(any()) } returns Unit
 
@@ -52,6 +58,9 @@ class DatabasePopulatorTest {
         databasePopulator.populateForScreenshots()
 
         // Then
+        // Verify that grinder config was inserted (only if none exists)
+        coVerify(exactly = 1) { grinderConfigDao.insertConfig(any()) }
+        
         // Verify that beans were inserted (should be 5 beans based on implementation)
         coVerify(exactly = 5) { beanDao.insertBean(any()) }
 
@@ -63,6 +72,8 @@ class DatabasePopulatorTest {
     @Test
     fun `populateForScreenshots should handle database insertion errors`() = runTest {
         // Given
+        coEvery { grinderConfigDao.getCurrentConfig() } returns null
+        coEvery { grinderConfigDao.insertConfig(any()) } returns Unit
         coEvery { beanDao.insertBean(any()) } throws RuntimeException("Database error")
 
         // When & Then
@@ -102,6 +113,8 @@ class DatabasePopulatorTest {
     fun `addMoreShots should populate database if no beans exist`() = runTest {
         // Given
         coEvery { beanDao.getActiveBeans() } returns flowOf(emptyList())
+        coEvery { grinderConfigDao.getCurrentConfig() } returns null
+        coEvery { grinderConfigDao.insertConfig(any()) } returns Unit
         coEvery { beanDao.insertBean(any()) } returns Unit
         coEvery { shotDao.insertShot(any()) } returns Unit
 
@@ -110,6 +123,7 @@ class DatabasePopulatorTest {
 
         // Then
         // Should call populateForScreenshots which inserts beans and shots
+        coVerify(exactly = 1) { grinderConfigDao.insertConfig(any()) }
         coVerify(exactly = 5) { beanDao.insertBean(any()) }
         coVerify(atLeast = 25) { shotDao.insertShot(any()) }
     }
@@ -166,8 +180,10 @@ class DatabasePopulatorTest {
 
         coEvery { beanDao.getAllBeans() } returns flowOf(existingBeans)
         coEvery { shotDao.getAllShots() } returns flowOf(existingShots)
+        coEvery { grinderConfigDao.getCurrentConfig() } returns mockk(relaxed = true)
         coEvery { shotDao.deleteShot(any()) } returns Unit
         coEvery { beanDao.deleteBean(any()) } returns Unit
+        coEvery { grinderConfigDao.deleteConfig(any()) } returns Unit
 
         // When
         databasePopulator.clearAllData()
@@ -176,6 +192,7 @@ class DatabasePopulatorTest {
         // Verify shots are deleted first (due to foreign key constraints)
         coVerify(exactly = 2) { shotDao.deleteShot(any()) }
         coVerify(exactly = 2) { beanDao.deleteBean(any()) }
+        coVerify(exactly = 1) { grinderConfigDao.deleteConfig(any()) }
     }
 
     @Test
@@ -197,6 +214,7 @@ class DatabasePopulatorTest {
 
         coEvery { beanDao.getAllBeans() } returns flowOf(existingBeans)
         coEvery { shotDao.getAllShots() } returns flowOf(existingShots)
+        coEvery { grinderConfigDao.getCurrentConfig() } returns mockk(relaxed = true)
         coEvery { shotDao.deleteShot(any()) } throws RuntimeException("Delete failed")
 
         // When & Then
