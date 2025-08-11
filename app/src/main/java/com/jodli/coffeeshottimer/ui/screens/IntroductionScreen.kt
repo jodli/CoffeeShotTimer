@@ -28,7 +28,7 @@ import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.AltRoute
+import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -672,7 +672,7 @@ private fun getIntroductionSlides(): List<IntroSlide> {
         IntroSlide(
             title = stringResource(R.string.intro_flexible_workflow_title),
             description = stringResource(R.string.intro_flexible_workflow_description),
-            illustration = Icons.Default.AltRoute
+            illustration = Icons.AutoMirrored.Filled.AltRoute
         ),
         
         // Timer usage slide
