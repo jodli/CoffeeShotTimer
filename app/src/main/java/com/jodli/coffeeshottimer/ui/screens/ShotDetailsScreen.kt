@@ -18,6 +18,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -50,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
@@ -308,34 +311,16 @@ private fun ShotOverviewCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier
+                    .weight(1f)
+                    .padding(end = spacing.medium)) {
                     Text(
                         text = shot.timestamp.format(dateFormatter),
                         style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    Spacer(modifier = Modifier.height(spacing.small))
-
-                    // Quality score
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.text_quality_score),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = stringResource(R.string.format_quality_score, shotDetails.analysis.qualityScore),
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = when {
-                                shotDetails.analysis.qualityScore >= 80 -> MaterialTheme.colorScheme.primary
-                                shotDetails.analysis.qualityScore >= 60 -> MaterialTheme.colorScheme.tertiary
-                                else -> MaterialTheme.colorScheme.error
-                            }
-                        )
-                    }
                 }
 
                 // Large brew ratio display
@@ -358,6 +343,35 @@ private fun ShotOverviewCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+
+            Spacer(modifier = Modifier.height(spacing.small))
+
+            // Quality score - moved outside columns for full width
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.text_quality_score),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = stringResource(R.string.format_quality_score, shotDetails.analysis.qualityScore),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    softWrap = false,
+                    color = when {
+                        shotDetails.analysis.qualityScore >= 80 -> MaterialTheme.colorScheme.primary
+                        shotDetails.analysis.qualityScore >= 60 -> MaterialTheme.colorScheme.tertiary
+                        else -> MaterialTheme.colorScheme.error
+                    }
+                )
             }
 
             Spacer(modifier = Modifier.height(spacing.medium))
@@ -398,7 +412,7 @@ private fun BeanInformationCard(
 
     CoffeeCard(modifier = modifier) {
         CardHeader(
-            icon = Icons.Default.Info,
+            icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
             title = stringResource(R.string.text_bean_information)
         )
 

@@ -15,13 +15,16 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Coffee
@@ -105,6 +108,7 @@ fun IntroductionScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .padding(horizontal = spacing.screenPadding, vertical = spacing.small)
         ) {
             // Skip button with animation - reduced top padding
@@ -310,6 +314,7 @@ fun WalkthroughPager(
     ) {
         // Horizontal pager for slides with enhanced animations
         AnimatedVisibility(
+            modifier = Modifier.weight(1f),
             visible = !isNavigating,
             enter = fadeIn(animationSpec = tween(300)) + slideInHorizontally(
                 animationSpec = tween(300),
@@ -322,7 +327,7 @@ fun WalkthroughPager(
         ) {
             HorizontalPager(
                 state = pagerState,
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.fillMaxSize(),
                 pageSpacing = spacing.medium
             ) { page ->
                 IntroSlideContent(
@@ -391,18 +396,19 @@ fun IntroSlideContent(
         Column(
             modifier = modifier
                 .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = spacing.large, vertical = spacing.medium),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             // Illustration with entrance animation - enhanced with background circle
             Box(
-                modifier = Modifier.size(160.dp),
+                modifier = Modifier.size(120.dp),
                 contentAlignment = Alignment.Center
             ) {
                 // Background circle for better visual impact
                 Surface(
-                    modifier = Modifier.size(140.dp),
+                    modifier = Modifier.size(96.dp),
                     shape = CircleShape,
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
                     tonalElevation = 2.dp
@@ -411,7 +417,7 @@ fun IntroSlideContent(
                 Icon(
                     imageVector = slide.illustration,
                     contentDescription = slide.title,
-                    modifier = Modifier.size(80.dp),
+                    modifier = Modifier.size(56.dp),
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -426,11 +432,11 @@ fun IntroSlideContent(
                 // Title with improved typography - more prominent and better fitting
                 Text(
                     text = slide.title,
-                    style = MaterialTheme.typography.headlineLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
                     textAlign = TextAlign.Center,
-                    lineHeight = MaterialTheme.typography.headlineLarge.lineHeight * 1.1f,
+                    lineHeight = MaterialTheme.typography.headlineMedium.lineHeight * 1.1f,
                     modifier = Modifier.padding(horizontal = spacing.small)
                 )
 
@@ -447,7 +453,7 @@ fun IntroSlideContent(
 
             // Feature highlights with staggered animations - increased spacing from text
             if (slide.highlights.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(spacing.extraLarge))
+                Spacer(modifier = Modifier.height(spacing.large))
                 
                 Column(
                     verticalArrangement = Arrangement.spacedBy(spacing.small),
@@ -596,18 +602,14 @@ fun IntroductionNavigationButtons(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Previous button (invisible on first page to maintain layout)
-            if (isFirstPage) {
-                Spacer(modifier = Modifier.width(120.dp))
-            } else {
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.button_previous),
-                    onClick = onPrevious,
-                    enabled = !isNavigating,
-                    modifier = Modifier.width(120.dp),
-                    fillMaxWidth = false
-                )
-            }
+            // Previous button (rendered disabled on first page to maintain layout)
+            CoffeeSecondaryButton(
+                text = stringResource(R.string.button_previous),
+                onClick = onPrevious,
+                enabled = !isFirstPage && !isNavigating,
+                modifier = Modifier.width(120.dp),
+                fillMaxWidth = false
+            )
 
             // Next/Get Started button
             if (isLastPage) {

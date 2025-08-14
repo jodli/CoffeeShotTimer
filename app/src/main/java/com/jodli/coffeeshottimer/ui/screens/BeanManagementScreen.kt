@@ -88,14 +88,18 @@ fun BeanManagementScreen(
             Text(
                 text = stringResource(R.string.title_bean_management),
                 style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f, fill = false)
             )
 
             CoffeePrimaryButton(
                 text = stringResource(R.string.text_add_bean),
                 onClick = onAddBeanClick,
                 icon = Icons.Default.Add,
-                fillMaxWidth = false
+                fillMaxWidth = false,
+                modifier = Modifier
+                    .padding(start = spacing.medium)
+                    .widthIn(min = 120.dp, max = 160.dp)
             )
         }
 
