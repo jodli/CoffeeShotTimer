@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,6 +46,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import androidx.compose.ui.res.stringResource
@@ -87,19 +89,23 @@ fun ShotHistoryScreen(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = stringResource(R.string.title_shot_history),
                     style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
                 if (currentFilter.hasFilters()) {
                     Text(
                         text = stringResource(R.string.text_filtered_results),
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
@@ -375,51 +381,51 @@ private fun ShotHistoryItem(
 
                 Spacer(modifier = Modifier.height(spacing.small))
 
-                // Key metrics row
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+                // Key metrics chips (wrap when not enough width)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(spacing.medium),
+                    verticalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     MetricChip(
                         label = stringResource(R.string.label_ratio),
                         value = shot.getFormattedBrewRatio(),
                         isGood = shot.isTypicalBrewRatio()
                     )
-
                     MetricChip(
                         label = stringResource(R.string.label_time),
                         value = shot.getFormattedExtractionTime(),
                         isGood = shot.isOptimalExtractionTime()
                     )
-
-                    MetricChip(
-                        label = stringResource(R.string.label_grinder),
-                        value = shot.grinderSetting,
-                        isNeutral = true
-                    )
+                    if (shot.grinderSetting.isNotBlank()) {
+                        MetricChip(
+                            label = stringResource(R.string.label_grinder),
+                            value = shot.grinderSetting,
+                            isNeutral = true
+                        )
+                    }
                 }
             }
 
-            // Right side - weights
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = stringResource(R.string.format_weight_in_out, shot.coffeeWeightIn.toInt(), shot.coffeeWeightOut.toInt()),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                // Quality indicator with success score
-                Column(
-                    horizontalAlignment = Alignment.End
+            // Right side - weights + quality inline, success below
+            Column(horizontalAlignment = Alignment.End) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
+                    Text(
+                        text = stringResource(R.string.format_weight_in_out, shot.coffeeWeightIn.toInt(), shot.coffeeWeightOut.toInt()),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium
+                    )
                     QualityIndicator(
                         isOptimalTime = shot.isOptimalExtractionTime(),
                         isTypicalRatio = shot.isTypicalBrewRatio()
                     )
-                    Spacer(modifier = Modifier.height(spacing.extraSmall))
-                    ShotSuccessIndicator(shot = shot)
                 }
+                ShotSuccessIndicator(
+                    shot = shot,
+                    modifier = Modifier.padding(top = spacing.extraSmall)
+                )
             }
         }
     }
@@ -601,51 +607,51 @@ private fun OverallStatisticsCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Key metrics grid
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_total_shots),
-                value = statistics.totalShots.toString(),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_beans_used),
-                value = statistics.uniqueBeans.toString(),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_avg_ratio),
-                value = stringResource(R.string.format_avg_brew_ratio_display, statistics.avgBrewRatio),
-                modifier = Modifier.weight(1f)
-            )
-        }
+                    Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                StatisticItem(
+                    label = stringResource(R.string.label_total_shots),
+                    value = statistics.totalShots.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_beans_used),
+                    value = statistics.uniqueBeans.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_avg_ratio),
+                    value = stringResource(R.string.format_avg_brew_ratio_display, statistics.avgBrewRatio),
+                    modifier = Modifier.weight(1f)
+                )
+                    }
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_avg_time),
-                value = stringResource(R.string.format_avg_extraction_time_display, statistics.avgExtractionTime.toInt()),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_optimal_time),
-                value = stringResource(R.string.format_optimal_extraction_percentage, statistics.optimalExtractionPercentage),
-                isGood = statistics.optimalExtractionPercentage > 50,
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_good_ratio),
-                value = stringResource(R.string.format_typical_ratio_percentage, statistics.typicalRatioPercentage),
-                isGood = statistics.typicalRatioPercentage > 50,
-                modifier = Modifier.weight(1f)
-            )
-        }
+                    Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                StatisticItem(
+                    label = stringResource(R.string.label_avg_time),
+                    value = stringResource(R.string.format_avg_extraction_time_display, statistics.avgExtractionTime.toInt()),
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_optimal_time),
+                    value = stringResource(R.string.format_optimal_extraction_percentage, statistics.optimalExtractionPercentage),
+                    isGood = statistics.optimalExtractionPercentage > 50,
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_good_ratio),
+                    value = stringResource(R.string.format_typical_ratio_percentage, statistics.typicalRatioPercentage),
+                    isGood = statistics.typicalRatioPercentage > 50,
+                    modifier = Modifier.weight(1f)
+                )
+                    }
 
         statistics.mostUsedGrinderSetting?.let { setting ->
             Spacer(modifier = Modifier.height(spacing.medium))
@@ -674,40 +680,40 @@ private fun ShotTrendsCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Trend indicators
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            TrendItem(
-                label = stringResource(R.string.label_shots_per_day),
-                value = String.format(java.util.Locale.ROOT, "%.1f", trends.shotsPerDay),
-                modifier = Modifier.weight(1f)
-            )
-            TrendItem(
-                label = stringResource(R.string.label_ratio_trend),
-                value = if (trends.brewRatioTrend >= 0) "+${
-                    String.format(
-                        java.util.Locale.ROOT,
-                        "%.2f",
-                        trends.brewRatioTrend
-                    )
-                }" else String.format(java.util.Locale.ROOT, "%.2f", trends.brewRatioTrend),
-                isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
-                modifier = Modifier.weight(1f)
-            )
-            TrendItem(
-                label = stringResource(R.string.label_time_trend),
-                value = if (trends.extractionTimeTrend >= 0) "+${
-                    String.format(
-                        java.util.Locale.ROOT,
-                        "%.1f",
-                        trends.extractionTimeTrend
-                    )
-                }s" else stringResource(R.string.format_extraction_time_trend_display, trends.extractionTimeTrend),
-                isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
-                modifier = Modifier.weight(1f)
-            )
-        }
+                    Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                TrendItem(
+                    label = stringResource(R.string.label_shots_per_day),
+                    value = String.format(java.util.Locale.ROOT, "%.1f", trends.shotsPerDay),
+                    modifier = Modifier.weight(1f)
+                )
+                TrendItem(
+                    label = stringResource(R.string.label_ratio_trend),
+                    value = if (trends.brewRatioTrend >= 0) "+${
+                        String.format(
+                            java.util.Locale.ROOT,
+                            "%.2f",
+                            trends.brewRatioTrend
+                        )
+                    }" else String.format(java.util.Locale.ROOT, "%.2f", trends.brewRatioTrend),
+                    isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
+                    modifier = Modifier.weight(1f)
+                )
+                TrendItem(
+                    label = stringResource(R.string.label_time_trend),
+                    value = if (trends.extractionTimeTrend >= 0) "+${
+                        String.format(
+                            java.util.Locale.ROOT,
+                            "%.1f",
+                            trends.extractionTimeTrend
+                        )
+                    }s" else stringResource(R.string.format_extraction_time_trend_display, trends.extractionTimeTrend),
+                    isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
+                    modifier = Modifier.weight(1f)
+                )
+                    }
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -776,29 +782,29 @@ private fun BrewRatioAnalysisCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Quality breakdown
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_typical_range),
-                value = stringResource(R.string.format_typical_ratio_percentage, analysis.typicalRatioPercentage),
-                isGood = analysis.typicalRatioPercentage > 70,
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_under_extracted),
-                value = stringResource(R.string.format_under_extracted_percentage, analysis.underExtractedPercentage),
-                isGood = analysis.underExtractedPercentage < 20,
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_over_extracted),
-                value = stringResource(R.string.format_over_extracted_percentage, analysis.overExtractedPercentage),
-                isGood = analysis.overExtractedPercentage < 20,
-                modifier = Modifier.weight(1f)
-            )
-        }
+                    Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                StatisticItem(
+                    label = stringResource(R.string.label_typical_range),
+                    value = stringResource(R.string.format_typical_ratio_percentage, analysis.typicalRatioPercentage),
+                    isGood = analysis.typicalRatioPercentage > 70,
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_under_extracted),
+                    value = stringResource(R.string.format_under_extracted_percentage, analysis.underExtractedPercentage),
+                    isGood = analysis.underExtractedPercentage < 20,
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_over_extracted),
+                    value = stringResource(R.string.format_over_extracted_percentage, analysis.overExtractedPercentage),
+                    isGood = analysis.overExtractedPercentage < 20,
+                    modifier = Modifier.weight(1f)
+                )
+                    }
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -868,29 +874,29 @@ private fun ExtractionTimeAnalysisCard(
             Spacer(modifier = Modifier.height(spacing.medium))
 
             // Quality breakdown
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = stringResource(R.string.label_optimal_time_range_short),
-                    value = stringResource(R.string.format_optimal_extraction_percentage, analysis.optimalTimePercentage),
-                    isGood = analysis.optimalTimePercentage > 50,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_too_fast),
-                    value = stringResource(R.string.format_too_fast_percentage, analysis.tooFastPercentage),
-                    isGood = analysis.tooFastPercentage < 30,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_too_slow),
-                    value = stringResource(R.string.format_too_slow_percentage, analysis.tooSlowPercentage),
-                    isGood = analysis.tooSlowPercentage < 30,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+                            Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    StatisticItem(
+                        label = stringResource(R.string.label_optimal_time_range_short),
+                        value = stringResource(R.string.format_optimal_extraction_percentage, analysis.optimalTimePercentage),
+                        isGood = analysis.optimalTimePercentage > 50,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatisticItem(
+                        label = stringResource(R.string.label_too_fast),
+                        value = stringResource(R.string.format_too_fast_percentage, analysis.tooFastPercentage),
+                        isGood = analysis.tooFastPercentage < 30,
+                        modifier = Modifier.weight(1f)
+                    )
+                    StatisticItem(
+                        label = stringResource(R.string.label_too_slow),
+                        value = stringResource(R.string.format_too_slow_percentage, analysis.tooSlowPercentage),
+                        isGood = analysis.tooSlowPercentage < 30,
+                        modifier = Modifier.weight(1f)
+                    )
+                            }
 
             Spacer(modifier = Modifier.height(spacing.medium))
 

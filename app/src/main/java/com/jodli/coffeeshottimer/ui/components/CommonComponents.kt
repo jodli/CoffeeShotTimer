@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -99,7 +100,7 @@ fun CoffeePrimaryButton(
                 .fillMaxWidth()
                 .height(spacing.touchTarget)
         } else {
-            modifier.height(spacing.touchTarget)
+            modifier.heightIn(min = spacing.touchTarget)
         },
         enabled = enabled,
         shape = RoundedCornerShape(spacing.cornerMedium)
@@ -114,7 +115,9 @@ fun CoffeePrimaryButton(
         }
         Text(
             text = text,
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
+            maxLines = 2,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center
         )
     }
 }

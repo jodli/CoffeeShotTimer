@@ -6,6 +6,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Fixed
+
+- Improved layout responsiveness and text wrapping across multiple screens for better display on various screen sizes.
+
 ## [1.3.0]
 
 ### Added
