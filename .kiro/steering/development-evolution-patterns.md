@@ -143,8 +143,8 @@ This document analyzes the development history of the Coffee Shot Timer app base
 **Current CI/CD Workflow** (`.github/workflows/cd.yml`):
 - **Triggers**: Main branch pushes, version tags (`v*`), manual dispatch
 - **Build Strategy**: 
-  - Tag builds (`v*`) → Alpha track deployment with changelog extraction
-  - Main branch builds → Internal testing with "Unreleased" section
+  - Tag builds (`v*`) → Production track deployment with changelog extraction
+  - Main branch builds → Open testing (beta) with "Unreleased" section
   - Manual builds → Internal testing with custom version name
 - **Artifact Generation**: Both APK and AAB for all builds
 - **Release Notes**: Automatically extracted from CHANGELOG.md

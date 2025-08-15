@@ -101,9 +101,21 @@ docs/                   # Documentation and screenshots
 gradle/                 # Gradle configuration
 ```
 
+## Development Workflow
+
+This project uses an automated CI/CD pipeline with three deployment tracks:
+
+### 🎯 Deployment Tracks
+
+| Trigger | Track | Audience | Purpose |
+|---------|-------|----------|---------|
+| Manual dispatch (any branch) | Internal | Development team | Test risky changes |
+| Push to `main` (app changes) | Beta (Open Testing) | Public beta users | Public testing |
+| Version tag (`v*`) | Production | All users | Live releases |
+
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a pull request. For major changes, please open an issue first to discuss what you would like to change.
+Contributions are welcome! Please follow the development workflow above. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 

@@ -294,8 +294,8 @@ testOptions {
 - "Unreleased" section for ongoing development
 - Manual commit moves unreleased content to versioned section on release
 - CI/CD automatically extracts appropriate changelog section:
-  - Tag builds (`v*`) extract matching version section → Alpha track
-  - Main branch builds extract "Unreleased" section → Internal testing
+  - Tag builds (`v*`) extract matching version section → Production track
+  - Main branch builds extract "Unreleased" section → Open testing (beta)
 - Automatic deployment to Google Play Console with extracted release notes
 - GitHub releases created with same changelog content
 
