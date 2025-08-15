@@ -118,7 +118,6 @@ android {
         }
         create("prod") {
             dimension = "version"
-            versionNameSuffix = "-prod"
             resValue("string", "app_name", "@string/app_name_prod")
         }
     }
