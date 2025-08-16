@@ -48,14 +48,10 @@ fun MoreScreen(
             .padding(spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        // Screen title
-        Text(
-            text = stringResource(id = R.string.title_more),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
+        // Top spacing for status bar clearance
+        Spacer(modifier = Modifier.height(spacing.small))
 
-        // Equipment & Grinder Settings
+        // Equipment & Grinder Settings - no header needed
         CoffeeCard(
             modifier = Modifier.fillMaxWidth(),
             onClick = onNavigateToEquipmentSettings

@@ -206,6 +206,9 @@ fun RecordShotScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(spacing.landscapeSpacing())
                     ) {
+                        // Top spacing for status bar clearance
+                        Spacer(modifier = Modifier.height(spacing.small))
+
                         // Header (compact in landscape)
                         if (BuildConfig.DEBUG) {
                             DebugTapDetector(
@@ -749,24 +752,8 @@ private fun RecordShotPortraitContent(
 ) {
     val spacing = LocalSpacing.current
     
-    // Header with debug tap detection (only in debug builds)
-    if (BuildConfig.DEBUG) {
-        DebugTapDetector(
-            onDebugActivated = { debugViewModel.showDialog() }
-        ) {
-            Text(
-                text = stringResource(R.string.title_new_shot),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    } else {
-        Text(
-            text = stringResource(R.string.title_new_shot),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold
-        )
-    }
+    // Top spacing for status bar clearance
+    Spacer(modifier = Modifier.height(spacing.small))
 
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
@@ -921,6 +908,9 @@ private fun RecordShotFormContent(
     onClearErrorMessage: () -> Unit,
     onRetryRecordShot: () -> Unit
 ) {
+    // Top spacing for status bar clearance
+    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
         selectedBean = selectedBean,
