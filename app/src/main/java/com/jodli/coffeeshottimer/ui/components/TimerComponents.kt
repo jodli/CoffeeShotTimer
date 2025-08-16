@@ -18,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,10 +61,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.Spacing
+import com.jodli.coffeeshottimer.ui.theme.adaptiveTimerSize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -74,15 +78,68 @@ import kotlinx.coroutines.launch
  *
  * Enhanced version that makes the entire timer component clickable for start/stop,
  * dramatically improving usability with a large touch target (~200dp vs 80dp)
+ * Supports landscape mode with smaller 160dp size
  */
 @Composable
 fun CircularTimer(
     currentTime: Long,
     targetTime: Long?,
     isRunning: Boolean,
-    modifier: Modifier = Modifier,
     showColorCoding: Boolean = true,
-    onStartStop: (() -> Unit)? = null // New parameter for clickable timer
+    onStartStop: (() -> Unit)? = null,
+    modifier: Modifier = Modifier,
+    useLandscapeTimer: Boolean = false
+) {
+    val spacing = LocalSpacing.current
+    
+    // Use adaptive sizing in landscape mode based on available space
+    if (useLandscapeTimer) {
+        BoxWithConstraints {
+            val adaptiveTimerSize = spacing.adaptiveTimerSize(
+                availableHeight = maxHeight,
+                availableWidth = maxWidth,
+                isLandscape = true
+            )
+            
+            CircularTimerInternal(
+                currentTime = currentTime,
+                targetTime = targetTime,
+                isRunning = isRunning,
+                showColorCoding = showColorCoding,
+                onStartStop = onStartStop,
+                timerSize = adaptiveTimerSize,
+                modifier = modifier,
+                useLandscapeTimer = true
+            )
+        }
+    } else {
+        // Portrait mode uses fixed size from theme
+        CircularTimerInternal(
+            currentTime = currentTime,
+            targetTime = targetTime,
+            isRunning = isRunning,
+            showColorCoding = showColorCoding,
+            onStartStop = onStartStop,
+            timerSize = spacing.timerSize,
+            modifier = modifier,
+            useLandscapeTimer = false
+        )
+    }
+}
+
+/**
+ * Internal circular timer implementation with fixed size
+ */
+@Composable 
+private fun CircularTimerInternal(
+    currentTime: Long,
+    targetTime: Long?,
+    isRunning: Boolean,
+    showColorCoding: Boolean = true,
+    onStartStop: (() -> Unit)? = null,
+    timerSize: Dp,
+    modifier: Modifier = Modifier,
+    useLandscapeTimer: Boolean = false
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -169,13 +226,13 @@ fun CircularTimer(
 
     Box(
         modifier = modifier
-            .size(spacing.timerSize)
+            .size(timerSize) // Use adaptive timer size
             .graphicsLayer(scaleX = scale, scaleY = scale)
             .then(
                 if (handleTimerClick != null) {
                     Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
-                        indication = ripple(bounded = false, radius = spacing.timerSize / 2),
+                        indication = ripple(bounded = false, radius = timerSize / 2), // Adapt ripple to timer size
                         onClick = handleTimerClick
                     )
                 } else Modifier
@@ -222,9 +279,16 @@ fun CircularTimer(
             verticalArrangement = Arrangement.Center
         ) {
             // Timer text with enhanced formatting
+            // Use smaller text in landscape mode to fit in smaller timer
+            val textStyle = if (useLandscapeTimer) {
+                MaterialTheme.typography.headlineMedium
+            } else {
+                MaterialTheme.typography.headlineLarge
+            }
+            
             Text(
                 text = formatExtractionTime(currentTime, stringResource(R.string.timer_seconds_suffix)),
-                style = MaterialTheme.typography.headlineLarge,
+                style = textStyle,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
@@ -236,7 +300,7 @@ fun CircularTimer(
                 isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> {
                     Text(
                         text = stringResource(R.string.error_minimum_time_required),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = if (useLandscapeTimer) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall,
                         color = animatedColor,
                         textAlign = TextAlign.Center,
                         fontWeight = FontWeight.Medium
@@ -254,7 +318,7 @@ fun CircularTimer(
                     if (qualityText.isNotEmpty()) {
                         Text(
                             text = qualityText,
-                            style = MaterialTheme.typography.bodySmall,
+                            style = if (useLandscapeTimer) MaterialTheme.typography.labelSmall else MaterialTheme.typography.bodySmall,
                             color = animatedColor,
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Medium
@@ -270,13 +334,13 @@ fun CircularTimer(
                         Icon(
                             imageVector = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
                             contentDescription = null,
-                            modifier = Modifier.size(spacing.iconSmall),
+                            modifier = Modifier.size(if (useLandscapeTimer) spacing.iconSmall / 2 else spacing.iconSmall),
                             tint = animatedColor.copy(alpha = 0.7f)
                         )
                         Spacer(modifier = Modifier.width(spacing.extraSmall))
                         Text(
                             text = if (isRunning) stringResource(R.string.text_tap_to_stop) else stringResource(R.string.text_tap_to_start),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = if (useLandscapeTimer) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                             textAlign = TextAlign.Center
                         )
@@ -287,7 +351,7 @@ fun CircularTimer(
                     // Show target time for non-color-coded timers
                     Text(
                         text = stringResource(R.string.format_extraction_time_with_target, formatExtractionTime(targetTime, stringResource(R.string.timer_seconds_suffix))),
-                        style = MaterialTheme.typography.labelMedium,
+                        style = if (useLandscapeTimer) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
@@ -338,7 +402,8 @@ fun TimerControls(
     useClickableTimer: Boolean = true, // NEW: Use entire timer as button
     currentTime: Long = 0L, // Required for clickable timer mode
     targetTime: Long? = null,
-    showColorCoding: Boolean = true
+    showColorCoding: Boolean = true,
+    useLandscapeTimer: Boolean = false // NEW: Use landscape timer sizing
 ) {
     if (useClickableTimer) {
         // New clickable timer approach - MOST USER FRIENDLY
@@ -350,7 +415,8 @@ fun TimerControls(
             onReset = onReset,
             modifier = modifier,
             showReset = showReset,
-            showColorCoding = showColorCoding
+            showColorCoding = showColorCoding,
+            useLandscapeTimer = useLandscapeTimer
         )
     } else if (useEnhanced) {
         // Enhanced separate button controls
@@ -696,6 +762,7 @@ fun EnhancedTimerButton(
  * - Reset button elegantly positioned as a small floating action button
  * - Maintains all existing functionality with improved UX
  * - Shows validation feedback when timer is below minimum save threshold
+ * - Supports landscape mode with 160dp timer size
  */
 @Composable
 fun ClickableTimerControls(
@@ -708,23 +775,90 @@ fun ClickableTimerControls(
     showReset: Boolean = true,
     showColorCoding: Boolean = true,
     showValidationState: Boolean = false,
-    isValidForSave: Boolean = true
+    isValidForSave: Boolean = true,
+    useLandscapeTimer: Boolean = false
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
+    
+    if (useLandscapeTimer) {
+        // Use adaptive sizing in landscape mode
+        BoxWithConstraints {
+            val adaptiveTimerSize = spacing.adaptiveTimerSize(
+                availableHeight = maxHeight,
+                availableWidth = maxWidth,
+                isLandscape = true
+            )
+            
+            ClickableTimerControlsInternal(
+                isRunning = isRunning,
+                currentTime = currentTime,
+                targetTime = targetTime,
+                onStartStop = onStartStop,
+                onReset = onReset,
+                timerSize = adaptiveTimerSize,
+                showReset = showReset,
+                showColorCoding = showColorCoding,
+                showValidationState = showValidationState,
+                isValidForSave = isValidForSave,
+                context = context,
+                spacing = spacing,
+                modifier = modifier,
+                useLandscapeTimer = true
+            )
+        }
+    } else {
+        // Portrait mode uses fixed size
+        ClickableTimerControlsInternal(
+            isRunning = isRunning,
+            currentTime = currentTime,
+            targetTime = targetTime,
+            onStartStop = onStartStop,
+            onReset = onReset,
+            timerSize = spacing.timerSize,
+            showReset = showReset,
+            showColorCoding = showColorCoding,
+            showValidationState = showValidationState,
+            isValidForSave = isValidForSave,
+            context = context,
+            spacing = spacing,
+            modifier = modifier,
+            useLandscapeTimer = false
+        )
+    }
+}
+
+@Composable
+private fun ClickableTimerControlsInternal(
+    isRunning: Boolean,
+    currentTime: Long,
+    targetTime: Long?,
+    onStartStop: () -> Unit,
+    onReset: () -> Unit,
+    timerSize: Dp,
+    showReset: Boolean,
+    showColorCoding: Boolean,
+    showValidationState: Boolean,
+    isValidForSave: Boolean,
+    context: Context,
+    spacing: Spacing,
+    modifier: Modifier = Modifier,
+    useLandscapeTimer: Boolean = false
+) {
 
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
-        // Main clickable timer component
+        // Main clickable timer component with adaptive sizing
         CircularTimer(
             currentTime = currentTime,
             targetTime = targetTime,
             isRunning = isRunning,
             showColorCoding = showColorCoding,
             onStartStop = onStartStop,
-            modifier = Modifier.size(spacing.timerSize)
+            modifier = Modifier.size(timerSize),
+            useLandscapeTimer = useLandscapeTimer
         )
 
         // Reset button positioned elegantly in the top-right area
