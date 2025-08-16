@@ -66,6 +66,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorState
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.util.formatForDisplay
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -176,14 +177,30 @@ fun ShotDetailsScreen(
                 }
 
                 uiState.shotDetails != null -> {
-                    ShotDetailsContent(
-                        shotDetails = uiState.shotDetails!!,
-                        editNotesState = editNotesState,
-                        onStartEditingNotes = { viewModel.startEditingNotes() },
-                        onUpdateNotes = { viewModel.updateNotes(it) },
-                        onSaveNotes = { viewModel.saveNotes() },
-                        onCancelEditingNotes = { viewModel.cancelEditingNotes() },
-                        modifier = Modifier.fillMaxSize()
+                    LandscapeContainer(
+                        modifier = Modifier.fillMaxSize(),
+                        portraitContent = {
+                            ShotDetailsContent(
+                                shotDetails = uiState.shotDetails!!,
+                                editNotesState = editNotesState,
+                                onStartEditingNotes = { viewModel.startEditingNotes() },
+                                onUpdateNotes = { viewModel.updateNotes(it) },
+                                onSaveNotes = { viewModel.saveNotes() },
+                                onCancelEditingNotes = { viewModel.cancelEditingNotes() },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        },
+                        landscapeContent = {
+                            ShotDetailsLandscapeContent(
+                                shotDetails = uiState.shotDetails!!,
+                                editNotesState = editNotesState,
+                                onStartEditingNotes = { viewModel.startEditingNotes() },
+                                onUpdateNotes = { viewModel.updateNotes(it) },
+                                onSaveNotes = { viewModel.saveNotes() },
+                                onCancelEditingNotes = { viewModel.cancelEditingNotes() },
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
                     )
                 }
             }
@@ -974,5 +991,78 @@ private fun RecommendationItemInline(
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.weight(1f)
         )
+    }
+}
+
+@Composable
+private fun ShotDetailsLandscapeContent(
+    shotDetails: ShotDetails,
+    editNotesState: com.jodli.coffeeshottimer.ui.viewmodel.EditNotesState,
+    onStartEditingNotes: () -> Unit,
+    onUpdateNotes: (String) -> Unit,
+    onSaveNotes: () -> Unit,
+    onCancelEditingNotes: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    Row(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(spacing.medium),
+        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+    ) {
+        // Left column - Primary information
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(spacing.medium),
+            contentPadding = PaddingValues(vertical = spacing.small)
+        ) {
+            // Shot Overview Card
+            item {
+                ShotOverviewCard(shotDetails = shotDetails)
+            }
+
+            // Shot Parameters Card
+            item {
+                ShotParametersCard(shotDetails = shotDetails)
+            }
+
+            // Context Card (if available)
+            if (shotDetails.previousShot != null || shotDetails.nextShot != null) {
+                item {
+                    ShotContextCard(shotDetails = shotDetails)
+                }
+            }
+        }
+
+        // Right column - Secondary information
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(spacing.medium),
+            contentPadding = PaddingValues(vertical = spacing.small)
+        ) {
+            // Bean Information Card
+            item {
+                BeanInformationCard(shotDetails = shotDetails)
+            }
+
+            // Analysis & Recommendations Card
+            item {
+                ShotAnalysisAndRecommendationsCard(shotDetails = shotDetails)
+            }
+
+            // Notes Card
+            item {
+                ShotNotesCard(
+                    shotDetails = shotDetails,
+                    editNotesState = editNotesState,
+                    onStartEditingNotes = onStartEditingNotes,
+                    onUpdateNotes = onUpdateNotes,
+                    onSaveNotes = onSaveNotes,
+                    onCancelEditingNotes = onCancelEditingNotes
+                )
+            }
+        }
     }
 }

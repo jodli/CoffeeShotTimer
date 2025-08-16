@@ -140,6 +140,7 @@
     <string name="text_most_used_setting">Most Used Setting</string>
     <string name="text_best_performing_setting">Best Performing Setting</string>
     <string name="text_active_filters">Active Filters</string>
+    <string name="format_more_filters">+%1$d more</string>
     <string name="text_no_analysis_data">No analysis data available</string>
 
     <string name="text_dialog_ok">OK</string>
