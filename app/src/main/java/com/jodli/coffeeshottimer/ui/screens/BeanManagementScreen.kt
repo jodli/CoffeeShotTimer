@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
@@ -54,6 +57,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorState
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.PhotoViewer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -178,33 +182,71 @@ fun BeanManagementScreen(
             }
 
             else -> {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(spacing.small),
-                    contentPadding = PaddingValues(bottom = spacing.large)
-                ) {
-                    items(
-                        items = uiState.beans,
-                        key = { bean -> bean.id }
-                    ) { bean ->
-                        BeanListItem(
-                            bean = bean,
-                            onEdit = { onEditBeanClick(bean.id) },
-                            onDelete = { showDeleteDialog = bean },
-                            onUseForShot = {
-                                if (bean.isActive) {
-                                    viewModel.setCurrentBean(bean.id)
-                                    onNavigateToRecordShot()
-                                }
-                            },
-                            onReactivate = if (!bean.isActive) {
-                                { viewModel.reactivateBean(bean.id) }
-                            } else null,
-                            onPhotoClick = { photoPath ->
-                                showPhotoViewer = photoPath
+                // Use LandscapeContainer to switch between portrait and landscape layouts
+                LandscapeContainer(
+                    portraitContent = {
+                        // Existing LazyColumn layout for portrait
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(spacing.small),
+                            contentPadding = PaddingValues(bottom = spacing.large)
+                        ) {
+                            items(
+                                items = uiState.beans,
+                                key = { bean -> bean.id }
+                            ) { bean ->
+                                BeanListItem(
+                                    bean = bean,
+                                    onEdit = { onEditBeanClick(bean.id) },
+                                    onDelete = { showDeleteDialog = bean },
+                                    onUseForShot = {
+                                        if (bean.isActive) {
+                                            viewModel.setCurrentBean(bean.id)
+                                            onNavigateToRecordShot()
+                                        }
+                                    },
+                                    onReactivate = if (!bean.isActive) {
+                                        { viewModel.reactivateBean(bean.id) }
+                                    } else null,
+                                    onPhotoClick = { photoPath ->
+                                        showPhotoViewer = photoPath
+                                    }
+                                )
                             }
-                        )
+                        }
+                    },
+                    landscapeContent = {
+                        // Two-column grid layout for landscape
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(spacing.small),
+                            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                            contentPadding = PaddingValues(bottom = spacing.large)
+                        ) {
+                            items(
+                                items = uiState.beans,
+                                key = { bean -> bean.id }
+                            ) { bean ->
+                                BeanListItem(
+                                    bean = bean,
+                                    onEdit = { onEditBeanClick(bean.id) },
+                                    onDelete = { showDeleteDialog = bean },
+                                    onUseForShot = {
+                                        if (bean.isActive) {
+                                            viewModel.setCurrentBean(bean.id)
+                                            onNavigateToRecordShot()
+                                        }
+                                    },
+                                    onReactivate = if (!bean.isActive) {
+                                        { viewModel.reactivateBean(bean.id) }
+                                    } else null,
+                                    onPhotoClick = { photoPath ->
+                                        showPhotoViewer = photoPath
+                                    }
+                                )
+                            }
+                        }
                     }
-                }
+                )
             }
         }
     }

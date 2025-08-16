@@ -62,6 +62,7 @@ import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.BeanPhotoSection
 import com.jodli.coffeeshottimer.ui.components.PhotoViewer
 import com.jodli.coffeeshottimer.ui.components.PhotoActionSheet
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
 import java.time.LocalDate
@@ -269,130 +270,275 @@ fun AddEditBeanScreen(
                 LoadingIndicator(message = stringResource(R.string.loading_bean_details))
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(spacing.medium),
-                verticalArrangement = Arrangement.spacedBy(spacing.medium)
-            ) {
-                // Bean Name
-                CoffeeTextField(
-                    value = uiState.name,
-                    onValueChange = viewModel::updateName,
-                    label = stringResource(R.string.label_bean_name_required),
-                    placeholder = stringResource(R.string.placeholder_enter_bean_name),
-                    leadingIcon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                    isError = uiState.nameError != null,
-                    errorMessage = uiState.nameError
-                )
-
-                // Roast Date
-                CoffeeTextField(
-                    value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
-                    onValueChange = { }, // Read-only, handled by date picker
-                    label = stringResource(R.string.label_roast_date_required),
-                    placeholder = stringResource(R.string.placeholder_select_roast_date),
-                    leadingIcon = Icons.Default.DateRange,
-                    trailingIcon = Icons.Default.DateRange,
-                    onTrailingIconClick = { showDatePicker = true },
-                    isError = uiState.roastDateError != null,
-                    errorMessage = uiState.roastDateError,
-                    singleLine = true
-                )
-
-                // Notes
-                CoffeeTextField(
-                    value = uiState.notes,
-                    onValueChange = viewModel::updateNotes,
-                    label = stringResource(R.string.label_notes),
-                    placeholder = stringResource(R.string.placeholder_optional_bean_notes),
-                    leadingIcon = Icons.Default.Edit,
-                    isError = uiState.notesError != null,
-                    errorMessage = uiState.notesError,
-                    singleLine = false,
-                    maxLines = 4
-                )
-
-                // Grinder Setting
-                CoffeeTextField(
-                    value = uiState.lastGrinderSetting,
-                    onValueChange = viewModel::updateAndValidateGrinderSetting,
-                    label = stringResource(R.string.label_grinder_setting),
-                    placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
-                    leadingIcon = Icons.Filled.Engineering,
-                    isError = uiState.grinderSettingError != null,
-                    errorMessage = uiState.grinderSettingError
-                )
-
-                // Photo Section - available in both create and edit modes
-                BeanPhotoSection(
-                    photoPath = uiState.photoPath,
-                    pendingPhotoUri = uiState.pendingPhotoUri,
-                    isLoading = uiState.isPhotoLoading,
-                    error = uiState.photoError,
-                    successMessage = uiState.photoSuccessMessage,
-                    canRetry = uiState.canRetryPhotoOperation,
-                    onAddPhoto = { handlePhotoCapture() },
-                    onReplacePhoto = { handlePhotoCapture() },
-                    onDeletePhoto = viewModel::removePhoto,
-                    onViewPhoto = { handlePhotoView() },
-                    onRetry = viewModel::retryPhotoOperation,
-                    onClearError = viewModel::clearPhotoError,
-                    onClearSuccess = viewModel::clearPhotoSuccessMessage
-                )
-
-                // Active Status (only show in edit mode)
-                if (uiState.isEditMode) {
-                    CoffeeCard(
-                        modifier = Modifier.fillMaxWidth()
+            LandscapeContainer(
+                portraitContent = {
+                    // Existing single-column layout for portrait
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(spacing.medium),
+                        verticalArrangement = Arrangement.spacedBy(spacing.medium)
                     ) {
-                        CardHeader(
-                            icon = Icons.Default.Settings,
-                            title = stringResource(R.string.text_bean_status),
-                            actions = {
-                                Switch(
-                                    checked = uiState.isActive,
-                                    onCheckedChange = viewModel::updateIsActive
+                        // Bean Name
+                        CoffeeTextField(
+                            value = uiState.name,
+                            onValueChange = viewModel::updateName,
+                            label = stringResource(R.string.label_bean_name_required),
+                            placeholder = stringResource(R.string.placeholder_enter_bean_name),
+                            leadingIcon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+                            isError = uiState.nameError != null,
+                            errorMessage = uiState.nameError
+                        )
+
+                        // Roast Date
+                        CoffeeTextField(
+                            value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                            onValueChange = { }, // Read-only, handled by date picker
+                            label = stringResource(R.string.label_roast_date_required),
+                            placeholder = stringResource(R.string.placeholder_select_roast_date),
+                            leadingIcon = Icons.Default.DateRange,
+                            trailingIcon = Icons.Default.DateRange,
+                            onTrailingIconClick = { showDatePicker = true },
+                            isError = uiState.roastDateError != null,
+                            errorMessage = uiState.roastDateError,
+                            singleLine = true
+                        )
+
+                        // Notes
+                        CoffeeTextField(
+                            value = uiState.notes,
+                            onValueChange = viewModel::updateNotes,
+                            label = stringResource(R.string.label_notes),
+                            placeholder = stringResource(R.string.placeholder_optional_bean_notes),
+                            leadingIcon = Icons.Default.Edit,
+                            isError = uiState.notesError != null,
+                            errorMessage = uiState.notesError,
+                            singleLine = false,
+                            maxLines = 4
+                        )
+
+                        // Grinder Setting
+                        CoffeeTextField(
+                            value = uiState.lastGrinderSetting,
+                            onValueChange = viewModel::updateAndValidateGrinderSetting,
+                            label = stringResource(R.string.label_grinder_setting),
+                            placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
+                            leadingIcon = Icons.Filled.Engineering,
+                            isError = uiState.grinderSettingError != null,
+                            errorMessage = uiState.grinderSettingError
+                        )
+
+                        // Photo Section - available in both create and edit modes
+                        BeanPhotoSection(
+                            photoPath = uiState.photoPath,
+                            pendingPhotoUri = uiState.pendingPhotoUri,
+                            isLoading = uiState.isPhotoLoading,
+                            error = uiState.photoError,
+                            successMessage = uiState.photoSuccessMessage,
+                            canRetry = uiState.canRetryPhotoOperation,
+                            onAddPhoto = { handlePhotoCapture() },
+                            onReplacePhoto = { handlePhotoCapture() },
+                            onDeletePhoto = viewModel::removePhoto,
+                            onViewPhoto = { handlePhotoView() },
+                            onRetry = viewModel::retryPhotoOperation,
+                            onClearError = viewModel::clearPhotoError,
+                            onClearSuccess = viewModel::clearPhotoSuccessMessage
+                        )
+
+                        // Active Status (only show in edit mode)
+                        if (uiState.isEditMode) {
+                            CoffeeCard(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                CardHeader(
+                                    icon = Icons.Default.Settings,
+                                    title = stringResource(R.string.text_bean_status),
+                                    actions = {
+                                        Switch(
+                                            checked = uiState.isActive,
+                                            onCheckedChange = viewModel::updateIsActive
+                                        )
+                                    }
+                                )
+
+                                Spacer(modifier = Modifier.height(spacing.small))
+
+                                Text(
+                                    text = if (uiState.isActive) stringResource(R.string.text_active_long) else stringResource(R.string.text_inactive),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
+                        }
+
+                        // Error Message
+                        if (uiState.error != null) {
+                            ErrorCard(
+                                title = stringResource(R.string.title_error),
+                                message = uiState.error ?: "Unknown error occurred",
+                                onDismiss = viewModel::clearError,
+                                onRetry = { viewModel.saveBean() }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(spacing.medium))
+
+                        // Save Button
+                        CoffeePrimaryButton(
+                            text = if (uiState.isSaving) stringResource(R.string.cd_saving) else if (uiState.isEditMode) stringResource(R.string.cd_update_bean) else stringResource(R.string.text_add_bean),
+                            onClick = viewModel::saveBean,
+                            enabled = !uiState.isSaving && uiState.name.isNotBlank(),
+                            modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(spacing.small))
+                        // Bottom padding for scrolling
+                        Spacer(modifier = Modifier.height(spacing.large))
+                    }
+                },
+                landscapeContent = {
+                    // Two-column layout for landscape
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(spacing.medium),
+                        verticalArrangement = Arrangement.spacedBy(spacing.medium)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+                        ) {
+                            // Left column - Basic info and settings
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(spacing.medium)
+                            ) {
+                                // Bean Name
+                                CoffeeTextField(
+                                    value = uiState.name,
+                                    onValueChange = viewModel::updateName,
+                                    label = stringResource(R.string.label_bean_name_required),
+                                    placeholder = stringResource(R.string.placeholder_enter_bean_name),
+                                    leadingIcon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+                                    isError = uiState.nameError != null,
+                                    errorMessage = uiState.nameError
+                                )
 
-                        Text(
-                            text = if (uiState.isActive) stringResource(R.string.text_active_long) else stringResource(R.string.text_inactive),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                // Roast Date
+                                CoffeeTextField(
+                                    value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
+                                    onValueChange = { }, // Read-only, handled by date picker
+                                    label = stringResource(R.string.label_roast_date_required),
+                                    placeholder = stringResource(R.string.placeholder_select_roast_date),
+                                    leadingIcon = Icons.Default.DateRange,
+                                    trailingIcon = Icons.Default.DateRange,
+                                    onTrailingIconClick = { showDatePicker = true },
+                                    isError = uiState.roastDateError != null,
+                                    errorMessage = uiState.roastDateError,
+                                    singleLine = true
+                                )
+
+                                // Grinder Setting
+                                CoffeeTextField(
+                                    value = uiState.lastGrinderSetting,
+                                    onValueChange = viewModel::updateAndValidateGrinderSetting,
+                                    label = stringResource(R.string.label_grinder_setting),
+                                    placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
+                                    leadingIcon = Icons.Filled.Engineering,
+                                    isError = uiState.grinderSettingError != null,
+                                    errorMessage = uiState.grinderSettingError
+                                )
+
+                                // Notes - give more space in landscape
+                                CoffeeTextField(
+                                    value = uiState.notes,
+                                    onValueChange = viewModel::updateNotes,
+                                    label = stringResource(R.string.label_notes),
+                                    placeholder = stringResource(R.string.placeholder_optional_bean_notes),
+                                    leadingIcon = Icons.Default.Edit,
+                                    isError = uiState.notesError != null,
+                                    errorMessage = uiState.notesError,
+                                    singleLine = false,
+                                    maxLines = 6 // More lines in landscape
+                                )
+
+                                // Active Status (only show in edit mode)
+                                if (uiState.isEditMode) {
+                                    CoffeeCard(
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        CardHeader(
+                                            icon = Icons.Default.Settings,
+                                            title = stringResource(R.string.text_bean_status),
+                                            actions = {
+                                                Switch(
+                                                    checked = uiState.isActive,
+                                                    onCheckedChange = viewModel::updateIsActive
+                                                )
+                                            }
+                                        )
+
+                                        Spacer(modifier = Modifier.height(spacing.small))
+
+                                        Text(
+                                            text = if (uiState.isActive) stringResource(R.string.text_active_long) else stringResource(R.string.text_inactive),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Right column - Photo and notes
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(spacing.medium)
+                            ) {
+                                // Photo Section - more prominent in landscape
+                                BeanPhotoSection(
+                                    photoPath = uiState.photoPath,
+                                    pendingPhotoUri = uiState.pendingPhotoUri,
+                                    isLoading = uiState.isPhotoLoading,
+                                    error = uiState.photoError,
+                                    successMessage = uiState.photoSuccessMessage,
+                                    canRetry = uiState.canRetryPhotoOperation,
+                                    onAddPhoto = { handlePhotoCapture() },
+                                    onReplacePhoto = { handlePhotoCapture() },
+                                    onDeletePhoto = viewModel::removePhoto,
+                                    onViewPhoto = { handlePhotoView() },
+                                    onRetry = viewModel::retryPhotoOperation,
+                                    onClearError = viewModel::clearPhotoError,
+                                    onClearSuccess = viewModel::clearPhotoSuccessMessage
+                                )
+                            }
+                        }
+
+                        // Error Message (full width)
+                        if (uiState.error != null) {
+                            ErrorCard(
+                                title = stringResource(R.string.title_error),
+                                message = uiState.error ?: "Unknown error occurred",
+                                onDismiss = viewModel::clearError,
+                                onRetry = { viewModel.saveBean() }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(spacing.medium))
+
+                        // Save Button (full width)
+                        CoffeePrimaryButton(
+                            text = if (uiState.isSaving) stringResource(R.string.cd_saving) else if (uiState.isEditMode) stringResource(R.string.cd_update_bean) else stringResource(R.string.text_add_bean),
+                            onClick = viewModel::saveBean,
+                            enabled = !uiState.isSaving && uiState.name.isNotBlank(),
+                            modifier = Modifier.fillMaxWidth()
                         )
+
+                        // Bottom padding for scrolling
+                        Spacer(modifier = Modifier.height(spacing.large))
                     }
                 }
-
-                // Error Message
-                if (uiState.error != null) {
-                    ErrorCard(
-                        title = stringResource(R.string.title_error),
-                        message = uiState.error ?: "Unknown error occurred",
-                        onDismiss = viewModel::clearError,
-                        onRetry = { viewModel.saveBean() }
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(spacing.medium))
-
-                // Save Button
-                CoffeePrimaryButton(
-                    text = if (uiState.isSaving) stringResource(R.string.cd_saving) else if (uiState.isEditMode) stringResource(R.string.cd_update_bean) else stringResource(R.string.text_add_bean),
-                    onClick = viewModel::saveBean,
-                    enabled = !uiState.isSaving && uiState.name.isNotBlank(),
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-
-
-                // Bottom padding for scrolling
-                Spacer(modifier = Modifier.height(spacing.large))
-            }
+            )
         }
     }
 
