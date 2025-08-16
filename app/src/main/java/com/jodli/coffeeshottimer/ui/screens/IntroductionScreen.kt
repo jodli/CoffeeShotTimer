@@ -9,6 +9,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Coffee
@@ -56,11 +58,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
+import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 
 /**
  * Data model for introduction slides
@@ -105,32 +111,270 @@ fun IntroductionScreen(
         modifier = modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding()
-                .padding(horizontal = spacing.screenPadding, vertical = spacing.small)
+        LandscapeContainer(
+            portraitContent = {
+                IntroductionPortraitLayout(
+                    slides = slides,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope,
+                    isNavigating = isNavigating,
+                    navigationError = navigationError,
+                    onSkip = onSkip,
+                    onComplete = onComplete,
+                    onNavigationStart = { isNavigating = true },
+                    onNavigationError = { error -> 
+                        navigationError = error
+                        isNavigating = false
+                    },
+                    onDismissError = {
+                        navigationError = null
+                        isNavigating = false
+                    }
+                )
+            },
+            landscapeContent = {
+                IntroductionLandscapeLayout(
+                    slides = slides,
+                    pagerState = pagerState,
+                    coroutineScope = coroutineScope,
+                    isNavigating = isNavigating,
+                    navigationError = navigationError,
+                    onSkip = onSkip,
+                    onComplete = onComplete,
+                    onNavigationStart = { isNavigating = true },
+                    onNavigationError = { error -> 
+                        navigationError = error
+                        isNavigating = false
+                    },
+                    onDismissError = {
+                        navigationError = null
+                        isNavigating = false
+                    }
+                )
+            }
+        )
+    }
+}
+
+/**
+ * Portrait layout for the introduction screen - maintains existing functionality
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun IntroductionPortraitLayout(
+    slides: List<IntroSlide>,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    isNavigating: Boolean,
+    navigationError: String?,
+    onSkip: () -> Unit,
+    onComplete: () -> Unit,
+    onNavigationStart: () -> Unit,
+    onNavigationError: (String) -> Unit,
+    onDismissError: () -> Unit
+) {
+    val spacing = LocalSpacing.current
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .padding(horizontal = spacing.screenPadding, vertical = spacing.small)
+    ) {
+        // Skip button with animation - reduced top padding
+        AnimatedVisibility(
+            visible = !isNavigating,
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(300))
         ) {
-            // Skip button with animation - reduced top padding
-            AnimatedVisibility(
-                visible = !isNavigating,
-                enter = fadeIn(animationSpec = tween(300)),
-                exit = fadeOut(animationSpec = tween(300))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = spacing.small),
+                horizontalArrangement = Arrangement.End
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = spacing.small),
-                    horizontalArrangement = Arrangement.End
+                TextButton(
+                    onClick = {
+                        try {
+                            onNavigationStart()
+                            onSkip()
+                        } catch (e: Exception) {
+                            onNavigationError("Failed to skip introduction: ${e.message}")
+                        }
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.button_skip),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+        }
+
+        // Loading indicator during navigation
+        if (isNavigating) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(spacing.touchTarget),
+                contentAlignment = Alignment.Center
+            ) {
+                LoadingIndicator(
+                    message = "Loading...",
+                    modifier = Modifier.size(spacing.iconMedium)
+                )
+            }
+        }
+
+        // Error message display
+        navigationError?.let { error ->
+            IntroductionErrorCard(
+                message = error,
+                onRetry = onDismissError,
+                onDismiss = onDismissError,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = spacing.small)
+            )
+        }
+
+        // Walkthrough pager with enhanced animations - better space utilization
+        WalkthroughPager(
+            slides = slides,
+            pagerState = pagerState,
+            isNavigating = isNavigating,
+            modifier = Modifier.weight(1f)
+        )
+
+        // Navigation buttons with error handling - reduced spacing
+        IntroductionNavigationButtons(
+            currentPage = pagerState.currentPage,
+            totalPages = slides.size,
+            isNavigating = isNavigating,
+            onPrevious = {
+                coroutineScope.launch {
+                    try {
+                        pagerState.animateScrollToPage(
+                            page = pagerState.currentPage - 1,
+                            animationSpec = tween(durationMillis = 500)
+                        )
+                    } catch (e: CancellationException) {
+                        // Ignore rapid-tap interruption; pager state still updates
+                    } catch (e: Exception) {
+                        onNavigationError("Failed to navigate to previous slide: ${e.message}")
+                    }
+                }
+            },
+            onNext = {
+                coroutineScope.launch {
+                    try {
+                        pagerState.animateScrollToPage(
+                            page = pagerState.currentPage + 1,
+                            animationSpec = tween(durationMillis = 500)
+                        )
+                    } catch (e: CancellationException) {
+                        // Ignore rapid-tap interruption; pager state still updates
+                    } catch (e: Exception) {
+                        onNavigationError("Failed to navigate to next slide: ${e.message}")
+                    }
+                }
+            },
+            onGetStarted = {
+                try {
+                    onNavigationStart()
+                    onComplete()
+                } catch (e: Exception) {
+                    onNavigationError("Failed to complete introduction: ${e.message}")
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = spacing.medium)
+        )
+    }
+}
+
+/**
+ * Landscape layout for the introduction screen - optimized for horizontal space
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun IntroductionLandscapeLayout(
+    slides: List<IntroSlide>,
+    pagerState: PagerState,
+    coroutineScope: CoroutineScope,
+    isNavigating: Boolean,
+    navigationError: String?,
+    onSkip: () -> Unit,
+    onComplete: () -> Unit,
+    onNavigationStart: () -> Unit,
+    onNavigationError: (String) -> Unit,
+    onDismissError: () -> Unit
+) {
+    val spacing = LocalSpacing.current
+    val landscapeSpacing = spacing.landscapeSpacing()
+    
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding()
+            .padding(horizontal = landscapeSpacing, vertical = spacing.small)
+    ) {
+        val maxWidth = maxWidth
+        
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // Top bar with skip button and loading/error states
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = spacing.small),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Error display in landscape - more compact
+                navigationError?.let { error ->
+                    Text(
+                        text = "Error: $error",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = spacing.medium)
+                    )
+                    
+                    TextButton(onClick = onDismissError) {
+                        Text(
+                            text = stringResource(R.string.button_dismiss),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+                }
+                
+                // Loading indicator in landscape
+                if (isNavigating) {
+                    LoadingIndicator(
+                        message = "Loading...",
+                        modifier = Modifier.size(spacing.iconSmall)
+                    )
+                    Spacer(modifier = Modifier.width(spacing.medium))
+                }
+                
+                // Skip button
+                AnimatedVisibility(
+                    visible = !isNavigating,
+                    enter = fadeIn(animationSpec = tween(300)),
+                    exit = fadeOut(animationSpec = tween(300))
                 ) {
                     TextButton(
                         onClick = {
                             try {
-                                isNavigating = true
+                                onNavigationStart()
                                 onSkip()
                             } catch (e: Exception) {
-                                navigationError = "Failed to skip introduction: ${e.message}"
-                                isNavigating = false
+                                onNavigationError("Failed to skip introduction: ${e.message}")
                             }
                         }
                     ) {
@@ -143,92 +387,427 @@ fun IntroductionScreen(
                 }
             }
 
-            // Loading indicator during navigation
-            if (isNavigating) {
+            // Main content area - horizontal layout
+            Row(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Left side: Slide content (60% width)
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(spacing.touchTarget),
-                    contentAlignment = Alignment.Center
+                        .weight(0.6f)
+                        .fillMaxSize()
                 ) {
-                    LoadingIndicator(
-                        message = "Loading...",
-                        modifier = Modifier.size(spacing.iconMedium)
+                    WalkthroughPagerLandscape(
+                        slides = slides,
+                        pagerState = pagerState,
+                        isNavigating = isNavigating,
+                        availableWidth = maxWidth * 0.6f,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+                
+                // Right side: Navigation and indicators (40% width)
+                Column(
+                    modifier = Modifier
+                        .weight(0.4f)
+                        .fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Page indicators with enhanced spacing for landscape
+                    AnimatedVisibility(
+                        visible = !isNavigating,
+                        enter = fadeIn(animationSpec = tween(300)),
+                        exit = fadeOut(animationSpec = tween(300))
+                    ) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(spacing.medium),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            // Vertical page indicators for landscape
+                            repeat(slides.size) { index ->
+                                PageIndicatorLandscape(
+                                    isActive = index == pagerState.currentPage,
+                                    modifier = Modifier.size(width = 24.dp, height = 8.dp)
+                                )
+                            }
+                        }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(landscapeSpacing * 2))
+                    
+                    // Navigation buttons - stacked vertically for landscape
+                    IntroductionNavigationButtonsLandscape(
+                        currentPage = pagerState.currentPage,
+                        totalPages = slides.size,
+                        isNavigating = isNavigating,
+                        onPrevious = {
+                            coroutineScope.launch {
+                                try {
+                                    pagerState.animateScrollToPage(
+                                        page = pagerState.currentPage - 1,
+                                        animationSpec = tween(durationMillis = 500)
+                                    )
+                                } catch (e: CancellationException) {
+                                    // Ignore rapid-tap interruption; pager state still updates
+                                } catch (e: Exception) {
+                                    onNavigationError("Failed to navigate to previous slide: ${e.message}")
+                                }
+                            }
+                        },
+                        onNext = {
+                            coroutineScope.launch {
+                                try {
+                                    pagerState.animateScrollToPage(
+                                        page = pagerState.currentPage + 1,
+                                        animationSpec = tween(durationMillis = 500)
+                                    )
+                                } catch (e: CancellationException) {
+                                    // Ignore rapid-tap interruption; pager state still updates
+                                } catch (e: Exception) {
+                                    onNavigationError("Failed to navigate to next slide: ${e.message}")
+                                }
+                            }
+                        },
+                        onGetStarted = {
+                            try {
+                                onNavigationStart()
+                                onComplete()
+                            } catch (e: Exception) {
+                                onNavigationError("Failed to complete introduction: ${e.message}")
+                            }
+                        }
                     )
                 }
             }
+        }
+    }
+}
 
-            // Error message display
-            navigationError?.let { error ->
-                IntroductionErrorCard(
-                    message = error,
-                    onRetry = {
-                        navigationError = null
-                        isNavigating = false
-                    },
-                    onDismiss = {
-                        navigationError = null
-                        isNavigating = false
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = spacing.small)
+/**
+ * Landscape-optimized walkthrough pager component
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun WalkthroughPagerLandscape(
+    slides: List<IntroSlide>,
+    pagerState: PagerState,
+    isNavigating: Boolean,
+    availableWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val landscapeSpacing = spacing.landscapeSpacing()
+
+    AnimatedVisibility(
+        modifier = modifier,
+        visible = !isNavigating,
+        enter = fadeIn(animationSpec = tween(300)) + slideInHorizontally(
+            animationSpec = tween(300),
+            initialOffsetX = { it / 4 }
+        ),
+        exit = fadeOut(animationSpec = tween(300)) + slideOutHorizontally(
+            animationSpec = tween(300),
+            targetOffsetX = { -it / 4 }
+        )
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+            pageSpacing = landscapeSpacing
+        ) { page ->
+            IntroSlideContentLandscape(
+                slide = slides[page],
+                isActive = page == pagerState.currentPage,
+                availableWidth = availableWidth,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+
+    // Loading state during navigation
+    if (isNavigating) {
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            LoadingIndicator(
+                message = "Preparing next step...",
+                modifier = Modifier.size(spacing.iconLarge)
+            )
+        }
+    }
+}
+
+/**
+ * Individual slide content component optimized for landscape orientation
+ */
+@Composable
+fun IntroSlideContentLandscape(
+    slide: IntroSlide,
+    isActive: Boolean,
+    availableWidth: Dp,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val landscapeSpacing = spacing.landscapeSpacing()
+
+    // Animate content when slide becomes active
+    AnimatedVisibility(
+        visible = isActive,
+        enter = fadeIn(animationSpec = tween(600, delayMillis = 200)) + slideInHorizontally(
+            animationSpec = tween(600, delayMillis = 200),
+            initialOffsetX = { it / 8 }
+        ),
+        exit = fadeOut(animationSpec = tween(300))
+    ) {
+        BoxWithConstraints(
+            modifier = modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = landscapeSpacing, vertical = landscapeSpacing)
+        ) {
+            val maxHeight = maxHeight
+            
+            // Horizontal layout for landscape
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Left side: Illustration (30% width)
+                Column(
+                    modifier = Modifier.weight(0.3f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Illustration with smaller size for landscape - enhanced with background circle
+                    val iconSize = minOf(80.dp, maxHeight * 0.3f)
+                    Box(
+                        modifier = Modifier.size(iconSize + 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        // Background circle for better visual impact
+                        Surface(
+                            modifier = Modifier.size(iconSize),
+                            shape = CircleShape,
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                            tonalElevation = 2.dp
+                        ) {}
+                        
+                        Icon(
+                            imageVector = slide.illustration,
+                            contentDescription = slide.title,
+                            modifier = Modifier.size(iconSize * 0.7f),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+                
+                // Right side: Content (70% width)
+                Column(
+                    modifier = Modifier.weight(0.7f),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.spacedBy(landscapeSpacing)
+                ) {
+                    // Title with landscape-appropriate sizing
+                    Text(
+                        text = slide.title,
+                        style = MaterialTheme.typography.headlineSmall, // Smaller for landscape
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        lineHeight = MaterialTheme.typography.headlineSmall.lineHeight * 1.1f
+                    )
+
+                    // Description with better sizing for landscape
+                    Text(
+                        text = slide.description,
+                        style = MaterialTheme.typography.bodyMedium, // More compact for landscape
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.3f
+                    )
+
+                    // Feature highlights with horizontal layout for landscape
+                    if (slide.highlights.isNotEmpty()) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(landscapeSpacing / 2),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            slide.highlights.forEachIndexed { index, highlight ->
+                                // Stagger the animation of each highlight
+                                LaunchedEffect(isActive) {
+                                    if (isActive) {
+                                        kotlinx.coroutines.delay(300L + (index * 100L))
+                                    }
+                                }
+                                
+                                AnimatedVisibility(
+                                    visible = isActive,
+                                    enter = fadeIn(
+                                        animationSpec = tween(400, delayMillis = 300 + (index * 100))
+                                    ) + slideInHorizontally(
+                                        animationSpec = tween(400, delayMillis = 300 + (index * 100)),
+                                        initialOffsetX = { it / 4 }
+                                    )
+                                ) {
+                                    FeatureHighlightItemLandscape(
+                                        highlight = highlight,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Feature highlight item component optimized for landscape
+ */
+@Composable
+fun FeatureHighlightItemLandscape(
+    highlight: FeatureHighlight,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val landscapeSpacing = spacing.landscapeSpacing()
+
+    Surface(
+        modifier = modifier.padding(vertical = spacing.extraSmall),
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 1.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(landscapeSpacing),
+            verticalAlignment = Alignment.Top,
+            horizontalArrangement = Arrangement.spacedBy(landscapeSpacing)
+        ) {
+            // Icon with background circle - smaller for landscape
+            Box(
+                modifier = Modifier.size(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Surface(
+                    modifier = Modifier.size(20.dp),
+                    shape = CircleShape,
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
+                ) {}
+                
+                Icon(
+                    imageVector = highlight.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp),
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
 
-            // Walkthrough pager with enhanced animations - better space utilization
-            WalkthroughPager(
-                slides = slides,
-                pagerState = pagerState,
-                isNavigating = isNavigating,
+            Column(
                 modifier = Modifier.weight(1f)
-            )
+            ) {
+                Text(
+                    text = highlight.title,
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-            // Navigation buttons with error handling - reduced spacing
-            IntroductionNavigationButtons(
-                currentPage = pagerState.currentPage,
-                totalPages = slides.size,
-                isNavigating = isNavigating,
-                onPrevious = {
-                    coroutineScope.launch {
-                        try {
-                            pagerState.animateScrollToPage(
-                                page = pagerState.currentPage - 1,
-                                animationSpec = tween(durationMillis = 500)
-                            )
-                        } catch (e: CancellationException) {
-                            // Ignore rapid-tap interruption; pager state still updates
-                        } catch (e: Exception) {
-                            navigationError = "Failed to navigate to previous slide: ${e.message}"
-                        }
-                    }
-                },
-                onNext = {
-                    coroutineScope.launch {
-                        try {
-                            pagerState.animateScrollToPage(
-                                page = pagerState.currentPage + 1,
-                                animationSpec = tween(durationMillis = 500)
-                            )
-                        } catch (e: CancellationException) {
-                            // Ignore rapid-tap interruption; pager state still updates
-                        } catch (e: Exception) {
-                            navigationError = "Failed to navigate to next slide: ${e.message}"
-                        }
-                    }
-                },
-                onGetStarted = {
-                    try {
-                        isNavigating = true
-                        onComplete()
-                    } catch (e: Exception) {
-                        navigationError = "Failed to complete introduction: ${e.message}"
-                        isNavigating = false
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = spacing.medium)
+                Text(
+                    text = highlight.description,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = MaterialTheme.typography.bodySmall.lineHeight * 1.2f,
+                    modifier = Modifier.padding(top = spacing.extraSmall / 2)
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Landscape-specific page indicator (vertical layout)
+ */
+@Composable
+fun PageIndicatorLandscape(
+    isActive: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val height = if (isActive) 24.dp else 8.dp
+    val color = if (isActive) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+    }
+    
+    Surface(
+        modifier = modifier
+            .width(8.dp)
+            .height(height),
+        shape = CircleShape,
+        color = color
+    ) {}
+}
+
+/**
+ * Navigation buttons for landscape orientation (vertical layout)
+ */
+@Composable
+fun IntroductionNavigationButtonsLandscape(
+    currentPage: Int,
+    totalPages: Int,
+    isNavigating: Boolean,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    onGetStarted: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val landscapeSpacing = spacing.landscapeSpacing()
+    val isFirstPage = currentPage == 0
+    val isLastPage = currentPage == totalPages - 1
+
+    AnimatedVisibility(
+        visible = !isNavigating,
+        enter = fadeIn(animationSpec = tween(300)),
+        exit = fadeOut(animationSpec = tween(300))
+    ) {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(landscapeSpacing)
+        ) {
+            // Next/Get Started button (primary action on top)
+            if (isLastPage) {
+                CoffeePrimaryButton(
+                    text = stringResource(R.string.button_get_started),
+                    onClick = onGetStarted,
+                    enabled = !isNavigating,
+                    modifier = Modifier.width(140.dp),
+                    fillMaxWidth = false
+                )
+            } else {
+                CoffeePrimaryButton(
+                    text = stringResource(R.string.button_next),
+                    onClick = onNext,
+                    enabled = !isNavigating,
+                    modifier = Modifier.width(120.dp),
+                    fillMaxWidth = false
+                )
+            }
+            
+            // Previous button (secondary action on bottom)
+            CoffeeSecondaryButton(
+                text = stringResource(R.string.button_previous),
+                onClick = onPrevious,
+                enabled = !isFirstPage && !isNavigating,
+                modifier = Modifier.width(120.dp),
+                fillMaxWidth = false
             )
         }
     }
