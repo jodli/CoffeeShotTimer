@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
+import android.os.SystemClock
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
@@ -30,26 +31,27 @@ class RecordShotUseCase @Inject constructor(
     val recordingState: StateFlow<ShotRecordingState> = _recordingState.asStateFlow()
 
     /**
-     * Start the extraction timer.
+     * Start the extraction timer using SystemClock.elapsedRealtime() for accuracy.
      */
     fun startTimer() {
         val currentState = _timerState.value
         if (!currentState.isRunning) {
             _timerState.value = currentState.copy(
                 isRunning = true,
-                startTime = System.currentTimeMillis() - (currentState.elapsedTimeSeconds * 1000L)
+                startTime = SystemClock.elapsedRealtime() - (currentState.elapsedTimeSeconds * 1000L)
             )
         }
     }
 
     /**
      * Pause the extraction timer and return the elapsed time.
+     * Uses SystemClock.elapsedRealtime() for accurate timing.
      * @return Elapsed time in seconds
      */
     fun pauseTimer(): Int {
         val currentState = _timerState.value
         if (currentState.isRunning) {
-            val elapsedTime = ((System.currentTimeMillis() - currentState.startTime) / 1000).toInt()
+            val elapsedTime = ((SystemClock.elapsedRealtime() - currentState.startTime) / 1000).toInt()
             _timerState.value = currentState.copy(
                 isRunning = false,
                 elapsedTimeSeconds = elapsedTime
@@ -75,12 +77,27 @@ class RecordShotUseCase @Inject constructor(
     }
 
     /**
+     * Restore timer state from saved data (for configuration changes).
+     * @param isRunning Whether the timer was running
+     * @param startTime The start time in SystemClock.elapsedRealtime()
+     * @param elapsedTimeSeconds The elapsed time in seconds
+     */
+    fun restoreTimerState(isRunning: Boolean, startTime: Long, elapsedTimeSeconds: Int) {
+        _timerState.value = TimerState(
+            isRunning = isRunning,
+            startTime = startTime,
+            elapsedTimeSeconds = elapsedTimeSeconds
+        )
+    }
+
+    /**
      * Update the timer state (called periodically while timer is running).
+     * Uses SystemClock.elapsedRealtime() for accurate timing.
      */
     fun updateTimer() {
         val currentState = _timerState.value
         if (currentState.isRunning) {
-            val elapsedTime = ((System.currentTimeMillis() - currentState.startTime) / 1000).toInt()
+            val elapsedTime = ((SystemClock.elapsedRealtime() - currentState.startTime) / 1000).toInt()
             _timerState.value = currentState.copy(elapsedTimeSeconds = elapsedTime)
         }
     }
