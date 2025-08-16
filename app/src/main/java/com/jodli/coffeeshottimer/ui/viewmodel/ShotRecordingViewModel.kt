@@ -1,6 +1,8 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import android.content.Context
+import android.os.SystemClock
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.R
@@ -60,7 +62,8 @@ class ShotRecordingViewModel @Inject constructor(
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
     private val grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository,
-    @param:ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     // Create validation utils instance
@@ -172,10 +175,18 @@ class ShotRecordingViewModel @Inject constructor(
     // Auto-save draft job
     private var autoSaveDraftJob: Job? = null
 
+    // Timer state preservation constants
+    companion object {
+        private const val TIMER_IS_RUNNING_KEY = "timer_is_running"
+        private const val TIMER_START_TIME_KEY = "timer_start_time"
+        private const val TIMER_ELAPSED_SECONDS_KEY = "timer_elapsed_seconds"
+    }
+
     init {
         loadActiveBeans()
         loadCurrentBean()
         loadGrinderConfiguration()
+        restoreTimerState()
         startTimerUpdates()
         observeRecordingState()
         startAutoSaveDraft()
@@ -253,10 +264,18 @@ class ShotRecordingViewModel @Inject constructor(
      */
     private fun startTimerUpdates() {
         timerUpdateJob = viewModelScope.launch {
+            var lastSaveTime = 0L
             while (isActive) {
                 delay(100L) // Update every 100ms for smooth display
                 if (timerState.value.isRunning) {
                     recordShotUseCase.updateTimer()
+                    
+                    // Save timer state every second to avoid excessive SavedStateHandle writes
+                    val currentTime = SystemClock.elapsedRealtime()
+                    if (currentTime - lastSaveTime >= 1000L) {
+                        saveTimerState()
+                        lastSaveTime = currentTime
+                    }
                 }
             }
         }
@@ -484,6 +503,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun startTimer() {
         recordShotUseCase.startTimer()
+        saveTimerState() // Save state after starting timer
         _showTimerValidation.value = false // Clear validation feedback when timer starts
         validateForm() // Revalidate as timer state affects form validity
     }
@@ -493,6 +513,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun pauseTimer() {
         recordShotUseCase.pauseTimer()
+        saveTimerState() // Save state after pausing timer
         _showTimerValidation.value = false // Clear validation feedback when timer stops
         validateForm()
     }
@@ -502,6 +523,7 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun resetTimer() {
         recordShotUseCase.resetTimer()
+        saveTimerState() // Save state after resetting timer
         _showTimerValidation.value = false // Clear validation feedback when timer resets
         validateForm()
     }
@@ -821,8 +843,40 @@ class ShotRecordingViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Restore timer state from SavedStateHandle after configuration changes.
+     */
+    private fun restoreTimerState() {
+        val isRunning = savedStateHandle.get<Boolean>(TIMER_IS_RUNNING_KEY) ?: false
+        val startTime = savedStateHandle.get<Long>(TIMER_START_TIME_KEY) ?: 0L
+        val elapsedSeconds = savedStateHandle.get<Int>(TIMER_ELAPSED_SECONDS_KEY) ?: 0
+
+        if (isRunning || elapsedSeconds > 0) {
+            // Restore timer state in the use case
+            recordShotUseCase.restoreTimerState(
+                isRunning = isRunning,
+                startTime = startTime,
+                elapsedTimeSeconds = elapsedSeconds
+            )
+        }
+    }
+
+    /**
+     * Save timer state to SavedStateHandle for configuration change preservation.
+     */
+    private fun saveTimerState() {
+        val currentTimerState = timerState.value
+        savedStateHandle[TIMER_IS_RUNNING_KEY] = currentTimerState.isRunning
+        savedStateHandle[TIMER_START_TIME_KEY] = currentTimerState.startTime
+        savedStateHandle[TIMER_ELAPSED_SECONDS_KEY] = currentTimerState.elapsedTimeSeconds
+    }
+
     override fun onCleared() {
         super.onCleared()
+        
+        // Save timer state before clearing
+        saveTimerState()
+        
         timerUpdateJob?.cancel()
         autoSaveDraftJob?.cancel()
 

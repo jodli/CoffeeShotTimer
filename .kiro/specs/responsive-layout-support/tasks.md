@@ -19,14 +19,14 @@ This implementation plan converts the responsive layout support design into acti
   - Write unit tests for landscape detection logic
   - _Requirements: 1.1, 1.5, 9.1_
 
-- [ ] 3. Enhance existing spacing system with landscape extensions
+- [x] 3. Enhance existing spacing system with landscape extensions
   - Add landscape-specific values to existing Spacing data class (landscapeTimerSize, landscapeContentSpacing)
   - Implement `Spacing.landscapeTimerSize()` and `Spacing.landscapeSpacing()` extension functions
   - Update CoffeeShotTimerTheme to provide landscape awareness
   - Write unit tests for responsive spacing calculations
   - _Requirements: 1.1, 1.4, 4.1_
 
-- [ ] 4. Preserve timer state across orientation changes
+- [x] 4. Preserve timer state across orientation changes
   - Enhance ShotRecordingViewModel to handle configuration changes properly
   - Implement timer state serialization using SavedStateHandle
   - Use SystemClock.elapsedRealtime() for accurate timing across rotations
