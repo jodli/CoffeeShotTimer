@@ -1,13 +1,18 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
+import android.os.SystemClock
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.RepositoryException
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.mockkStatic
+import io.mockk.unmockkStatic
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -24,27 +29,42 @@ class RecordShotUseCaseTest {
     
     @Before
     fun setup() {
+        // Mock SystemClock for consistent testing
+        mockkStatic(SystemClock::class)
+        
         shotRepository = mockk()
         recordShotUseCase = RecordShotUseCase(shotRepository)
+    }
+    
+    @After
+    fun tearDown() {
+        unmockkStatic(SystemClock::class)
     }
     
     // Timer functionality tests
     
     @Test
     fun `startTimer should set timer to running state`() {
+        // Given
+        val mockTime = 1000L
+        every { SystemClock.elapsedRealtime() } returns mockTime
+        
         // When
         recordShotUseCase.startTimer()
         
         // Then
         val timerState = recordShotUseCase.timerState.value
         assertTrue("Timer should be running", timerState.isRunning)
-        assertTrue("Start time should be set", timerState.startTime > 0)
+        assertEquals("Start time should be set to mock time", mockTime, timerState.startTime)
         assertEquals("Elapsed time should be 0", 0, timerState.elapsedTimeSeconds)
     }
     
     @Test
     fun `startTimer should not restart if already running`() {
         // Given
+        val mockTime = 2000L
+        every { SystemClock.elapsedRealtime() } returns mockTime
+        
         recordShotUseCase.startTimer()
         val initialStartTime = recordShotUseCase.timerState.value.startTime
         
@@ -59,8 +79,13 @@ class RecordShotUseCaseTest {
     @Test
     fun `stopTimer should stop running timer and return elapsed time`() {
         // Given
+        var mockTime = 3000L
+        every { SystemClock.elapsedRealtime() } answers { mockTime }
+        
         recordShotUseCase.startTimer()
-        Thread.sleep(100) // Small delay to ensure elapsed time > 0
+        
+        // Advance time by 2 seconds
+        mockTime += 2000L
         
         // When
         val elapsedTime = recordShotUseCase.stopTimer()
@@ -68,7 +93,7 @@ class RecordShotUseCaseTest {
         // Then
         val timerState = recordShotUseCase.timerState.value
         assertFalse("Timer should not be running", timerState.isRunning)
-        assertTrue("Elapsed time should be greater than 0", elapsedTime >= 0)
+        assertEquals("Elapsed time should be 2 seconds", 2, elapsedTime)
         assertEquals("Elapsed time should match state", elapsedTime, timerState.elapsedTimeSeconds)
     }
     
@@ -87,8 +112,10 @@ class RecordShotUseCaseTest {
     @Test
     fun `resetTimer should reset timer to initial state`() {
         // Given
+        val mockTime = 1000L
+        every { SystemClock.elapsedRealtime() } returns mockTime
+        
         recordShotUseCase.startTimer()
-        Thread.sleep(50)
         recordShotUseCase.stopTimer()
         
         // When
@@ -274,9 +301,11 @@ class RecordShotUseCaseTest {
     @Test
     fun `recordShot should reset timer after successful recording`() = runTest {
         // Given
+        val mockTime = 2000L
+        every { SystemClock.elapsedRealtime() } returns mockTime
+        
         coEvery { shotRepository.recordShot(any()) } returns Result.success(Unit)
         recordShotUseCase.startTimer()
-        Thread.sleep(50)
         
         // When
         val result = recordShotUseCase.recordShot(
@@ -299,9 +328,14 @@ class RecordShotUseCaseTest {
     @Test
     fun `recordShotWithCurrentTimer should use current timer elapsed time`() = runTest {
         // Given
+        var mockTime = 3000L
+        every { SystemClock.elapsedRealtime() } answers { mockTime }
+        
         coEvery { shotRepository.recordShot(any()) } returns Result.success(Unit)
         recordShotUseCase.startTimer()
-        // Simulate some elapsed time by updating the timer state manually
+        
+        // Simulate time passing - advance time by 2 seconds
+        mockTime += 2000L
         recordShotUseCase.updateTimer()
         
         // When
@@ -316,8 +350,8 @@ class RecordShotUseCaseTest {
         assertTrue("Recording should succeed", result.isSuccess)
         val shot = result.getOrNull()
         assertNotNull("Should return shot", shot)
-        // The extraction time should be at least 0 (could be 0 in fast tests)
-        assertTrue("Extraction time should be non-negative", shot!!.extractionTimeSeconds >= 0)
+        // The extraction time should be 2 seconds based on our mock time advancement
+        assertEquals("Extraction time should match elapsed time", 2, shot!!.extractionTimeSeconds)
         
         coVerify { shotRepository.recordShot(any()) }
     }
@@ -325,6 +359,9 @@ class RecordShotUseCaseTest {
     @Test
     fun `recordShotWithCurrentTimer should stop running timer`() = runTest {
         // Given
+        val mockTime = 4000L
+        every { SystemClock.elapsedRealtime() } returns mockTime
+        
         coEvery { shotRepository.recordShot(any()) } returns Result.success(Unit)
         recordShotUseCase.startTimer()
         

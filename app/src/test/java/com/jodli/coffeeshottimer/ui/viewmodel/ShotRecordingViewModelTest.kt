@@ -62,7 +62,8 @@ class ShotRecordingViewModelTest {
             stringResourceProvider,
             validationStringProvider,
             grinderConfigRepository,
-            context
+            context,
+            androidx.lifecycle.SavedStateHandle()
         )
     }
     
