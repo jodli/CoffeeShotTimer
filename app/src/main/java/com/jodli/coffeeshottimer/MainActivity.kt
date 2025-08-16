@@ -6,7 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -18,9 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.jodli.coffeeshottimer.ui.components.AdaptiveNavigation
+import com.jodli.coffeeshottimer.ui.components.AppNavigationRail
 import com.jodli.coffeeshottimer.ui.components.BottomNavigationBar
 import com.jodli.coffeeshottimer.ui.navigation.AppNavigation
 import com.jodli.coffeeshottimer.ui.navigation.NavigationDestinations
@@ -77,32 +82,51 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val configuration = LocalConfiguration.current
+                val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-                // Determine if bottom navigation should be shown
-                val showBottomNavigation = when (currentRoute) {
+                // Determine if navigation should be shown
+                val showNavigation = when (currentRoute) {
                     NavigationDestinations.RecordShot.route,
                     NavigationDestinations.ShotHistory.route,
                     NavigationDestinations.BeanManagement.route,
                     NavigationDestinations.More.route -> true
-                    // Hide bottom navigation during onboarding
+                    // Hide navigation during onboarding
                     NavigationDestinations.OnboardingIntroduction.route,
                     NavigationDestinations.OnboardingEquipmentSetup.route -> false
                     else -> false
                 }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        if (showBottomNavigation) {
-                            BottomNavigationBar(navController = navController)
-                        }
+                if (isLandscape && showNavigation) {
+                    // Landscape layout with navigation rail on the left
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        AppNavigationRail(navController = navController)
+                        AppNavigation(
+                            navController = navController,
+                            modifier = Modifier.weight(1f),
+                            startDestination = state.route
+                        )
                     }
-                ) { innerPadding ->
-                    AppNavigation(
-                        navController = navController,
-                        modifier = Modifier.padding(innerPadding),
-                        startDestination = state.route
-                    )
+                } else {
+                    // Portrait layout or no navigation - use Scaffold with bottom navigation
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        bottomBar = {
+                            if (showNavigation) {
+                                BottomNavigationBar(navController = navController)
+                            }
+                        }
+                    ) { innerPadding ->
+                        AppNavigation(
+                            navController = navController,
+                            modifier = Modifier.padding(innerPadding),
+                            startDestination = state.route
+                        )
+                    }
                 }
             }
         }
@@ -113,8 +137,10 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
+                val configuration = LocalConfiguration.current
+                val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-                val showBottomNavigation = when (currentRoute) {
+                val showNavigation = when (currentRoute) {
                     NavigationDestinations.RecordShot.route,
                     NavigationDestinations.ShotHistory.route,
                     NavigationDestinations.BeanManagement.route,
@@ -124,19 +150,36 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                     else -> false
                 }
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        if (showBottomNavigation) {
-                            BottomNavigationBar(navController = navController)
-                        }
+                if (isLandscape && showNavigation) {
+                    // Landscape layout with navigation rail on the left
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                    ) {
+                        AppNavigationRail(navController = navController)
+                        AppNavigation(
+                            navController = navController,
+                            modifier = Modifier.weight(1f),
+                            startDestination = fallback
+                        )
                     }
-                ) { innerPadding ->
-                    AppNavigation(
-                        navController = navController,
-                        modifier = Modifier.padding(innerPadding),
-                        startDestination = fallback
-                    )
+                } else {
+                    // Portrait layout or no navigation - use Scaffold with bottom navigation
+                    Scaffold(
+                        modifier = Modifier.fillMaxSize(),
+                        bottomBar = {
+                            if (showNavigation) {
+                                BottomNavigationBar(navController = navController)
+                            }
+                        }
+                    ) { innerPadding ->
+                        AppNavigation(
+                            navController = navController,
+                            modifier = Modifier.padding(innerPadding),
+                            startDestination = fallback
+                        )
+                    }
                 }
             }
         }
