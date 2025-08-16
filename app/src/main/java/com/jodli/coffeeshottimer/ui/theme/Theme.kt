@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.theme
 
+import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -9,8 +10,10 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -48,10 +51,66 @@ data class Spacing(
     val timerButtonSize: Dp = 80.dp,
     val iconButtonSize: Dp = 32.dp,
     val sliderHeightSmall: Dp = 24.dp,
-    val thumbnailSize: Dp = 48.dp
+    val thumbnailSize: Dp = 48.dp,
+    // Landscape-specific values
+    val landscapeTimerSize: Dp = 160.dp,
+    val landscapeContentSpacing: Dp = 12.dp
 )
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }
+
+// Landscape configuration system
+val LocalIsLandscape = staticCompositionLocalOf { false }
+
+/**
+ * Configuration data class for landscape-specific layout information
+ */
+data class LandscapeConfiguration(
+    val isLandscape: Boolean,
+    val screenWidthDp: Int,
+    val screenHeightDp: Int,
+    val timerSize: Dp,
+    val contentSpacing: Dp
+)
+
+/**
+ * Remembers landscape configuration based on current device configuration.
+ * Provides reactive landscape detection and layout parameters.
+ */
+@Composable
+fun rememberLandscapeConfiguration(): LandscapeConfiguration {
+    val configuration = LocalConfiguration.current
+    
+    return remember(configuration) {
+        val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        
+        LandscapeConfiguration(
+            isLandscape = isLandscape,
+            screenWidthDp = configuration.screenWidthDp,
+            screenHeightDp = configuration.screenHeightDp,
+            timerSize = if (isLandscape) 160.dp else 200.dp,
+            contentSpacing = if (isLandscape) 12.dp else 16.dp
+        )
+    }
+}
+
+/**
+ * Extension function to get landscape-appropriate timer size
+ */
+@Composable
+fun Spacing.landscapeTimerSize(): Dp {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    return if (isLandscape) landscapeTimerSize else timerSize
+}
+
+/**
+ * Extension function to get landscape-appropriate content spacing
+ */
+@Composable
+fun Spacing.landscapeSpacing(): Dp {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    return if (isLandscape) landscapeContentSpacing else medium
+}
 
 // Light coffee theme - warm and creamy like the launcher icon
 private val LightColorScheme = lightColorScheme(
@@ -116,7 +175,13 @@ fun CoffeeShotTimerTheme(
         else -> LightColorScheme
     }
 
-    CompositionLocalProvider(LocalSpacing provides Spacing()) {
+    // Detect landscape orientation
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+    CompositionLocalProvider(
+        LocalSpacing provides Spacing(),
+        LocalIsLandscape provides isLandscape
+    ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
