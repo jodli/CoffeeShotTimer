@@ -142,6 +142,7 @@
     <string name="text_most_used_setting">Meistverwendete Einstellung</string>
     <string name="text_best_performing_setting">Beste Einstellung</string>
     <string name="text_active_filters">Aktive Filter</string>
+    <string name="format_more_filters">+%1$d weitere</string>
     <string name="text_no_analysis_data">Keine Analysedaten verfügbar</string>
 
     <string name="text_dialog_ok">OK</string>
