@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -44,6 +45,13 @@ class MainActivity : ComponentActivity() {
                 EspressoShotTrackerApp(mainActivityViewModel)
             }
         }
+    }
+    
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // Handle configuration changes (orientation, screen size, etc.)
+        // Compose will automatically recompose when configuration changes
+        // No additional handling needed as ViewModels preserve state
     }
 }
 
