@@ -79,27 +79,21 @@ fun BeanManagementScreen(
             .fillMaxSize()
             .padding(spacing.medium)
     ) {
-        // Header
+        // Top spacing for status bar clearance
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        // Action button row - no header needed
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.title_bean_management),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.weight(1f, fill = false)
-            )
-
             CoffeePrimaryButton(
                 text = stringResource(R.string.text_add_bean),
                 onClick = onAddBeanClick,
                 icon = Icons.Default.Add,
                 fillMaxWidth = false,
-                modifier = Modifier
-                    .padding(start = spacing.medium)
-                    .widthIn(min = 120.dp, max = 160.dp)
+                modifier = Modifier.widthIn(min = 120.dp, max = 160.dp)
             )
         }
 

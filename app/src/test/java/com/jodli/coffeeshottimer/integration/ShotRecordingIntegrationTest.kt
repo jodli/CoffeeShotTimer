@@ -138,7 +138,8 @@ class ShotRecordingIntegrationTest {
             stringResourceProvider,
             validationStringProvider,
             grinderConfigRepository,
-            context
+            context,
+            androidx.lifecycle.SavedStateHandle()
         )
     }
     
