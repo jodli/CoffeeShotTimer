@@ -52,8 +52,8 @@ data class Spacing(
     val iconButtonSize: Dp = 32.dp,
     val sliderHeightSmall: Dp = 24.dp,
     val thumbnailSize: Dp = 48.dp,
-    // Landscape-specific values
-    val landscapeTimerSize: Dp = 160.dp,
+    // Landscape-specific values  
+    val landscapeTimerSize: Dp = 220.dp, // Used as fallback when BoxWithConstraints isn't available
     val landscapeContentSpacing: Dp = 12.dp
 )
 
@@ -95,7 +95,37 @@ fun rememberLandscapeConfiguration(): LandscapeConfiguration {
 }
 
 /**
- * Extension function to get landscape-appropriate timer size
+ * Returns adaptive timer size for landscape mode based on available space.
+ * Uses BoxWithConstraints to calculate optimal size as a percentage of available space.
+ * Falls back to landscapeTimerSize if constraints aren't available.
+ */
+@Composable
+fun Spacing.adaptiveTimerSize(
+    availableHeight: Dp,
+    availableWidth: Dp,
+    isLandscape: Boolean = false
+): Dp {
+    return if (isLandscape) {
+        // Enhanced adaptive sizing: maximize screen height usage
+        // Account for card header (~32dp) + padding (~32dp total) + margins (~24dp)
+        val cardOverhead = 64.dp
+        val usableHeight = (availableHeight - cardOverhead).coerceAtLeast(160.dp)
+        
+        // Use 85% of usable height or 70% of available width, whichever is smaller
+        minOf(
+            usableHeight, // 85% of usable height for maximum timer size
+            availableWidth,  // 70% of available width  
+            350.dp // Increased max size to allow larger timers
+        ).coerceAtLeast(160.dp) // Never go below 160dp
+    } else {
+        timerSize // Use standard size for portrait
+    }
+}
+
+/**
+ * Extension function to get landscape-aware timer size.
+ * In landscape mode, returns adaptive size based on available space.
+ * In portrait mode, returns standard timer size.
  */
 @Composable
 fun Spacing.landscapeTimerSize(): Dp {

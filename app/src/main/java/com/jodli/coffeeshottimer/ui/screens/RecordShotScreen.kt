@@ -1,12 +1,14 @@
 package com.jodli.coffeeshottimer.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -68,7 +70,11 @@ import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.TimerControls
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
+import com.jodli.coffeeshottimer.ui.components.RecordShotLandscapeLayout
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
+import com.jodli.coffeeshottimer.ui.theme.landscapeTimerSize
 import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 
@@ -126,160 +132,144 @@ fun RecordShotScreen(
     val currentTime = (timerState.elapsedTimeSeconds * 1000).toLong()
     val targetTime: Long? = null // Can be set for target extraction time if needed
 
-    Column(
+    LandscapeContainer(
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
-            .imePadding()
-            .verticalScroll(scrollState)
-            .padding(spacing.screenPadding),
-        verticalArrangement = Arrangement.spacedBy(spacing.large)
-    ) {
-        // Header with debug tap detection (only in debug builds)
-        if (BuildConfig.DEBUG) {
-            DebugTapDetector(
-                onDebugActivated = { debugViewModel.showDialog() }
+            .imePadding(),
+        portraitContent = {
+            // Portrait layout (existing vertical column layout)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(spacing.screenPadding),
+                verticalArrangement = Arrangement.spacedBy(spacing.large)
             ) {
-                Text(
-                    text = stringResource(R.string.title_new_shot),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
+                RecordShotPortraitContent(
+                    showBeanSelector = showBeanSelector,
+                    selectedBean = selectedBean,
+                    onShowBeanSelector = { showBeanSelector = true },
+                    onNavigateToBeanManagement = onNavigateToBeanManagement,
+                    currentTime = currentTime,
+                    targetTime = targetTime,
+                    uiTimerState = uiTimerState,
+                    showTimerValidation = showTimerValidation,
+                    onStartPause = {
+                        if (timerState.isRunning) {
+                            viewModel.pauseTimer()
+                        } else {
+                            viewModel.startTimer()
+                        }
+                    },
+                    onReset = { viewModel.resetTimer() },
+                    coffeeWeightIn = coffeeWeightIn,
+                    onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
+                    coffeeWeightInError = coffeeWeightInError,
+                    coffeeWeightOut = coffeeWeightOut,
+                    onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
+                    coffeeWeightOutError = coffeeWeightOutError,
+                    brewRatio = brewRatio,
+                    formattedBrewRatio = formattedBrewRatio,
+                    isOptimalBrewRatio = isOptimalBrewRatio,
+                    grinderSetting = grinderSetting,
+                    onGrinderSettingChange = viewModel::updateGrinderSetting,
+                    grinderSettingError = grinderSettingError,
+                    suggestedGrinderSetting = suggestedGrinderSetting,
+                    previousSuccessfulSettings = previousSuccessfulSettings,
+                    onUseSuggestion = { suggestion -> viewModel.updateGrinderSetting(suggestion) },
+                    grinderScaleMin = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
+                    grinderScaleMax = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
+                    notes = notes,
+                    onNotesChange = viewModel::updateNotes,
+                    bringIntoViewRequester = bringIntoViewRequester,
+                    coroutineScope = coroutineScope,
+                    isFormValid = isFormValid,
+                    isLoading = isLoading,
+                    onRecordShot = { viewModel.recordShot() },
+                    successMessage = successMessage,
+                    onClearSuccessMessage = { viewModel.clearSuccessMessage() },
+                    errorMessage = errorMessage,
+                    onClearErrorMessage = { viewModel.clearErrorMessage() },
+                    onRetryRecordShot = { viewModel.recordShot() },
+                    debugViewModel = debugViewModel
                 )
             }
-        } else {
-            Text(
-                text = stringResource(R.string.title_new_shot),
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        // Bean Selection with navigation to bean management
-        BeanSelectionCard(
-            selectedBean = selectedBean,
-            onBeanSelect = { showBeanSelector = true },
-            onManageBeans = onNavigateToBeanManagement,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Timer Section
-        TimerSection(
-            currentTime = currentTime,
-            targetTime = targetTime,
-            timerState = uiTimerState,
-            showTimerValidation = showTimerValidation,
-            onStartPause = {
-                if (timerState.isRunning) {
-                    viewModel.pauseTimer()
-                } else {
-                    viewModel.startTimer()
-                }
-            },
-            onReset = {
-                viewModel.resetTimer()
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Weight Inputs with Sliders
-        WeightSlidersSection(
-            coffeeWeightIn = coffeeWeightIn,
-            onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
-            coffeeWeightInError = coffeeWeightInError,
-            coffeeWeightOut = coffeeWeightOut,
-            onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
-            coffeeWeightOutError = coffeeWeightOutError,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Brew Ratio Display
-        BrewRatioCard(
-            brewRatio = brewRatio,
-            formattedBrewRatio = formattedBrewRatio,
-            isOptimal = isOptimalBrewRatio,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Grinder Setting with suggestions
-        GrinderSettingSection(
-            grinderSetting = grinderSetting,
-            onGrinderSettingChange = viewModel::updateGrinderSetting,
-            grinderSettingError = grinderSettingError,
-            suggestedSetting = suggestedGrinderSetting,
-            previousSuccessfulSettings = previousSuccessfulSettings,
-            onUseSuggestion = { suggestion ->
-                viewModel.updateGrinderSetting(suggestion)
-            },
-            minSetting = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
-            maxSetting = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Notes (Optional)
-        NotesSection(
-            notes = notes,
-            onNotesChange = viewModel::updateNotes,
-            bringIntoViewRequester = bringIntoViewRequester,
-            coroutineScope = coroutineScope,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Save Button
-        SaveShotButton(
-            enabled = isFormValid,
-            isLoading = isLoading,
-            onClick = {
-                viewModel.recordShot()
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Success message
-        successMessage?.let { success ->
-            CoffeeCard(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = success,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    TextButton(
-                        onClick = { viewModel.clearSuccessMessage() }
+        },
+        landscapeContent = {
+            // Landscape layout (horizontal timer + form layout)
+            RecordShotLandscapeLayout(
+                modifier = Modifier.fillMaxSize(),
+                timerContent = {
+                    // Timer section with landscape sizing
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(spacing.landscapeSpacing())
                     ) {
-                        Text(
-                            text = stringResource(R.string.button_dismiss),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        // Top spacing for status bar clearance
+                        Spacer(modifier = Modifier.height(spacing.small))
+                        
+                        // Timer Section with landscape sizing
+                        TimerSection(
+                            currentTime = currentTime,
+                            targetTime = targetTime,
+                            timerState = uiTimerState,
+                            showTimerValidation = showTimerValidation,
+                            onStartPause = {
+                                if (timerState.isRunning) {
+                                    viewModel.pauseTimer()
+                                } else {
+                                    viewModel.startTimer()
+                                }
+                            },
+                            onReset = { viewModel.resetTimer() },
+                            modifier = Modifier.fillMaxWidth(),
+                            useLandscapeTimer = true // New parameter for landscape timer sizing
                         )
                     }
+                },
+                formContent = {
+                    // Form controls in scrollable right pane
+                    RecordShotFormContent(
+                        selectedBean = selectedBean,
+                        onShowBeanSelector = { showBeanSelector = true },
+                        onNavigateToBeanManagement = onNavigateToBeanManagement,
+                        coffeeWeightIn = coffeeWeightIn,
+                        onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
+                        coffeeWeightInError = coffeeWeightInError,
+                        coffeeWeightOut = coffeeWeightOut,
+                        onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
+                        coffeeWeightOutError = coffeeWeightOutError,
+                        brewRatio = brewRatio,
+                        formattedBrewRatio = formattedBrewRatio,
+                        isOptimalBrewRatio = isOptimalBrewRatio,
+                        grinderSetting = grinderSetting,
+                        onGrinderSettingChange = viewModel::updateGrinderSetting,
+                        grinderSettingError = grinderSettingError,
+                        suggestedGrinderSetting = suggestedGrinderSetting,
+                        previousSuccessfulSettings = previousSuccessfulSettings,
+                        onUseSuggestion = { suggestion -> viewModel.updateGrinderSetting(suggestion) },
+                        grinderScaleMin = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
+                        grinderScaleMax = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
+                        notes = notes,
+                        onNotesChange = viewModel::updateNotes,
+                        bringIntoViewRequester = bringIntoViewRequester,
+                        coroutineScope = coroutineScope,
+                        isFormValid = isFormValid,
+                        isLoading = isLoading,
+                        onRecordShot = { viewModel.recordShot() },
+                        successMessage = successMessage,
+                        onClearSuccessMessage = { viewModel.clearSuccessMessage() },
+                        errorMessage = errorMessage,
+                        onClearErrorMessage = { viewModel.clearErrorMessage() },
+                        onRetryRecordShot = { viewModel.recordShot() }
+                    )
                 }
-            }
-        }
-
-        // Error message
-        errorMessage?.let { error ->
-            ErrorCard(
-                title = stringResource(R.string.error_recording_error),
-                message = error,
-                onDismiss = { viewModel.clearErrorMessage() },
-                onRetry = { viewModel.recordShot() }
             )
         }
-
-
-
-        // Bottom spacing for navigation bar
-        Spacer(modifier = Modifier.height(spacing.large))
-    }
+    )
 
     // Shot Recorded Dialog with Recommendations
     if (showShotRecordedDialog && recordedShotData != null) {
@@ -406,31 +396,67 @@ private fun TimerSection(
     showTimerValidation: Boolean,
     onStartPause: () -> Unit,
     onReset: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    useLandscapeTimer: Boolean = false
 ) {
     val spacing = LocalSpacing.current
 
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.Settings,
-            title = stringResource(R.string.text_extraction_timer)
-        )
+    if (useLandscapeTimer) {
+        // In landscape mode, make the timer card fill available height for maximum timer size
+        CoffeeCard(
+            modifier = modifier
+                .fillMaxWidth()
+                .fillMaxHeight() // Fill the entire height of the left pane
+        ) {
+            CardHeader(
+                icon = Icons.Default.Settings,
+                title = stringResource(R.string.text_extraction_timer)
+            )
 
-        Spacer(modifier = Modifier.height(spacing.medium))
+            // Use all remaining space for the timer with minimal padding
+            Box(
+                modifier = Modifier
+                    .fillMaxSize() // Use all remaining space in the card
+                    .padding(spacing.small), // Minimal padding to keep timer from edges
+                contentAlignment = Alignment.Center
+            ) {
+                TimerControls(
+                    isRunning = timerState == TimerState.RUNNING,
+                    onStartPause = onStartPause,
+                    onReset = onReset,
+                    currentTime = currentTime,
+                    targetTime = targetTime,
+                    showReset = currentTime > 0L,
+                    useClickableTimer = true,
+                    showColorCoding = true,
+                    modifier = Modifier, // Don't use fillMaxWidth here - let timer size itself adaptively
+                    useLandscapeTimer = useLandscapeTimer
+                )
+            }
+        }
+    } else {
+        // Portrait mode uses standard layout
+        CoffeeCard(modifier = modifier) {
+            CardHeader(
+                icon = Icons.Default.Settings,
+                title = stringResource(R.string.text_extraction_timer)
+            )
 
-        // Enhanced clickable timer - entire timer is now the start/stop button!
-        // This dramatically improves usability with a ~200dp touch target vs 80dp
-        TimerControls(
-            isRunning = timerState == TimerState.RUNNING,
-            onStartPause = onStartPause,
-            onReset = onReset,
-            currentTime = currentTime,
-            targetTime = targetTime,
-            showReset = currentTime > 0L,
-            useClickableTimer = true, // Use the new clickable timer approach
-            showColorCoding = true,
-            modifier = Modifier.fillMaxWidth()
-        )
+            Spacer(modifier = Modifier.height(spacing.medium))
+
+            TimerControls(
+                isRunning = timerState == TimerState.RUNNING,
+                onStartPause = onStartPause,
+                onReset = onReset,
+                currentTime = currentTime,
+                targetTime = targetTime,
+                showReset = currentTime > 0L,
+                useClickableTimer = true,
+                showColorCoding = true,
+                modifier = Modifier.fillMaxWidth(),
+                useLandscapeTimer = useLandscapeTimer
+            )
+        }
     }
 }
 
@@ -656,4 +682,324 @@ private fun BeanSelectorBottomSheet(
 
 enum class TimerState {
     STOPPED, RUNNING, PAUSED
+}
+
+/**
+ * Portrait layout content for RecordShotScreen
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun RecordShotPortraitContent(
+    showBeanSelector: Boolean,
+    selectedBean: Bean?,
+    onShowBeanSelector: () -> Unit,
+    onNavigateToBeanManagement: () -> Unit,
+    currentTime: Long,
+    targetTime: Long?,
+    uiTimerState: TimerState,
+    showTimerValidation: Boolean,
+    onStartPause: () -> Unit,
+    onReset: () -> Unit,
+    coffeeWeightIn: String,
+    onCoffeeWeightInChange: (String) -> Unit,
+    coffeeWeightInError: String?,
+    coffeeWeightOut: String,
+    onCoffeeWeightOutChange: (String) -> Unit,
+    coffeeWeightOutError: String?,
+    brewRatio: Double?,
+    formattedBrewRatio: String?,
+    isOptimalBrewRatio: Boolean,
+    grinderSetting: String,
+    onGrinderSettingChange: (String) -> Unit,
+    grinderSettingError: String?,
+    suggestedGrinderSetting: String?,
+    previousSuccessfulSettings: List<String>,
+    onUseSuggestion: (String) -> Unit,
+    grinderScaleMin: Float,
+    grinderScaleMax: Float,
+    notes: String,
+    onNotesChange: (String) -> Unit,
+    bringIntoViewRequester: BringIntoViewRequester,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    isFormValid: Boolean,
+    isLoading: Boolean,
+    onRecordShot: () -> Unit,
+    successMessage: String?,
+    onClearSuccessMessage: () -> Unit,
+    errorMessage: String?,
+    onClearErrorMessage: () -> Unit,
+    onRetryRecordShot: () -> Unit,
+    debugViewModel: DebugViewModel
+) {
+    val spacing = LocalSpacing.current
+    
+    // Header with debug tap detection (only in debug builds)
+    if (BuildConfig.DEBUG) {
+        DebugTapDetector(
+            onDebugActivated = { debugViewModel.showDialog() }
+        ) {
+            Text(
+                text = stringResource(R.string.title_new_shot),
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    } else {
+        Text(
+            text = stringResource(R.string.title_new_shot),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold
+        )
+    }
+
+    // Bean Selection with navigation to bean management
+    BeanSelectionCard(
+        selectedBean = selectedBean,
+        onBeanSelect = onShowBeanSelector,
+        onManageBeans = onNavigateToBeanManagement,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Timer Section
+    TimerSection(
+        currentTime = currentTime,
+        targetTime = targetTime,
+        timerState = uiTimerState,
+        showTimerValidation = showTimerValidation,
+        onStartPause = onStartPause,
+        onReset = onReset,
+        modifier = Modifier.fillMaxWidth(),
+        useLandscapeTimer = false
+    )
+
+    // Weight Inputs with Sliders
+    WeightSlidersSection(
+        coffeeWeightIn = coffeeWeightIn,
+        onCoffeeWeightInChange = onCoffeeWeightInChange,
+        coffeeWeightInError = coffeeWeightInError,
+        coffeeWeightOut = coffeeWeightOut,
+        onCoffeeWeightOutChange = onCoffeeWeightOutChange,
+        coffeeWeightOutError = coffeeWeightOutError,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Brew Ratio Display
+    BrewRatioCard(
+        brewRatio = brewRatio,
+        formattedBrewRatio = formattedBrewRatio,
+        isOptimal = isOptimalBrewRatio,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Grinder Setting with suggestions
+    GrinderSettingSection(
+        grinderSetting = grinderSetting,
+        onGrinderSettingChange = onGrinderSettingChange,
+        grinderSettingError = grinderSettingError,
+        suggestedSetting = suggestedGrinderSetting,
+        previousSuccessfulSettings = previousSuccessfulSettings,
+        onUseSuggestion = onUseSuggestion,
+        minSetting = grinderScaleMin,
+        maxSetting = grinderScaleMax,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Notes (Optional)
+    NotesSection(
+        notes = notes,
+        onNotesChange = onNotesChange,
+        bringIntoViewRequester = bringIntoViewRequester,
+        coroutineScope = coroutineScope,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Save Button
+    SaveShotButton(
+        enabled = isFormValid,
+        isLoading = isLoading,
+        onClick = onRecordShot,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Success message
+    successMessage?.let { success ->
+        CoffeeCard(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = success,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                )
+
+                TextButton(
+                    onClick = onClearSuccessMessage
+                ) {
+                    Text(
+                        text = stringResource(R.string.button_dismiss),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+    }
+
+    // Error message
+    errorMessage?.let { error ->
+        ErrorCard(
+            title = stringResource(R.string.error_recording_error),
+            message = error,
+            onDismiss = onClearErrorMessage,
+            onRetry = onRetryRecordShot
+        )
+    }
+
+    // Bottom spacing for navigation bar
+    Spacer(modifier = Modifier.height(spacing.large))
+}
+
+/**
+ * Form content for landscape layout (scrollable right pane)
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun RecordShotFormContent(
+    selectedBean: Bean?,
+    onShowBeanSelector: () -> Unit,
+    onNavigateToBeanManagement: () -> Unit,
+    coffeeWeightIn: String,
+    onCoffeeWeightInChange: (String) -> Unit,
+    coffeeWeightInError: String?,
+    coffeeWeightOut: String,
+    onCoffeeWeightOutChange: (String) -> Unit,
+    coffeeWeightOutError: String?,
+    brewRatio: Double?,
+    formattedBrewRatio: String?,
+    isOptimalBrewRatio: Boolean,
+    grinderSetting: String,
+    onGrinderSettingChange: (String) -> Unit,
+    grinderSettingError: String?,
+    suggestedGrinderSetting: String?,
+    previousSuccessfulSettings: List<String>,
+    onUseSuggestion: (String) -> Unit,
+    grinderScaleMin: Float,
+    grinderScaleMax: Float,
+    notes: String,
+    onNotesChange: (String) -> Unit,
+    bringIntoViewRequester: BringIntoViewRequester,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    isFormValid: Boolean,
+    isLoading: Boolean,
+    onRecordShot: () -> Unit,
+    successMessage: String?,
+    onClearSuccessMessage: () -> Unit,
+    errorMessage: String?,
+    onClearErrorMessage: () -> Unit,
+    onRetryRecordShot: () -> Unit
+) {
+    // Bean Selection with navigation to bean management
+    BeanSelectionCard(
+        selectedBean = selectedBean,
+        onBeanSelect = onShowBeanSelector,
+        onManageBeans = onNavigateToBeanManagement,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Weight Inputs with Sliders
+    WeightSlidersSection(
+        coffeeWeightIn = coffeeWeightIn,
+        onCoffeeWeightInChange = onCoffeeWeightInChange,
+        coffeeWeightInError = coffeeWeightInError,
+        coffeeWeightOut = coffeeWeightOut,
+        onCoffeeWeightOutChange = onCoffeeWeightOutChange,
+        coffeeWeightOutError = coffeeWeightOutError,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Brew Ratio Display
+    BrewRatioCard(
+        brewRatio = brewRatio,
+        formattedBrewRatio = formattedBrewRatio,
+        isOptimal = isOptimalBrewRatio,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Grinder Setting with suggestions
+    GrinderSettingSection(
+        grinderSetting = grinderSetting,
+        onGrinderSettingChange = onGrinderSettingChange,
+        grinderSettingError = grinderSettingError,
+        suggestedSetting = suggestedGrinderSetting,
+        previousSuccessfulSettings = previousSuccessfulSettings,
+        onUseSuggestion = onUseSuggestion,
+        minSetting = grinderScaleMin,
+        maxSetting = grinderScaleMax,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Notes (Optional)
+    NotesSection(
+        notes = notes,
+        onNotesChange = onNotesChange,
+        bringIntoViewRequester = bringIntoViewRequester,
+        coroutineScope = coroutineScope,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Save Button
+    SaveShotButton(
+        enabled = isFormValid,
+        isLoading = isLoading,
+        onClick = onRecordShot,
+        modifier = Modifier.fillMaxWidth()
+    )
+
+    // Success message
+    successMessage?.let { success ->
+        CoffeeCard(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            )
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = success,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                )
+
+                TextButton(
+                    onClick = onClearSuccessMessage
+                ) {
+                    Text(
+                        text = stringResource(R.string.button_dismiss),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                }
+            }
+        }
+    }
+
+    // Error message
+    errorMessage?.let { error ->
+        ErrorCard(
+            title = stringResource(R.string.error_recording_error),
+            message = error,
+            onDismiss = onClearErrorMessage,
+            onRetry = onRetryRecordShot
+        )
+    }
 }
