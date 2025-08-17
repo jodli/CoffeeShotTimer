@@ -47,6 +47,13 @@ Coffee Shot Timer is a precision Android app designed specifically for espresso 
 - 🔧 Baristas looking to refine their technique
 - 🏠 Home coffee enthusiasts serious about quality
 
+## ☕ Support the Project
+Love Coffee Shot Timer? Consider supporting its development!
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support%20my%20work-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jodli)
+
+Every coffee fuels late-night coding sessions and exciting new features like pressure profiling and advanced analytics!
+
 ## Technology Stack
 
 This is an Android application built with:
