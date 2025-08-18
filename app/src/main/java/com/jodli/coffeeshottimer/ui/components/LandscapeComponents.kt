@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -43,7 +44,11 @@ fun LandscapeContainer(
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
     
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier.then(
+            if (isLandscape) Modifier.statusBarsPadding() else Modifier
+        )
+    ) {
         if (isLandscape && landscapeContent != null) {
             landscapeContent()
         } else {

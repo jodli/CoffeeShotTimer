@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -208,9 +209,6 @@ fun RecordShotScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(spacing.landscapeSpacing())
                     ) {
-                        // Top spacing for status bar clearance
-                        Spacer(modifier = Modifier.height(spacing.small))
-                        
                         // Timer Section with landscape sizing
                         TimerSection(
                             currentTime = currentTime,
@@ -733,9 +731,6 @@ private fun RecordShotPortraitContent(
 ) {
     val spacing = LocalSpacing.current
     
-    // Top spacing for status bar clearance
-    Spacer(modifier = Modifier.height(spacing.small))
-
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
         selectedBean = selectedBean,
@@ -889,9 +884,6 @@ private fun RecordShotFormContent(
     onClearErrorMessage: () -> Unit,
     onRetryRecordShot: () -> Unit
 ) {
-    // Top spacing for status bar clearance
-    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
-
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
         selectedBean = selectedBean,

@@ -8,9 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Engineering
@@ -48,9 +49,6 @@ fun MoreScreen(
             .padding(spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        // Top spacing for status bar clearance
-        Spacer(modifier = Modifier.height(spacing.small))
-
         // Equipment & Grinder Settings - no header needed
         CoffeeCard(
             modifier = Modifier.fillMaxWidth(),
