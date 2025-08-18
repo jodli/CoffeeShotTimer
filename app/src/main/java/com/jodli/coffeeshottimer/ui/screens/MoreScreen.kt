@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,8 +44,36 @@ fun MoreScreen(
     val spacing = LocalSpacing.current
     val context = LocalContext.current
 
+    LandscapeContainer(
+        modifier = modifier.fillMaxSize(),
+        portraitContent = {
+            MoreScreenContent(
+                onNavigateToEquipmentSettings = onNavigateToEquipmentSettings,
+                onNavigateToAbout = onNavigateToAbout,
+                spacing = spacing,
+                context = context
+            )
+        },
+        landscapeContent = {
+            MoreScreenContent(
+                onNavigateToEquipmentSettings = onNavigateToEquipmentSettings,
+                onNavigateToAbout = onNavigateToAbout,
+                spacing = spacing,
+                context = context
+            )
+        }
+    )
+}
+
+@Composable
+private fun MoreScreenContent(
+    onNavigateToEquipmentSettings: () -> Unit,
+    onNavigateToAbout: () -> Unit,
+    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing,
+    context: android.content.Context
+) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.medium)

@@ -79,175 +79,59 @@ fun BeanManagementScreen(
     var showDeleteDialog by remember { mutableStateOf<Bean?>(null) }
     var showPhotoViewer by remember { mutableStateOf<String?>(null) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(spacing.medium)
-    ) {
-        // Action button row - no header needed
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            CoffeePrimaryButton(
-                text = stringResource(R.string.text_add_bean),
-                onClick = onAddBeanClick,
-                icon = Icons.Default.Add,
-                fillMaxWidth = false,
-                modifier = Modifier.widthIn(min = 120.dp, max = 160.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Search and Filter Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Search Field
-            CoffeeTextField(
-                value = searchQuery,
-                onValueChange = viewModel::updateSearchQuery,
-                label = stringResource(R.string.label_search_beans),
-                placeholder = stringResource(R.string.placeholder_enter_bean_name_search),
-                leadingIcon = Icons.Default.Search,
-                trailingIcon = if (searchQuery.isNotEmpty()) Icons.Default.Clear else null,
-                onTrailingIconClick = if (searchQuery.isNotEmpty()) {
-                    { viewModel.updateSearchQuery("") }
-                } else null,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Filter Toggle
-            FilterChip(
-                onClick = viewModel::toggleShowInactive,
-                label = {
-                    Text(
-                        text = if (showInactive) stringResource(R.string.text_all) else stringResource(R.string.text_active),
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                selected = showInactive,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.MoreVert,
-                        contentDescription = null,
-                        modifier = Modifier.size(spacing.iconSmall)
-                    )
-                }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Content
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LoadingIndicator(message = stringResource(R.string.loading_beans))
-                }
-            }
-
-            uiState.error != null -> {
-                ErrorState(
-                    title = stringResource(R.string.error_loading_beans),
-                    message = uiState.error ?: "Unknown error occurred",
-                    onRetry = {
-                        viewModel.clearError()
-                        viewModel.refresh()
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            uiState.beans.isEmpty() -> {
-                EmptyState(
-										icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                    title = stringResource(R.string.text_no_beans_available),
-                    description = if (searchQuery.isNotEmpty()) {
-                        stringResource(R.string.text_search_beans_hint)
-                    } else {
-                        stringResource(R.string.text_add_first_bean)
-                    },
-                    actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null
-                )
-            }
-
-            else -> {
-                // Use LandscapeContainer to switch between portrait and landscape layouts
-                LandscapeContainer(
-                    portraitContent = {
-                        // Existing LazyColumn layout for portrait
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(spacing.small),
-                            contentPadding = PaddingValues(bottom = spacing.large)
-                        ) {
-                            items(
-                                items = uiState.beans,
-                                key = { bean -> bean.id }
-                            ) { bean ->
-                                BeanListItem(
-                                    bean = bean,
-                                    onEdit = { onEditBeanClick(bean.id) },
-                                    onDelete = { showDeleteDialog = bean },
-                                    onUseForShot = {
-                                        if (bean.isActive) {
-                                            viewModel.setCurrentBean(bean.id)
-                                            onNavigateToRecordShot()
-                                        }
-                                    },
-                                    onReactivate = if (!bean.isActive) {
-                                        { viewModel.reactivateBean(bean.id) }
-                                    } else null,
-                                    onPhotoClick = { photoPath ->
-                                        showPhotoViewer = photoPath
-                                    }
-                                )
-                            }
-                        }
-                    },
-                    landscapeContent = {
-                        // Two-column grid layout for landscape
-                        LazyVerticalGrid(
-                            columns = GridCells.Fixed(2),
-                            verticalArrangement = Arrangement.spacedBy(spacing.small),
-                            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                            contentPadding = PaddingValues(bottom = spacing.large)
-                        ) {
-                            items(
-                                items = uiState.beans,
-                                key = { bean -> bean.id }
-                            ) { bean ->
-                                BeanListItem(
-                                    bean = bean,
-                                    onEdit = { onEditBeanClick(bean.id) },
-                                    onDelete = { showDeleteDialog = bean },
-                                    onUseForShot = {
-                                        if (bean.isActive) {
-                                            viewModel.setCurrentBean(bean.id)
-                                            onNavigateToRecordShot()
-                                        }
-                                    },
-                                    onReactivate = if (!bean.isActive) {
-                                        { viewModel.reactivateBean(bean.id) }
-                                    } else null,
-                                    onPhotoClick = { photoPath ->
-                                        showPhotoViewer = photoPath
-                                    }
-                                )
-                            }
-                        }
+    LandscapeContainer(
+        modifier = Modifier.fillMaxSize(),
+        portraitContent = {
+            BeanManagementContent(
+                uiState = uiState,
+                searchQuery = searchQuery,
+                showInactive = showInactive,
+                onAddBeanClick = onAddBeanClick,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onToggleShowInactive = viewModel::toggleShowInactive,
+                onEditBeanClick = onEditBeanClick,
+                onDeleteBean = { showDeleteDialog = it },
+                onUseForShot = { bean ->
+                    if (bean.isActive) {
+                        viewModel.setCurrentBean(bean.id)
+                        onNavigateToRecordShot()
                     }
-                )
-            }
+                },
+                onReactivateBean = { viewModel.reactivateBean(it) },
+                onPhotoClick = { showPhotoViewer = it },
+                onRetry = {
+                    viewModel.clearError()
+                    viewModel.refresh()
+                },
+                spacing = spacing
+            )
+        },
+        landscapeContent = {
+            BeanManagementContent(
+                uiState = uiState,
+                searchQuery = searchQuery,
+                showInactive = showInactive,
+                onAddBeanClick = onAddBeanClick,
+                onSearchQueryChange = viewModel::updateSearchQuery,
+                onToggleShowInactive = viewModel::toggleShowInactive,
+                onEditBeanClick = onEditBeanClick,
+                onDeleteBean = { showDeleteDialog = it },
+                onUseForShot = { bean ->
+                    if (bean.isActive) {
+                        viewModel.setCurrentBean(bean.id)
+                        onNavigateToRecordShot()
+                    }
+                },
+                onReactivateBean = { viewModel.reactivateBean(it) },
+                onPhotoClick = { showPhotoViewer = it },
+                onRetry = {
+                    viewModel.clearError()
+                    viewModel.refresh()
+                },
+                spacing = spacing
+            )
         }
-    }
+    )
 
     // Delete Confirmation Dialog
     showDeleteDialog?.let { bean ->
@@ -286,6 +170,180 @@ fun BeanManagementScreen(
             photoUri = null,
             onDismiss = { showPhotoViewer = null }
         )
+    }
+}
+
+@Composable
+private fun BeanManagementContent(
+    uiState: com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementUiState,
+    searchQuery: String,
+    showInactive: Boolean,
+    onAddBeanClick: () -> Unit,
+    onSearchQueryChange: (String) -> Unit,
+    onToggleShowInactive: () -> Unit,
+    onEditBeanClick: (String) -> Unit,
+    onDeleteBean: (Bean) -> Unit,
+    onUseForShot: (Bean) -> Unit,
+    onReactivateBean: (String) -> Unit,
+    onPhotoClick: (String) -> Unit,
+    onRetry: () -> Unit,
+    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(spacing.medium)
+    ) {
+        // Action button row - no header needed
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CoffeePrimaryButton(
+                text = stringResource(R.string.text_add_bean),
+                onClick = onAddBeanClick,
+                icon = Icons.Default.Add,
+                fillMaxWidth = false,
+                modifier = Modifier.widthIn(min = 120.dp, max = 160.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Search and Filter Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Search Field
+            CoffeeTextField(
+                value = searchQuery,
+                onValueChange = onSearchQueryChange,
+                label = stringResource(R.string.label_search_beans),
+                placeholder = stringResource(R.string.placeholder_enter_bean_name_search),
+                leadingIcon = Icons.Default.Search,
+                trailingIcon = if (searchQuery.isNotEmpty()) Icons.Default.Clear else null,
+                onTrailingIconClick = if (searchQuery.isNotEmpty()) {
+                    { onSearchQueryChange("") }
+                } else null,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Filter Toggle
+            FilterChip(
+                onClick = onToggleShowInactive,
+                label = {
+                    Text(
+                        text = if (showInactive) stringResource(R.string.text_all) else stringResource(R.string.text_active),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                },
+                selected = showInactive,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = null,
+                        modifier = Modifier.size(spacing.iconSmall)
+                    )
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Content
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    LoadingIndicator(message = stringResource(R.string.loading_beans))
+                }
+            }
+
+            uiState.error != null -> {
+                ErrorState(
+                    title = stringResource(R.string.error_loading_beans),
+                    message = uiState.error ?: "Unknown error occurred",
+                    onRetry = onRetry,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            uiState.beans.isEmpty() -> {
+                EmptyState(
+                    icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+                    title = stringResource(R.string.text_no_beans_available),
+                    description = if (searchQuery.isNotEmpty()) {
+                        stringResource(R.string.text_search_beans_hint)
+                    } else {
+                        stringResource(R.string.text_add_first_bean)
+                    },
+                    actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null
+                )
+            }
+
+            else -> {
+                // Use LandscapeContainer to switch between portrait and landscape layouts
+                LandscapeContainer(
+                    portraitContent = {
+                        // Existing LazyColumn layout for portrait
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(spacing.small),
+                            contentPadding = PaddingValues(bottom = spacing.large)
+                        ) {
+                            items(
+                                items = uiState.beans,
+                                key = { bean -> bean.id }
+                            ) { bean ->
+                                BeanListItem(
+                                    bean = bean,
+                                    onEdit = { onEditBeanClick(bean.id) },
+                                    onDelete = { onDeleteBean(bean) },
+                                    onUseForShot = { onUseForShot(bean) },
+                                    onReactivate = if (!bean.isActive) {
+                                        { onReactivateBean(bean.id) }
+                                    } else null,
+                                    onPhotoClick = { photoPath ->
+                                        onPhotoClick(photoPath)
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    landscapeContent = {
+                        // Two-column grid layout for landscape
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(spacing.small),
+                            horizontalArrangement = Arrangement.spacedBy(spacing.small),
+                            contentPadding = PaddingValues(bottom = spacing.large)
+                        ) {
+                            items(
+                                items = uiState.beans,
+                                key = { bean -> bean.id }
+                            ) { bean ->
+                                BeanListItem(
+                                    bean = bean,
+                                    onEdit = { onEditBeanClick(bean.id) },
+                                    onDelete = { onDeleteBean(bean) },
+                                    onUseForShot = { onUseForShot(bean) },
+                                    onReactivate = if (!bean.isActive) {
+                                        { onReactivateBean(bean.id) }
+                                    } else null,
+                                    onPhotoClick = { photoPath ->
+                                        onPhotoClick(photoPath)
+                                    }
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+        }
     }
 }
 
