@@ -183,6 +183,132 @@ Behavior:
 
 ## Navigation Patterns
 
+### Screen Header Guidelines
+The app follows a consistent header pattern based on navigation context:
+
+#### Main Navigation Screens (No TopAppBar)
+**When**: Navigation bar is visible at bottom (portrait) or side (landscape)
+**Screens**: RecordShot, ShotHistory, BeanManagement, More
+**Pattern**:
+- No TopAppBar or screen title header
+- Users can see current screen from highlighted navigation item
+- Content starts immediately with functional elements
+- Creates clean, focused interface for core app functions
+
+**Rationale**: Since users can clearly see which screen they're on from the active navigation indicator, adding a redundant title wastes valuable screen space and creates visual clutter.
+
+#### Sub-Screens (With TopAppBar + Back Button)
+**When**: Navigation bar is hidden (accessed from main screens)
+**Screens**: AboutScreen, EquipmentSettingsScreen, AddEditBeanScreen, ShotDetailsScreen
+**Pattern**:
+- TopAppBar with screen title using `headlineMedium` + `FontWeight.Bold`
+- Leading navigation icon (back arrow) using `Icons.AutoMirrored.Filled.ArrowBack`
+- Optional trailing action icons (save, delete, etc.)
+- Clear visual hierarchy with title and back navigation
+
+**Rationale**: Without the navigation bar context, users need clear indication of:
+1. Where they are (screen title)
+2. How to get back (back button)
+3. Available actions (action icons)
+
+#### Onboarding/Modal Screens (With TopAppBar + Special Navigation)
+**When**: Outside normal app flow (first-time setup, modal interactions)
+**Screens**: IntroductionScreen, EquipmentSetupScreen
+**Pattern**:
+- TopAppBar with contextual title
+- Navigation appropriate to flow (back to previous step, skip, etc.)
+- May include progress indicators
+- Special handling for flow completion
+
+**Rationale**: Onboarding and modal contexts require different navigation patterns than the main app, so headers provide necessary context and flow control.
+
+### Back Button Implementation Standards
+**Icon**: Always use `Icons.AutoMirrored.Filled.ArrowBack`
+- Handles RTL layouts automatically
+- Consistent with Material Design standards
+- 24.dp size (default icon size)
+
+**Content Description**: Use `stringResource(R.string.cd_back)` 
+- Provides accessibility support
+- Consistent across all back buttons
+- Localizable for different languages
+
+**Action**: Navigate back using `navController.popBackStack()` or provided callback
+- Handle navigation in ViewModel or parent component
+- Ensure proper state cleanup on back navigation
+- Consider confirmation dialogs for unsaved changes
+
+**Example Implementation**:
+```kotlin
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SubScreen(
+    onNavigateBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.title_screen_name),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
+                        )
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        // Screen content
+    }
+}
+```
+
+### Status Bar and System UI Handling
+The app uses edge-to-edge display with proper status bar spacing:
+
+**Portrait Mode (Scaffold Wrapped)**:
+- Content automatically receives proper status bar padding via Scaffold's `innerPadding`
+- No manual `statusBarsPadding()` needed on screen content
+- Navigation bar automatically handled by Scaffold
+
+**Landscape Mode (No Scaffold)**:
+- `LandscapeContainer` automatically applies `statusBarsPadding()` only in landscape orientation
+- Prevents content from drawing behind status bar
+- Manual spacing not needed - handled by container
+
+**Implementation**:
+- Use `LandscapeContainer` for screens with landscape-specific layouts
+- Use `Scaffold` for sub-screens with TopAppBar
+- Never apply manual `statusBarsPadding()` - let containers handle it
+- Test in both orientations to ensure proper spacing
+
+**Example**:
+```kotlin
+// ✅ Correct - LandscapeContainer handles status bar automatically
+LandscapeContainer(
+    modifier = Modifier.fillMaxSize(), // No statusBarsPadding needed
+    portraitContent = { /* content */ },
+    landscapeContent = { /* content */ }
+)
+
+// ✅ Correct - Scaffold handles status bar via innerPadding  
+Scaffold(
+    modifier = modifier, // No statusBarsPadding needed
+    topBar = { TopAppBar(/* ... */) }
+) { innerPadding ->
+    Content(modifier = Modifier.padding(innerPadding))
+}
+```
+
 ### Screen Transitions
 - Use standard navigation component patterns
 - Consistent back button behavior

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -181,7 +182,7 @@ fun IntroductionPortraitLayout(
             .navigationBarsPadding()
             .padding(horizontal = spacing.screenPadding, vertical = spacing.small)
     ) {
-        // Skip button with animation - reduced top padding
+        // Skip button with animation - consistent top padding following design guidelines
         AnimatedVisibility(
             visible = !isNavigating,
             enter = fadeIn(animationSpec = tween(300)),
@@ -392,30 +393,31 @@ fun IntroductionLandscapeLayout(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2),
+                horizontalArrangement = Arrangement.spacedBy(landscapeSpacing),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Left side: Slide content (60% width)
+                // Left side: Slide content (75% width)
                 Box(
                     modifier = Modifier
-                        .weight(0.6f)
+                        .weight(0.75f)
                         .fillMaxSize()
                 ) {
                     WalkthroughPagerLandscape(
                         slides = slides,
                         pagerState = pagerState,
                         isNavigating = isNavigating,
-                        availableWidth = maxWidth * 0.6f,
+                        availableWidth = maxWidth * 0.75f,
                         modifier = Modifier.fillMaxSize()
                     )
                 }
                 
-                // Right side: Navigation and indicators (40% width)
+                // Right side: Navigation and indicators (25% width) - pushed to right edge
                 Column(
                     modifier = Modifier
-                        .weight(0.4f)
-                        .fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
+                        .weight(0.25f)
+                        .fillMaxSize()
+                        .padding(end = landscapeSpacing), // Push to right edge
+                    horizontalAlignment = Alignment.CenterHorizontally, // Align to right edge
                     verticalArrangement = Arrangement.Center
                 ) {
                     // Page indicators with enhanced spacing for landscape
