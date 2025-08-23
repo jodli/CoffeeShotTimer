@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [1.3.2]
+
 ### Added
 
 - Adaptive landscape orientation with a navigation rail and responsive layouts across all screens.
