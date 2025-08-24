@@ -46,6 +46,7 @@ class MainActivityViewModel @Inject constructor(
                     val destination = when (nextStep) {
                         OnboardingStep.INTRODUCTION -> NavigationDestinations.OnboardingIntroduction.route
                         OnboardingStep.EQUIPMENT_SETUP -> NavigationDestinations.OnboardingEquipmentSetup.route
+                        OnboardingStep.GUIDED_BEAN_CREATION -> NavigationDestinations.OnboardingGuidedBeanCreation.route
                         OnboardingStep.FIRST_SHOT -> NavigationDestinations.RecordShot.route
                         OnboardingStep.COMPLETED, null -> {
                             // Edge case: marked as first-time but progress shows complete

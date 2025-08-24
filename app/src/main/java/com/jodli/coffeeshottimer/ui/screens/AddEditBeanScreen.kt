@@ -66,6 +66,7 @@ import com.jodli.coffeeshottimer.ui.components.PhotoActionSheet
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
+import com.jodli.coffeeshottimer.data.model.Bean
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -74,7 +75,10 @@ import java.time.format.DateTimeFormatter
 fun AddEditBeanScreen(
     beanId: String? = null,
     onNavigateBack: () -> Unit = {},
-    viewModel: AddEditBeanViewModel = hiltViewModel()
+    viewModel: AddEditBeanViewModel = hiltViewModel(),
+    isOnboardingMode: Boolean = false,
+    onboardingTitle: String? = null,
+    onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val spacing = LocalSpacing.current
@@ -226,7 +230,13 @@ fun AddEditBeanScreen(
     // Handle save success
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess) {
-            onNavigateBack()
+            if (isOnboardingMode && onSubmit != null && uiState.savedBean != null) {
+                // In onboarding mode, call the custom submit callback
+                onSubmit(uiState.savedBean!!)
+            } else {
+                // Normal mode, navigate back
+                onNavigateBack()
+            }
             viewModel.resetSaveSuccess()
         }
     }
@@ -243,24 +253,26 @@ fun AddEditBeanScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = if (uiState.isEditMode) stringResource(R.string.cd_edit_bean) else stringResource(R.string.text_add_bean),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back)
+        // Top App Bar (only show in non-onboarding mode)
+        if (!isOnboardingMode) {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = if (uiState.isEditMode) stringResource(R.string.cd_edit_bean) else stringResource(R.string.text_add_bean),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
 
         // Content
         if (uiState.isLoading) {
@@ -296,7 +308,7 @@ fun AddEditBeanScreen(
                         CoffeeTextField(
                             value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                             onValueChange = { }, // Read-only, handled by date picker
-                            label = stringResource(R.string.label_roast_date_required),
+                            label = if (isOnboardingMode) stringResource(R.string.bean_form_roast_date_label) else stringResource(R.string.label_roast_date_required),
                             placeholder = stringResource(R.string.placeholder_select_roast_date),
                             leadingIcon = Icons.Default.DateRange,
                             trailingIcon = Icons.Default.DateRange,
@@ -319,16 +331,18 @@ fun AddEditBeanScreen(
                             maxLines = 4
                         )
 
-                        // Grinder Setting
-                        CoffeeTextField(
-                            value = uiState.lastGrinderSetting,
-                            onValueChange = viewModel::updateAndValidateGrinderSetting,
-                            label = stringResource(R.string.label_grinder_setting),
-                            placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
-                            leadingIcon = Icons.Filled.Engineering,
-                            isError = uiState.grinderSettingError != null,
-                            errorMessage = uiState.grinderSettingError
-                        )
+                        // Grinder Setting (hide in onboarding mode)
+                        if (!isOnboardingMode) {
+                            CoffeeTextField(
+                                value = uiState.lastGrinderSetting,
+                                onValueChange = viewModel::updateAndValidateGrinderSetting,
+                                label = stringResource(R.string.label_grinder_setting),
+                                placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
+                                leadingIcon = Icons.Filled.Engineering,
+                                isError = uiState.grinderSettingError != null,
+                                errorMessage = uiState.grinderSettingError
+                            )
+                        }
 
                         // Photo Section - available in both create and edit modes
                         BeanPhotoSection(
@@ -347,8 +361,8 @@ fun AddEditBeanScreen(
                             onClearSuccess = viewModel::clearPhotoSuccessMessage
                         )
 
-                        // Active Status (only show in edit mode)
-                        if (uiState.isEditMode) {
+                        // Active Status (only show in edit mode and not in onboarding)
+                        if (uiState.isEditMode && !isOnboardingMode) {
                             CoffeeCard(
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -385,13 +399,45 @@ fun AddEditBeanScreen(
 
                         Spacer(modifier = Modifier.height(spacing.medium))
 
-                        // Save Button
-                        CoffeePrimaryButton(
-                            text = if (uiState.isSaving) stringResource(R.string.cd_saving) else if (uiState.isEditMode) stringResource(R.string.cd_update_bean) else stringResource(R.string.text_add_bean),
-                            onClick = viewModel::saveBean,
-                            enabled = !uiState.isSaving && uiState.name.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        // Action Buttons
+                        if (isOnboardingMode) {
+                            // Onboarding mode: Back and Create buttons
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+                            ) {
+                                com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton(
+                                    text = stringResource(R.string.button_back),
+                                    onClick = onNavigateBack,
+                                    enabled = !uiState.isSaving,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                CoffeePrimaryButton(
+                                    text = if (uiState.isSaving) {
+                                        stringResource(R.string.cd_saving)
+                                    } else {
+                                        stringResource(R.string.button_create_bean)
+                                    },
+                                    onClick = viewModel::saveBean,
+                                    enabled = !uiState.isSaving && uiState.name.isNotBlank(),
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        } else {
+                            // Normal mode: Single save/update button
+                            CoffeePrimaryButton(
+                                text = if (uiState.isSaving) {
+                                    stringResource(R.string.cd_saving)
+                                } else if (uiState.isEditMode) {
+                                    stringResource(R.string.cd_update_bean)
+                                } else {
+                                    stringResource(R.string.text_add_bean)
+                                },
+                                onClick = viewModel::saveBean,
+                                enabled = !uiState.isSaving && uiState.name.isNotBlank(),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
 
                         // Bottom padding for scrolling
                         Spacer(modifier = Modifier.height(spacing.large))
@@ -430,7 +476,7 @@ fun AddEditBeanScreen(
                                 CoffeeTextField(
                                     value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                                     onValueChange = { }, // Read-only, handled by date picker
-                                    label = stringResource(R.string.label_roast_date_required),
+                                    label = if (isOnboardingMode) stringResource(R.string.bean_form_roast_date_label) else stringResource(R.string.label_roast_date_required),
                                     placeholder = stringResource(R.string.placeholder_select_roast_date),
                                     leadingIcon = Icons.Default.DateRange,
                                     trailingIcon = Icons.Default.DateRange,
@@ -440,16 +486,18 @@ fun AddEditBeanScreen(
                                     singleLine = true
                                 )
 
-                                // Grinder Setting
-                                CoffeeTextField(
-                                    value = uiState.lastGrinderSetting,
-                                    onValueChange = viewModel::updateAndValidateGrinderSetting,
-                                    label = stringResource(R.string.label_grinder_setting),
-                                    placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
-                                    leadingIcon = Icons.Filled.Engineering,
-                                    isError = uiState.grinderSettingError != null,
-                                    errorMessage = uiState.grinderSettingError
-                                )
+                                // Grinder Setting (hide in onboarding mode)
+                                if (!isOnboardingMode) {
+                                    CoffeeTextField(
+                                        value = uiState.lastGrinderSetting,
+                                        onValueChange = viewModel::updateAndValidateGrinderSetting,
+                                        label = stringResource(R.string.label_grinder_setting),
+                                        placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
+                                        leadingIcon = Icons.Filled.Engineering,
+                                        isError = uiState.grinderSettingError != null,
+                                        errorMessage = uiState.grinderSettingError
+                                    )
+                                }
 
                                 // Notes - give more space in landscape
                                 CoffeeTextField(
@@ -464,8 +512,8 @@ fun AddEditBeanScreen(
                                     maxLines = 6 // More lines in landscape
                                 )
 
-                                // Active Status (only show in edit mode)
-                                if (uiState.isEditMode) {
+                                // Active Status (only show in edit mode and not in onboarding)
+                                if (uiState.isEditMode && !isOnboardingMode) {
                                     CoffeeCard(
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
@@ -527,13 +575,45 @@ fun AddEditBeanScreen(
 
                         Spacer(modifier = Modifier.height(spacing.medium))
 
-                        // Save Button (full width)
-                        CoffeePrimaryButton(
-                            text = if (uiState.isSaving) stringResource(R.string.cd_saving) else if (uiState.isEditMode) stringResource(R.string.cd_update_bean) else stringResource(R.string.text_add_bean),
-                            onClick = viewModel::saveBean,
-                            enabled = !uiState.isSaving && uiState.name.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        // Action Buttons (full width)
+                        if (isOnboardingMode) {
+                            // Onboarding mode: Back and Create buttons
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+                            ) {
+                                com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton(
+                                    text = stringResource(R.string.button_back),
+                                    onClick = onNavigateBack,
+                                    enabled = !uiState.isSaving,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                CoffeePrimaryButton(
+                                    text = if (uiState.isSaving) {
+                                        stringResource(R.string.cd_saving)
+                                    } else {
+                                        stringResource(R.string.button_create_bean)
+                                    },
+                                    onClick = viewModel::saveBean,
+                                    enabled = !uiState.isSaving && uiState.name.isNotBlank(),
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                        } else {
+                            // Normal mode: Single save/update button
+                            CoffeePrimaryButton(
+                                text = if (uiState.isSaving) {
+                                    stringResource(R.string.cd_saving)
+                                } else if (uiState.isEditMode) {
+                                    stringResource(R.string.cd_update_bean)
+                                } else {
+                                    stringResource(R.string.text_add_bean)
+                                },
+                                onClick = viewModel::saveBean,
+                                enabled = !uiState.isSaving && uiState.name.isNotBlank(),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
 
                         // Bottom padding for scrolling
                         Spacer(modifier = Modifier.height(spacing.large))

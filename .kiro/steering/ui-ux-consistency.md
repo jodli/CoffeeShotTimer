@@ -74,12 +74,14 @@ CoffeeCard(
 - `spacing.extraSmall` top padding for error messages
 
 ### Typography Hierarchy
-**Screen Titles**: `headlineMedium` with `FontWeight.Bold`
+**Screen Titles**: `headlineMedium` with `FontWeight.Bold` (use `headlineSmall` in landscape)
 **Section Headers**: `titleMedium` with `FontWeight.Bold`
 **Card Titles**: `titleMedium` with `FontWeight.Medium`
 **Body Text**: `bodyMedium` for standard content
 **Labels**: `labelMedium` for form labels and small UI text
 **Captions**: `bodySmall` for secondary information
+
+**Important**: Always use `headlineMedium` for main screen titles, not `headlineLarge`. Scale down to `headlineSmall` in landscape orientation for better space utilization.
 
 ### Loading States
 **Use `LoadingIndicator` component**:
@@ -111,6 +113,39 @@ CoffeeCard(
 
 3. **Bottom Spacing**
    - `spacing.large` (24.dp) bottom padding for navigation clearance
+
+### Responsive Layout Patterns
+
+#### Onboarding/Educational Screen Layout
+**Portrait**:
+- Single column layout with centered content
+- Hero icon at top with `spacing.large` margins
+- Content sections with `spacing.medium` vertical spacing
+- Action buttons at bottom with horizontal arrangement
+
+**Landscape**:
+- Two-column layout using `Row` with `Arrangement.spacedBy(landscapeSpacing * 2)`
+- Left column (30% weight): Hero icon + title, center-aligned
+- Right column (70% weight): Content + actions, start-aligned
+- Consistent `landscapeSpacing` for internal component spacing
+- Vertical scrolling for content overflow
+
+**Weight Distribution Standard**:
+```kotlin
+// Left side: Visual/branding (30% width)
+Column(modifier = Modifier.weight(0.3f)) { /* Icon + Title */ }
+
+// Right side: Content/actions (70% width) 
+Column(modifier = Modifier.weight(0.7f)) { /* Content + Actions */ }
+```
+
+#### Typography Scaling for Orientation
+**Portrait to Landscape Typography Scaling**:
+- `headlineLarge` → `headlineSmall`
+- `headlineMedium` → `headlineSmall` 
+- `titleMedium` → `titleSmall`
+- `bodyMedium` → `bodySmall`
+- `labelLarge` → `labelMedium`
 
 ### Card Layouts
 **Information Cards**:
@@ -367,12 +402,104 @@ Scaffold(
 - Consistent sizing (8.dp diameter)
 - Grouped indicators with small spacing
 
+## Onboarding & Educational Patterns
+
+### Hero Icon Display
+**Usage**: Primary visual element for onboarding and educational screens
+**Standards**:
+- **Portrait**: 140.dp container, 120.dp background circle, 70.dp icon
+- **Landscape**: 100.dp container, 80.dp background circle, 50.dp icon
+- Background circle using `primaryContainer.copy(alpha = 0.1f)`
+- 2.dp tonal elevation for subtle depth
+- Icon tinted with `primary` color
+
+**Example**:
+```kotlin
+Box(
+    modifier = Modifier.size(140.dp), // 100.dp for landscape
+    contentAlignment = Alignment.Center
+) {
+    Surface(
+        modifier = Modifier.size(120.dp), // 80.dp for landscape
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+        tonalElevation = 2.dp
+    ) {}
+    
+    Icon(
+        imageVector = illustration,
+        contentDescription = title,
+        modifier = Modifier.size(70.dp), // 50.dp for landscape
+        tint = MaterialTheme.colorScheme.primary
+    )
+}
+```
+
+### Educational Cards
+**Usage**: Explain features or concepts in onboarding flows
+**Standards**:
+- Use `CoffeeCard` as base container
+- Left icon (24.dp portrait, 20.dp landscape) with `primary` tint
+- Title using `titleMedium` with `FontWeight.Medium`
+- Description using `bodyMedium` with `onSurfaceVariant` color
+- `spacing.medium` gap between icon and text (portrait)
+- `landscapeSpacing` for all spacing in landscape variant
+
+**Pattern Variants**:
+- **Simple**: Icon + title + description
+- **Highlighted**: Icon with circular background + title + description
+
+### Feature Highlight Cards
+**Usage**: Showcase specific app features with enhanced visual treatment
+**Standards**:
+- Use `CoffeeCard` base with interactive styling
+- Circular icon background (32.dp container, 28.dp circle portrait)
+- Background color: `primaryContainer.copy(alpha = 0.2f)`
+- Icon size: 16.dp (portrait), 12.dp (landscape)
+- Title: `titleMedium` + `FontWeight.SemiBold` (portrait), `labelLarge` (landscape)
+- Description: `bodyMedium` (portrait), `bodySmall` (landscape)
+
+### Page Indicators
+**Usage**: Show progress through onboarding or tutorial flows
+**Standards**:
+- Active state: 24.dp width, 8.dp height, `primary` color
+- Inactive state: 8.dp width, 8.dp height, `onSurfaceVariant.copy(alpha = 0.4f)`
+- Circular shape using `CircleShape`
+- `spacing.extraSmall` horizontal padding between indicators
+- Center alignment in horizontal row
+
+**Example**:
+```kotlin
+@Composable
+fun PageIndicator(isActive: Boolean) {
+    val width = if (isActive) 24.dp else 8.dp
+    val color = if (isActive) {
+        MaterialTheme.colorScheme.primary
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+    }
+    
+    Surface(
+        modifier = Modifier.width(width).height(8.dp),
+        shape = CircleShape,
+        color = color
+    ) {}
+}
+```
+
 ## Implementation Guidelines
 
 ### Component Reuse
 - Always use existing components before creating new ones
 - Extend existing components rather than duplicating
 - Maintain consistent prop interfaces across similar components
+
+### Responsive Design Principles
+- Use `LandscapeContainer` for onboarding/educational screens
+- Apply 30%/70% weight distribution for landscape layouts
+- Scale typography down for landscape orientation
+- Use `landscapeSpacing` consistently in landscape variants
+- Maintain content hierarchy across orientations
 
 ### State Management
 - Use consistent state patterns across screens

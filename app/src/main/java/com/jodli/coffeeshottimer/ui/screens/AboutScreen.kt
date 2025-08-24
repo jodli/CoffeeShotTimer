@@ -65,7 +65,7 @@ fun AboutScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.title_about),
-                        style = MaterialTheme.typography.headlineSmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
                 },

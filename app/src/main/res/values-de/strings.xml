@@ -170,7 +170,37 @@
     <string name="text_improving_consistency">Konsistenz verbessern</string>
     <string name="text_room_for_improvement">Verbesserungspotential</string>
 
-    <!-- Buttons -->
+    <!-- Onboarding Guided Bean Creation -->
+    <string name="onboarding_guided_bean_creation_title">Lass uns deine erste Bohne hinzufügen</string>
+    <string name="onboarding_progress_step_title">Schritt %1$d von %2$d: %3$s</string>
+
+    <!-- Bean Education Content -->
+    <string name="bean_education_title">Warum Bohnen tracken?</string>
+    <string name="bean_education_freshness_title">Timing ist alles</string>
+    <string name="bean_education_freshness_description">Kaffee ist 4-21 Tage nach der Röstung am besten. Verfolge Röstdaten und wir helfen dir, im perfekten Moment zu brühen.</string>
+    <string name="bean_education_history_title">Entdecke deine Favoriten</string>
+    <string name="bean_education_history_description">Indem du Shots mit bestimmten Bohnen verknüpfst, lernst du, welche Kaffees mit deiner Technik und Ausrüstung glänzen.</string>
+    <string name="bean_education_visual_title">Auf einen Blick erkennen</string>
+    <string name="bean_education_visual_description">Fotos helfen dir, deine Favoriten sofort zu erkennen und dich an die fantastische Packung zu erinnern, die du wieder kaufen möchtest.</string>
+
+    <!-- Bean Creation Success -->
+    <string name="bean_creation_success_title">Fantastisch! Deine erste Bohne ist bereit</string>
+    <string name="bean_creation_success_message">%1$s ist jetzt Teil deiner Kaffee-Reise. Zeit, deinen ersten verfolgten Shot zu ziehen und zu sehen, was dieser Kaffee drauf hat!</string>
+    <string name="bean_creation_success_freshness_good">Perfektes Timing – diese Bohnen sind in ihrer besten Phase für fantastischen Espresso!</string>
+    <string name="bean_creation_success_freshness_fresh">Diese Bohnen sind super frisch. Gib ihnen 2-4 Tage und sie werden unglaublich für Espresso sein.</string>
+    <string name="bean_creation_success_freshness_aging">Diese Bohnen sind schön entwickelt und noch perfekt für köstliche Espresso-Shots!</string>
+
+    <!-- Action Buttons -->
+    <string name="button_add_my_first_bean">Meine erste Bohne hinzufügen</string>
+    <string name="button_skip_for_now">Vorerst überspringen</string>
+    <string name="button_create_bean">Bohne erstellen</string>
+    <string name="button_continue_to_shot">Lass uns einen Shot ziehen</string>
+    <string name="button_back">Zurück</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_bean_education_freshness">Kaffeebohnen-Frische Illustration</string>
+    <string name="cd_bean_creation_success">Bohne-Erstellung Erfolgs-Animation</string>
+    <string name="cd_onboarding_progress">Onboarding-Fortschrittsanzeige</string>
     <string name="button_clear_all">Alle löschen</string>
     <string name="button_apply_filters">Filter anwenden</string>
     <string name="button_clear_start">Start löschen</string>
@@ -276,8 +306,17 @@
 
     <!-- Photo UI Strings -->
     <string name="text_bean_photo">Bohnenfoto</string>
+    <string name="text_optional">Optional</string>
+    <string name="text_creating_bean">Bohne wird erstellt...</string>
+    <string name="bean_form_title">Erzähle uns von deinem Kaffee</string>
+    <string name="bean_form_name_label">Bohnenname oder Beschreibung</string>
+    <string name="bean_form_name_placeholder">z.B. Kolumbianischer Single Origin</string>
+    <string name="bean_form_roast_date_label">Röstdatum (falls bekannt)</string>
+    <string name="bean_form_roast_date_help">Das hilft bei der Verfolgung der Frische. Leer lassen, falls unbekannt.</string>
+    <string name="bean_form_photo_help">Ein Foto hilft dabei, deine Bohnen später zu identifizieren</string>
+    <string name="bean_form_photo_help_simplified">Du kannst Fotos später in der Bohnenverwaltung hinzufügen</string>
     <string name="text_add_photo">Foto hinzufügen</string>
-    
+
     <!-- Short photo button text -->
     <string name="text_view_short">Ansehen</string>
     <string name="text_replace_short">Ersetzen</string>
@@ -298,7 +337,7 @@
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Foto löschen?</string>
     <string name="dialog_delete_photo_message">Bist du sicher, dass du dieses Foto löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.</string>
-    
+
     <!-- Photo Content Descriptions -->
     <string name="cd_bean_photo">Bohnenfoto</string>
     <string name="cd_add_photo">Foto hinzufügen</string>
@@ -460,28 +499,28 @@
 
     <!-- Introduction Screen Content -->
     <string name="intro_welcome_title">Willkommen bei\nCoffee Shot Timer</string>
-    <string name="intro_welcome_description">Verwandle dein Espresso-Brühen in eine systematische Reise der Verbesserung mit präzisem Timing und detaillierter Verfolgung.</string>
-    
-    <string name="intro_main_screens_title">Hauptfunktionen</string>
-    <string name="intro_main_screens_description">Entdecke die drei Hauptbereiche der App, die deinen Brühworkflow unterstützen:</string>
-    
+    <string name="intro_welcome_description">Meistere die Kunst des Espressos mit präzisem Timing und Einblicken, die dir helfen, durchgehend großartige Shots zu brühen.</string>
+
+    <string name="intro_main_screens_title">Alles was du brauchst</string>
+    <string name="intro_main_screens_description">Drei einfache Tools, die zusammenarbeiten, um dein Espresso-Spiel zu verbessern:</string>
+
     <string name="intro_record_shot_title">Shots aufnehmen</string>
-    <string name="intro_record_shot_description">Verfolge deine Espresso-Shots mit präzisen Messungen und Timing</string>
-    
-    <string name="intro_shot_history_title">Shot-Verlauf</string>
-    <string name="intro_shot_history_description">Analysiere deine Brühmuster und Verbesserungen über die Zeit</string>
-    
-    <string name="intro_bean_management_title">Bohnenverwaltung</string>
-    <string name="intro_bean_management_description">Organisiere deine Kaffeebohnen und verfolge ihre Frische</string>
-    
-    <string name="intro_flexible_workflow_title">Flexibler Workflow</string>
-    <string name="intro_flexible_workflow_description">Fülle Messungen in beliebiger Reihenfolge aus, die zu deinem Brühstil passt. Kaffee rein, Mahlgrad, Extraktionszeit und Kaffee raus können alle während des Brühens erfasst werden.</string>
-    
+    <string name="intro_record_shot_description">Erfasse jedes Detail – Timing, Gewichte, Mahlgrade und Notizen</string>
+
+    <string name="intro_shot_history_title">Fortschritt verfolgen</string>
+    <string name="intro_shot_history_description">Erkenne deine Brühmuster und entdecke, was deine besten Shots ausmacht</string>
+
+    <string name="intro_bean_management_title">Bohnen verwalten</string>
+    <string name="intro_bean_management_description">Behalte den Überblick über deine Kaffeesammlung und optimale Frischefenster</string>
+
+    <string name="intro_flexible_workflow_title">Dein Workflow, dein Weg</string>
+    <string name="intro_flexible_workflow_description">Keine starren Schritte zu befolgen. Erfasse Messungen in der Reihenfolge, die sich natürlich anfühlt – Dosierung, Mahlung, Zeit und Ausbeute passen sich an, wie du brühst.</string>
+
     <string name="intro_timer_usage_title">Intelligenter Timer</string>
-    <string name="intro_timer_usage_description">Starte den Timer vor, während oder nach anderen Messungen. Der flexible Timer passt sich deiner Brühroutine an und bietet farbkodiertes Feedback für optimale Extraktionszeiten.</string>
-    
-    <string name="intro_get_started_title">Bereit zum Beginnen</string>
-    <string name="intro_get_started_description">Lass uns deine Ausrüstung einrichten und deinen ersten Shot aufnehmen. Du wirst Schritt für Schritt durch den Prozess geführt.</string>
+    <string name="intro_timer_usage_description">Erhalte Echtzeit-Feedback mit farbcodierten Timing-Zonen. Starte wann immer du bereit bist – der Timer arbeitet um deinen Prozess herum, nicht dagegen.</string>
+
+    <string name="intro_get_started_title">Los geht\'s mit dem Brühen</string>
+    <string name="intro_get_started_description">Bereit, deinen ersten verfolgten Shot zu ziehen? Wir helfen dir beim Einrichten deiner Ausrüstung und beim Start deiner Reise zu besserem Espresso!</string>
 
     <!-- Shot Recommendations -->
     <string name="recommendation_grind_finer">Erwäge feiner zu mahlen, um die Extraktion zu verlangsamen (aktuell: %1$ss)</string>
@@ -506,7 +545,7 @@
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Ausrüstung einrichten</string>
     <string name="text_equipment_setup_description">Konfiguriere deine Mühleneinstellungen, um dein Brüherlebnis zu personalisieren.</string>
-    
+
     <!-- Equipment Settings (non-onboarding) -->
     <string name="title_equipment_settings">Mühleneinstellungen</string>
     <string name="text_equipment_settings_description">Stelle die minimalen und maximalen Werte ein, die die Skala deiner Mühle unterstützt. Dies wird in der App zur Validierung und als Leitfaden verwendet.</string>
@@ -553,5 +592,7 @@
     <string name="suggestion_range_of_at_least_3_steps">Ein Bereich von mindestens 3 Schritten gibt dir Raum, deinen Mahlgrad anzupassen.</string>
     <string name="suggestion_smaller_range_is_easier">Ein kleinerer Bereich ist normalerweise einfacher zu handhaben.</string>
     <string name="suggestion_enter_whole_numbers_only">Bitte gib nur ganze Zahlen ein (z.B. 1, 10, 50).</string>
-    
+
+    <!-- Bean Form Strings -->
+
 </resources>

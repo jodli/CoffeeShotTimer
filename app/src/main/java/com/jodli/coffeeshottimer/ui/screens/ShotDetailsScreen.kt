@@ -98,7 +98,13 @@ fun ShotDetailsScreen(
     ) {
         // Top App Bar
         TopAppBar(
-            title = { Text(stringResource(R.string.title_shot_details)) },
+            title = { 
+                Text(
+                    text = stringResource(R.string.title_shot_details),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            },
             navigationIcon = {
                 IconButton(onClick = onNavigateBack) {
                     Icon(

@@ -502,4 +502,90 @@ class AddEditBeanViewModelTest {
         coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
         coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
     }
+
+    @Test
+    fun `saveBean in onboarding mode should store savedBean in state`() = runTest(testDispatcher) {
+        val beanId = "new-bean-id"
+        val mockBean = mockk<Bean>(relaxed = true) {
+            every { id } returns beanId
+            every { name } returns "Test Bean"
+            every { roastDate } returns java.time.LocalDate.now()
+            every { notes } returns ""
+            every { isActive } returns true
+        }
+
+        // Setup form with valid data
+        viewModel.updateName("Test Bean")
+
+        // Mock successful bean creation
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
+
+        viewModel.saveBean()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.saveSuccess)
+        assertFalse(state.isSaving)
+        assertNull(state.error)
+        assertEquals(mockBean, state.savedBean) // Should store the created bean
+
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+    }
+
+    @Test
+    fun `saveBean with pending photo in onboarding mode should handle photo success`() = runTest(testDispatcher) {
+        val mockUri: Uri = mockk()
+        val beanId = "new-bean-id"
+        val photoPath = "/path/to/photo.jpg"
+        val mockBean = mockk<Bean>(relaxed = true) {
+            every { id } returns beanId
+            every { name } returns "Test Bean"
+            every { roastDate } returns java.time.LocalDate.now()
+            every { notes } returns ""
+            every { isActive } returns true
+        }
+
+        // Setup form with valid data and pending photo
+        viewModel.updateName("Test Bean")
+        viewModel.addPhoto(mockUri)
+
+        // Mock successful bean creation and photo addition
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.success(photoPath)
+        coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
+
+        viewModel.saveBean()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.saveSuccess)
+        assertFalse(state.isSaving)
+        assertNull(state.error)
+        assertEquals(mockBean, state.savedBean) // Should store the created bean
+
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
+    }
+
+    @Test
+    fun `resetSaveSuccess should clear savedBean`() = runTest(testDispatcher) {
+        val mockBean = mockk<Bean>()
+
+        // First set saveSuccess and savedBean by triggering a successful save
+        viewModel.updateName("Test Bean")
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
+
+        viewModel.saveBean()
+
+        var state = viewModel.uiState.value
+        assertTrue(state.saveSuccess)
+        assertEquals(mockBean, state.savedBean)
+
+        // Reset save success
+        viewModel.resetSaveSuccess()
+
+        state = viewModel.uiState.value
+        assertFalse(state.saveSuccess)
+        assertNull(state.savedBean)
+    }
 }
