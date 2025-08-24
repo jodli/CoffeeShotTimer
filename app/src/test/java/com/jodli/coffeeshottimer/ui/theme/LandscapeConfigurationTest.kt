@@ -20,63 +20,9 @@ class LandscapeConfigurationTest {
     val composeTestRule = createComposeRule()
 
     @Test
-    fun `rememberLandscapeConfiguration detects portrait orientation correctly`() {
-        val portraitConfig = Configuration().apply {
-            orientation = Configuration.ORIENTATION_PORTRAIT
-            screenWidthDp = 360
-            screenHeightDp = 640
-        }
-
-        var landscapeConfiguration: LandscapeConfiguration? = null
-
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalConfiguration provides portraitConfig) {
-                landscapeConfiguration = rememberLandscapeConfiguration()
-            }
-        }
-
-        composeTestRule.runOnIdle {
-            landscapeConfiguration?.let { config ->
-                assertFalse("Should not be landscape in portrait mode", config.isLandscape)
-                assertEquals("Screen width should match", 360, config.screenWidthDp)
-                assertEquals("Screen height should match", 640, config.screenHeightDp)
-                assertEquals("Timer size should be portrait size", 200.dp, config.timerSize)
-                assertEquals("Content spacing should be portrait spacing", 16.dp, config.contentSpacing)
-            }
-        }
-    }
-
-    @Test
-    fun `rememberLandscapeConfiguration detects landscape orientation correctly`() {
-        val landscapeConfig = Configuration().apply {
-            orientation = Configuration.ORIENTATION_LANDSCAPE
-            screenWidthDp = 640
-            screenHeightDp = 360
-        }
-
-        var landscapeConfiguration: LandscapeConfiguration? = null
-
-        composeTestRule.setContent {
-            CompositionLocalProvider(LocalConfiguration provides landscapeConfig) {
-                landscapeConfiguration = rememberLandscapeConfiguration()
-            }
-        }
-
-        composeTestRule.runOnIdle {
-            landscapeConfiguration?.let { config ->
-                assertTrue("Should be landscape in landscape mode", config.isLandscape)
-                assertEquals("Screen width should match", 640, config.screenWidthDp)
-                assertEquals("Screen height should match", 360, config.screenHeightDp)
-                assertEquals("Timer size should be landscape size", 160.dp, config.timerSize)
-                assertEquals("Content spacing should be landscape spacing", 12.dp, config.contentSpacing)
-            }
-        }
-    }
-
-    @Test
     fun `Spacing landscapeTimerSize returns correct values`() {
         val spacing = Spacing()
-        
+
         // Test portrait mode
         val portraitConfig = Configuration().apply {
             orientation = Configuration.ORIENTATION_PORTRAIT
@@ -115,7 +61,7 @@ class LandscapeConfigurationTest {
     @Test
     fun `Spacing landscapeSpacing returns correct values`() {
         val spacing = Spacing()
-        
+
         // Test portrait mode
         val portraitConfig = Configuration().apply {
             orientation = Configuration.ORIENTATION_PORTRAIT
@@ -212,7 +158,7 @@ class LandscapeConfigurationTest {
     @Test
     fun `Spacing data class contains landscape-specific values`() {
         val spacing = Spacing()
-        
+
         assertEquals("landscapeTimerSize should be 160dp", 160.dp, spacing.landscapeTimerSize)
         assertEquals("landscapeContentSpacing should be 12dp", 12.dp, spacing.landscapeContentSpacing)
     }

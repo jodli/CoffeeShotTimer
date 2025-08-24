@@ -52,7 +52,7 @@ data class Spacing(
     val iconButtonSize: Dp = 32.dp,
     val sliderHeightSmall: Dp = 24.dp,
     val thumbnailSize: Dp = 48.dp,
-    // Landscape-specific values  
+    // Landscape-specific values
     val landscapeTimerSize: Dp = 220.dp, // Used as fallback when BoxWithConstraints isn't available
     val landscapeContentSpacing: Dp = 12.dp
 )
@@ -74,27 +74,6 @@ data class LandscapeConfiguration(
 )
 
 /**
- * Remembers landscape configuration based on current device configuration.
- * Provides reactive landscape detection and layout parameters.
- */
-@Composable
-fun rememberLandscapeConfiguration(): LandscapeConfiguration {
-    val configuration = LocalConfiguration.current
-    
-    return remember(configuration) {
-        val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-        
-        LandscapeConfiguration(
-            isLandscape = isLandscape,
-            screenWidthDp = configuration.screenWidthDp,
-            screenHeightDp = configuration.screenHeightDp,
-            timerSize = if (isLandscape) 160.dp else 200.dp,
-            contentSpacing = if (isLandscape) 12.dp else 16.dp
-        )
-    }
-}
-
-/**
  * Returns adaptive timer size for landscape mode based on available space.
  * Uses BoxWithConstraints to calculate optimal size as a percentage of available space.
  * Falls back to landscapeTimerSize if constraints aren't available.
@@ -110,11 +89,11 @@ fun Spacing.adaptiveTimerSize(
         // Account for card header (~32dp) + padding (~32dp total) + margins (~24dp)
         val cardOverhead = 64.dp
         val usableHeight = (availableHeight - cardOverhead).coerceAtLeast(160.dp)
-        
+
         // Use 85% of usable height or 70% of available width, whichever is smaller
         minOf(
             usableHeight, // 85% of usable height for maximum timer size
-            availableWidth,  // 70% of available width  
+            availableWidth,  // 70% of available width
             350.dp // Increased max size to allow larger timers
         ).coerceAtLeast(160.dp) // Never go below 160dp
     } else {
