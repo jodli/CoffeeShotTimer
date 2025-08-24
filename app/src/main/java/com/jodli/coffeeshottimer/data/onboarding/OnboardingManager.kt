@@ -62,6 +62,7 @@ interface OnboardingManager {
 data class OnboardingProgress(
     val hasSeenIntroduction: Boolean = false,
     val hasCompletedEquipmentSetup: Boolean = false,
+    val hasCreatedFirstBean: Boolean = false,
     val hasRecordedFirstShot: Boolean = false,
     val grinderConfigurationId: String? = null,
     val onboardingStartedAt: Long = System.currentTimeMillis(),
@@ -73,7 +74,7 @@ data class OnboardingProgress(
      * @return true if all onboarding steps are complete
      */
     fun isComplete(): Boolean {
-        return hasSeenIntroduction && hasCompletedEquipmentSetup && hasRecordedFirstShot
+        return hasSeenIntroduction && hasCompletedEquipmentSetup && hasCreatedFirstBean && hasRecordedFirstShot
     }
     
     /**
@@ -85,6 +86,7 @@ data class OnboardingProgress(
         return when {
             !hasSeenIntroduction -> OnboardingStep.INTRODUCTION
             !hasCompletedEquipmentSetup -> OnboardingStep.EQUIPMENT_SETUP
+            !hasCreatedFirstBean -> OnboardingStep.GUIDED_BEAN_CREATION
             !hasRecordedFirstShot -> OnboardingStep.FIRST_SHOT
             else -> null
         }
@@ -97,6 +99,7 @@ data class OnboardingProgress(
 enum class OnboardingStep {
     INTRODUCTION,
     EQUIPMENT_SETUP,
+    GUIDED_BEAN_CREATION,
     FIRST_SHOT,
     COMPLETED
 }

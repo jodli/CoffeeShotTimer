@@ -21,6 +21,7 @@ import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.data.model.Bean
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -226,17 +227,19 @@ class AddEditBeanViewModel @Inject constructor(
             }
 
             if (result.isSuccess) {
+                val savedBean = result.getOrNull()
+                
                 // If we're in create mode and have a pending photo, add it to the newly created bean
                 if (editingBeanId == null && currentState.pendingPhotoUri != null) {
-                    val newBean = result.getOrNull()
-                    if (newBean != null) {
-                        val photoResult = addPhotoToBeanUseCase.execute(newBean.id, currentState.pendingPhotoUri)
+                    if (savedBean != null) {
+                        val photoResult = addPhotoToBeanUseCase.execute(savedBean.id, currentState.pendingPhotoUri)
                         if (photoResult.isFailure) {
                             // Photo failed to save, but bean was created successfully
                             // Show warning but don't fail the entire operation
                             _uiState.value = _uiState.value.copy(
                                 isSaving = false,
                                 saveSuccess = true,
+                                savedBean = savedBean,
                                 photoError = domainErrorTranslator.translateResultError(photoResult)
                             )
                             return@launch
@@ -246,7 +249,8 @@ class AddEditBeanViewModel @Inject constructor(
 
                 _uiState.value = _uiState.value.copy(
                     isSaving = false,
-                    saveSuccess = true
+                    saveSuccess = true,
+                    savedBean = savedBean
                 )
             } else {
                 _uiState.value = _uiState.value.copy(
@@ -262,7 +266,7 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     fun resetSaveSuccess() {
-        _uiState.value = _uiState.value.copy(saveSuccess = false)
+        _uiState.value = _uiState.value.copy(saveSuccess = false, savedBean = null)
     }
 
     /**
@@ -570,6 +574,7 @@ data class AddEditBeanUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
+    val savedBean: Bean? = null, // The saved/created bean for onboarding mode
     val error: String? = null,
     val isEditMode: Boolean = false,
     val isPhotoLoading: Boolean = false,

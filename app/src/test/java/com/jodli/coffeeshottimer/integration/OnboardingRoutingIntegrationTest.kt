@@ -47,7 +47,7 @@ class OnboardingRoutingIntegrationTest {
     @Test
     fun `complete first-time user flow routes through all onboarding steps`() = runTest {
         // Test scenario: New user progresses through complete onboarding flow
-        
+
         // Step 1: First launch - should route to introduction
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
@@ -73,7 +73,7 @@ class OnboardingRoutingIntegrationTest {
         assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (step2State as RoutingState.Success).route)
         assertTrue(step2State.isFirstTimeUser)
 
-        // Step 3: After equipment setup - should route to first shot (RecordShot)
+        // Step 3: After equipment setup - should route to guided bean creation
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true
@@ -84,11 +84,15 @@ class OnboardingRoutingIntegrationTest {
 
         val step3State = viewModel.routingState.first()
         assertTrue(step3State is RoutingState.Success)
-        assertEquals(NavigationDestinations.RecordShot.route, (step3State as RoutingState.Success).route)
+        assertEquals(NavigationDestinations.OnboardingGuidedBeanCreation.route, (step3State as RoutingState.Success).route)
         assertTrue(step3State.isFirstTimeUser)
 
-        // Step 4: After first shot - should be marked complete and route to normal flow
-        coEvery { onboardingManager.isFirstTimeUser() } returns false
+        // Step 4: After guided bean creation - should route to first shot (RecordShot)
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true
+        )
 
         viewModel = MainActivityViewModel(onboardingManager)
         advanceUntilIdle()
@@ -96,18 +100,30 @@ class OnboardingRoutingIntegrationTest {
         val step4State = viewModel.routingState.first()
         assertTrue(step4State is RoutingState.Success)
         assertEquals(NavigationDestinations.RecordShot.route, (step4State as RoutingState.Success).route)
-        assertTrue(!step4State.isFirstTimeUser)
+        assertTrue(step4State.isFirstTimeUser)
+
+        // Step 5: After first shot - should be marked complete and route to normal flow
+        coEvery { onboardingManager.isFirstTimeUser() } returns false
+
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        val step5State = viewModel.routingState.first()
+        assertTrue(step5State is RoutingState.Success)
+        assertEquals(NavigationDestinations.RecordShot.route, (step5State as RoutingState.Success).route)
+        assertTrue(!step5State.isFirstTimeUser)
     }
 
     @Test
     fun `app update scenario handles inconsistent state correctly`() = runTest {
         // Test scenario: App update causes inconsistent onboarding state
-        
+
         // Given: User is marked as first-time but has completed all steps
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
         coEvery { onboardingManager.markOnboardingComplete() } returns Unit
@@ -123,14 +139,14 @@ class OnboardingRoutingIntegrationTest {
         val state = viewModel.routingState.first()
         assertTrue(state is RoutingState.Success)
         assertEquals(NavigationDestinations.RecordShot.route, (state as RoutingState.Success).route)
-        
+
         coVerify { onboardingManager.markOnboardingComplete() }
     }
 
     @Test
     fun `data clearing scenario resets to introduction`() = runTest {
         // Test scenario: User clears app data, should restart onboarding
-        
+
         // Given: Fresh state after data clearing
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
@@ -148,7 +164,7 @@ class OnboardingRoutingIntegrationTest {
     @Test
     fun `error recovery provides fallback to normal flow`() = runTest {
         // Test scenario: OnboardingManager fails, should fallback gracefully
-        
+
         // Given: OnboardingManager throws exception
         val exception = RuntimeException("Storage failure")
         coEvery { onboardingManager.isFirstTimeUser() } throws exception
@@ -179,7 +195,7 @@ class OnboardingRoutingIntegrationTest {
     @Test
     fun `force normal flow bypasses onboarding completely`() = runTest {
         // Test scenario: Emergency bypass of onboarding system
-        
+
         // Given: User should normally go through onboarding
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
@@ -205,7 +221,7 @@ class OnboardingRoutingIntegrationTest {
     @Test
     fun `onboarding navigation flow handles back navigation correctly`() = runTest {
         // Test scenario: User navigates back during onboarding flow
-        
+
         // Step 1: Start at introduction
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
@@ -243,7 +259,7 @@ class OnboardingRoutingIntegrationTest {
     @Test
     fun `onboarding skip functionality routes correctly`() = runTest {
         // Test scenario: User skips onboarding at introduction screen
-        
+
         // Given: User is at introduction screen
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
@@ -269,12 +285,13 @@ class OnboardingRoutingIntegrationTest {
     @Test
     fun `onboarding completion clears navigation stack correctly`() = runTest {
         // Test scenario: User completes onboarding and should not be able to navigate back
-        
-        // Given: User completes equipment setup
+
+        // Given: User completes guided bean creation
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
-            hasCompletedEquipmentSetup = true
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true
         )
 
         viewModel = MainActivityViewModel(onboardingManager)
@@ -290,6 +307,7 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
 

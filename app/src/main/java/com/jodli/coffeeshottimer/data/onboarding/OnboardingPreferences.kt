@@ -33,6 +33,7 @@ class OnboardingPreferences @Inject constructor(
         val completedProgress = currentProgress.copy(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true,
             lastUpdatedAt = System.currentTimeMillis()
         )
@@ -141,6 +142,7 @@ class OnboardingPreferences @Inject constructor(
 private data class SerializableOnboardingProgress(
     val hasSeenIntroduction: Boolean = false,
     val hasCompletedEquipmentSetup: Boolean = false,
+    val hasCreatedFirstBean: Boolean = false,
     val hasRecordedFirstShot: Boolean = false,
     val grinderConfigurationId: String? = null,
     val onboardingStartedAt: Long = System.currentTimeMillis(),
@@ -150,6 +152,7 @@ private data class SerializableOnboardingProgress(
         return OnboardingProgress(
             hasSeenIntroduction = hasSeenIntroduction,
             hasCompletedEquipmentSetup = hasCompletedEquipmentSetup,
+            hasCreatedFirstBean = hasCreatedFirstBean,
             hasRecordedFirstShot = hasRecordedFirstShot,
             grinderConfigurationId = grinderConfigurationId,
             onboardingStartedAt = onboardingStartedAt,
@@ -165,6 +168,7 @@ private fun OnboardingProgress.toSerializable(): SerializableOnboardingProgress 
     return SerializableOnboardingProgress(
         hasSeenIntroduction = hasSeenIntroduction,
         hasCompletedEquipmentSetup = hasCompletedEquipmentSetup,
+        hasCreatedFirstBean = hasCreatedFirstBean,
         hasRecordedFirstShot = hasRecordedFirstShot,
         grinderConfigurationId = grinderConfigurationId,
         onboardingStartedAt = onboardingStartedAt,

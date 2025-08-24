@@ -78,12 +78,34 @@ class MainActivityViewModelTest {
     }
 
     @Test
-    fun `when user is first time and has completed equipment setup, routes to record shot`() = runTest {
+    fun `when user is first time and has completed equipment setup, routes to guided bean creation`() = runTest {
         // Given
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true
+        )
+
+        // When
+        viewModel = MainActivityViewModel(onboardingManager)
+        advanceUntilIdle()
+
+        // Then
+        val state = viewModel.routingState.first()
+        assertTrue(state is RoutingState.Success)
+        val successState = state as RoutingState.Success
+        assertEquals(NavigationDestinations.OnboardingGuidedBeanCreation.route, successState.route)
+        assertTrue(successState.isFirstTimeUser)
+    }
+
+    @Test
+    fun `when user is first time and has created bean, routes to record shot`() = runTest {
+        // Given
+        coEvery { onboardingManager.isFirstTimeUser() } returns true
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true
         )
 
         // When
@@ -122,6 +144,7 @@ class MainActivityViewModelTest {
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
         coEvery { onboardingManager.markOnboardingComplete() } returns Unit
@@ -136,7 +159,7 @@ class MainActivityViewModelTest {
         val successState = state as RoutingState.Success
         assertEquals(NavigationDestinations.RecordShot.route, successState.route)
         assertTrue(successState.isFirstTimeUser)
-        
+
         // Verify onboarding was marked complete
         coVerify { onboardingManager.markOnboardingComplete() }
     }
@@ -216,6 +239,7 @@ class MainActivityViewModelTest {
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
         coEvery { onboardingManager.markOnboardingComplete() } returns Unit
@@ -233,7 +257,7 @@ class MainActivityViewModelTest {
         val successState = state as RoutingState.Success
         assertEquals(NavigationDestinations.RecordShot.route, successState.route)
         assertTrue(!successState.isFirstTimeUser)
-        
+
         // Verify onboarding was marked complete
         coVerify { onboardingManager.markOnboardingComplete() }
     }

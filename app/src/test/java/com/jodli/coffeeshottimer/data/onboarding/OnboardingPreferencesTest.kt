@@ -24,13 +24,13 @@ class OnboardingPreferencesTest {
     fun setup() {
         mockSharedPreferences = mockk()
         mockEditor = mockk(relaxed = true)
-        
+
         every { mockSharedPreferences.edit() } returns mockEditor
         every { mockEditor.putBoolean(any(), any()) } returns mockEditor
         every { mockEditor.putString(any(), any()) } returns mockEditor
         every { mockEditor.remove(any()) } returns mockEditor
         every { mockEditor.apply() } returns Unit
-        
+
         onboardingPreferences = OnboardingPreferences(mockSharedPreferences)
     }
 
@@ -82,6 +82,7 @@ class OnboardingPreferencesTest {
         // Then
         assertFalse(progress.hasSeenIntroduction)
         assertFalse(progress.hasCompletedEquipmentSetup)
+        assertFalse(progress.hasCreatedFirstBean)
         assertFalse(progress.hasRecordedFirstShot)
         assertNull(progress.grinderConfigurationId)
     }
@@ -93,6 +94,7 @@ class OnboardingPreferencesTest {
             {
                 "hasSeenIntroduction": true,
                 "hasCompletedEquipmentSetup": false,
+                "hasCreatedFirstBean": true,
                 "hasRecordedFirstShot": false,
                 "grinderConfigurationId": "test-config-id",
                 "onboardingStartedAt": 1234567890,
@@ -107,6 +109,7 @@ class OnboardingPreferencesTest {
         // Then
         assertTrue(progress.hasSeenIntroduction)
         assertFalse(progress.hasCompletedEquipmentSetup)
+        assertTrue(progress.hasCreatedFirstBean)
         assertFalse(progress.hasRecordedFirstShot)
         assertEquals("test-config-id", progress.grinderConfigurationId)
     }
@@ -122,6 +125,7 @@ class OnboardingPreferencesTest {
         // Then
         assertFalse(progress.hasSeenIntroduction)
         assertFalse(progress.hasCompletedEquipmentSetup)
+        assertFalse(progress.hasCreatedFirstBean)
         assertFalse(progress.hasRecordedFirstShot)
     }
 
@@ -131,6 +135,7 @@ class OnboardingPreferencesTest {
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = false,
             hasRecordedFirstShot = false,
             grinderConfigurationId = "test-config"
         )
@@ -143,10 +148,11 @@ class OnboardingPreferencesTest {
         verify { mockEditor.putString("onboarding_progress", capture(progressSlot)) }
         verify { mockEditor.putBoolean("onboarding_complete", false) } // Not complete yet
         verify { mockEditor.apply() }
-        
+
         // Verify the JSON contains expected data
         assertTrue(progressSlot.captured.contains("\"hasSeenIntroduction\":true"))
         assertTrue(progressSlot.captured.contains("\"hasCompletedEquipmentSetup\":true"))
+        assertTrue(progressSlot.captured.contains("\"hasCreatedFirstBean\":false"))
         assertTrue(progressSlot.captured.contains("\"hasRecordedFirstShot\":false"))
     }
 
@@ -156,6 +162,7 @@ class OnboardingPreferencesTest {
         val completeProgress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
 
@@ -202,6 +209,7 @@ class OnboardingPreferencesTest {
                 "progress": {
                     "hasSeenIntroduction": true,
                     "hasCompletedEquipmentSetup": false,
+                    "hasCreatedFirstBean": true,
                     "hasRecordedFirstShot": false,
                     "grinderConfigurationId": null,
                     "onboardingStartedAt": 1234567890,
@@ -283,6 +291,7 @@ class OnboardingProgressTest {
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = false,
+            hasCreatedFirstBean = false,
             hasRecordedFirstShot = false
         )
 
@@ -296,6 +305,7 @@ class OnboardingProgressTest {
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
 
@@ -328,11 +338,27 @@ class OnboardingProgressTest {
     }
 
     @Test
-    fun `getNextStep returns FIRST_SHOT when equipment setup done`() {
+    fun `getNextStep returns GUIDED_BEAN_CREATION when equipment setup done`() {
         // Given
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true
+        )
+
+        // When
+        val nextStep = progress.getNextStep()
+
+        // Then
+        assertEquals(OnboardingStep.GUIDED_BEAN_CREATION, nextStep)
+    }
+
+    @Test
+    fun `getNextStep returns FIRST_SHOT when bean creation done`() {
+        // Given
+        val progress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true
         )
 
         // When
@@ -348,6 +374,7 @@ class OnboardingProgressTest {
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
             hasRecordedFirstShot = true
         )
 

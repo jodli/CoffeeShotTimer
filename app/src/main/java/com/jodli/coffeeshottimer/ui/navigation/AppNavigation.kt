@@ -88,14 +88,29 @@ fun AppNavigation(
         composable(NavigationDestinations.OnboardingEquipmentSetup.route) {
             EquipmentSetupScreen(
                 onComplete = { _ ->
+                    navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
+                },
+                onBack = {
+                    // Allow going back to introduction if user wants to review
+                    navController.popBackStack()
+                },
+                isOnboardingMode = true
+            )
+        }
+
+        composable(NavigationDestinations.OnboardingGuidedBeanCreation.route) {
+            com.jodli.coffeeshottimer.ui.screens.GuidedBeanCreationScreen(
+                onComplete = { bean ->
                     navController.navigate(NavigationDestinations.RecordShot.route) {
                         // Clear all onboarding screens from back stack after completion
                         popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
                     }
                 },
-                onBack = {
-                    // Allow going back to introduction if user wants to review
-                    navController.popBackStack()
+                onSkip = {
+                    navController.navigate(NavigationDestinations.RecordShot.route) {
+                        // Clear all onboarding screens from back stack when skipping
+                        popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
+                    }
                 }
             )
         }

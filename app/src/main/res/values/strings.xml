@@ -168,7 +168,37 @@
     <string name="text_improving_consistency">Improving consistency</string>
     <string name="text_room_for_improvement">Room for improvement</string>
 
-    <!-- Buttons -->
+    <!-- Onboarding Guided Bean Creation -->
+    <string name="onboarding_guided_bean_creation_title">Let\'s Add Your First Bean</string>
+    <string name="onboarding_progress_step_title">Step %1$d of %2$d: %3$s</string>
+
+    <!-- Bean Education Content -->
+    <string name="bean_education_title">Why Track Your Beans?</string>
+    <string name="bean_education_freshness_title">Timing is Everything</string>
+    <string name="bean_education_freshness_description">Coffee peaks 4-21 days after roasting. Track roast dates and we\'ll help you brew at the perfect moment.</string>
+    <string name="bean_education_history_title">Discover Your Favorites</string>
+    <string name="bean_education_history_description">By connecting shots to specific beans, you\'ll learn which coffees shine with your technique and equipment.</string>
+    <string name="bean_education_visual_title">Remember at a Glance</string>
+    <string name="bean_education_visual_description">Photos help you instantly recognize your favorites and remember that amazing bag you want to buy again.</string>
+
+    <!-- Bean Creation Success -->
+    <string name="bean_creation_success_title">Awesome! Your First Bean is Ready</string>
+    <string name="bean_creation_success_message">%1$s is now part of your coffee journey. Time to pull your first tracked shot and see what this coffee can do!</string>
+    <string name="bean_creation_success_freshness_good">Perfect timing – these beans are in their sweet spot for amazing espresso!</string>
+    <string name="bean_creation_success_freshness_fresh">These beans are super fresh. Give them 2-4 days and they\'ll be incredible for espresso.</string>
+    <string name="bean_creation_success_freshness_aging">These beans are nicely developed and still perfect for delicious espresso shots!</string>
+
+    <!-- Action Buttons -->
+    <string name="button_add_my_first_bean">Add My First Bean</string>
+    <string name="button_skip_for_now">Skip for Now</string>
+    <string name="button_create_bean">Create Bean</string>
+    <string name="button_continue_to_shot">Let\'s Pull a Shot</string>
+    <string name="button_back">Back</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_bean_education_freshness">Coffee bean freshness illustration</string>
+    <string name="cd_bean_creation_success">Bean creation success animation</string>
+    <string name="cd_onboarding_progress">Onboarding progress indicator</string>
     <string name="button_clear_all">Clear All</string>
     <string name="button_apply_filters">Apply Filters</string>
     <string name="button_clear_start">Clear Start</string>
@@ -274,8 +304,17 @@
 
     <!-- Photo UI Strings -->
     <string name="text_bean_photo">Bean Photo</string>
+    <string name="text_optional">Optional</string>
+    <string name="text_creating_bean">Creating bean...</string>
+    <string name="bean_form_title">Tell us about your coffee</string>
+    <string name="bean_form_name_label">Bean name or description</string>
+    <string name="bean_form_name_placeholder">e.g., Colombian Single Origin</string>
+    <string name="bean_form_roast_date_label">Roast date (if known)</string>
+    <string name="bean_form_roast_date_help">This helps track freshness. Leave blank if unknown.</string>
+    <string name="bean_form_photo_help">Adding a photo helps identify your beans later</string>
+    <string name="bean_form_photo_help_simplified">You can add photos later from the bean management screen</string>
     <string name="text_add_photo">Add Photo</string>
-    
+
     <!-- Short photo button text -->
     <string name="text_view_short">View</string>
     <string name="text_replace_short">Replace</string>
@@ -292,11 +331,11 @@
     <string name="text_retry">Retry</string>
     <string name="text_try_again">Try Again</string>
     <string name="text_grant_permission">Grant Permission</string>
-    
+
     <!-- Photo Confirmation Dialogs -->
     <string name="dialog_delete_photo_title">Delete Photo?</string>
     <string name="dialog_delete_photo_message">Are you sure you want to delete this photo? This action cannot be undone.</string>
-    
+
     <!-- Photo Content Descriptions -->
     <string name="cd_bean_photo">Bean photo</string>
     <string name="cd_add_photo">Add photo</string>
@@ -458,28 +497,28 @@
 
     <!-- Introduction Screen Content -->
     <string name="intro_welcome_title">Welcome to\nCoffee Shot Timer</string>
-    <string name="intro_welcome_description">Transform your espresso brewing into a systematic journey of improvement with precise timing and detailed tracking.</string>
-    
-    <string name="intro_main_screens_title">Main Features</string>
-    <string name="intro_main_screens_description">Explore the three main areas of the app designed to support your brewing workflow:</string>
-    
+    <string name="intro_welcome_description">Master the art of espresso with precision timing and insights that help you brew consistently great shots, every time.</string>
+
+    <string name="intro_main_screens_title">Everything You Need</string>
+    <string name="intro_main_screens_description">Three simple tools that work together to elevate your espresso game:</string>
+
     <string name="intro_record_shot_title">Record Shots</string>
-    <string name="intro_record_shot_description">Track your espresso shots with precise measurements and timing</string>
-    
-    <string name="intro_shot_history_title">Shot History</string>
-    <string name="intro_shot_history_description">Analyze your brewing patterns and improvements over time</string>
-    
-    <string name="intro_bean_management_title">Bean Management</string>
-    <string name="intro_bean_management_description">Organize your coffee beans and track their freshness</string>
-    
-    <string name="intro_flexible_workflow_title">Flexible Workflow</string>
-    <string name="intro_flexible_workflow_description">Fill in measurements in any order that matches your brewing style. Coffee in, grind setting, extraction time, and coffee out can all be recorded as you go.</string>
-    
-    <string name="intro_timer_usage_title">Smart Timer</string>
-    <string name="intro_timer_usage_description">Start the timer before, during, or after other measurements. The flexible timer adapts to your brewing workflow and provides optimal extraction guidance.</string>
-    
-    <string name="intro_get_started_title">Ready to Begin</string>
-    <string name="intro_get_started_description">Let\'s set up your equipment and record your first shot. You\'ll be brewing better espresso in no time!</string>
+    <string name="intro_record_shot_description">Capture every detail – timing, weights, grind settings, and notes</string>
+
+    <string name="intro_shot_history_title">Track Progress</string>
+    <string name="intro_shot_history_description">See your brewing patterns and discover what makes your best shots</string>
+
+    <string name="intro_bean_management_title">Manage Beans</string>
+    <string name="intro_bean_management_description">Keep track of your coffee collection and optimal freshness windows</string>
+
+    <string name="intro_flexible_workflow_title">Your Workflow, Your Way</string>
+    <string name="intro_flexible_workflow_description">No rigid steps to follow. Record measurements in whatever order feels natural – dose, grind, time, and yield all adapt to how you brew.</string>
+
+    <string name="intro_timer_usage_title">Intelligent Timer</string>
+    <string name="intro_timer_usage_description">Get real-time feedback with color-coded timing zones. Start whenever you\'re ready – the timer works around your process, not against it.</string>
+
+    <string name="intro_get_started_title">Let\'s Get Brewing</string>
+    <string name="intro_get_started_description">Ready to pull your first tracked shot? We\'ll help you set up your equipment and start your journey to better espresso!</string>
 
     <!-- Shot Recommendations -->
     <string name="recommendation_grind_finer">Consider using a finer grind to slow extraction (current: %1$ss)</string>
@@ -504,7 +543,7 @@
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Equipment Setup</string>
     <string name="text_equipment_setup_description">Configure your grinder settings to personalize your brewing experience.</string>
-    
+
     <!-- Equipment Settings (non-onboarding) -->
     <string name="title_equipment_settings">Grinder Settings</string>
     <string name="text_equipment_settings_description">Set the minimum and maximum values that your grinder\'s scale supports. This is used across the app to validate and guide grinder inputs.</string>
@@ -551,5 +590,5 @@
     <string name="suggestion_range_of_at_least_3_steps">A range of at least 3 steps gives you room to adjust your grind.</string>
     <string name="suggestion_smaller_range_is_easier">A smaller range is usually easier to work with.</string>
     <string name="suggestion_enter_whole_numbers_only">Please enter whole numbers only (e.g., 1, 10, 50).</string>
-    
+
 </resources>

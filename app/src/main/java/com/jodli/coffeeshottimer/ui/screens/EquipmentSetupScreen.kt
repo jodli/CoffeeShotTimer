@@ -61,7 +61,8 @@ fun EquipmentSetupScreen(
     onComplete: (GrinderConfiguration) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: EquipmentSetupViewModel = hiltViewModel()
+    viewModel: EquipmentSetupViewModel = hiltViewModel(),
+    isOnboardingMode: Boolean = false
 ) {
     val spacing = LocalSpacing.current
     val uiState by viewModel.uiState.collectAsState()
@@ -73,24 +74,26 @@ fun EquipmentSetupScreen(
     Column(
         modifier = modifier.fillMaxSize()
     ) {
-        // Top App Bar
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.title_equipment_setup),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back)
+        // Top App Bar (only show in non-onboarding mode)
+        if (!isOnboardingMode) {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.title_equipment_setup),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
+                        )
+                    }
                 }
-            }
-        )
+            )
+        }
         
         // Content
         Column(
@@ -162,15 +165,19 @@ com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
                         horizontalArrangement = Arrangement.spacedBy(spacing.medium)
                     ) {
                         CoffeeSecondaryButton(
-                            text = stringResource(R.string.button_skip),
-                            onClick = {
-                                viewModel.skipSetup(
-                                    onSuccess = onComplete,
-                                    onError = { error ->
-                                        errorMessage = error
-                                        showErrorDialog = true
-                                    }
-                                )
+                            text = if (isOnboardingMode) stringResource(R.string.button_back) else stringResource(R.string.button_skip),
+                            onClick = if (isOnboardingMode) {
+                                onBack
+                            } else {
+                                {
+                                    viewModel.skipSetup(
+                                        onSuccess = onComplete,
+                                        onError = { error ->
+                                            errorMessage = error
+                                            showErrorDialog = true
+                                        }
+                                    )
+                                }
                             },
                             enabled = !uiState.isLoading,
                             modifier = Modifier.weight(1f)

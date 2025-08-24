@@ -12,6 +12,7 @@ sealed class NavigationDestinations(val route: String) {
     // Onboarding destinations
     object OnboardingIntroduction : NavigationDestinations("onboarding_introduction")
     object OnboardingEquipmentSetup : NavigationDestinations("onboarding_equipment_setup")
+    object OnboardingGuidedBeanCreation : NavigationDestinations("onboarding_guided_bean_creation")
 
     // Settings destinations
     object EquipmentSettings : NavigationDestinations("settings_equipment")
