@@ -6,6 +6,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Added
+
+- Enhanced onboarding experience with guided bean creation for first-time users.
+
 ## [1.3.2]
 
 ### Added
