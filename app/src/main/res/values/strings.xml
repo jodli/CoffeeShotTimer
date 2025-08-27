@@ -591,4 +591,23 @@
     <string name="suggestion_smaller_range_is_easier">A smaller range is usually easier to work with.</string>
     <string name="suggestion_enter_whole_numbers_only">Please enter whole numbers only (e.g., 1, 10, 50).</string>
 
+    <!-- Basket Configuration -->
+    <string name="text_basket_configuration">Basket Configuration</string>
+    <string name="text_basket_description">Set weight ranges based on your portafilter basket size</string>
+    <string name="text_basket_presets">Common Baskets</string>
+    <string name="button_single_basket">Single</string>
+    <string name="button_double_basket">Double</string>
+    <string name="label_coffee_in_min">Coffee In Min (g)</string>
+    <string name="label_coffee_in_max">Coffee In Max (g)</string>
+    <string name="label_coffee_out_min">Coffee Out Min (g)</string>
+    <string name="label_coffee_out_max">Coffee Out Max (g)</string>
+    <string name="text_manual_basket_range">Manual Range</string>
+    <string name="placeholder_coffee_in_min">e.g., 14</string>
+    <string name="placeholder_coffee_in_max">e.g., 22</string>
+    <string name="placeholder_coffee_out_min">e.g., 28</string>
+    <string name="placeholder_coffee_out_max">e.g., 55</string>
+    <string name="text_basket_validation_success">✓ Weight ranges configured! Perfect for %1$s shots.</string>
+    <string name="text_basket_settings">Basket Settings</string>
+    <string name="text_basket_settings_description">Configure weight slider ranges based on your basket size. This helps you stay within optimal parameters for consistent extraction.</string>
+
 </resources>

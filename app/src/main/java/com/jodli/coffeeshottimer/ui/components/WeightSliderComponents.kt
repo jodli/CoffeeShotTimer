@@ -50,7 +50,8 @@ import kotlin.math.roundToInt
 import java.util.Locale
 
 /**
- * Constants for weight slider bounds
+ * Default constants for weight slider bounds.
+ * These are used as fallbacks when no basket configuration is available.
  */
 object WeightSliderConstants {
     const val COFFEE_IN_MIN_WEIGHT = 5f
@@ -235,12 +236,15 @@ fun WeightSlider(
 
 /**
  * Specialized weight slider for coffee input weight.
+ * Supports dynamic min/max values from basket configuration.
  */
 @Composable
 fun CoffeeWeightInSlider(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    minWeight: Float = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
+    maxWeight: Float = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
     errorMessage: String? = null,
     enabled: Boolean = true
 ) {
@@ -249,8 +253,8 @@ fun CoffeeWeightInSlider(
         onValueChange = onValueChange,
         label = stringResource(R.string.label_coffee_in),
         modifier = modifier,
-        minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
-        maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
+        minWeight = minWeight,
+        maxWeight = maxWeight,
         icon = Icons.AutoMirrored.Filled.Input,
         errorMessage = errorMessage,
         enabled = enabled
@@ -259,12 +263,15 @@ fun CoffeeWeightInSlider(
 
 /**
  * Specialized weight slider for coffee output weight.
+ * Supports dynamic min/max values from basket configuration.
  */
 @Composable
 fun CoffeeWeightOutSlider(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    minWeight: Float = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
+    maxWeight: Float = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT,
     errorMessage: String? = null,
     enabled: Boolean = true
 ) {
@@ -273,8 +280,8 @@ fun CoffeeWeightOutSlider(
         onValueChange = onValueChange,
         label = stringResource(R.string.label_coffee_out),
         modifier = modifier,
-        minWeight = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
-        maxWeight = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT,
+        minWeight = minWeight,
+        maxWeight = maxWeight,
         icon = Icons.Default.Output,
         errorMessage = errorMessage,
         enabled = enabled
