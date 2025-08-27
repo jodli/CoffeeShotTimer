@@ -5,9 +5,11 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
+import com.jodli.coffeeshottimer.data.model.BasketConfiguration
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.Shot
@@ -19,8 +21,8 @@ import com.jodli.coffeeshottimer.data.model.Shot
  * relationships and performance optimizations.
  */
 @Database(
-    entities = [Bean::class, Shot::class, GrinderConfiguration::class],
-    version = 3,
+    entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
+    version = 4,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -29,6 +31,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun beanDao(): BeanDao
     abstract fun shotDao(): ShotDao
     abstract fun grinderConfigDao(): GrinderConfigDao
+    abstract fun basketConfigDao(): BasketConfigDao
 
     companion object {
         const val DATABASE_NAME = "espresso_tracker_database"
@@ -39,7 +42,8 @@ abstract class AppDatabase : RoomDatabase() {
         fun getAllMigrations(): Array<Migration> {
             return arrayOf(
                 MIGRATION_1_2,
-                MIGRATION_2_3
+                MIGRATION_2_3,
+                MIGRATION_3_4
             )
         }
 
@@ -133,6 +137,52 @@ abstract class AppDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 2->3 failed: ${e.message}", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 3 to 4: Add basket_configuration table.
+         */
+        private val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Create basket_configuration table
+                    // Note: Room handles REAL for Float fields and INTEGER for Boolean fields
+                    db.execSQL("""
+                        CREATE TABLE IF NOT EXISTS basket_configuration (
+                            id TEXT NOT NULL PRIMARY KEY,
+                            coffeeInMin REAL NOT NULL,
+                            coffeeInMax REAL NOT NULL,
+                            coffeeOutMin REAL NOT NULL,
+                            coffeeOutMax REAL NOT NULL,
+                            createdAt TEXT NOT NULL,
+                            isActive INTEGER NOT NULL
+                        )
+                    """)
+
+                    // Create indices for basket_configuration using Room's canonical naming
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_createdAt ON basket_configuration (createdAt)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_isActive ON basket_configuration (isActive)")
+
+                    // Insert default basket configuration (Double Shot preset) for existing users
+                    // Using a simplified UUID generation for SQLite
+                    db.execSQL("""
+                        INSERT INTO basket_configuration (id, coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax, createdAt, isActive)
+                        VALUES (
+                            lower(hex(randomblob(16))),
+                            14.0,
+                            22.0,
+                            28.0,
+                            55.0,
+                            datetime('now'),
+                            1
+                        )
+                    """)
+
+                } catch (e: Exception) {
+                    // Surface the failure so Room can handle it and report clearly
+                    throw RuntimeException("Migration 3->4 failed: ${e.message}", e)
                 }
             }
         }
