@@ -593,6 +593,23 @@
     <string name="suggestion_smaller_range_is_easier">Ein kleinerer Bereich ist normalerweise einfacher zu handhaben.</string>
     <string name="suggestion_enter_whole_numbers_only">Bitte gib nur ganze Zahlen ein (z.B. 1, 10, 50).</string>
 
-    <!-- Bean Form Strings -->
+    <!-- Basket Configuration -->
+    <string name="text_basket_configuration">Siebträger-Konfiguration</string>
+    <string name="text_basket_description">Gewichtsbereiche basierend auf deiner Siebgröße einstellen</string>
+    <string name="text_basket_presets">Gängige Siebe</string>
+    <string name="button_single_basket">Einzeln</string>
+    <string name="button_double_basket">Doppelt</string>
+    <string name="label_coffee_in_min">Pulver Rein Min (g)</string>
+    <string name="label_coffee_in_max">Pulver Rein Max (g)</string>
+    <string name="label_coffee_out_min">Kaffee Raus Min (g)</string>
+    <string name="label_coffee_out_max">Kaffee Raus Max (g)</string>
+    <string name="text_manual_basket_range">Manueller Bereich</string>
+    <string name="placeholder_coffee_in_min">z.B. 14</string>
+    <string name="placeholder_coffee_in_max">z.B. 22</string>
+    <string name="placeholder_coffee_out_min">z.B. 28</string>
+    <string name="placeholder_coffee_out_max">z.B. 55</string>
+    <string name="text_basket_validation_success">✓ Gewichtsbereiche konfiguriert! Perfekt für %1$s Shots.</string>
+    <string name="text_basket_settings">Siebeinstellungen</string>
+    <string name="text_basket_settings_description">Konfiguriere die Gewichtsbereichsregler basierend auf deiner Siebgröße. Dies hilft dir, innerhalb optimaler Parameter für konsistente Extraktion zu bleiben.</string>
 
 </resources>
