@@ -430,12 +430,3 @@ data class EquipmentSetupFlowUiState(
     val error: String? = null
 )
 
-/**
- * Represents the different steps in equipment setup
- */
-enum class EquipmentSetupStep {
-    WELCOME,
-    GRINDER_SETUP,
-    BASKET_SETUP,
-    SUMMARY
-}

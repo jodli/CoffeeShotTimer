@@ -573,6 +573,51 @@
     <string name="feedback_email_subject">Coffee Shot Timer feedback</string>
     <string name="text_made_with_love">Made with ☕ for the home barista community</string>
 
+    <!-- Equipment Setup Flow Steps -->
+    <string name="equipment_setup_step_welcome">Welcome</string>
+    <string name="equipment_setup_step_grinder">Grinder Setup</string>
+    <string name="equipment_setup_step_basket">Basket Setup</string>
+    <string name="equipment_setup_step_summary">Review Settings</string>
+    
+    <!-- Equipment Setup Welcome Screen -->
+    <string name="equipment_setup_welcome_title">Let\'s Set Up Your Equipment</string>
+    <string name="equipment_setup_welcome_description">A quick setup to personalize your espresso experience based on your specific equipment.</string>
+    <string name="equipment_setup_grinder_title">Grinder Settings</string>
+    <string name="equipment_setup_grinder_description">Configure your grinder\'s scale range for precise adjustment tracking.</string>
+    <string name="equipment_setup_basket_title">Basket Configuration</string>
+    <string name="equipment_setup_basket_description">Set weight ranges based on your basket size for optimal extraction.</string>
+    <string name="equipment_setup_benefits_title">Why Configure Equipment?</string>
+    <string name="equipment_setup_benefits_description">Get personalized guidance and validation tailored to your specific setup.</string>
+    
+    <!-- Equipment Setup Grinder Step -->
+    <string name="equipment_setup_grinder_step_title">Configure Your Grinder</string>
+    <string name="equipment_setup_grinder_step_description">What\'s the range of your grinder\'s adjustment scale? This helps track your settings accurately.</string>
+    
+    <!-- Equipment Setup Basket Step -->
+    <string name="equipment_setup_basket_step_title">Configure Your Basket</string>
+    <string name="equipment_setup_basket_step_description">Set the weight ranges for your portafilter basket. This ensures your doses stay within optimal parameters.</string>
+    
+    <!-- Equipment Setup Summary -->
+    <string name="equipment_setup_summary_title">All Set!</string>
+    <string name="equipment_setup_summary_description">Review your equipment configuration below. You can always change these settings later.</string>
+    <string name="button_save_and_continue">Save &amp; Continue</string>
+    <string name="error_saving_configuration">Configuration Error</string>
+    <string name="summary_grinder_range_format">Scale range: %1$s to %2$s</string>
+    <string name="summary_grinder_steps_format">%1$d adjustment steps available</string>
+    <string name="summary_coffee_in_format">Coffee in: %1$sg – %2$sg</string>
+    <string name="summary_coffee_out_format">Coffee out: %1$sg – %2$sg</string>
+    <string name="summary_basket_type_format">Basket type: %1$s</string>
+    <string name="basket_type_single">Single</string>
+    <string name="basket_type_double">Double</string>
+    <string name="basket_type_custom">Custom</string>
+    
+    <!-- Basket Validation Suggestions -->
+    <string name="suggestion_basket_min_less_than_max">The minimum value must be less than the maximum value.</string>
+    <string name="suggestion_basket_check_minimum_values">Check that your minimum values aren\'t too low for your basket.</string>
+    <string name="suggestion_basket_check_maximum_values">Check that your maximum values aren\'t too high for your basket.</string>
+    <string name="suggestion_basket_increase_range">Try increasing the range between min and max values.</string>
+    <string name="suggestion_basket_check_ratios">Adjust the ranges to allow typical brew ratios (1:1.5 to 1:3).</string>
+    
     <!-- Equipment Setup Validation and Errors -->
     <string name="text_equipment_setup_failed">Setup Failed</string>
     <string name="text_saving_configuration">Saving configuration…</string>
