@@ -69,7 +69,6 @@ import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
 import com.jodli.coffeeshottimer.ui.components.SectionHeader
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.TimerControls
-import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.RecordShotLandscapeLayout
@@ -97,8 +96,6 @@ fun RecordShotScreen(
     val coffeeWeightOut by viewModel.coffeeWeightOut.collectAsStateWithLifecycle()
     val grinderSetting by viewModel.grinderSetting.collectAsStateWithLifecycle()
     val notes by viewModel.notes.collectAsStateWithLifecycle()
-    val coffeeWeightInError by viewModel.coffeeWeightInError.collectAsStateWithLifecycle()
-    val coffeeWeightOutError by viewModel.coffeeWeightOutError.collectAsStateWithLifecycle()
     val grinderSettingError by viewModel.grinderSettingError.collectAsStateWithLifecycle()
     val brewRatio by viewModel.brewRatio.collectAsStateWithLifecycle()
     val formattedBrewRatio by viewModel.formattedBrewRatio.collectAsStateWithLifecycle()
@@ -115,6 +112,12 @@ fun RecordShotScreen(
 
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
+
+    // Basket configuration ranges
+    val basketCoffeeInMin by viewModel.basketCoffeeInMin.collectAsStateWithLifecycle()
+    val basketCoffeeInMax by viewModel.basketCoffeeInMax.collectAsStateWithLifecycle()
+    val basketCoffeeOutMin by viewModel.basketCoffeeOutMin.collectAsStateWithLifecycle()
+    val basketCoffeeOutMax by viewModel.basketCoffeeOutMax.collectAsStateWithLifecycle()
 
     // Debug state (only in debug builds)
     val debugUiState by debugViewModel.uiState.collectAsStateWithLifecycle()
@@ -166,10 +169,8 @@ fun RecordShotScreen(
                     onReset = { viewModel.resetTimer() },
                     coffeeWeightIn = coffeeWeightIn,
                     onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
-                    coffeeWeightInError = coffeeWeightInError,
                     coffeeWeightOut = coffeeWeightOut,
                     onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
-                    coffeeWeightOutError = coffeeWeightOutError,
                     brewRatio = brewRatio,
                     formattedBrewRatio = formattedBrewRatio,
                     isOptimalBrewRatio = isOptimalBrewRatio,
@@ -181,6 +182,10 @@ fun RecordShotScreen(
                     onUseSuggestion = { suggestion -> viewModel.updateGrinderSetting(suggestion) },
                     grinderScaleMin = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
                     grinderScaleMax = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
+                    basketCoffeeInMin = basketCoffeeInMin,
+                    basketCoffeeInMax = basketCoffeeInMax,
+                    basketCoffeeOutMin = basketCoffeeOutMin,
+                    basketCoffeeOutMax = basketCoffeeOutMax,
                     notes = notes,
                     onNotesChange = viewModel::updateNotes,
                     bringIntoViewRequester = bringIntoViewRequester,
@@ -236,10 +241,10 @@ fun RecordShotScreen(
                         onNavigateToBeanManagement = onNavigateToBeanManagement,
                         coffeeWeightIn = coffeeWeightIn,
                         onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
-                        coffeeWeightInError = coffeeWeightInError,
+                        coffeeWeightInError = null, // Not needed with clamped sliders
                         coffeeWeightOut = coffeeWeightOut,
                         onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
-                        coffeeWeightOutError = coffeeWeightOutError,
+                        coffeeWeightOutError = null, // Not needed with clamped sliders
                         brewRatio = brewRatio,
                         formattedBrewRatio = formattedBrewRatio,
                         isOptimalBrewRatio = isOptimalBrewRatio,
@@ -251,6 +256,10 @@ fun RecordShotScreen(
                         onUseSuggestion = { suggestion -> viewModel.updateGrinderSetting(suggestion) },
                         grinderScaleMin = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
                         grinderScaleMax = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
+                        basketCoffeeInMin = basketCoffeeInMin,
+                        basketCoffeeInMax = basketCoffeeInMax,
+                        basketCoffeeOutMin = basketCoffeeOutMin,
+                        basketCoffeeOutMax = basketCoffeeOutMax,
                         notes = notes,
                         onNotesChange = viewModel::updateNotes,
                         bringIntoViewRequester = bringIntoViewRequester,
@@ -700,10 +709,8 @@ private fun RecordShotPortraitContent(
     onReset: () -> Unit,
     coffeeWeightIn: String,
     onCoffeeWeightInChange: (String) -> Unit,
-    coffeeWeightInError: String?,
     coffeeWeightOut: String,
     onCoffeeWeightOutChange: (String) -> Unit,
-    coffeeWeightOutError: String?,
     brewRatio: Double?,
     formattedBrewRatio: String?,
     isOptimalBrewRatio: Boolean,
@@ -715,6 +722,10 @@ private fun RecordShotPortraitContent(
     onUseSuggestion: (String) -> Unit,
     grinderScaleMin: Float,
     grinderScaleMax: Float,
+    basketCoffeeInMin: Float,
+    basketCoffeeInMax: Float,
+    basketCoffeeOutMin: Float,
+    basketCoffeeOutMax: Float,
     notes: String,
     onNotesChange: (String) -> Unit,
     bringIntoViewRequester: BringIntoViewRequester,
@@ -755,10 +766,12 @@ private fun RecordShotPortraitContent(
     WeightSlidersSection(
         coffeeWeightIn = coffeeWeightIn,
         onCoffeeWeightInChange = onCoffeeWeightInChange,
-        coffeeWeightInError = coffeeWeightInError,
         coffeeWeightOut = coffeeWeightOut,
         onCoffeeWeightOutChange = onCoffeeWeightOutChange,
-        coffeeWeightOutError = coffeeWeightOutError,
+        basketCoffeeInMin = basketCoffeeInMin,
+        basketCoffeeInMax = basketCoffeeInMax,
+        basketCoffeeOutMin = basketCoffeeOutMin,
+        basketCoffeeOutMax = basketCoffeeOutMax,
         modifier = Modifier.fillMaxWidth()
     )
 
@@ -871,6 +884,10 @@ private fun RecordShotFormContent(
     onUseSuggestion: (String) -> Unit,
     grinderScaleMin: Float,
     grinderScaleMax: Float,
+    basketCoffeeInMin: Float,
+    basketCoffeeInMax: Float,
+    basketCoffeeOutMin: Float,
+    basketCoffeeOutMax: Float,
     notes: String,
     onNotesChange: (String) -> Unit,
     bringIntoViewRequester: BringIntoViewRequester,
@@ -896,10 +913,12 @@ private fun RecordShotFormContent(
     WeightSlidersSection(
         coffeeWeightIn = coffeeWeightIn,
         onCoffeeWeightInChange = onCoffeeWeightInChange,
-        coffeeWeightInError = coffeeWeightInError,
         coffeeWeightOut = coffeeWeightOut,
         onCoffeeWeightOutChange = onCoffeeWeightOutChange,
-        coffeeWeightOutError = coffeeWeightOutError,
+        basketCoffeeInMin = basketCoffeeInMin,
+        basketCoffeeInMax = basketCoffeeInMax,
+        basketCoffeeOutMin = basketCoffeeOutMin,
+        basketCoffeeOutMax = basketCoffeeOutMax,
         modifier = Modifier.fillMaxWidth()
     )
 

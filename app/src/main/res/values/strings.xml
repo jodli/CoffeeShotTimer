@@ -546,6 +546,7 @@
 
     <!-- Equipment Settings (non-onboarding) -->
     <string name="title_equipment_settings">Grinder Settings</string>
+    <string name="title_basket_settings">Basket Settings</string>
     <string name="text_equipment_settings_description">Set the minimum and maximum values that your grinder\'s scale supports. This is used across the app to validate and guide grinder inputs.</string>
     <string name="title_more">More</string>
     <string name="text_grinder_scale_range">Grinder Scale Range</string>

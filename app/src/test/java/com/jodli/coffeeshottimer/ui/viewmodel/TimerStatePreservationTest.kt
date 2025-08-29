@@ -45,6 +45,7 @@ class TimerStatePreservationTest {
     private lateinit var stringResourceProvider: StringResourceProvider
     private lateinit var validationStringProvider: ValidationStringProvider
     private lateinit var grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
+    private lateinit var basketConfigRepository: com.jodli.coffeeshottimer.data.repository.BasketConfigRepository
     private lateinit var context: Context
     private lateinit var savedStateHandle: SavedStateHandle
     
@@ -67,6 +68,7 @@ class TimerStatePreservationTest {
         stringResourceProvider = mockk(relaxed = true)
         validationStringProvider = mockk(relaxed = true)
         grinderConfigRepository = mockk(relaxed = true)
+        basketConfigRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
         savedStateHandle = SavedStateHandle()
         
@@ -99,6 +101,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -126,6 +129,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle // Same SavedStateHandle
         )
@@ -150,6 +154,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -176,6 +181,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -199,6 +205,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -223,6 +230,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -246,6 +254,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -267,6 +276,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -288,6 +298,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -311,6 +322,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )
@@ -332,6 +344,7 @@ class TimerStatePreservationTest {
             stringResourceProvider = stringResourceProvider,
             validationStringProvider = validationStringProvider,
             grinderConfigRepository = grinderConfigRepository,
+            basketConfigRepository = basketConfigRepository,
             context = context,
             savedStateHandle = savedStateHandle
         )

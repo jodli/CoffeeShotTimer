@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Public
+import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,7 +38,8 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    onNavigateToEquipmentSettings: () -> Unit,
+    onNavigateToGrinderSettings: () -> Unit,
+    onNavigateToBasketSettings: () -> Unit,
     onNavigateToAbout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -48,7 +50,8 @@ fun MoreScreen(
         modifier = modifier.fillMaxSize(),
         portraitContent = {
             MoreScreenContent(
-                onNavigateToEquipmentSettings = onNavigateToEquipmentSettings,
+                onNavigateToGrinderSettings = onNavigateToGrinderSettings,
+                onNavigateToBasketSettings = onNavigateToBasketSettings,
                 onNavigateToAbout = onNavigateToAbout,
                 spacing = spacing,
                 context = context
@@ -56,7 +59,8 @@ fun MoreScreen(
         },
         landscapeContent = {
             MoreScreenContent(
-                onNavigateToEquipmentSettings = onNavigateToEquipmentSettings,
+                onNavigateToGrinderSettings = onNavigateToGrinderSettings,
+                onNavigateToBasketSettings = onNavigateToBasketSettings,
                 onNavigateToAbout = onNavigateToAbout,
                 spacing = spacing,
                 context = context
@@ -67,7 +71,8 @@ fun MoreScreen(
 
 @Composable
 private fun MoreScreenContent(
-    onNavigateToEquipmentSettings: () -> Unit,
+    onNavigateToGrinderSettings: () -> Unit,
+    onNavigateToBasketSettings: () -> Unit,
     onNavigateToAbout: () -> Unit,
     spacing: com.jodli.coffeeshottimer.ui.theme.Spacing,
     context: android.content.Context
@@ -78,10 +83,10 @@ private fun MoreScreenContent(
             .padding(spacing.screenPadding),
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        // Equipment & Grinder Settings - no header needed
+        // Grinder Settings
         CoffeeCard(
             modifier = Modifier.fillMaxWidth(),
-            onClick = onNavigateToEquipmentSettings
+            onClick = onNavigateToGrinderSettings
         ) {
             androidx.compose.foundation.layout.Row(
                 modifier = Modifier
@@ -99,6 +104,40 @@ private fun MoreScreenContent(
                     Column {
                         Text(
                             text = stringResource(id = R.string.title_equipment_settings),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // Basket Settings (Portafilter Configuration)
+        CoffeeCard(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = onNavigateToBasketSettings
+        ) {
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = spacing.cardPadding, vertical = spacing.small)
+                    .height(spacing.touchTarget),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                androidx.compose.foundation.layout.Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+                ) {
+                    Icon(Icons.Filled.Scale, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Column {
+                        Text(
+                            text = stringResource(id = R.string.title_basket_settings),
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.onSurface
                         )

@@ -51,6 +51,7 @@ class ShotRecordingViewModelTest {
         domainErrorTranslator = mockk<DomainErrorTranslator>(relaxed = true)
         validationStringProvider = mockk<ValidationStringProvider>(relaxed = true)
         val grinderConfigRepository = mockk<com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository>(relaxed = true)
+        val basketConfigRepository = mockk<com.jodli.coffeeshottimer.data.repository.BasketConfigRepository>(relaxed = true)
 
         // Create ViewModel with injected dependencies
         viewModel = ShotRecordingViewModel(
@@ -62,6 +63,7 @@ class ShotRecordingViewModelTest {
             stringResourceProvider,
             validationStringProvider,
             grinderConfigRepository,
+            basketConfigRepository,
             context,
             androidx.lifecycle.SavedStateHandle()
         )

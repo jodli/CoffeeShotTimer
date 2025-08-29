@@ -49,6 +49,7 @@ import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.OnboardingErrorCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.validation.GrinderValidationHelpers
 import com.jodli.coffeeshottimer.ui.viewmodel.EquipmentSetupViewModel
 
 /**
@@ -154,7 +155,7 @@ com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
                         minError = uiState.minError,
                         maxError = uiState.maxError,
                         generalError = uiState.generalError,
-                        validationSuggestion = uiState.generalError?.let { viewModel.getValidationSuggestion(it) },
+                        validationSuggestion = GrinderValidationHelpers.getValidationSuggestion(uiState.generalError),
                         showDescription = true,
                         showPresets = true
                     )

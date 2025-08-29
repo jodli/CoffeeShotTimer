@@ -174,7 +174,7 @@ fun EquipmentSetupProgress(
         Spacer(modifier = Modifier.height(spacing.small))
         
         LinearProgressIndicator(
-            progress = currentStepNumber.toFloat() / totalSteps.toFloat(),
+            progress = { currentStepNumber.toFloat() / totalSteps.toFloat() },
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.primary,
             trackColor = MaterialTheme.colorScheme.surfaceVariant

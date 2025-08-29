@@ -62,6 +62,7 @@ class ShotRecordingViewModel @Inject constructor(
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
     private val grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository,
+    private val basketConfigRepository: com.jodli.coffeeshottimer.data.repository.BasketConfigRepository,
     @param:ApplicationContext private val context: Context,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -140,6 +141,19 @@ class ShotRecordingViewModel @Inject constructor(
 
     private val _grinderScaleMax = MutableStateFlow(20.0f)
     val grinderScaleMax: StateFlow<Float> = _grinderScaleMax.asStateFlow()
+    
+    // Basket configuration for weight ranges
+    private val _basketCoffeeInMin = MutableStateFlow(5f)
+    val basketCoffeeInMin: StateFlow<Float> = _basketCoffeeInMin.asStateFlow()
+    
+    private val _basketCoffeeInMax = MutableStateFlow(22f)
+    val basketCoffeeInMax: StateFlow<Float> = _basketCoffeeInMax.asStateFlow()
+    
+    private val _basketCoffeeOutMin = MutableStateFlow(10f)
+    val basketCoffeeOutMin: StateFlow<Float> = _basketCoffeeOutMin.asStateFlow()
+    
+    private val _basketCoffeeOutMax = MutableStateFlow(55f)
+    val basketCoffeeOutMax: StateFlow<Float> = _basketCoffeeOutMax.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
@@ -186,6 +200,7 @@ class ShotRecordingViewModel @Inject constructor(
         loadActiveBeans()
         loadCurrentBean()
         loadGrinderConfiguration()
+        loadBasketConfiguration()
         restoreTimerState()
         startTimerUpdates()
         observeRecordingState()
@@ -254,6 +269,40 @@ class ShotRecordingViewModel @Inject constructor(
                     // Fallback to defaults if repository fails
                     _grinderScaleMin.value = com.jodli.coffeeshottimer.data.model.GrinderConfiguration.DEFAULT_CONFIGURATION.scaleMin.toFloat()
                     _grinderScaleMax.value = com.jodli.coffeeshottimer.data.model.GrinderConfiguration.DEFAULT_CONFIGURATION.scaleMax.toFloat()
+                }
+            )
+        }
+    }
+    
+    /**
+     * Load basket configuration for weight slider ranges.
+     */
+    private fun loadBasketConfiguration() {
+        viewModelScope.launch {
+            val result = basketConfigRepository.getActiveConfig()
+            result.fold(
+                onSuccess = { config ->
+                    if (config != null) {
+                        _basketCoffeeInMin.value = config.coffeeInMin
+                        _basketCoffeeInMax.value = config.coffeeInMax
+                        _basketCoffeeOutMin.value = config.coffeeOutMin
+                        _basketCoffeeOutMax.value = config.coffeeOutMax
+                    } else {
+                        // Use default basket configuration if none exists
+                        val defaultConfig = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
+                        _basketCoffeeInMin.value = defaultConfig.coffeeInMin
+                        _basketCoffeeInMax.value = defaultConfig.coffeeInMax
+                        _basketCoffeeOutMin.value = defaultConfig.coffeeOutMin
+                        _basketCoffeeOutMax.value = defaultConfig.coffeeOutMax
+                    }
+                },
+                onFailure = {
+                    // Fallback to default basket configuration
+                    val defaultConfig = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
+                    _basketCoffeeInMin.value = defaultConfig.coffeeInMin
+                    _basketCoffeeInMax.value = defaultConfig.coffeeInMax
+                    _basketCoffeeOutMin.value = defaultConfig.coffeeOutMin
+                    _basketCoffeeOutMax.value = defaultConfig.coffeeOutMax
                 }
             )
         }

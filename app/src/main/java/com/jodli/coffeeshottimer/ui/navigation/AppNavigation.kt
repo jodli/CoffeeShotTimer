@@ -17,7 +17,7 @@ import com.jodli.coffeeshottimer.ui.screens.IntroductionScreen
 import com.jodli.coffeeshottimer.ui.screens.RecordShotScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotDetailsScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen
-import com.jodli.coffeeshottimer.ui.screens.EquipmentSetupScreen
+import com.jodli.coffeeshottimer.ui.screens.EquipmentSetupFlowScreen
 
 @Composable
 fun AppNavigation(
@@ -86,15 +86,14 @@ fun AppNavigation(
         }
 
         composable(NavigationDestinations.OnboardingEquipmentSetup.route) {
-            EquipmentSetupScreen(
-                onComplete = { _ ->
+            EquipmentSetupFlowScreen(
+                onComplete = {
                     navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
                 },
-                onBack = {
-                    // Allow going back to introduction if user wants to review
-                    navController.popBackStack()
-                },
-                isOnboardingMode = true
+                onSkip = {
+                    // Skip directly to guided bean creation
+                    navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
+                }
             )
         }
 
@@ -118,8 +117,11 @@ fun AppNavigation(
         // More tab
         composable(NavigationDestinations.More.route) {
             com.jodli.coffeeshottimer.ui.screens.MoreScreen(
-                onNavigateToEquipmentSettings = {
+                onNavigateToGrinderSettings = {
                     navController.navigate(NavigationDestinations.EquipmentSettings.route)
+                },
+                onNavigateToBasketSettings = {
+                    navController.navigate(NavigationDestinations.BasketSettings.route)
                 },
                 onNavigateToAbout = {
                     navController.navigate(NavigationDestinations.About.route)
@@ -127,9 +129,16 @@ fun AppNavigation(
             )
         }
 
-        // Equipment settings (accessible outside onboarding)
+        // Grinder settings (accessible outside onboarding)
         composable(NavigationDestinations.EquipmentSettings.route) {
-            com.jodli.coffeeshottimer.ui.screens.EquipmentSettingsScreen(
+            com.jodli.coffeeshottimer.ui.screens.GrinderSettingsScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Basket settings
+        composable(NavigationDestinations.BasketSettings.route) {
+            com.jodli.coffeeshottimer.ui.screens.BasketSettingsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

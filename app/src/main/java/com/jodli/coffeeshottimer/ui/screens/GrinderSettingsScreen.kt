@@ -39,11 +39,12 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.GentleValidationMessage
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.validation.GrinderValidationHelpers
 import com.jodli.coffeeshottimer.ui.viewmodel.EquipmentSettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EquipmentSettingsScreen(
+fun GrinderSettingsScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: EquipmentSettingsViewModel = hiltViewModel()
@@ -93,7 +94,7 @@ fun EquipmentSettingsScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
+                com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
                     scaleMin = uiState.scaleMin,
                     scaleMax = uiState.scaleMax,
                     onScaleMinChange = viewModel::updateScaleMin,
@@ -102,9 +103,9 @@ com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
                     minError = uiState.minError,
                     maxError = uiState.maxError,
                     generalError = uiState.generalError,
-                    validationSuggestion = uiState.generalError?.let { viewModel.getValidationSuggestion(it) },
-                    showDescription = false,
-                    showPresets = false
+                    validationSuggestion = GrinderValidationHelpers.getValidationSuggestion(uiState.generalError),
+                    showDescription = true,
+                    showPresets = true
                 )
 
                 CoffeePrimaryButton(

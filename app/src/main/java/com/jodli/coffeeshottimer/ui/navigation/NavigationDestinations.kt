@@ -15,7 +15,8 @@ sealed class NavigationDestinations(val route: String) {
     object OnboardingGuidedBeanCreation : NavigationDestinations("onboarding_guided_bean_creation")
 
     // Settings destinations
-    object EquipmentSettings : NavigationDestinations("settings_equipment")
+    object EquipmentSettings : NavigationDestinations("settings_grinder")  // Renamed for clarity
+    object BasketSettings : NavigationDestinations("settings_basket")
     object About : NavigationDestinations("about")
 
     // Modal destinations
