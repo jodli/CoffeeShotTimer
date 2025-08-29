@@ -225,7 +225,9 @@ fun BeanEducationContent(
     val spacing = LocalSpacing.current
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(spacing.large))
@@ -284,7 +286,7 @@ fun BeanEducationContent(
             description = stringResource(R.string.bean_education_visual_description)
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(spacing.large))
 
         // Error display
         if (error != null) {
@@ -562,7 +564,9 @@ fun BeanCreationSuccess(
     val spacing = LocalSpacing.current
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(spacing.large))
@@ -614,7 +618,7 @@ fun BeanCreationSuccess(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(spacing.large))
 
         // Loading indicator
         if (isLoading) {
