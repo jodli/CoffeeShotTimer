@@ -288,42 +288,6 @@ class EquipmentSetupViewModelTest {
     }
 
     @Test
-    fun `getValidationSuggestion returns appropriate suggestions`() {
-        assertEquals(
-            "Mock error message",
-            viewModel.getValidationSuggestion("Minimum scale value must be less than maximum scale value")
-        )
-        
-        assertEquals(
-            "Mock error message",
-            viewModel.getValidationSuggestion("Minimum scale value cannot be negative")
-        )
-        
-        assertEquals(
-            "Mock error message",
-            viewModel.getValidationSuggestion("Maximum scale value cannot exceed 1000")
-        )
-        
-        assertEquals(
-            "Mock error message",
-            viewModel.getValidationSuggestion("Scale range must have at least 3 steps")
-        )
-        
-        assertEquals(
-            "Mock error message",
-            viewModel.getValidationSuggestion("Scale range cannot exceed 100 steps")
-        )
-        
-        assertEquals(
-            "Mock error message",
-            viewModel.getValidationSuggestion("Please enter a valid number")
-        )
-        
-        assertEquals("", viewModel.getValidationSuggestion("Unknown error"))
-        assertEquals("", viewModel.getValidationSuggestion(null))
-    }
-
-    @Test
     fun `clearError clears error state`() = runTest {
         // Set error state
         viewModel.updateScaleMin("1")

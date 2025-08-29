@@ -9,6 +9,7 @@ import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
+import com.jodli.coffeeshottimer.data.repository.BasketConfigRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
@@ -50,6 +51,7 @@ class ShotRecordingIntegrationTest {
     private lateinit var domainErrorTranslator: DomainErrorTranslator
     private lateinit var validationStringProvider: ValidationStringProvider
     private lateinit var grinderConfigRepository: GrinderConfigRepository
+    private lateinit var basketConfigRepository: BasketConfigRepository
     private lateinit var context: Context
     private lateinit var sharedPreferences: SharedPreferences
     private lateinit var editor: SharedPreferences.Editor
@@ -68,6 +70,7 @@ class ShotRecordingIntegrationTest {
         domainErrorTranslator = mockk(relaxed = true)
         validationStringProvider = mockk(relaxed = true)
         grinderConfigRepository = mockk(relaxed = true)
+        basketConfigRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
         sharedPreferences = mockk(relaxed = true)
         editor = mockk(relaxed = true)
@@ -138,6 +141,7 @@ class ShotRecordingIntegrationTest {
             stringResourceProvider,
             validationStringProvider,
             grinderConfigRepository,
+            basketConfigRepository,
             context,
             androidx.lifecycle.SavedStateHandle()
         )

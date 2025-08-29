@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 /**
  * ViewModel for the multi-step Equipment Setup flow during onboarding.
@@ -179,10 +180,10 @@ class EquipmentSetupFlowViewModel @Inject constructor(
 
     fun setBasketPreset(preset: BasketPreset) {
         _uiState.value = _uiState.value.copy(
-            coffeeInMin = preset.coffeeInMin.toString(),
-            coffeeInMax = preset.coffeeInMax.toString(),
-            coffeeOutMin = preset.coffeeOutMin.toString(),
-            coffeeOutMax = preset.coffeeOutMax.toString(),
+            coffeeInMin = preset.coffeeInMin.roundToInt().toString(),
+            coffeeInMax = preset.coffeeInMax.roundToInt().toString(),
+            coffeeOutMin = preset.coffeeOutMin.roundToInt().toString(),
+            coffeeOutMax = preset.coffeeOutMax.roundToInt().toString(),
             coffeeInMinError = null,
             coffeeInMaxError = null,
             coffeeOutMinError = null,
@@ -194,10 +195,10 @@ class EquipmentSetupFlowViewModel @Inject constructor(
 
     private fun validateBasket(): Boolean {
         val currentState = _uiState.value
-        val inMin = currentState.coffeeInMin.toFloatOrNull()
-        val inMax = currentState.coffeeInMax.toFloatOrNull()
-        val outMin = currentState.coffeeOutMin.toFloatOrNull()
-        val outMax = currentState.coffeeOutMax.toFloatOrNull()
+        val inMin = currentState.coffeeInMin.toIntOrNull()?.toFloat()
+        val inMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
+        val outMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
+        val outMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
         
         var inMinError: String? = null
         var inMaxError: String? = null
@@ -206,16 +207,16 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         var generalError: String? = null
         
         if (currentState.coffeeInMin.isNotBlank() && inMin == null) {
-            inMinError = "Please enter a valid number"
+            inMinError = "Please enter a valid whole number"
         }
         if (currentState.coffeeInMax.isNotBlank() && inMax == null) {
-            inMaxError = "Please enter a valid number"
+            inMaxError = "Please enter a valid whole number"
         }
         if (currentState.coffeeOutMin.isNotBlank() && outMin == null) {
-            outMinError = "Please enter a valid number"
+            outMinError = "Please enter a valid whole number"
         }
         if (currentState.coffeeOutMax.isNotBlank() && outMax == null) {
-            outMaxError = "Please enter a valid number"
+            outMaxError = "Please enter a valid whole number"
         }
         
         var isValid = false
@@ -256,10 +257,10 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         // Parse all values
         val grinderMin = currentState.grinderScaleMin.toIntOrNull()
         val grinderMax = currentState.grinderScaleMax.toIntOrNull()
-        val coffeeInMin = currentState.coffeeInMin.toFloatOrNull()
-        val coffeeInMax = currentState.coffeeInMax.toFloatOrNull()
-        val coffeeOutMin = currentState.coffeeOutMin.toFloatOrNull()
-        val coffeeOutMax = currentState.coffeeOutMax.toFloatOrNull()
+        val coffeeInMin = currentState.coffeeInMin.toIntOrNull()?.toFloat()
+        val coffeeInMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
+        val coffeeOutMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
+        val coffeeOutMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
         
         if (grinderMin == null || grinderMax == null || 
             coffeeInMin == null || coffeeInMax == null || 

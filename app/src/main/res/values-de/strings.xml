@@ -548,6 +548,7 @@
 
     <!-- Equipment Settings (non-onboarding) -->
     <string name="title_equipment_settings">Mühleneinstellungen</string>
+    <string name="title_basket_settings">Sieb-Einstellungen</string>
     <string name="text_equipment_settings_description">Stelle die minimalen und maximalen Werte ein, die die Skala deiner Mühle unterstützt. Dies wird in der App zur Validierung und als Leitfaden verwendet.</string>
     <string name="title_more">Mehr</string>
     <string name="text_grinder_scale_range">Mühlen-Skalenbereich</string>
@@ -573,7 +574,52 @@
     <string name="link_privacy_policy_description">Erfahre, wie wir deine Daten schützen</string>
     <string name="button_send_feedback">Feedback senden</string>
     <string name="feedback_email_subject">Coffee Shot Timer Feedback</string>
-    <string name="text_made_with_love">Hergestellt mit ☕ für die Home‑Barista‑Community</string>
+        <string name="text_made_with_love">Mit ☕ für die Heimbarista-Community erstellt</string>
+
+    <!-- Equipment Setup Flow Steps -->
+    <string name="equipment_setup_step_welcome">Willkommen</string>
+    <string name="equipment_setup_step_grinder">Mühle einrichten</string>
+    <string name="equipment_setup_step_basket">Siebträger einrichten</string>
+    <string name="equipment_setup_step_summary">Einstellungen überprüfen</string>
+    
+    <!-- Equipment Setup Welcome Screen -->
+    <string name="equipment_setup_welcome_title">Richten Sie Ihre Ausrüstung ein</string>
+    <string name="equipment_setup_welcome_description">Eine schnelle Einrichtung, um Ihr Espresso-Erlebnis basierend auf Ihrer spezifischen Ausrüstung zu personalisieren.</string>
+    <string name="equipment_setup_grinder_title">Mühle-Einstellungen</string>
+    <string name="equipment_setup_grinder_description">Konfigurieren Sie den Skalenbereich Ihrer Mühle für eine präzise Anpassungsverfolgung.</string>
+    <string name="equipment_setup_basket_title">Siebträger-Konfiguration</string>
+    <string name="equipment_setup_basket_description">Stellen Sie Gewichtsbereiche basierend auf Ihrer Siebträgergröße für optimale Extraktion ein.</string>
+    <string name="equipment_setup_benefits_title">Warum Ausrüstung konfigurieren?</string>
+    <string name="equipment_setup_benefits_description">Erhalten Sie personalisierte Anleitungen und Validierung, die auf Ihr spezifisches Setup zugeschnitten sind.</string>
+    
+    <!-- Equipment Setup Grinder Step -->
+    <string name="equipment_setup_grinder_step_title">Konfigurieren Sie Ihre Mühle</string>
+    <string name="equipment_setup_grinder_step_description">Wie ist der Bereich der Anpassungsskala Ihrer Mühle? Dies hilft bei der genauen Verfolgung Ihrer Einstellungen.</string>
+    
+    <!-- Equipment Setup Basket Step -->
+    <string name="equipment_setup_basket_step_title">Konfigurieren Sie Ihren Siebträger</string>
+    <string name="equipment_setup_basket_step_description">Stellen Sie die Gewichtsbereiche für Ihren Siebträger ein. Dies stellt sicher, dass Ihre Dosierungen innerhalb optimaler Parameter bleiben.</string>
+    
+    <!-- Equipment Setup Summary Step -->
+    <string name="equipment_setup_summary_title">Alles bereit!</string>
+    <string name="equipment_setup_summary_description">Überprüfen Sie Ihre Ausrüstungskonfiguration unten. Sie können diese Einstellungen jederzeit später ändern.</string>
+    <string name="button_save_and_continue">Speichern &amp; Fortfahren</string>
+    <string name="error_saving_configuration">Konfigurationsfehler</string>
+    <string name="summary_grinder_range_format">Skalenbereich: %1$s bis %2$s</string>
+    <string name="summary_grinder_steps_format">%1$d Anpassungsschritte verfügbar</string>
+    <string name="summary_coffee_in_format">Kaffee rein: %1$sg – %2$sg</string>
+    <string name="summary_coffee_out_format">Kaffee raus: %1$sg – %2$sg</string>
+    <string name="summary_basket_type_format">Siebträger-Typ: %1$s</string>
+    <string name="basket_type_single">Einfach</string>
+    <string name="basket_type_double">Doppelt</string>
+    <string name="basket_type_custom">Benutzerdefiniert</string>
+    
+    <!-- Basket Validation Suggestions -->
+    <string name="suggestion_basket_min_less_than_max">Der Mindestwert muss kleiner als der Maximalwert sein.</string>
+    <string name="suggestion_basket_check_minimum_values">Überprüfen Sie, dass Ihre Mindestwerte nicht zu niedrig für Ihren Siebträger sind.</string>
+    <string name="suggestion_basket_check_maximum_values">Überprüfen Sie, dass Ihre Maximalwerte nicht zu hoch für Ihren Siebträger sind.</string>
+    <string name="suggestion_basket_increase_range">Versuchen Sie, den Bereich zwischen Min- und Max-Werten zu vergrößern.</string>
+    <string name="suggestion_basket_check_ratios">Passen Sie die Bereiche an, um typische Brühverhältnisse (1:1,5 bis 1:3) zu ermöglichen.</string>
 
     <!-- Equipment Setup Validation and Errors -->
     <string name="text_equipment_setup_failed">Einrichtung fehlgeschlagen</string>

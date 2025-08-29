@@ -583,12 +583,16 @@ private fun GrinderSettingRangeIndicator(
 fun WeightSlidersSection(
     coffeeWeightIn: String,
     onCoffeeWeightInChange: (String) -> Unit,
-    coffeeWeightInError: String?,
+    coffeeWeightInError: String? = null,  // Now optional since sliders clamp values
     coffeeWeightOut: String,
     onCoffeeWeightOutChange: (String) -> Unit,
-    coffeeWeightOutError: String?,
+    coffeeWeightOutError: String? = null,  // Now optional since sliders clamp values
     modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    basketCoffeeInMin: Float = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
+    basketCoffeeInMax: Float = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
+    basketCoffeeOutMin: Float = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
+    basketCoffeeOutMax: Float = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT
 ) {
     val spacing = LocalSpacing.current
 
@@ -604,8 +608,10 @@ fun WeightSlidersSection(
         CoffeeWeightInSlider(
             value = coffeeWeightIn,
             onValueChange = onCoffeeWeightInChange,
-            errorMessage = coffeeWeightInError,
+            errorMessage = null,  // Suppress validation errors since sliders clamp values
             enabled = enabled,
+            minWeight = basketCoffeeInMin,
+            maxWeight = basketCoffeeInMax,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -615,8 +621,10 @@ fun WeightSlidersSection(
         CoffeeWeightOutSlider(
             value = coffeeWeightOut,
             onValueChange = onCoffeeWeightOutChange,
-            errorMessage = coffeeWeightOutError,
+            errorMessage = null,  // Suppress validation errors since sliders clamp values
             enabled = enabled,
+            minWeight = basketCoffeeOutMin,
+            maxWeight = basketCoffeeOutMax,
             modifier = Modifier.fillMaxWidth()
         )
     }

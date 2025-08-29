@@ -22,6 +22,7 @@ import com.jodli.coffeeshottimer.ui.components.BasketSetup
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.validation.BasketValidationHelpers
 
 /**
  * Screen for the basket setup step in the equipment setup flow.
@@ -93,7 +94,7 @@ fun BasketSetupStepScreen(
             coffeeOutMinError = coffeeOutMinError,
             coffeeOutMaxError = coffeeOutMaxError,
             generalError = generalError,
-            validationSuggestion = getBasketValidationSuggestion(generalError),
+            validationSuggestion = BasketValidationHelpers.getValidationSuggestion(generalError),
             showDescription = false, // Already shown above
             showPresets = true
         )
@@ -121,23 +122,5 @@ fun BasketSetupStepScreen(
         }
         
         Spacer(modifier = Modifier.height(spacing.large))
-    }
-}
-
-@Composable
-private fun getBasketValidationSuggestion(error: String?): String {
-    if (error == null) return ""
-    return when {
-        error.contains("minimum must be less than maximum") -> 
-            stringResource(R.string.suggestion_basket_min_less_than_max)
-        error.contains("cannot be less than") -> 
-            stringResource(R.string.suggestion_basket_check_minimum_values)
-        error.contains("cannot exceed") -> 
-            stringResource(R.string.suggestion_basket_check_maximum_values)
-        error.contains("range must be at least") -> 
-            stringResource(R.string.suggestion_basket_increase_range)
-        error.contains("brew ratios") -> 
-            stringResource(R.string.suggestion_basket_check_ratios)
-        else -> ""
     }
 }

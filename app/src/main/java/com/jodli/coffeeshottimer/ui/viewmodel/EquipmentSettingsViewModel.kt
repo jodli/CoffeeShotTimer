@@ -128,45 +128,16 @@ class EquipmentSettingsViewModel @Inject constructor(
         }
     }
 
-    fun getValidationSuggestion(error: String?): String {
-        if (error == null) return ""
-        return when {
-            error.contains("must be less than") -> getSuggestionIncreaseMaxOrDecreaseMin()
-            error.contains("cannot be negative") -> getSuggestionGrinderScalesStartAtZeroOrOne()
-            error.contains("cannot exceed 1000") -> getSuggestionMostGrinderScalesDontGoAbove100()
-            error.contains("at least 3 steps") -> getSuggestionRangeOfAtLeast3Steps()
-            error.contains("cannot exceed 100 steps") -> getSuggestionSmallerRangeIsEasier()
-            error.contains("valid number") -> getSuggestionEnterWholeNumbersOnly()
-            else -> ""
-        }
-    }
-
     private fun getValidationNumberError(): String {
         return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.validation_valid_number)
     }
+    
     private fun getFixValidationErrorsMessage(): String {
         return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.error_fix_validation_errors)
     }
+    
     private fun getFailedToSaveConfigurationMessage(): String {
         return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.error_failed_to_save_configuration)
-    }
-    private fun getSuggestionIncreaseMaxOrDecreaseMin(): String {
-        return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.suggestion_increase_max_or_decrease_min)
-    }
-    private fun getSuggestionGrinderScalesStartAtZeroOrOne(): String {
-        return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.suggestion_grinder_scales_start_at_zero_or_one)
-    }
-    private fun getSuggestionMostGrinderScalesDontGoAbove100(): String {
-        return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.suggestion_most_grinder_scales_dont_go_above_100)
-    }
-    private fun getSuggestionRangeOfAtLeast3Steps(): String {
-        return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.suggestion_range_of_at_least_3_steps)
-    }
-    private fun getSuggestionSmallerRangeIsEasier(): String {
-        return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.suggestion_smaller_range_is_easier)
-    }
-    private fun getSuggestionEnterWholeNumbersOnly(): String {
-        return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.suggestion_enter_whole_numbers_only)
     }
 }
 
