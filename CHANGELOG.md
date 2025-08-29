@@ -9,6 +9,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Added
 
 - Enhanced onboarding experience with guided bean creation for first-time users.
+- Basket size configuration to customize weight ranges based on your portafilter basket size.
 
 ## [1.3.2]
 
