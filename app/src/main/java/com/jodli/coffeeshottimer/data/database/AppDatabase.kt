@@ -22,7 +22,7 @@ import com.jodli.coffeeshottimer.data.model.Shot
  */
 @Database(
     entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -43,7 +43,8 @@ abstract class AppDatabase : RoomDatabase() {
             return arrayOf(
                 MIGRATION_1_2,
                 MIGRATION_2_3,
-                MIGRATION_3_4
+                MIGRATION_3_4,
+                MIGRATION_4_5
             )
         }
 
@@ -147,6 +148,36 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
+                    // Ensure all existing table indices are properly aligned with Room's expectations
+                    // This is critical because Room validates the entire schema, not just new additions
+                    
+                    // Clean up any legacy bean indices that might exist from older migrations
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
+
+                    // Ensure all canonical bean indices exist (idempotent operations)
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
+                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
+
+                    // Clean up any legacy shot indices that might exist
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
+
+                    // Ensure all canonical shot indices exist (idempotent operations)
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
+
+                    // Ensure grinder_configuration indices are properly in place
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_grinder_configuration_createdAt ON grinder_configuration (createdAt)")
+
                     // Create basket_configuration table
                     // Note: Room handles REAL for Float fields and INTEGER for Boolean fields
                     db.execSQL("""
@@ -166,7 +197,7 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_isActive ON basket_configuration (isActive)")
 
                     // Insert default basket configuration (Double Shot preset) for existing users
-                    // Using a simplified UUID generation for SQLite
+                    // Using a simplified UUID generation for SQLite and ISO format for consistency
                     db.execSQL("""
                         INSERT INTO basket_configuration (id, coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax, createdAt, isActive)
                         VALUES (
@@ -175,14 +206,43 @@ abstract class AppDatabase : RoomDatabase() {
                             22.0,
                             28.0,
                             55.0,
-                            datetime('now'),
+                            strftime('%Y-%m-%dT%H:%M:%S', 'now'),
                             1
                         )
                     """)
 
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
-                    throw RuntimeException("Migration 3->4 failed: ${e.message}", e)
+                    throw RuntimeException("Migration 3->4 failed: ${e.message}. This migration adds basket_configuration table and ensures all existing indices are properly aligned.", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 4 to 5: Fix date format consistency in basket_configuration table.
+         * Converts SQLite datetime format to ISO format for consistency with Room converters.
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Update existing basket_configuration records to use ISO date format
+                    // Convert from SQLite format (YYYY-MM-DD HH:MM:SS) to ISO format (YYYY-MM-DDTHH:MM:SS)
+                    db.execSQL("""
+                        UPDATE basket_configuration 
+                        SET createdAt = REPLACE(createdAt, ' ', 'T') 
+                        WHERE createdAt LIKE '____-__-__ __:__:__'
+                    """)
+
+                    // Also handle any records with milliseconds
+                    db.execSQL("""
+                        UPDATE basket_configuration 
+                        SET createdAt = REPLACE(createdAt, ' ', 'T') 
+                        WHERE createdAt LIKE '____-__-__ __:__:__.___'
+                    """)
+
+                } catch (e: Exception) {
+                    // Surface the failure so Room can handle it and report clearly
+                    throw RuntimeException("Migration 4->5 failed: ${e.message}. This migration fixes date format consistency in basket_configuration table.", e)
                 }
             }
         }

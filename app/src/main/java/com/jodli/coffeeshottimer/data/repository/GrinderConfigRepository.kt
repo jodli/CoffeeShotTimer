@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.util.Log
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.ValidationResult
@@ -95,10 +96,15 @@ class GrinderConfigRepository @Inject constructor(
      * @return Result indicating success or failure with validation errors
      */
     suspend fun saveConfig(config: GrinderConfiguration): Result<Unit> {
+        Log.d(TAG, "saveConfig: Starting save process for config: $config")
         return try {
             // Validate configuration data
+            Log.d(TAG, "saveConfig: Validating configuration")
             val validationResult = config.validate()
+            Log.d(TAG, "saveConfig: Validation result - isValid=${validationResult.isValid}, errors=${validationResult.errors}")
+            
             if (!validationResult.isValid) {
+                Log.e(TAG, "saveConfig: Validation failed - ${validationResult.errors}")
                 return Result.failure(
                     RepositoryException.ValidationError(
                         "Grinder configuration validation failed: ${validationResult.errors.joinToString(", ")}"
@@ -106,20 +112,47 @@ class GrinderConfigRepository @Inject constructor(
                 )
             }
 
-            // Treat duplicate range configuration as idempotent success (no-op)
-            val existingConfig = grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
+            // Check for duplicate range configuration
+            Log.d(TAG, "saveConfig: Checking for existing config with same range")
+            val existingConfig = try {
+                grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
+            } catch (e: Exception) {
+                Log.e(TAG, "saveConfig: Error checking for existing config", e)
+                throw e
+            }
+            Log.d(TAG, "saveConfig: Existing config found: $existingConfig")
+            
             if (existingConfig != null) {
-                return Result.success(Unit)
+                // If duplicate exists, insert a new one with current timestamp to make it "current"
+                // This ensures the Flow emits a new value and UI updates
+                Log.d(TAG, "saveConfig: Duplicate config found, inserting new one with current timestamp")
+                val result = executeWithRetry(
+                    operation = { 
+                        Log.d(TAG, "saveConfig: Inserting new config with current timestamp")
+                        grinderConfigDao.insertConfig(config)
+                        Log.d(TAG, "saveConfig: New config inserted successfully")
+                        Unit
+                    },
+                    errorMessage = "Failed to save grinder configuration"
+                )
+                Log.d(TAG, "saveConfig: executeWithRetry result - isSuccess=${result.isSuccess}")
+                return result
             }
 
-            executeWithRetry(
+            Log.d(TAG, "saveConfig: No duplicate found, proceeding with save")
+            val result = executeWithRetry(
                 operation = { 
+                    Log.d(TAG, "saveConfig: Inserting new config")
                     grinderConfigDao.insertConfig(config)
+                    Log.d(TAG, "saveConfig: Config inserted successfully")
                     Unit
                 },
                 errorMessage = "Failed to save grinder configuration"
             )
+            Log.d(TAG, "saveConfig: executeWithRetry result - isSuccess=${result.isSuccess}")
+            result
         } catch (exception: Exception) {
+            Log.e(TAG, "saveConfig: Exception caught", exception)
             Result.failure(RepositoryException.DatabaseError("Failed to save grinder configuration", exception))
         }
     }
@@ -390,5 +423,9 @@ class GrinderConfigRepository @Inject constructor(
                 lastException
             )
         )
+    }
+
+    companion object {
+        private const val TAG = "GrinderConfigRepository"
     }
 }

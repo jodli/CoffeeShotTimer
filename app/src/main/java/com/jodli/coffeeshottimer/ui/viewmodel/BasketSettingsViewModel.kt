@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.model.BasketConfiguration
@@ -197,7 +198,10 @@ class BasketSettingsViewModel @Inject constructor(
      * Save the basket configuration
      */
     fun saveConfiguration(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        Log.d(TAG, "saveConfiguration: Starting save process")
         val currentState = _uiState.value
+        
+        Log.d(TAG, "saveConfiguration: Current state - coffeeInMin=${currentState.coffeeInMin}, coffeeInMax=${currentState.coffeeInMax}, coffeeOutMin=${currentState.coffeeOutMin}, coffeeOutMax=${currentState.coffeeOutMax}")
         
         // Parse all values as integers then convert to floats
         val coffeeInMin = currentState.coffeeInMin.toIntOrNull()?.toFloat()
@@ -205,12 +209,16 @@ class BasketSettingsViewModel @Inject constructor(
         val coffeeOutMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
         val coffeeOutMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
         
+        Log.d(TAG, "saveConfiguration: Parsed values - coffeeInMin=$coffeeInMin, coffeeInMax=$coffeeInMax, coffeeOutMin=$coffeeOutMin, coffeeOutMax=$coffeeOutMax")
+        
         if (coffeeInMin == null || coffeeInMax == null || 
             coffeeOutMin == null || coffeeOutMax == null) {
+            Log.e(TAG, "saveConfiguration: Failed to parse values - some values are null")
             onError("Please complete all configuration fields")
             return
         }
         
+        Log.d(TAG, "saveConfiguration: Setting loading state to true")
         _uiState.value = currentState.copy(isLoading = true, error = null)
         
         viewModelScope.launch {
@@ -223,14 +231,20 @@ class BasketSettingsViewModel @Inject constructor(
                     isActive = true
                 )
                 
+                Log.d(TAG, "saveConfiguration: Created BasketConfiguration - $basketConfig")
+                
                 val result = basketConfigRepository.saveConfig(basketConfig)
+                
+                Log.d(TAG, "saveConfiguration: Repository saveConfig returned - isSuccess=${result.isSuccess}")
                 
                 result.fold(
                     onSuccess = {
+                        Log.d(TAG, "saveConfiguration: Save successful, calling onSuccess")
                         _uiState.value = currentState.copy(isLoading = false)
                         onSuccess()
                     },
                     onFailure = { exception ->
+                        Log.e(TAG, "saveConfiguration: Save failed with exception", exception)
                         val errorMessage = when (exception) {
                             is RepositoryException.ValidationError -> 
                                 exception.message ?: "Configuration validation failed"
@@ -238,6 +252,8 @@ class BasketSettingsViewModel @Inject constructor(
                                 "Failed to save basket configuration"
                             else -> "An unexpected error occurred"
                         }
+                        
+                        Log.e(TAG, "saveConfiguration: Error message: $errorMessage")
                         
                         _uiState.value = currentState.copy(
                             isLoading = false,
@@ -247,6 +263,7 @@ class BasketSettingsViewModel @Inject constructor(
                     }
                 )
             } catch (exception: Exception) {
+                Log.e(TAG, "saveConfiguration: Unexpected exception in coroutine", exception)
                 val errorMessage = "An unexpected error occurred"
                 _uiState.value = currentState.copy(
                     isLoading = false,
@@ -255,6 +272,10 @@ class BasketSettingsViewModel @Inject constructor(
                 onError(errorMessage)
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "BasketSettingsViewModel"
     }
 
     fun clearError() {
