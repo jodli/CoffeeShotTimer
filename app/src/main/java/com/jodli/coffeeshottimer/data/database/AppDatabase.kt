@@ -147,6 +147,36 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
+                    // Ensure all existing table indices are properly aligned with Room's expectations
+                    // This is critical because Room validates the entire schema, not just new additions
+                    
+                    // Clean up any legacy bean indices that might exist from older migrations
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
+
+                    // Ensure all canonical bean indices exist (idempotent operations)
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
+                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
+
+                    // Clean up any legacy shot indices that might exist
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
+
+                    // Ensure all canonical shot indices exist (idempotent operations)
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
+
+                    // Ensure grinder_configuration indices are properly in place
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_grinder_configuration_createdAt ON grinder_configuration (createdAt)")
+
                     // Create basket_configuration table
                     // Note: Room handles REAL for Float fields and INTEGER for Boolean fields
                     db.execSQL("""
@@ -182,7 +212,7 @@ abstract class AppDatabase : RoomDatabase() {
 
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
-                    throw RuntimeException("Migration 3->4 failed: ${e.message}", e)
+                    throw RuntimeException("Migration 3->4 failed: ${e.message}. This migration adds basket_configuration table and ensures all existing indices are properly aligned.", e)
                 }
             }
         }
