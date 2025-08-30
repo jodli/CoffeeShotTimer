@@ -1,6 +1,7 @@
 package com.jodli.coffeeshottimer.debug
 
 import com.jodli.coffeeshottimer.data.util.DatabasePopulator
+import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
@@ -26,6 +27,7 @@ class ConditionalCompilationTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var databasePopulator: DatabasePopulator
+    private lateinit var onboardingManager: OnboardingManager
     private lateinit var stringResourceProvider: StringResourceProvider
     private lateinit var domainErrorTranslator: DomainErrorTranslator
     private lateinit var debugViewModel: DebugViewModel
@@ -37,9 +39,10 @@ class ConditionalCompilationTest {
         
         Dispatchers.setMain(testDispatcher)
         databasePopulator = mockk(relaxed = true)
+        onboardingManager = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
         domainErrorTranslator = mockk(relaxed = true)
-        debugViewModel = DebugViewModel(databasePopulator, stringResourceProvider, domainErrorTranslator)
+        debugViewModel = DebugViewModel(databasePopulator, onboardingManager, stringResourceProvider, domainErrorTranslator)
     }
 
     @After
@@ -113,15 +116,6 @@ class ConditionalCompilationTest {
         // The key is that it doesn't immediately return without doing anything
     }
 
-    @Test
-    fun `DebugViewModel addMoreShots should execute in debug build`() = runTest {
-        // When
-        debugViewModel.addMoreShots(5)
-
-        // Then - Should start loading (since we're in debug build)
-        val state = debugViewModel.uiState.value
-        // In debug build, the operation should start
-    }
 
     @Test
     fun `DebugViewModel clearDatabase should execute in debug build`() = runTest {

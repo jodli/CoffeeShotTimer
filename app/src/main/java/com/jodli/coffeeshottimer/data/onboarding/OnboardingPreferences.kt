@@ -128,6 +128,67 @@ class OnboardingPreferences @Inject constructor(
             .apply()
     }
     
+    // DEBUG METHODS FOR TESTING ONBOARDING FLOWS
+    
+    override suspend fun resetToNewUser() = withContext(Dispatchers.IO) {
+        // Clear all onboarding state to simulate a completely new user
+        sharedPreferences.edit()
+            .remove(KEY_ONBOARDING_COMPLETE)
+            .remove(KEY_ONBOARDING_PROGRESS)
+            .remove(KEY_GRINDER_CONFIG_ID)
+            .apply()
+    }
+    
+    override suspend fun resetToExistingUserWithBeans() = withContext(Dispatchers.IO) {
+        // Set state for existing user who has beans (skips intro and bean creation)
+        val existingUserProgress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
+            hasRecordedFirstShot = false, // Still needs to record first shot
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION,
+            onboardingStartedAt = System.currentTimeMillis() - 86400000, // 24 hours ago
+            lastUpdatedAt = System.currentTimeMillis()
+        )
+        
+        sharedPreferences.edit()
+            .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(existingUserProgress.toSerializable()))
+            .putBoolean(KEY_ONBOARDING_COMPLETE, false) // Not complete until first shot
+            .apply()
+    }
+    
+    override suspend fun resetToExistingUserNoBeans() = withContext(Dispatchers.IO) {
+        // Set state for existing user without beans (skips intro, shows equipment + bean creation)
+        val existingUserProgress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = false, // Still needs to create beans
+            hasRecordedFirstShot = false,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION,
+            onboardingStartedAt = System.currentTimeMillis() - 86400000, // 24 hours ago
+            lastUpdatedAt = System.currentTimeMillis()
+        )
+        
+        sharedPreferences.edit()
+            .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(existingUserProgress.toSerializable()))
+            .putBoolean(KEY_ONBOARDING_COMPLETE, false)
+            .apply()
+    }
+    
+    override suspend fun forceEquipmentSetup() = withContext(Dispatchers.IO) {
+        // Set equipment setup version to older value to force it to appear
+        val currentProgress = getOnboardingProgress()
+        val forcedProgress = currentProgress.copy(
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1,
+            lastUpdatedAt = System.currentTimeMillis()
+        )
+        
+        sharedPreferences.edit()
+            .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(forcedProgress.toSerializable()))
+            .putBoolean(KEY_ONBOARDING_COMPLETE, false)
+            .apply()
+    }
+    
     companion object {
         private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         private const val KEY_ONBOARDING_PROGRESS = "onboarding_progress"

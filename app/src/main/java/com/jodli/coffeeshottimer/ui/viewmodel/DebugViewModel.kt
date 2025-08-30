@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.data.util.DatabasePopulator
+import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,6 +23,7 @@ import com.jodli.coffeeshottimer.R
 @HiltViewModel
 class DebugViewModel @Inject constructor(
     private val databasePopulator: DatabasePopulator?,
+    private val onboardingManager: OnboardingManager,
     private val stringResourceProvider: StringResourceProvider,
     private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
@@ -97,13 +99,14 @@ class DebugViewModel @Inject constructor(
         }
     }
 
+    // ONBOARDING DEBUG METHODS
+
     /**
-     * Adds additional shots to existing beans for testing purposes.
-     *
-     * @param count Number of additional shots to create (default: 10)
+     * Resets onboarding state to simulate a new user.
+     * Clears all onboarding progress so the user will see the full onboarding flow.
      */
-    fun addMoreShots(count: Int = 10) {
-        if (!BuildConfig.DEBUG || databasePopulator == null) return
+    fun resetToNewUser() {
+        if (!BuildConfig.DEBUG) return
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -112,15 +115,72 @@ class DebugViewModel @Inject constructor(
             )
 
             try {
-                databasePopulator.addMoreShots(count)
+                onboardingManager.resetToNewUser()
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = "Added $count additional shots successfully!"
+                    operationResult = "Reset to new user - will see full onboarding flow"
                 )
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    operationResult = domainErrorTranslator.translateError(e)
+                    operationResult = "Failed to reset onboarding: ${domainErrorTranslator.translateError(e)}"
+                )
+            }
+        }
+    }
+
+
+    /**
+     * Configures onboarding state to simulate an existing user who hasn't created beans.
+     * Will skip introduction but show equipment setup and bean creation.
+     */
+    fun resetToExistingUserNoBeans() {
+        if (!BuildConfig.DEBUG) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                operationResult = null
+            )
+
+            try {
+                onboardingManager.resetToExistingUserNoBeans()
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    operationResult = "Set as existing user without beans - will see equipment + bean creation"
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    operationResult = "Failed to set user state: ${domainErrorTranslator.translateError(e)}"
+                )
+            }
+        }
+    }
+
+    /**
+     * Forces equipment setup to appear by setting the version to an older value.
+     * Simulates the scenario where new equipment features have been added.
+     */
+    fun forceEquipmentSetup() {
+        if (!BuildConfig.DEBUG) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                operationResult = null
+            )
+
+            try {
+                onboardingManager.forceEquipmentSetup()
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    operationResult = "Forced equipment setup to appear due to 'new features'"
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    operationResult = "Failed to force equipment setup: ${domainErrorTranslator.translateError(e)}"
                 )
             }
         }
@@ -154,6 +214,7 @@ class DebugViewModel @Inject constructor(
             }
         }
     }
+
 
     /**
      * Clears any operation result message.
