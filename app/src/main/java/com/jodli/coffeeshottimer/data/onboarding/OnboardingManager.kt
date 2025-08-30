@@ -53,6 +53,32 @@ interface OnboardingManager {
      * @return true if restore was successful, false otherwise
      */
     suspend fun restoreOnboardingState(backupData: String): Boolean
+    
+    // DEBUG METHODS FOR TESTING ONBOARDING FLOWS
+    
+    /**
+     * Resets onboarding state to simulate a completely new user.
+     * Clears all progress so the user will see the full onboarding flow.
+     */
+    suspend fun resetToNewUser()
+    
+    /**
+     * Configures onboarding state to simulate an existing user who has created beans.
+     * Sets appropriate flags to skip introduction and bean creation.
+     */
+    suspend fun resetToExistingUserWithBeans()
+    
+    /**
+     * Configures onboarding state to simulate an existing user who hasn't created beans.
+     * Sets appropriate flags to skip introduction but show equipment setup and bean creation.
+     */
+    suspend fun resetToExistingUserNoBeans()
+    
+    /**
+     * Forces equipment setup to appear by setting the version to an older value.
+     * Simulates the scenario where new equipment features have been added.
+     */
+    suspend fun forceEquipmentSetup()
 }
 
 /**
