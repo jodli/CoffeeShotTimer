@@ -4,17 +4,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonAdd
+import androidx.compose.material.icons.filled.PersonOutline
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Storage
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -40,21 +47,23 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlinx.coroutines.delay
 
 /**
- * Debug dialog that provides database management utilities for developers.
+ * Debug dialog that provides database management and onboarding testing utilities for developers.
  * Only available in debug builds to prevent accidental use in production.
  *
  * Features:
  * - Fill database with realistic test data for screenshots
- * - Add more shots for testing data volume
  * - Clear all database data for clean testing
+ * - Reset onboarding state for testing different user scenarios
  * - Loading states and result feedback
  * - Confirmation dialogs for destructive operations
  *
  * @param isVisible Whether the dialog should be displayed
  * @param onDismiss Callback invoked when dialog should be dismissed
  * @param onFillDatabase Callback invoked when fill database button is tapped
- * @param onAddMoreShots Callback invoked when add more shots button is tapped
  * @param onClearDatabase Callback invoked when clear database button is tapped
+ * @param onResetToNewUser Callback invoked when reset to new user button is tapped
+ * @param onResetToExistingUserNoBeans Callback invoked when reset to existing user without beans button is tapped
+ * @param onForceEquipmentSetup Callback invoked when force equipment setup button is tapped
  * @param isLoading Whether a database operation is currently in progress
  * @param operationResult Result message from the last operation (success or error)
  * @param showConfirmation Whether to show confirmation dialog for clear operation
@@ -66,8 +75,10 @@ fun DebugDialog(
     isVisible: Boolean,
     onDismiss: () -> Unit,
     onFillDatabase: () -> Unit,
-    onAddMoreShots: () -> Unit,
     onClearDatabase: () -> Unit,
+    onResetToNewUser: () -> Unit,
+    onResetToExistingUserNoBeans: () -> Unit,
+    onForceEquipmentSetup: () -> Unit,
     isLoading: Boolean,
     operationResult: String?,
     showConfirmation: Boolean,
@@ -81,7 +92,9 @@ fun DebugDialog(
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.8f),
             shape = RoundedCornerShape(spacing.cornerLarge),
             elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationDialog),
             colors = CardDefaults.cardColors(
@@ -91,6 +104,7 @@ fun DebugDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
                     .padding(spacing.large)
             ) {
                 // Header with debug indicator
@@ -187,6 +201,16 @@ fun DebugDialog(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(spacing.medium)
                     ) {
+                        // Database Operations Section
+                        Text(
+                            text = "Database Operations",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
                         // Fill Database button
                         CoffeePrimaryButton(
                             text = stringResource(R.string.button_fill_database),
@@ -204,23 +228,6 @@ fun DebugDialog(
 
                         Spacer(modifier = Modifier.height(spacing.small))
 
-                        // Add More Shots button
-                        CoffeeSecondaryButton(
-                            text = stringResource(R.string.button_add_more_shots),
-                            onClick = onAddMoreShots,
-                            icon = Icons.Default.Add,
-                            enabled = !isLoading
-                        )
-
-                        Text(
-                            text = stringResource(R.string.text_add_shots_description),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = spacing.small)
-                        )
-
-                        Spacer(modifier = Modifier.height(spacing.small))
-
                         // Clear Database button
                         CoffeeSecondaryButton(
                             text = stringResource(R.string.button_clear_database),
@@ -231,6 +238,67 @@ fun DebugDialog(
 
                         Text(
                             text = stringResource(R.string.text_clear_database_description),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = spacing.small)
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.large))
+
+                        // Onboarding Testing Section
+                        Text(
+                            text = "Onboarding Testing",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontWeight = FontWeight.SemiBold
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
+                        // Reset to New User button
+                        CoffeeSecondaryButton(
+                            text = "New User",
+                            onClick = onResetToNewUser,
+                            icon = Icons.Default.PersonAdd,
+                            enabled = !isLoading
+                        )
+
+                        Text(
+                            text = "Show full onboarding flow",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = spacing.small)
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
+                        // Reset to Existing User without Beans button
+                        CoffeeSecondaryButton(
+                            text = "User - No Beans",
+                            onClick = onResetToExistingUserNoBeans,
+                            icon = Icons.Default.PersonOutline,
+                            enabled = !isLoading
+                        )
+
+                        Text(
+                            text = "Trigger guided bean creation",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = spacing.small)
+                        )
+
+                        Spacer(modifier = Modifier.height(spacing.small))
+
+                        // Force Equipment Setup button
+                        CoffeeSecondaryButton(
+                            text = "Equipment Setup",
+                            onClick = onForceEquipmentSetup,
+                            icon = Icons.Default.Settings,
+                            enabled = !isLoading
+                        )
+
+                        Text(
+                            text = "Force equipment setup flow",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)

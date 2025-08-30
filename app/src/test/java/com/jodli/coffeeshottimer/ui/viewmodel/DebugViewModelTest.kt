@@ -1,6 +1,7 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.data.util.DatabasePopulator
+import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import io.mockk.coEvery
@@ -31,6 +32,7 @@ class DebugViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var databasePopulator: DatabasePopulator
+    private lateinit var onboardingManager: OnboardingManager
     private lateinit var stringResourceProvider: StringResourceProvider
     private lateinit var domainErrorTranslator: DomainErrorTranslator
     private lateinit var viewModel: DebugViewModel
@@ -42,6 +44,7 @@ class DebugViewModelTest {
         
         Dispatchers.setMain(testDispatcher)
         databasePopulator = mockk(relaxed = true)
+        onboardingManager = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
         domainErrorTranslator = mockk(relaxed = true)
         
@@ -55,7 +58,7 @@ class DebugViewModelTest {
         coEvery { domainErrorTranslator.getDeleteError() } returns "Failed to clear database"
         coEvery { domainErrorTranslator.translateError(any()) } returns "Unknown error occurred"
         
-        viewModel = DebugViewModel(databasePopulator, stringResourceProvider, domainErrorTranslator)
+        viewModel = DebugViewModel(databasePopulator, onboardingManager, stringResourceProvider, domainErrorTranslator)
     }
 
     @After
@@ -131,7 +134,7 @@ class DebugViewModelTest {
     @Test
     fun `fillDatabase should not execute when databasePopulator is null`() = runTest {
         // Given
-        val viewModelWithNullPopulator = DebugViewModel(null, stringResourceProvider, domainErrorTranslator)
+        val viewModelWithNullPopulator = DebugViewModel(null, onboardingManager, stringResourceProvider, domainErrorTranslator)
 
         // When
         viewModelWithNullPopulator.fillDatabase()
@@ -178,66 +181,6 @@ class DebugViewModelTest {
         assertFalse("Should not be loading after error", state.isLoading)
         assertEquals(
             "Failed to fill database: Unknown error occurred",
-            state.operationResult
-        )
-    }
-
-    // Note: Release build behavior is tested in ConditionalCompilationTest
-
-    @Test
-    fun `addMoreShots should execute successfully with default count`() = runTest {
-        // Given
-        coEvery { databasePopulator.addMoreShots(10) } returns Unit
-
-        // When
-        viewModel.addMoreShots()
-        advanceUntilIdle()
-
-        // Then
-        coVerify(exactly = 1) { databasePopulator.addMoreShots(10) }
-        
-        val state = viewModel.uiState.value
-        assertFalse("Should not be loading after completion", state.isLoading)
-        assertEquals(
-            "Added 10 additional shots successfully!",
-            state.operationResult
-        )
-    }
-
-    @Test
-    fun `addMoreShots should execute successfully with custom count`() = runTest {
-        // Given
-        val customCount = 5
-        coEvery { databasePopulator.addMoreShots(customCount) } returns Unit
-
-        // When
-        viewModel.addMoreShots(customCount)
-        advanceUntilIdle()
-
-        // Then
-        coVerify(exactly = 1) { databasePopulator.addMoreShots(customCount) }
-        
-        val state = viewModel.uiState.value
-        assertEquals(
-            "Added $customCount additional shots successfully!",
-            state.operationResult
-        )
-    }
-
-    @Test
-    fun `addMoreShots should handle errors correctly`() = runTest {
-        // Given
-        val errorMessage = "No beans found"
-        coEvery { databasePopulator.addMoreShots(any()) } throws Exception(errorMessage)
-
-        // When
-        viewModel.addMoreShots(5)
-        advanceUntilIdle()
-
-        // Then
-        val state = viewModel.uiState.value
-        assertEquals(
-            "Unknown error occurred",
             state.operationResult
         )
     }
