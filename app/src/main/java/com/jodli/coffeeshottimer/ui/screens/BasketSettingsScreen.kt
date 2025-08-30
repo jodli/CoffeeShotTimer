@@ -42,6 +42,11 @@ fun BasketSettingsScreen(
 ) {
     val spacing = LocalSpacing.current
     val uiState by viewModel.uiState.collectAsState()
+    
+    // Debug logging for UI state changes
+    LaunchedEffect(uiState) {
+        android.util.Log.d("BasketSettingsScreen", "UI State changed: isLoading=${uiState.isLoading}, isBasketValid=${uiState.isBasketValid}, error=${uiState.error}")
+    }
 
     Scaffold(
         modifier = modifier,
@@ -104,9 +109,15 @@ fun BasketSettingsScreen(
                 CoffeePrimaryButton(
                     text = stringResource(id = R.string.button_save),
                     onClick = { 
+                        android.util.Log.d("BasketSettingsScreen", "Save button clicked - isBasketValid=${uiState.isBasketValid}, isLoading=${uiState.isLoading}")
                         viewModel.saveConfiguration(
-                            onSuccess = onNavigateBack,
-                            onError = { /* Handle error if needed */ }
+                            onSuccess = {
+                                android.util.Log.d("BasketSettingsScreen", "Save successful, navigating back")
+                                onNavigateBack()
+                            },
+                            onError = { error ->
+                                android.util.Log.e("BasketSettingsScreen", "Save failed with error: $error")
+                            }
                         )
                     },
                     enabled = uiState.isBasketValid && !uiState.isLoading,

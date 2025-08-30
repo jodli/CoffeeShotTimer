@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.util.Log
 import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.model.BasketConfiguration
 import com.jodli.coffeeshottimer.data.model.BasketPreset
@@ -97,10 +98,15 @@ class BasketConfigRepository @Inject constructor(
      * @return Result indicating success or failure with validation errors
      */
     suspend fun saveConfig(config: BasketConfiguration): Result<Unit> {
+        Log.d(TAG, "saveConfig: Starting save process for config: $config")
         return try {
             // Validate configuration data
+            Log.d(TAG, "saveConfig: Validating configuration")
             val validationResult = config.validate()
+            Log.d(TAG, "saveConfig: Validation result - isValid=${validationResult.isValid}, errors=${validationResult.errors}")
+            
             if (!validationResult.isValid) {
+                Log.e(TAG, "saveConfig: Validation failed - ${validationResult.errors}")
                 return Result.failure(
                     RepositoryException.ValidationError(
                         "Basket configuration validation failed: ${validationResult.errors.joinToString(", ")}"
@@ -109,32 +115,50 @@ class BasketConfigRepository @Inject constructor(
             }
 
             // Treat duplicate range configuration as idempotent success (no-op)
-            val existingConfig = basketConfigDao.getConfigByRanges(
-                config.coffeeInMin,
-                config.coffeeInMax,
-                config.coffeeOutMin,
-                config.coffeeOutMax
-            )
+            Log.d(TAG, "saveConfig: Checking for existing config with same ranges")
+            val existingConfig = try {
+                basketConfigDao.getConfigByRanges(
+                    config.coffeeInMin,
+                    config.coffeeInMax,
+                    config.coffeeOutMin,
+                    config.coffeeOutMax
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "saveConfig: Error checking for existing config", e)
+                throw e
+            }
+            Log.d(TAG, "saveConfig: Existing config found: $existingConfig")
+            
             if (existingConfig != null) {
+                Log.d(TAG, "saveConfig: Duplicate config found, checking if it's active: ${existingConfig.isActive}")
                 // If duplicate exists but it's not active, activate it
                 if (!existingConfig.isActive) {
+                    Log.d(TAG, "saveConfig: Activating existing duplicate config")
                     basketConfigDao.deactivateAllConfigs()
                     basketConfigDao.activateConfig(existingConfig.id)
                 }
+                Log.d(TAG, "saveConfig: Returning success for duplicate config")
                 return Result.success(Unit)
             }
 
-            executeWithRetry(
+            Log.d(TAG, "saveConfig: No duplicate found, proceeding with save")
+            val result = executeWithRetry(
                 operation = { 
+                    Log.d(TAG, "saveConfig: Deactivating all existing configs")
                     // Deactivate all existing configurations
                     basketConfigDao.deactivateAllConfigs()
+                    Log.d(TAG, "saveConfig: Inserting new config")
                     // Save the new configuration as active
                     basketConfigDao.insertConfig(config.copy(isActive = true))
+                    Log.d(TAG, "saveConfig: Config inserted successfully")
                     Unit
                 },
                 errorMessage = "Failed to save basket configuration"
             )
+            Log.d(TAG, "saveConfig: executeWithRetry result - isSuccess=${result.isSuccess}")
+            result
         } catch (exception: Exception) {
+            Log.e(TAG, "saveConfig: Exception caught", exception)
             Result.failure(RepositoryException.DatabaseError("Failed to save basket configuration", exception))
         }
     }
@@ -403,25 +427,36 @@ class BasketConfigRepository @Inject constructor(
         maxRetries: Int = 3,
         delayMs: Long = 100
     ): Result<T> {
+        Log.d(TAG, "executeWithRetry: Starting operation with maxRetries=$maxRetries")
         var lastException: Exception? = null
         
         repeat(maxRetries) { attempt ->
             try {
+                Log.d(TAG, "executeWithRetry: Attempt ${attempt + 1} of $maxRetries")
                 val result = operation()
+                Log.d(TAG, "executeWithRetry: Operation successful on attempt ${attempt + 1}")
                 return Result.success(result)
             } catch (exception: Exception) {
+                Log.e(TAG, "executeWithRetry: Attempt ${attempt + 1} failed", exception)
                 lastException = exception
                 if (attempt < maxRetries - 1) {
-                    delay(delayMs * (attempt + 1)) // Exponential backoff
+                    val delayTime = delayMs * (attempt + 1)
+                    Log.d(TAG, "executeWithRetry: Retrying after ${delayTime}ms delay")
+                    delay(delayTime) // Exponential backoff
                 }
             }
         }
         
+        Log.e(TAG, "executeWithRetry: All attempts failed", lastException)
         return Result.failure(
             RepositoryException.DatabaseError(
                 "$errorMessage (after $maxRetries attempts)",
                 lastException
             )
         )
+    }
+
+    companion object {
+        private const val TAG = "BasketConfigRepository"
     }
 }
