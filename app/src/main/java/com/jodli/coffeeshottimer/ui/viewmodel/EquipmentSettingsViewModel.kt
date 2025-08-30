@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
@@ -105,27 +106,51 @@ class EquipmentSettingsViewModel @Inject constructor(
     }
 
     fun save(onSuccess: () -> Unit) {
+        Log.d(TAG, "save: Starting grinder save process")
         val current = _uiState.value
         val minVal = current.scaleMin.toIntOrNull()
         val maxVal = current.scaleMax.toIntOrNull()
+        
+        Log.d(TAG, "save: Current state - scaleMin=${current.scaleMin}, scaleMax=${current.scaleMax}, isFormValid=${current.isFormValid}")
+        Log.d(TAG, "save: Parsed values - minVal=$minVal, maxVal=$maxVal")
+        
         if (!current.isFormValid || minVal == null || maxVal == null) {
+            Log.e(TAG, "save: Form validation failed")
             _uiState.value = current.copy(generalError = getFixValidationErrorsMessage())
             return
         }
+        
         val config = GrinderConfiguration(scaleMin = minVal, scaleMax = maxVal)
+        Log.d(TAG, "save: Created GrinderConfiguration - $config")
+        
         _uiState.value = current.copy(isLoading = true)
+        Log.d(TAG, "save: Set loading state to true")
+        
         viewModelScope.launch {
-            val result = grinderConfigRepository.saveConfig(config)
-            result.fold(
-                onSuccess = {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    onSuccess()
-                },
-                onFailure = {
-                    _uiState.value = _uiState.value.copy(isLoading = false, generalError = getFailedToSaveConfigurationMessage())
-                }
-            )
+            try {
+                val result = grinderConfigRepository.saveConfig(config)
+                Log.d(TAG, "save: Repository saveConfig returned - isSuccess=${result.isSuccess}")
+                
+                result.fold(
+                    onSuccess = {
+                        Log.d(TAG, "save: Save successful, calling onSuccess")
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        onSuccess()
+                    },
+                    onFailure = { exception ->
+                        Log.e(TAG, "save: Save failed with exception", exception)
+                        _uiState.value = _uiState.value.copy(isLoading = false, generalError = getFailedToSaveConfigurationMessage())
+                    }
+                )
+            } catch (exception: Exception) {
+                Log.e(TAG, "save: Unexpected exception in coroutine", exception)
+                _uiState.value = _uiState.value.copy(isLoading = false, generalError = getFailedToSaveConfigurationMessage())
+            }
         }
+    }
+
+    companion object {
+        private const val TAG = "EquipmentSettingsViewModel"
     }
 
     private fun getValidationNumberError(): String {
