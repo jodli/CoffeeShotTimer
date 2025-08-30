@@ -276,35 +276,37 @@ class ShotRecordingViewModel @Inject constructor(
     
     /**
      * Load basket configuration for weight slider ranges.
+     * Uses reactive Flow to automatically update when configuration changes.
      */
     private fun loadBasketConfiguration() {
         viewModelScope.launch {
-            val result = basketConfigRepository.getActiveConfig()
-            result.fold(
-                onSuccess = { config ->
-                    if (config != null) {
-                        _basketCoffeeInMin.value = config.coffeeInMin
-                        _basketCoffeeInMax.value = config.coffeeInMax
-                        _basketCoffeeOutMin.value = config.coffeeOutMin
-                        _basketCoffeeOutMax.value = config.coffeeOutMax
-                    } else {
-                        // Use default basket configuration if none exists
+            basketConfigRepository.getActiveConfigFlow().collect { result ->
+                result.fold(
+                    onSuccess = { config ->
+                        if (config != null) {
+                            _basketCoffeeInMin.value = config.coffeeInMin
+                            _basketCoffeeInMax.value = config.coffeeInMax
+                            _basketCoffeeOutMin.value = config.coffeeOutMin
+                            _basketCoffeeOutMax.value = config.coffeeOutMax
+                        } else {
+                            // Use default basket configuration if none exists
+                            val defaultConfig = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
+                            _basketCoffeeInMin.value = defaultConfig.coffeeInMin
+                            _basketCoffeeInMax.value = defaultConfig.coffeeInMax
+                            _basketCoffeeOutMin.value = defaultConfig.coffeeOutMin
+                            _basketCoffeeOutMax.value = defaultConfig.coffeeOutMax
+                        }
+                    },
+                    onFailure = {
+                        // Fallback to default basket configuration
                         val defaultConfig = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
                         _basketCoffeeInMin.value = defaultConfig.coffeeInMin
                         _basketCoffeeInMax.value = defaultConfig.coffeeInMax
                         _basketCoffeeOutMin.value = defaultConfig.coffeeOutMin
                         _basketCoffeeOutMax.value = defaultConfig.coffeeOutMax
                     }
-                },
-                onFailure = {
-                    // Fallback to default basket configuration
-                    val defaultConfig = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
-                    _basketCoffeeInMin.value = defaultConfig.coffeeInMin
-                    _basketCoffeeInMax.value = defaultConfig.coffeeInMax
-                    _basketCoffeeOutMin.value = defaultConfig.coffeeOutMin
-                    _basketCoffeeOutMax.value = defaultConfig.coffeeOutMax
-                }
-            )
+                )
+            }
         }
     }
 
