@@ -65,6 +65,8 @@ data class OnboardingProgress(
     val hasCreatedFirstBean: Boolean = false,
     val hasRecordedFirstShot: Boolean = false,
     val grinderConfigurationId: String? = null,
+    val basketConfigurationId: String? = null, // NEW: Track basket configuration
+    val equipmentSetupVersion: Int = 1, // NEW: Track equipment setup version for forcing updates
     val onboardingStartedAt: Long = System.currentTimeMillis(),
     val lastUpdatedAt: Long = System.currentTimeMillis()
 ) {
@@ -74,7 +76,11 @@ data class OnboardingProgress(
      * @return true if all onboarding steps are complete
      */
     fun isComplete(): Boolean {
-        return hasSeenIntroduction && hasCompletedEquipmentSetup && hasCreatedFirstBean && hasRecordedFirstShot
+        return hasSeenIntroduction && 
+               hasCompletedEquipmentSetup && 
+               equipmentSetupVersion >= CURRENT_EQUIPMENT_SETUP_VERSION &&
+               hasCreatedFirstBean && 
+               hasRecordedFirstShot
     }
     
     /**
@@ -85,11 +91,27 @@ data class OnboardingProgress(
     fun getNextStep(): OnboardingStep? {
         return when {
             !hasSeenIntroduction -> OnboardingStep.INTRODUCTION
-            !hasCompletedEquipmentSetup -> OnboardingStep.EQUIPMENT_SETUP
+            !hasCompletedEquipmentSetup || equipmentSetupVersion < CURRENT_EQUIPMENT_SETUP_VERSION -> OnboardingStep.EQUIPMENT_SETUP
             !hasCreatedFirstBean -> OnboardingStep.GUIDED_BEAN_CREATION
             !hasRecordedFirstShot -> OnboardingStep.FIRST_SHOT
             else -> null
         }
+    }
+    
+    /**
+     * Checks if equipment setup needs to be completed or updated.
+     * This will be true for new users and existing users who haven't completed the latest equipment setup.
+     */
+    fun needsEquipmentSetup(): Boolean {
+        return !hasCompletedEquipmentSetup || equipmentSetupVersion < CURRENT_EQUIPMENT_SETUP_VERSION
+    }
+    
+    companion object {
+        /**
+         * Current version of equipment setup. Increment this to force existing users
+         * to go through equipment setup again when new features are added.
+         */
+        const val CURRENT_EQUIPMENT_SETUP_VERSION = 2 // Incremented for basket configuration
     }
 }
 

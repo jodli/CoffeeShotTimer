@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingProgress
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingStep
+import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.ui.navigation.NavigationDestinations
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +20,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val onboardingManager: OnboardingManager
+    private val onboardingManager: OnboardingManager,
+    private val beanRepository: BeanRepository
 ) : ViewModel() {
 
     private val _routingState = MutableStateFlow<RoutingState>(RoutingState.Loading)
@@ -37,10 +39,10 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val isFirstTimeUser = onboardingManager.isFirstTimeUser()
+                val progress = onboardingManager.getOnboardingProgress()
                 
                 if (isFirstTimeUser) {
-                    // Check if user has partial progress
-                    val progress = onboardingManager.getOnboardingProgress()
+                    // New user - follow normal onboarding flow
                     val nextStep = progress.getNextStep()
                     
                     val destination = when (nextStep) {
@@ -58,11 +60,20 @@ class MainActivityViewModel @Inject constructor(
                     
                     _routingState.value = RoutingState.Success(destination, isFirstTimeUser = true)
                 } else {
-                    // Existing user - route to normal app flow
-                    _routingState.value = RoutingState.Success(
-                        NavigationDestinations.RecordShot.route, 
-                        isFirstTimeUser = false
-                    )
+                    // Existing user - check if they need to complete new equipment setup
+                    if (progress.needsEquipmentSetup()) {
+                        // Force existing users to go through equipment setup for new features
+                        _routingState.value = RoutingState.Success(
+                            NavigationDestinations.OnboardingEquipmentSetup.route,
+                            isFirstTimeUser = false // Mark as existing user to skip intro/bean creation
+                        )
+                    } else {
+                        // Existing user with up-to-date setup - route to normal app flow
+                        _routingState.value = RoutingState.Success(
+                            NavigationDestinations.RecordShot.route, 
+                            isFirstTimeUser = false
+                        )
+                    }
                 }
             } catch (exception: Exception) {
                 // Error handling: graceful fallback to normal flow
@@ -102,6 +113,79 @@ class MainActivityViewModel @Inject constructor(
                 onboardingManager.markOnboardingComplete()
             } catch (_: Exception) {
                 // Ignore and let routing logic handle on next launch
+            }
+        }
+    }
+
+    /**
+     * Handles equipment setup completion and determines next step based on whether user needs bean creation.
+     * Returns true if the user should skip bean creation (they already have beans).
+     */
+    fun handleEquipmentSetupComplete(onResult: (shouldSkipBeanCreation: Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val progress = onboardingManager.getOnboardingProgress()
+                
+                // Update progress to mark equipment setup as complete with current version
+                val updatedProgress = progress.copy(
+                    hasCompletedEquipmentSetup = true,
+                    equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                )
+                onboardingManager.updateOnboardingProgress(updatedProgress)
+                
+                // Check if user has existing beans - if so, they can skip bean creation
+                val beanCountResult = beanRepository.getActiveBeanCount()
+                val hasExistingBeans = beanCountResult.getOrNull() ?: 0 > 0
+                
+                if (hasExistingBeans) {
+                    // User with beans - mark bean creation as complete and skip to main app
+                    val finalProgress = updatedProgress.copy(hasCreatedFirstBean = true)
+                    onboardingManager.updateOnboardingProgress(finalProgress)
+                    onResult(true) // Skip bean creation
+                } else {
+                    // User without beans - needs to go through bean creation
+                    onResult(false) // Don't skip bean creation
+                }
+            } catch (exception: Exception) {
+                // On error, assume they need bean creation to be safe
+                onResult(false)
+            }
+        }
+    }
+    
+    /**
+     * Handles equipment setup skip and determines next step based on whether user needs bean creation.
+     * Returns true if the user should skip bean creation (they already have beans).
+     */
+    fun handleEquipmentSetupSkip(onResult: (shouldSkipBeanCreation: Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val progress = onboardingManager.getOnboardingProgress()
+                
+                // Even when skipping, mark equipment setup as complete with current version
+                // so they don't get forced through it again
+                val updatedProgress = progress.copy(
+                    hasCompletedEquipmentSetup = true,
+                    equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                )
+                onboardingManager.updateOnboardingProgress(updatedProgress)
+                
+                // Check if user has existing beans - if so, they can skip bean creation
+                val beanCountResult = beanRepository.getActiveBeanCount()
+                val hasExistingBeans = beanCountResult.getOrNull() ?: 0 > 0
+                
+                if (hasExistingBeans) {
+                    // User with beans - mark bean creation as complete and skip to main app
+                    val finalProgress = updatedProgress.copy(hasCreatedFirstBean = true)
+                    onboardingManager.updateOnboardingProgress(finalProgress)
+                    onResult(true) // Skip bean creation
+                } else {
+                    // User without beans - needs to go through bean creation
+                    onResult(false) // Don't skip bean creation
+                }
+            } catch (exception: Exception) {
+                // On error, assume they need bean creation to be safe
+                onResult(false)
             }
         }
     }
