@@ -8,6 +8,9 @@ import java.time.format.DateTimeFormatter
 /**
  * Room type converters for handling LocalDate and LocalDateTime objects.
  * These converters allow Room to store and retrieve date/time objects as strings.
+ * 
+ * All dates are stored in ISO format for consistency. The database migration 4→5
+ * ensures all existing data is converted to this format.
  */
 class Converters {
 
