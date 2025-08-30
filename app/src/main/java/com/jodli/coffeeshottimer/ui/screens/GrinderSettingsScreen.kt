@@ -55,6 +55,11 @@ fun GrinderSettingsScreen(
     LaunchedEffect(Unit) {
         viewModel.load()
     }
+    
+    // Debug logging for UI state changes
+    LaunchedEffect(uiState) {
+        android.util.Log.d("GrinderSettingsScreen", "UI State changed: isLoading=${uiState.isLoading}, isFormValid=${uiState.isFormValid}, generalError=${uiState.generalError}")
+    }
 
     Scaffold(
         modifier = modifier,
@@ -110,7 +115,15 @@ fun GrinderSettingsScreen(
 
                 CoffeePrimaryButton(
                     text = stringResource(id = R.string.button_save),
-                    onClick = { viewModel.save(onSuccess = onNavigateBack) },
+                    onClick = { 
+                        android.util.Log.d("GrinderSettingsScreen", "Save button clicked - isFormValid=${uiState.isFormValid}, isLoading=${uiState.isLoading}")
+                        viewModel.save(
+                            onSuccess = {
+                                android.util.Log.d("GrinderSettingsScreen", "Save successful, navigating back")
+                                onNavigateBack()
+                            }
+                        )
+                    },
                     enabled = uiState.isFormValid && !uiState.isLoading,
                 )
             }
