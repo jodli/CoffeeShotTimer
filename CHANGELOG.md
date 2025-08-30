@@ -6,6 +6,12 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [1.4.1]
+
+### Fixed
+
+- Database migration issues.
+
 ## [1.4.0]
 
 ### Added
