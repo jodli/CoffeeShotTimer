@@ -22,7 +22,7 @@ import com.jodli.coffeeshottimer.data.model.Shot
  */
 @Database(
     entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
-    version = 4,
+    version = 5,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -43,7 +43,8 @@ abstract class AppDatabase : RoomDatabase() {
             return arrayOf(
                 MIGRATION_1_2,
                 MIGRATION_2_3,
-                MIGRATION_3_4
+                MIGRATION_3_4,
+                MIGRATION_4_5
             )
         }
 
@@ -196,7 +197,7 @@ abstract class AppDatabase : RoomDatabase() {
                     db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_isActive ON basket_configuration (isActive)")
 
                     // Insert default basket configuration (Double Shot preset) for existing users
-                    // Using a simplified UUID generation for SQLite
+                    // Using a simplified UUID generation for SQLite and ISO format for consistency
                     db.execSQL("""
                         INSERT INTO basket_configuration (id, coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax, createdAt, isActive)
                         VALUES (
@@ -205,7 +206,7 @@ abstract class AppDatabase : RoomDatabase() {
                             22.0,
                             28.0,
                             55.0,
-                            datetime('now'),
+                            strftime('%Y-%m-%dT%H:%M:%S', 'now'),
                             1
                         )
                     """)
@@ -213,6 +214,35 @@ abstract class AppDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 3->4 failed: ${e.message}. This migration adds basket_configuration table and ensures all existing indices are properly aligned.", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 4 to 5: Fix date format consistency in basket_configuration table.
+         * Converts SQLite datetime format to ISO format for consistency with Room converters.
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Update existing basket_configuration records to use ISO date format
+                    // Convert from SQLite format (YYYY-MM-DD HH:MM:SS) to ISO format (YYYY-MM-DDTHH:MM:SS)
+                    db.execSQL("""
+                        UPDATE basket_configuration 
+                        SET createdAt = REPLACE(createdAt, ' ', 'T') 
+                        WHERE createdAt LIKE '____-__-__ __:__:__'
+                    """)
+
+                    // Also handle any records with milliseconds
+                    db.execSQL("""
+                        UPDATE basket_configuration 
+                        SET createdAt = REPLACE(createdAt, ' ', 'T') 
+                        WHERE createdAt LIKE '____-__-__ __:__:__.___'
+                    """)
+
+                } catch (e: Exception) {
+                    // Surface the failure so Room can handle it and report clearly
+                    throw RuntimeException("Migration 4->5 failed: ${e.message}. This migration fixes date format consistency in basket_configuration table.", e)
                 }
             }
         }
