@@ -10,6 +10,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 - Configurable grinder step sizes to match your specific grinder's precision (0.1, 0.2, 0.5, 1.0, or custom values).
 
+### Changed
+
+- Improved onboarding flow to guide existing users through equipment setup and bean configuration when new features are available.
+
 ## [1.4.1]
 
 ### Fixed
