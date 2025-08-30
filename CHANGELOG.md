@@ -6,6 +6,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Changed
+
+- Improved onboarding flow to guide existing users through equipment setup and bean configuration when new features are available.
+
 ## [1.4.1]
 
 ### Fixed
