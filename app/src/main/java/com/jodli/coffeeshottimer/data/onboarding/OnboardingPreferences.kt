@@ -145,6 +145,8 @@ private data class SerializableOnboardingProgress(
     val hasCreatedFirstBean: Boolean = false,
     val hasRecordedFirstShot: Boolean = false,
     val grinderConfigurationId: String? = null,
+    val basketConfigurationId: String? = null,
+    val equipmentSetupVersion: Int = 1, // Default to 1 for existing users
     val onboardingStartedAt: Long = System.currentTimeMillis(),
     val lastUpdatedAt: Long = System.currentTimeMillis()
 ) {
@@ -155,6 +157,8 @@ private data class SerializableOnboardingProgress(
             hasCreatedFirstBean = hasCreatedFirstBean,
             hasRecordedFirstShot = hasRecordedFirstShot,
             grinderConfigurationId = grinderConfigurationId,
+            basketConfigurationId = basketConfigurationId,
+            equipmentSetupVersion = equipmentSetupVersion,
             onboardingStartedAt = onboardingStartedAt,
             lastUpdatedAt = lastUpdatedAt
         )
@@ -171,6 +175,8 @@ private fun OnboardingProgress.toSerializable(): SerializableOnboardingProgress 
         hasCreatedFirstBean = hasCreatedFirstBean,
         hasRecordedFirstShot = hasRecordedFirstShot,
         grinderConfigurationId = grinderConfigurationId,
+        basketConfigurationId = basketConfigurationId,
+        equipmentSetupVersion = equipmentSetupVersion,
         onboardingStartedAt = onboardingStartedAt,
         lastUpdatedAt = lastUpdatedAt
     )
