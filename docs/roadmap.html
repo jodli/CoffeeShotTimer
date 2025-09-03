@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roadmap - Coffee Shot Timer</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/icon-192.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Immediate theme detection to prevent flash -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('coffee-shot-timer-theme');
+                const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const theme = savedTheme || systemTheme;
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header" role="banner">
+        <nav class="nav-container container" role="navigation" aria-label="Main navigation">
+            <a href="index.html" class="nav-logo" aria-label="Coffee Shot Timer Home">
+                <img src="assets/images/icon-192.svg" alt="Coffee Shot Timer Icon" width="32" height="32">
+                Coffee Shot Timer
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="guides.html">Guides</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+                <li><a href="contribute.html">Contribute</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary">
+                    Download App
+                </a>
+                
+                <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Product Roadmap & Changelog</h1>
+                    <p>See what's coming next and track our progress. This roadmap is updated regularly based on user feedback and development priorities.</p>
+                </div>
+                
+                <div class="grid grid-2">
+                    <div class="coffee-card">
+                        <h2>🚧 Roadmap Coming Soon</h2>
+                        <p>We're working on a comprehensive roadmap that will show you exactly what's coming next. This will include:</p>
+                        <ul class="quality-list">
+                            <li><span class="quality-indicator quality-indicator-good"></span>Planned features with timelines</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Community feature voting</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Development progress tracking</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Integration with GitHub milestones</li>
+                        </ul>
+                        
+                        <p style="margin-top: var(--space-m); padding-top: var(--space-m); border-top: 1px solid var(--color-primary-container);"><strong>For now:</strong> Check out our <a href="https://github.com/jodli/CoffeeShotTimer/issues" target="_blank" rel="noopener">planned features and improvements on GitHub</a></p>
+                    </div>
+                    
+                    <div class="coffee-card">
+                        <h2>📝 Automated Changelog</h2>
+                        <p>We're setting up automatic changelog generation from our GitHub releases. This will show:</p>
+                        <ul class="quality-list">
+                            <li><span class="quality-indicator quality-indicator-good"></span>Latest app updates and features</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Bug fixes and improvements</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Breaking changes and migration notes</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Direct links to download each version</li>
+                        </ul>
+                        
+                        <p style="margin-top: var(--space-m); padding-top: var(--space-m); border-top: 1px solid var(--color-primary-container);"><strong>Current releases:</strong> View all <a href="https://github.com/jodli/CoffeeShotTimer/releases" target="_blank" rel="noopener">releases and changelogs on GitHub</a></p>
+                    </div>
+                </div>
+                
+                <div class="text-center" style="margin-top: var(--space-2xl);">
+                    <div class="coffee-card">
+                        <h3>💬 Join the Discussion</h3>
+                        <p>Help shape the future of Coffee Shot Timer by joining our community discussions and sharing your ideas.</p>
+                        
+                        <div style="display: flex; justify-content: center; gap: var(--space-m); margin-top: var(--space-m); flex-wrap: wrap;">
+                            <a href="https://github.com/jodli/CoffeeShotTimer/discussions" target="_blank" rel="noopener" class="coffee-button coffee-button-primary">GitHub Discussions</a>
+                            <a href="https://github.com/jodli/CoffeeShotTimer/issues/new?template=feature_request.md" target="_blank" rel="noopener" class="coffee-button coffee-button-secondary">Request Feature</a>
+                            <a href="index.html" class="coffee-button coffee-button-secondary">← Back to Home</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener noreferrer" target="_blank">GitHub</a></li>
+                    <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
+                    <li><a href="roadmap.html">Roadmap</a></li>
+                    <li><a href="contribute.html">Contribute</a></li>
+                </ul>
+                
+                <p class="footer-copyright">
+                    © 2025 Coffee Shot Timer. Made with ☕ for coffee lovers everywhere.
+                </p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="assets/js/theme.js"></script>
+</body>
+</html>

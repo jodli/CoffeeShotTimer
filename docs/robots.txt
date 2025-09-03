@@ -1,0 +1,15 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://jodli.github.io/CoffeeShotTimer_landing_page/sitemap.xml
+
+# Disallow crawling of assets that don't need indexing
+Disallow: /assets/js/
+Disallow: /assets/css/
+
+# Allow crawling of images for image search
+Allow: /assets/images/
+
+# Crawl delay (optional, helps with server load)
+Crawl-delay: 1

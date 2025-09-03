@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <!-- Main landing page -->
+    <url>
+        <loc>https://jodli.github.io/CoffeeShotTimer_landing_page/</loc>
+        <lastmod>2025-01-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>1.0</priority>
+    </url>
+    
+    <!-- Privacy policy -->
+    <url>
+        <loc>https://jodli.github.io/CoffeeShotTimer_landing_page/privacy.html</loc>
+        <lastmod>2025-01-09</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+    
+    <!-- Additional pages -->
+    <url>
+        <loc>https://jodli.github.io/CoffeeShotTimer_landing_page/guides.html</loc>
+        <lastmod>2025-01-09</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <url>
+        <loc>https://jodli.github.io/CoffeeShotTimer_landing_page/roadmap.html</loc>
+        <lastmod>2025-01-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    
+    <url>
+        <loc>https://jodli.github.io/CoffeeShotTimer_landing_page/contribute.html</loc>
+        <lastmod>2025-01-09</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    
+    <!-- Future pages (Phase 2) -->
+    <!-- 
+    <url>
+        <loc>https://jodli.github.io/CoffeeShotTimer_landing_page/press.html</loc>
+        <lastmod>2025-01-09</lastmod>
+        <changefreq>quarterly</changefreq>
+        <priority>0.4</priority>
+    </url>
+    -->
+</urlset>

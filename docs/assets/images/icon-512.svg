@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="512" height="512" rx="85" fill="#F2E6D3"/>
+  
+  <!-- Coffee cup silhouette -->
+  <ellipse cx="256" cy="380" rx="130" ry="20" fill="#B8763D" opacity="0.3"/>
+  <path d="M150 320 L362 320 L348 400 L164 400 Z" fill="#B8763D"/>
+  <rect x="156" y="270" width="200" height="50" rx="10" fill="#2D1B0F"/>
+  
+  <!-- Timer elements -->
+  <circle cx="256" cy="210" r="65" fill="none" stroke="#7BA5A3" stroke-width="8"/>
+  <circle cx="256" cy="210" r="55" fill="none" stroke="#B8763D" stroke-width="6" stroke-dasharray="130 200"/>
+  
+  <!-- Timer hands -->
+  <line x1="256" y1="210" x2="256" y2="170" stroke="#2D1B0F" stroke-width="6" stroke-linecap="round"/>
+  <line x1="256" y1="210" x2="290" y2="210" stroke="#2D1B0F" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="256" cy="210" r="8" fill="#2D1B0F"/>
+  
+  <!-- Additional details -->
+  <circle cx="256" cy="210" r="75" fill="none" stroke="#E8DDD0" stroke-width="2"/>
+</svg>
