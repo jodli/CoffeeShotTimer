@@ -1,79 +1,417 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Meta tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coffee Shot Timer - Privacy Policy</title>
-    <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; color: #333; }
-        h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
-        h2 { color: #34495e; margin-top: 30px; }
-        .language-toggle { text-align: center; margin: 20px 0; }
-        .language-toggle button { background: #3498db; color: white; border: none; padding: 10px 20px; margin: 0 5px; border-radius: 5px; cursor: pointer; }
-        .language-toggle button:hover { background: #2980b9; }
-        .language-toggle button.active { background: #2c3e50; }
-        .language-section { display: none; }
-        .language-section.active { display: block; }
-        .highlight { background: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0; }
-    </style>
+    <meta name="description" content="Track and log your espresso shots with precise timing. 100% offline, privacy-focused espresso timer app for Android.">
+    <meta name="keywords" content="espresso timer, coffee shot timer, espresso extraction, coffee brewing app, android, barista tools, home espresso">
+    <meta name="author" content="Coffee Shot Timer">
+    <meta name="theme-color" content="#B8763D">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Coffee Shot Timer - Espresso Shot Timer">
+    <meta property="og:description" content="Track your espresso extractions with precise timing and shot logging. 100% offline Android app.">
+    <meta property="og:image" content="https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/og-image.svg">
+    <meta property="og:url" content="https://jodli.github.io/CoffeeShotTimer_landing_page/">
+    <meta property="og:site_name" content="Coffee Shot Timer">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Coffee Shot Timer - Precision Espresso Tracking">
+    <meta property="twitter:description" content="The precision app for perfect espresso extraction">
+    <meta property="twitter:image" content="https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/og-image.svg">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://jodli.github.io/CoffeeShotTimer_landing_page/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/icon-192.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Schema.org markup -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "MobileApplication",
+        "name": "Coffee Shot Timer",
+        "alternateName": "Espresso Timer",
+        "description": "Espresso shot timer for home baristas. Track your extractions with timing and shot history logging.",
+        "operatingSystem": "Android",
+        "applicationCategory": "LifestyleApplication",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "jodli"
+        },
+        "datePublished": "2024-12-20",
+        "screenshot": [
+            "https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/feature-timer.svg",
+            "https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/feature-beans.svg",
+            "https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/feature-analysis.svg"
+        ],
+        "featureList": [
+            "Shot timer with easy controls",
+            "Bean management and tracking",
+            "Shot history logging",
+            "100% offline functionality",
+            "Grinder settings tracking"
+        ]
+    }
+    </script>
+    
+    <title>Coffee Shot Timer - Precision Espresso Tracking</title>
+    
+    <!-- Immediate theme detection to prevent flash -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('coffee-shot-timer-theme');
+                const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const theme = savedTheme || systemTheme;
+                document.documentElement.setAttribute('data-theme', theme);
+                
+                // Update theme-color meta tag
+                const themeColors = { light: '#B8763D', dark: '#E6B577' };
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColors[theme]);
+            } catch (e) {
+                // Fallback to light theme if anything fails
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
 </head>
 <body>
-    <div class="language-toggle">
-        <button onclick="showLanguage('en')" id="btn-en" class="active">English</button>
-        <button onclick="showLanguage('de')" id="btn-de">Deutsch</button>
-    </div>
-
-    <div id="content-en" class="language-section active">
-        <h1>Privacy Policy for Coffee Shot Timer</h1>
-        <p><strong>Effective Date:</strong> 2025/07/24</p>
-        
-        <div class="highlight">
-            <h2>Information We Do NOT Collect</h2>
-            <p>Coffee Shot Timer is completely offline. We do NOT:</p>
-            <ul>
-                <li>Collect personal data (name, email, location)</li>
-                <li>Track usage or analytics</li>
-                <li>Require account creation</li>
-                <li>Connect to the internet</li>
+    <!-- Skip to content link for accessibility -->
+    <a href="#main-content" class="sr-only">Skip to main content</a>
+    
+    <!-- Navigation Header -->
+    <header class="nav-header" role="banner">
+        <nav class="nav-container container" role="navigation" aria-label="Main navigation">
+            <a href="#" class="nav-logo" aria-label="Coffee Shot Timer Home">
+                <img src="assets/images/icon-192.svg" alt="Coffee Shot Timer Icon" width="32" height="32">
+                Coffee Shot Timer
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="#features">Features</a></li>
+                <li><a href="guides.html">Guides</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+                <li><a href="contribute.html">Contribute</a></li>
             </ul>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary">
+                    Download App
+                </a>
+                
+                <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <!-- Hero Section -->
+        <section class="section-hero" role="banner">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">The Espresso Timer for Home Baristas</h1>
+                    <p class="hero-subtitle">Track your espresso shots with precise timing and detailed logging. 100% offline and privacy-focused.</p>
+                    
+                    <div class="hero-actions">
+                        <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary coffee-button-large" id="download">
+                            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7,10 12,15 17,10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Download on Google Play
+                        </a>
+                        <a href="https://github.com/jodli/CoffeeShotTimer" class="coffee-button coffee-button-secondary coffee-button-large" rel="noopener noreferrer" target="_blank">
+                            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                            </svg>
+                            View on GitHub
+                        </a>
+                    </div>
+                    
+                    <div class="hero-visual">
+                        <img src="assets/images/hero-timer.svg" alt="Coffee Shot Timer Interface" class="hero-timer" width="200" height="200">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Value Proposition Section -->
+        <section class="section" id="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Why Coffee Shot Timer?</h2>
+                    <p>Everything you need to perfect your espresso extractions in one beautiful, offline-first app.</p>
+                </div>
+                
+                <div class="value-grid">
+                    <div class="coffee-card value-card">
+                        <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12,6 12,12 16,14"></polyline>
+                        </svg>
+                        <h3>Precision Timing</h3>
+                        <p>Track your extraction time with a large, easy-to-read timer designed for use in the kitchen.</p>
+                        <ul class="quality-list">
+                            <li><span class="quality-indicator quality-indicator-good"></span>Clear time display</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Start/stop controls</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Easy to use interface</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="coffee-card value-card">
+                        <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                        <h3>Smart Tracking</h3>
+                        <p>Log your shots with detailed information including timing, ratios, and grinder settings.</p>
+                        <ul class="quality-list">
+                            <li><span class="quality-indicator quality-indicator-good"></span>Shot history logging</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Bean management</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Grinder settings tracking</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="coffee-card value-card">
+                        <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"></path>
+                            <path d="m22 6-10 7L2 6"></path>
+                        </svg>
+                        <h3>100% Offline</h3>
+                        <p>No internet required. Your data stays on your device with full privacy protection.</p>
+                        <ul class="quality-list">
+                            <li><span class="quality-indicator quality-indicator-good"></span>No tracking</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>Local data only</li>
+                            <li><span class="quality-indicator quality-indicator-good"></span>No accounts needed</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature Showcase Section -->
+        <section class="section">
+            <div class="container">
+                <div class="feature-showcase">
+                    <!-- Feature 1: Timer -->
+                    <div class="feature-item">
+                        <div class="feature-content">
+                            <h3>Precision Shot Timer</h3>
+                            <p>Track your extraction time with an easy-to-use timer that helps you achieve consistent results. Aim for that sweet spot of 25-30 seconds for a balanced extraction.</p>
+                            <ul class="quality-list">
+                                <li><span class="quality-indicator quality-indicator-good"></span>Easy-to-read display</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Simple start/stop controls</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Time tracking to the second</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Shot history recording</li>
+                            </ul>
+                        </div>
+                        <div class="feature-image">
+                            <img src="assets/images/feature-timer.svg" alt="Coffee Shot Timer - Main Timer Interface" width="300" height="500" loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- Feature 2: Bean Management -->
+                    <div class="feature-item">
+                        <div class="feature-content">
+                            <h3>Bean Management</h3>
+                            <p>Keep track of your coffee beans including roast dates and origins. Organize your collection and remember which beans produced your best shots.</p>
+                            <ul class="quality-list">
+                                <li><span class="quality-indicator quality-indicator-good"></span>Track bean information</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Record roast dates</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Note origins and roasters</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Link beans to shot history</li>
+                            </ul>
+                        </div>
+                        <div class="feature-image">
+                            <img src="assets/images/feature-beans.svg" alt="Coffee Shot Timer - Bean Management" width="300" height="500" loading="lazy">
+                        </div>
+                    </div>
+
+                    <!-- Feature 3: Analysis -->
+                    <div class="feature-item">
+                        <div class="feature-content">
+                            <h3>Shot History & Analysis</h3>
+                            <p>Review your shot history to understand what works best. Track your progress and learn from each extraction.</p>
+                            <ul class="quality-list">
+                                <li><span class="quality-indicator quality-indicator-good"></span>Complete shot history</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>View past extractions</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Track your improvements</li>
+                                <li><span class="quality-indicator quality-indicator-good"></span>Data export options</li>
+                            </ul>
+                        </div>
+                        <div class="feature-image">
+                            <img src="assets/images/feature-analysis.svg" alt="Coffee Shot Timer - Analysis and History" width="300" height="500" loading="lazy">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Target Audience Section -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Perfect For</h2>
+                    <p>Whether you're just starting your espresso journey or you're a seasoned home barista, Coffee Shot Timer adapts to your needs.</p>
+                </div>
+                
+                <div class="audience-grid">
+                    <div class="audience-chip">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
+                        </svg>
+                        <div class="content">
+                            <h4>Espresso Machine Owners</h4>
+                            <p>Get consistent results from your home espresso setup</p>
+                        </div>
+                    </div>
+                    
+                    <div class="audience-chip">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="9" cy="21" r="1"></circle>
+                            <circle cx="20" cy="21" r="1"></circle>
+                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                        </svg>
+                        <div class="content">
+                            <h4>Coffee Enthusiasts</h4>
+                            <p>Explore different beans and brewing parameters systematically</p>
+                        </div>
+                    </div>
+                    
+                    <div class="audience-chip">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 20V10"></path>
+                            <path d="M12 20V4"></path>
+                            <path d="M6 20v-6"></path>
+                        </svg>
+                        <div class="content">
+                            <h4>Data-Driven Perfectionists</h4>
+                            <p>Track, measure, and optimize every aspect of your brewing</p>
+                        </div>
+                    </div>
+                    
+                    <div class="audience-chip">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="m2 17 10 5 10-5"></path>
+                            <path d="m2 12 10 5 10-5"></path>
+                        </svg>
+                        <div class="content">
+                            <h4>Home Barista Beginners</h4>
+                            <p>Learn proper timing and technique with guided feedback</p>
+                        </div>
+                    </div>
+                    
+                    <div class="audience-chip">
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        <div class="content">
+                            <h4>Professionals at Home</h4>
+                            <p>Bring professional timing techniques to your home setup</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Open Source Section -->
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Proudly Open Source</h2>
+                    <p>Coffee Shot Timer is built with ❤️ by the community. Contribute, suggest features, or explore the code.</p>
+                </div>
+                
+                <div class="github-stats">
+                    <a href="https://github.com/jodli/CoffeeShotTimer" class="github-badge" rel="noopener noreferrer" target="_blank">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                        </svg>
+                        Stars
+                    </a>
+                    <a href="https://github.com/jodli/CoffeeShotTimer/network/members" class="github-badge" rel="noopener noreferrer" target="_blank">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 6.1H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2z"></path>
+                            <polyline points="22,6.1 12,13.1 2,6.1"></polyline>
+                        </svg>
+                        Forks
+                    </a>
+                    <a href="https://github.com/jodli/CoffeeShotTimer/issues" class="github-badge" rel="noopener noreferrer" target="_blank">
+                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="m9 12 2 2 4-4"></path>
+                        </svg>
+                        Issues
+                    </a>
+                </div>
+                
+                <div class="text-center">
+                    <a href="contribute.html" class="coffee-button coffee-button-secondary">Learn How to Contribute</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener noreferrer" target="_blank">GitHub</a></li>
+                    <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
+                    <li><a href="roadmap.html">Roadmap</a></li>
+                    <li><a href="contribute.html">Contribute</a></li>
+                </ul>
+                
+                <p class="footer-copyright">
+                    © 2025 Coffee Shot Timer. Made with ☕ for coffee lovers everywhere.
+                </p>
+            </div>
         </div>
-
-        <h2>Local Data Storage</h2>
-        <p>Only stores settings locally on your device. Never transmitted anywhere.</p>
-
-        <h2>Contact</h2>
-        <p>Questions? Email: <strong>jobst87@gmail.com</strong></p>
-    </div>
-
-    <div id="content-de" class="language-section">
-        <h1>Datenschutzerklärung für Coffee Shot Timer</h1>
-        <p><strong>Gültigkeitsdatum:</strong> 24.07.2025</p>
-        
-        <div class="highlight">
-            <h2>Informationen, die wir NICHT sammeln</h2>
-            <p>Coffee Shot Timer ist vollständig offline. Wir sammeln NICHT:</p>
-            <ul>
-                <li>Persönliche Daten (Name, E-Mail, Standort)</li>
-                <li>Nutzungsanalysen</li>
-                <li>Kontodaten</li>
-                <li>Internetverbindungen</li>
-            </ul>
-        </div>
-
-        <h2>Lokale Datenspeicherung</h2>
-        <p>Speichert nur Einstellungen lokal auf Ihrem Gerät. Wird niemals übertragen.</p>
-
-        <h2>Kontakt</h2>
-        <p>Fragen? E-Mail: <strong>jobst87@gmail.com</strong></p>
-    </div>
-
-    <script>
-        function showLanguage(lang) {
-            document.querySelectorAll('.language-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.language-toggle button').forEach(b => b.classList.remove('active'));
-            document.getElementById('content-' + lang).classList.add('active');
-            document.getElementById('btn-' + lang).classList.add('active');
-        }
-    </script>
+    </footer>
+    
+    <script src="assets/js/theme.js"></script>
 </body>
 </html>

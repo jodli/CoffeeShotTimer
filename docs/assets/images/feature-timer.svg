@@ -1,0 +1,32 @@
+<svg width="300" height="500" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Phone frame -->
+  <rect width="300" height="500" rx="25" fill="#2D1B0F"/>
+  <rect x="10" y="30" width="280" height="440" rx="15" fill="#F2E6D3"/>
+  
+  <!-- Status bar -->
+  <rect x="15" y="35" width="270" height="25" fill="#FAF5F0"/>
+  <text x="25" y="50" font-family="system-ui" font-size="10" fill="#2D1B0F">9:41</text>
+  <text x="260" y="50" font-family="system-ui" font-size="10" fill="#2D1B0F">100%</text>
+  
+  <!-- Main timer -->
+  <circle cx="150" cy="180" r="80" fill="none" stroke="#E8DDD0" stroke-width="6"/>
+  <circle cx="150" cy="180" r="80" fill="none" stroke="#B8763D" stroke-width="8" 
+          stroke-dasharray="200 300" stroke-linecap="round"/>
+  
+  <!-- Timer text -->
+  <text x="150" y="175" text-anchor="middle" font-family="system-ui" font-size="32" font-weight="500" fill="#2D1B0F">00:25</text>
+  <text x="150" y="195" text-anchor="middle" font-family="system-ui" font-size="12" fill="#5D3A1A">EXTRACTION</text>
+  
+  <!-- Control buttons -->
+  <rect x="50" y="300" width="80" height="44" rx="8" fill="#B8763D"/>
+  <text x="90" y="327" text-anchor="middle" font-family="system-ui" font-size="14" font-weight="500" fill="white">START</text>
+  
+  <rect x="170" y="300" width="80" height="44" rx="8" fill="none" stroke="#B8763D" stroke-width="2"/>
+  <text x="210" y="327" text-anchor="middle" font-family="system-ui" font-size="14" font-weight="500" fill="#B8763D">RESET</text>
+  
+  <!-- Bean info card -->
+  <rect x="25" y="370" width="250" height="60" rx="12" fill="#FAF5F0" stroke="#E8DDD0"/>
+  <text x="35" y="390" font-family="system-ui" font-size="14" font-weight="500" fill="#2D1B0F">Ethiopian Yirgacheffe</text>
+  <text x="35" y="405" font-family="system-ui" font-size="12" fill="#5D3A1A">Roasted 5 days ago • Fresh</text>
+  <circle cx="255" cy="395" r="5" fill="#B8763D"/>
+</svg>

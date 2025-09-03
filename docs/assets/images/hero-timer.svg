@@ -1,0 +1,51 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#E8DDD0" stroke-width="4"/>
+  
+  <!-- Progress circle (will be animated) -->
+  <circle 
+    id="progress-circle"
+    cx="100" 
+    cy="100" 
+    r="90" 
+    fill="none" 
+    stroke="#B8763D" 
+    stroke-width="6" 
+    stroke-linecap="round"
+    stroke-dasharray="565.48" 
+    stroke-dashoffset="565.48"
+    transform="rotate(-90 100 100)"
+  />
+  
+  <!-- Timer display -->
+  <text 
+    x="100" 
+    y="95" 
+    text-anchor="middle" 
+    font-family="system-ui, -apple-system, sans-serif" 
+    font-size="24" 
+    font-weight="500" 
+    fill="#2D1B0F"
+    id="timer-display"
+  >00:00</text>
+  
+  <!-- Label -->
+  <text 
+    x="100" 
+    y="115" 
+    text-anchor="middle" 
+    font-family="system-ui, -apple-system, sans-serif" 
+    font-size="12" 
+    fill="#5D3A1A"
+  >EXTRACTION TIME</text>
+  
+  <!-- Animation -->
+  <animateTransform
+    attributeName="transform"
+    attributeType="XML"
+    type="rotate"
+    from="0 100 100"
+    to="360 100 100"
+    dur="60s"
+    repeatCount="indefinite"/>
+</svg>

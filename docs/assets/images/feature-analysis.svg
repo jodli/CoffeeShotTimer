@@ -1,0 +1,52 @@
+<svg width="300" height="500" viewBox="0 0 300 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- Phone frame -->
+  <rect width="300" height="500" rx="25" fill="#2D1B0F"/>
+  <rect x="10" y="30" width="280" height="440" rx="15" fill="#F2E6D3"/>
+  
+  <!-- Header -->
+  <rect x="15" y="35" width="270" height="60" fill="#FAF5F0"/>
+  <text x="25" y="55" font-family="system-ui" font-size="18" font-weight="600" fill="#2D1B0F">Shot History</text>
+  <text x="25" y="75" font-family="system-ui" font-size="12" fill="#5D3A1A">Last 7 days • 12 shots</text>
+  
+  <!-- Chart area -->
+  <rect x="25" y="110" width="250" height="120" rx="12" fill="#FAF5F0" stroke="#E8DDD0"/>
+  <text x="35" y="130" font-family="system-ui" font-size="12" font-weight="500" fill="#2D1B0F">Extraction Time Trend</text>
+  
+  <!-- Simple line chart -->
+  <polyline points="40,190 70,180 100,185 130,175 160,170 190,165 220,160 250,155" 
+            fill="none" stroke="#B8763D" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- Data points -->
+  <circle cx="40" cy="190" r="3" fill="#B8763D"/>
+  <circle cx="70" cy="180" r="3" fill="#B8763D"/>
+  <circle cx="100" cy="185" r="3" fill="#B8763D"/>
+  <circle cx="130" cy="175" r="3" fill="#B8763D"/>
+  <circle cx="160" cy="170" r="3" fill="#7BA5A3"/>
+  <circle cx="190" cy="165" r="3" fill="#7BA5A3"/>
+  <circle cx="220" cy="160" r="3" fill="#7BA5A3"/>
+  <circle cx="250" cy="155" r="3" fill="#7BA5A3"/>
+  
+  <!-- Recent shots list -->
+  <rect x="25" y="250" width="250" height="60" rx="12" fill="#FAF5F0" stroke="#E8DDD0"/>
+  <text x="35" y="270" font-family="system-ui" font-size="14" font-weight="500" fill="#2D1B0F">Today, 9:15 AM</text>
+  <text x="35" y="285" font-family="system-ui" font-size="12" fill="#5D3A1A">18g → 36g (1:2.0) • 25s</text>
+  <text x="35" y="300" font-family="system-ui" font-size="12" fill="#5D3A1A">Ethiopian Yirgacheffe</text>
+  <circle cx="250" cy="275" r="4" fill="#B8763D"/>
+  <circle cx="260" cy="275" r="4" fill="#B8763D"/>
+  <circle cx="270" cy="275" r="4" fill="#7BA5A3"/>
+  
+  <rect x="25" y="330" width="250" height="60" rx="12" fill="#FAF5F0" stroke="#E8DDD0"/>
+  <text x="35" y="350" font-family="system-ui" font-size="14" font-weight="500" fill="#2D1B0F">Yesterday, 7:45 AM</text>
+  <text x="35" y="365" font-family="system-ui" font-size="12" fill="#5D3A1A">19g → 40g (1:2.1) • 28s</text>
+  <text x="35" y="380" font-family="system-ui" font-size="12" fill="#5D3A1A">Brazilian Santos</text>
+  <circle cx="250" cy="355" r="4" fill="#7BA5A3"/>
+  <circle cx="260" cy="355" r="4" fill="#B8763D"/>
+  <circle cx="270" cy="355" r="4" fill="#B8763D"/>
+  
+  <!-- Stats summary -->
+  <rect x="25" y="410" width="250" height="40" rx="8" fill="#E8DDD0"/>
+  <text x="35" y="427" font-family="system-ui" font-size="12" font-weight="500" fill="#2D1B0F">Avg Ratio: 1:2.0</text>
+  <text x="35" y="440" font-family="system-ui" font-size="12" fill="#5D3A1A">Avg Time: 26s</text>
+  <text x="160" y="427" font-family="system-ui" font-size="12" font-weight="500" fill="#2D1B0F">Best Quality: 85%</text>
+  <text x="160" y="440" font-family="system-ui" font-size="12" fill="#5D3A1A">This Week</text>
+</svg>

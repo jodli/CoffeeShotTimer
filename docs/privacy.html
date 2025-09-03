@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Privacy Policy for Coffee Shot Timer - 100% offline espresso timer app that respects your privacy and never collects personal data.">
+    <meta name="robots" content="index, follow">
+    <title>Privacy Policy - Coffee Shot Timer</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="assets/images/icon-192.svg">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- Immediate theme detection to prevent flash -->
+    <script>
+        (function() {
+            try {
+                const savedTheme = localStorage.getItem('coffee-shot-timer-theme');
+                const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                const theme = savedTheme || systemTheme;
+                document.documentElement.setAttribute('data-theme', theme);
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
+    
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    
+    <!-- Additional styles for language switcher -->
+    <style>
+        .language-toggle {
+            text-align: center;
+            margin: var(--space-xl) 0;
+        }
+        
+        .language-toggle button {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: var(--space-s) var(--space-l);
+            margin: 0 var(--space-xs);
+            border-radius: var(--radius-m);
+            cursor: pointer;
+            font-size: var(--font-size-s);
+            font-weight: var(--font-weight-medium);
+            min-height: var(--touch-target);
+            transition: all 0.2s ease;
+        }
+        
+        .language-toggle button:hover {
+            background: var(--color-secondary);
+            transform: translateY(-1px);
+        }
+        
+        .language-toggle button.active {
+            background: var(--color-on-background);
+        }
+        
+        .language-section {
+            display: none;
+        }
+        
+        .language-section.active {
+            display: block;
+        }
+        
+        .highlight {
+            background: var(--color-primary-container);
+            padding: var(--space-m);
+            border-left: 4px solid var(--color-primary);
+            margin: var(--space-l) 0;
+            border-radius: var(--radius-s);
+        }
+        
+        .privacy-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Header -->
+    <header class="nav-header" role="banner">
+        <nav class="nav-container container" role="navigation" aria-label="Main navigation">
+            <a href="index.html" class="nav-logo" aria-label="Coffee Shot Timer Home">
+                <img src="assets/images/icon-192.svg" alt="Coffee Shot Timer Icon" width="32" height="32">
+                Coffee Shot Timer
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html#features">Features</a></li>
+                <li><a href="guides.html">Guides</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+                <li><a href="contribute.html">Contribute</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+                
+                <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary">
+                    Download App
+                </a>
+                
+                <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main id="main-content" role="main">
+        <section class="section">
+            <div class="container">
+                <div class="section-header">
+                    <h1>Privacy Policy</h1>
+                    <p>We built Coffee Shot Timer to be 100% offline and privacy-first. No accounts, no tracking, no analytics.</p>
+                </div>
+                
+                <div class="privacy-content">
+                <div class="language-toggle">
+                    <button onclick="showLanguage('en')" id="en-btn" class="active">English</button>
+                    <button onclick="showLanguage('de')" id="de-btn">Deutsch</button>
+                </div>
+
+    <div id="content-en" class="language-section active">
+        <h1>Privacy Policy for Coffee Shot Timer</h1>
+        <p><strong>Last Updated:</strong> July 2025</p>
+        
+        <div class="highlight">
+            <h2>Information We Do NOT Collect</h2>
+            <p>Coffee Shot Timer is completely offline. We do NOT:</p>
+            <ul>
+                <li>Collect personal data (name, email, location)</li>
+                <li>Track usage or analytics</li>
+                <li>Require account creation</li>
+                <li>Connect to the internet</li>
+            </ul>
+        </div>
+
+        <h2>Local Data Storage</h2>
+        <p>All data (shots, beans, settings) is stored locally on your device only. Never transmitted anywhere.</p>
+
+        <h2>Contact</h2>
+        <p>Questions? Email: <strong>jobst87@gmail.com</strong></p>
+    </div>
+
+    <div id="content-de" class="language-section">
+        <h1>Datenschutzerklärung für Coffee Shot Timer</h1>
+        <p><strong>Zuletzt aktualisiert:</strong> Juli 2025</p>
+        
+        <div class="highlight">
+            <h2>Informationen, die wir NICHT sammeln</h2>
+            <p>Coffee Shot Timer ist vollständig offline. Wir sammeln NICHT:</p>
+            <ul>
+                <li>Persönliche Daten (Name, E-Mail, Standort)</li>
+                <li>Nutzungsanalysen</li>
+                <li>Kontodaten</li>
+                <li>Internetverbindungen</li>
+            </ul>
+        </div>
+
+        <h2>Lokale Datenspeicherung</h2>
+        <p>Speichert nur Einstellungen lokal auf Ihrem Gerät. Wird niemals übertragen.</p>
+
+        <h2>Kontakt</h2>
+        <p>Fragen? E-Mail: <strong>jobst87@gmail.com</strong></p>
+    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" role="contentinfo">
+        <div class="container">
+            <div class="footer-content">
+                <ul class="footer-links">
+                    <li><a href="privacy.html">Privacy Policy</a></li>
+                    <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener noreferrer" target="_blank">GitHub</a></li>
+                    <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
+                    <li><a href="roadmap.html">Roadmap</a></li>
+                    <li><a href="contribute.html">Contribute</a></li>
+                </ul>
+                
+                <p class="footer-copyright">
+                    © 2025 Coffee Shot Timer. Made with ☕ for coffee lovers everywhere.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="assets/js/theme.js"></script>
+
+    <!-- Language switcher functionality -->
+    <script>
+        function showLanguage(lang) {
+            document.querySelectorAll('.language-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.language-toggle button').forEach(b => b.classList.remove('active'));
+            document.getElementById('content-' + lang).classList.add('active');
+            document.getElementById(lang + '-btn').classList.add('active');
+        }
+    </script>
+</body>
+</html>
