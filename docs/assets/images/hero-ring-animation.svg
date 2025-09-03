@@ -1,0 +1,171 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#B8763D;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#D4A574;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#7BA5A3;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coffeeFlow" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5D3A1A;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#2C1810;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <radialGradient id="coffeePowder" cx="50%" cy="50%">
+      <stop offset="0%" style="stop-color:#8B6F47;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#5D3A1A;stop-opacity:1" />
+    </radialGradient>
+
+    <!-- Coffee drop effect -->
+    <filter id="gooey">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="3" />
+      <feColorMatrix values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -10" />
+    </filter>
+  </defs>
+
+  <!-- Central ring background -->
+  <circle cx="200" cy="200" r="80" 
+    fill="none" 
+    stroke="#E8DDD0" 
+    stroke-width="12"
+    opacity="0.3"/>
+
+  <!-- Animated progress ring -->
+  <circle cx="200" cy="200" r="80" 
+    fill="none" 
+    stroke="url(#ringGradient)" 
+    stroke-width="12"
+    stroke-linecap="round"
+    stroke-dasharray="502.65"
+    stroke-dashoffset="502.65"
+    transform="rotate(-90 200 200)">
+    <animate attributeName="stroke-dashoffset" 
+      values="502.65;0" 
+      dur="8s" 
+      repeatCount="indefinite"
+      ease="ease-out"/>
+  </circle>
+
+  <!-- Stylized portafilter inside ring at top -->
+  <g id="portafilter" transform="translate(200, 160)">
+    <!-- Handle -->
+    <rect x="-35" y="-3" width="20" height="6" rx="3" fill="#2D1B0F"/>
+    
+    <!-- Basket -->
+    <path d="M-15,-5 L15,-5 L12,8 L-12,8 Z" 
+      fill="#3C3C3C" 
+      stroke="#2D1B0F" 
+      stroke-width="1.5"/>
+    
+    <!-- Coffee powder falling animation -->
+    <g id="coffeePowder">
+      <circle r="2" fill="url(#coffeePowder)" opacity="0">
+        <animate attributeName="cy" values="8;25;35" dur="1.5s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="1.5s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="1.5" fill="#8B6F47" opacity="0">
+        <animate attributeName="cy" values="8;25;35" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+        <animate attributeName="cx" values="0;-3;-2" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="1.5s" begin="0.2s" repeatCount="indefinite"/>
+      </circle>
+      <circle r="1.5" fill="#5D3A1A" opacity="0">
+        <animate attributeName="cy" values="8;25;35" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+        <animate attributeName="cx" values="0;3;2" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0;1;0" dur="1.5s" begin="0.4s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+  </g>
+
+  <!-- Weight labels positioned near their elements -->
+  <g font-family="system-ui, -apple-system, sans-serif" text-anchor="middle">
+    <!-- 18g in above portafilter -->
+    <text x="200" y="138" font-size="14" font-weight="600" fill="#5D3A1A">
+      18g in
+    </text>
+    <!-- 36g out below mug -->
+    <text x="200" y="265" font-size="14" font-weight="600" fill="#5D3A1A">
+      36g out
+    </text>
+  </g>
+
+  <!-- Modern coffee cup inside ring at bottom -->
+  <g id="cup" transform="translate(200, 230)">
+    <!-- Cup body - smaller, minimalist style -->
+    <path d="M-18,0 L-15,20 L15,20 L18,0 Z"
+      fill="none" 
+      stroke="#2D1B0F" 
+      stroke-width="2"
+      stroke-linecap="round"/>
+    
+    <!-- Handle -->
+    <path d="M18,5 Q25,5 25,12 Q25,20 18,18"
+      fill="none" 
+      stroke="#2D1B0F" 
+      stroke-width="2" 
+      stroke-linecap="round"/>
+    
+    <!-- Coffee filling animation -->
+    <clipPath id="cupMask">
+      <path d="M-18,0 L-15,20 L15,20 L18,0 Z"/>
+    </clipPath>
+    
+    <g clip-path="url(#cupMask)">
+      <!-- Coffee liquid -->
+      <rect x="-18" y="20" width="36" height="0" fill="url(#coffeeFlow)">
+        <animate attributeName="y" 
+          values="20;20;4"
+          dur="8s" 
+          keyTimes="0;0.3;1"
+          repeatCount="indefinite"/>
+        <animate attributeName="height" 
+          values="0;0;16"
+          dur="8s"
+          keyTimes="0;0.3;1" 
+          repeatCount="indefinite"/>
+      </rect>
+      
+      <!-- Coffee surface wave effect -->
+      <ellipse cx="0" cy="4" rx="16" ry="2" fill="#8B6F47" opacity="0">
+        <animate attributeName="opacity" 
+          values="0;0;0.6" 
+          dur="8s"
+          keyTimes="0;0.3;1" 
+          repeatCount="indefinite"/>
+        <animateTransform attributeName="transform" 
+          type="scale" 
+          values="1,1;1.1,1;1,1" 
+          dur="2s" 
+          begin="2.4s"
+          repeatCount="indefinite"/>
+      </ellipse>
+    </g>
+  </g>
+
+  <!-- Subtle visual accents inside ring -->
+  <g id="floatingElements">
+    <!-- Small steam wisps inside cup area -->
+    <g opacity="0">
+      <path d="M185,230 Q183,225 185,220" fill="none" stroke="#B8763D" stroke-width="1.5" opacity="0.3">
+        <animate attributeName="d" 
+          values="M185,230 Q183,225 185,220;M185,225 Q187,220 185,215"
+          dur="2s"
+          begin="4s" 
+          repeatCount="indefinite"/>
+      </path>
+      <path d="M215,230 Q217,225 215,220" fill="none" stroke="#7BA5A3" stroke-width="1.5" opacity="0.3">
+        <animate attributeName="d" 
+          values="M215,230 Q217,225 215,220;M215,225 Q213,220 215,215"
+          dur="2s"
+          begin="4.3s" 
+          repeatCount="indefinite"/>
+      </path>
+      <animate attributeName="opacity" 
+        values="0;0;1;1" 
+        dur="8s"
+        keyTimes="0;0.5;0.6;1" 
+        repeatCount="indefinite"/>
+    </g>
+  </g>
+
+</svg>
