@@ -351,11 +351,29 @@
   max-width: 300px;
 }
 
-.hero-timer {
+.hero-timer,
+.hero-animation {
   width: 100%;
   height: auto;
-  filter: drop-shadow(var(--shadow-lg));
-  animation: pulse 4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 30px rgba(0,0,0,0.1));
+  animation: float 4s ease-in-out infinite;
+}
+
+/* Dark mode adjustments for hero animation */
+[data-theme="dark"] .hero-animation {
+  filter: drop-shadow(0 10px 30px rgba(230, 181, 119, 0.15));
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .hero-animation {
+    animation: none;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 @keyframes pulse {
@@ -402,11 +420,110 @@
   align-items: center;
 }
 
+/* Smartphone device frame */
+.device-frame {
+  position: relative;
+  max-width: 320px;
+  margin: 0 auto;
+  padding: 12px;
+  background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
+  border-radius: 36px;
+  box-shadow: 
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 20px 50px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Phone notch */
+.device-frame::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 24px;
+  background: #1a1a1a;
+  border-radius: 0 0 20px 20px;
+  z-index: 1;
+}
+
+/* Power button */
+.device-frame::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 120px;
+  width: 3px;
+  height: 60px;
+  background: linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+  border-radius: 0 2px 2px 0;
+  box-shadow: inset -1px 0 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Volume buttons */
+.device-volume {
+  position: absolute;
+  left: -2px;
+  top: 100px;
+}
+
+.device-volume::before,
+.device-volume::after {
+  content: '';
+  position: absolute;
+  width: 3px;
+  height: 40px;
+  background: linear-gradient(to bottom, #2c2c2c, #1a1a1a);
+  border-radius: 2px 0 0 2px;
+  box-shadow: inset 1px 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.device-volume::after {
+  top: 50px;
+}
+
+.device-screen {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #000;
+}
+
 .feature-image img {
-  max-width: 100%;
+  display: block;
+  width: 100%;
   height: auto;
-  border-radius: var(--radius-l);
-  box-shadow: var(--shadow-lg);
+  border-radius: 24px;
+}
+
+/* Fallback for browsers that don't support the complex device frame */
+@supports not (background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%)) {
+  .device-frame {
+    border: 8px solid #333;
+    border-radius: 36px;
+    padding: 8px;
+    background: #222;
+  }
+  
+  .device-frame::before,
+  .device-frame::after,
+  .device-volume {
+    display: none;
+  }
+}
+
+/* Ensure mobile screenshots don't get too large */
+@media (max-width: 480px) {
+  .device-frame {
+    max-width: 280px;
+    padding: 10px;
+  }
+  
+  .device-frame::before {
+    width: 100px;
+    height: 20px;
+  }
 }
 
 /* Alternating layout on desktop */
