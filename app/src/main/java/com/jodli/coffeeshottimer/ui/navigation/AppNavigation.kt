@@ -88,11 +88,32 @@ fun AppNavigation(
         composable(NavigationDestinations.OnboardingEquipmentSetup.route) {
             EquipmentSetupFlowScreen(
                 onComplete = {
-                    navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
+                    // Check if the user should skip bean creation (they already have beans)
+                    mainActivityViewModel.handleEquipmentSetupComplete { shouldSkipBeanCreation ->
+                        if (shouldSkipBeanCreation) {
+                            // User has beans - go directly to main app
+                            navController.navigate(NavigationDestinations.RecordShot.route) {
+                                popUpTo(NavigationDestinations.OnboardingEquipmentSetup.route) { inclusive = true }
+                            }
+                        } else {
+                            // User needs beans - continue to bean creation
+                            navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
+                        }
+                    }
                 },
                 onSkip = {
-                    // Skip directly to guided bean creation
-                    navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
+                    // Check if the user should skip bean creation (they already have beans)
+                    mainActivityViewModel.handleEquipmentSetupSkip { shouldSkipBeanCreation ->
+                        if (shouldSkipBeanCreation) {
+                            // User has beans - go directly to main app
+                            navController.navigate(NavigationDestinations.RecordShot.route) {
+                                popUpTo(NavigationDestinations.OnboardingEquipmentSetup.route) { inclusive = true }
+                            }
+                        } else {
+                            // User needs beans - continue to bean creation
+                            navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
+                        }
+                    }
                 }
             )
         }

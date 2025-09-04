@@ -163,7 +163,8 @@ class OnboardingPreferencesTest {
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
             hasCreatedFirstBean = true,
-            hasRecordedFirstShot = true
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
         // When
@@ -306,7 +307,8 @@ class OnboardingProgressTest {
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
             hasCreatedFirstBean = true,
-            hasRecordedFirstShot = true
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
         // When & Then
@@ -342,7 +344,8 @@ class OnboardingProgressTest {
         // Given
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
-            hasCompletedEquipmentSetup = true
+            hasCompletedEquipmentSetup = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
         // When
@@ -358,7 +361,8 @@ class OnboardingProgressTest {
         val progress = OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
-            hasCreatedFirstBean = true
+            hasCreatedFirstBean = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
         // When
@@ -375,7 +379,8 @@ class OnboardingProgressTest {
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
             hasCreatedFirstBean = true,
-            hasRecordedFirstShot = true
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
         // When
@@ -383,5 +388,77 @@ class OnboardingProgressTest {
 
         // Then
         assertNull(nextStep)
+    }
+    
+    @Test
+    fun `isComplete returns false when equipment setup version is outdated`() {
+        // Given
+        val progress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1
+        )
+
+        // When & Then
+        assertFalse(progress.isComplete())
+    }
+    
+    @Test
+    fun `getNextStep returns EQUIPMENT_SETUP when version is outdated`() {
+        // Given
+        val progress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1
+        )
+
+        // When
+        val nextStep = progress.getNextStep()
+
+        // Then
+        assertEquals(OnboardingStep.EQUIPMENT_SETUP, nextStep)
+    }
+    
+    @Test
+    fun `needsEquipmentSetup returns true when equipment setup not completed`() {
+        // Given
+        val progress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = false,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+        )
+
+        // When & Then
+        assertTrue(progress.needsEquipmentSetup())
+    }
+    
+    @Test
+    fun `needsEquipmentSetup returns true when equipment setup version is outdated`() {
+        // Given
+        val progress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1
+        )
+
+        // When & Then
+        assertTrue(progress.needsEquipmentSetup())
+    }
+    
+    @Test
+    fun `needsEquipmentSetup returns false when equipment setup is complete and current version`() {
+        // Given
+        val progress = OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+        )
+
+        // When & Then
+        assertFalse(progress.needsEquipmentSetup())
     }
 }

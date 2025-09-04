@@ -61,8 +61,6 @@ import com.jodli.coffeeshottimer.ui.components.BeanCard
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
-import com.jodli.coffeeshottimer.ui.components.DebugDialog
-import com.jodli.coffeeshottimer.ui.components.DebugTapDetector
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
@@ -75,7 +73,6 @@ import com.jodli.coffeeshottimer.ui.components.RecordShotLandscapeLayout
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeTimerSize
-import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -83,8 +80,7 @@ import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 fun RecordShotScreen(
     onNavigateToBeanManagement: () -> Unit = {},
     onNavigateToShotDetails: (String) -> Unit = {},
-    viewModel: ShotRecordingViewModel = hiltViewModel(),
-    debugViewModel: DebugViewModel = hiltViewModel()
+    viewModel: ShotRecordingViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
     val scrollState = rememberScrollState()
@@ -119,8 +115,6 @@ fun RecordShotScreen(
     val basketCoffeeOutMin by viewModel.basketCoffeeOutMin.collectAsStateWithLifecycle()
     val basketCoffeeOutMax by viewModel.basketCoffeeOutMax.collectAsStateWithLifecycle()
 
-    // Debug state (only in debug builds)
-    val debugUiState by debugViewModel.uiState.collectAsStateWithLifecycle()
 
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
@@ -197,8 +191,7 @@ fun RecordShotScreen(
                     onClearSuccessMessage = { viewModel.clearSuccessMessage() },
                     errorMessage = errorMessage,
                     onClearErrorMessage = { viewModel.clearErrorMessage() },
-                    onRetryRecordShot = { viewModel.recordShot() },
-                    debugViewModel = debugViewModel
+                    onRetryRecordShot = { viewModel.recordShot() }
                 )
             }
         },
@@ -291,21 +284,6 @@ fun RecordShotScreen(
         )
     }
 
-    // Debug Dialog (only in debug builds)
-    if (BuildConfig.DEBUG) {
-        DebugDialog(
-            isVisible = debugUiState.isDialogVisible,
-            onDismiss = { debugViewModel.hideDialog() },
-            onFillDatabase = { debugViewModel.fillDatabase() },
-            onAddMoreShots = { debugViewModel.addMoreShots() },
-            onClearDatabase = { debugViewModel.clearDatabase() },
-            isLoading = debugUiState.isLoading,
-            operationResult = debugUiState.operationResult,
-            showConfirmation = debugUiState.showConfirmation,
-            onShowConfirmation = { debugViewModel.showConfirmation() },
-            onHideConfirmation = { debugViewModel.hideConfirmation() }
-        )
-    }
 
     // Bean Selection Bottom Sheet
     if (showBeanSelector) {
@@ -737,8 +715,7 @@ private fun RecordShotPortraitContent(
     onClearSuccessMessage: () -> Unit,
     errorMessage: String?,
     onClearErrorMessage: () -> Unit,
-    onRetryRecordShot: () -> Unit,
-    debugViewModel: DebugViewModel
+    onRetryRecordShot: () -> Unit
 ) {
     val spacing = LocalSpacing.current
     

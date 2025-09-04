@@ -5,6 +5,7 @@ import com.jodli.coffeeshottimer.data.onboarding.OnboardingProgress
 import com.jodli.coffeeshottimer.ui.navigation.NavigationDestinations
 import com.jodli.coffeeshottimer.ui.viewmodel.MainActivityViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.RoutingState
+import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -18,6 +19,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -31,12 +33,17 @@ class OnboardingRoutingIntegrationTest {
 
     private lateinit var onboardingManager: OnboardingManager
     private lateinit var viewModel: MainActivityViewModel
+    private lateinit var beanRepository: BeanRepository
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         onboardingManager = mockk()
+        beanRepository = mockk()
+        
+        // Default mock behavior for BeanRepository
+        coEvery { beanRepository.getActiveBeanCount() } returns Result.success(0)
     }
 
     @After
@@ -52,11 +59,11 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val step1State = viewModel.routingState.first()
-        assertTrue(step1State is RoutingState.Success)
+        assertTrue("Expected Success state but got $step1State", step1State is RoutingState.Success)
         assertEquals(NavigationDestinations.OnboardingIntroduction.route, (step1State as RoutingState.Success).route)
         assertTrue(step1State.isFirstTimeUser)
 
@@ -65,7 +72,7 @@ class OnboardingRoutingIntegrationTest {
             hasSeenIntroduction = true
         )
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val step2State = viewModel.routingState.first()
@@ -76,10 +83,11 @@ class OnboardingRoutingIntegrationTest {
         // Step 3: After equipment setup - should route to guided bean creation
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
-            hasCompletedEquipmentSetup = true
+            hasCompletedEquipmentSetup = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val step3State = viewModel.routingState.first()
@@ -91,10 +99,11 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
-            hasCreatedFirstBean = true
+            hasCreatedFirstBean = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val step4State = viewModel.routingState.first()
@@ -105,7 +114,7 @@ class OnboardingRoutingIntegrationTest {
         // Step 5: After first shot - should be marked complete and route to normal flow
         coEvery { onboardingManager.isFirstTimeUser() } returns false
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val step5State = viewModel.routingState.first()
@@ -124,11 +133,12 @@ class OnboardingRoutingIntegrationTest {
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
             hasCreatedFirstBean = true,
-            hasRecordedFirstShot = true
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
         coEvery { onboardingManager.markOnboardingComplete() } returns Unit
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         // When: handleAppUpdate is called
@@ -151,7 +161,7 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         // Then: Should route to introduction
@@ -169,7 +179,7 @@ class OnboardingRoutingIntegrationTest {
         val exception = RuntimeException("Storage failure")
         coEvery { onboardingManager.isFirstTimeUser() } throws exception
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         // Then: Should provide error state with fallback route
@@ -177,10 +187,17 @@ class OnboardingRoutingIntegrationTest {
         assertTrue(state is RoutingState.Error)
         val errorState = state as RoutingState.Error
         assertEquals(NavigationDestinations.RecordShot.route, errorState.fallbackRoute)
-        assertEquals(exception, errorState.exception)
+        assertEquals("Storage failure", errorState.exception.message)
 
         // When: Retry is attempted and succeeds
         coEvery { onboardingManager.isFirstTimeUser() } returns false
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+        )
 
         viewModel.retryRouting()
         advanceUntilIdle()
@@ -200,7 +217,7 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         // Verify initial onboarding routing
@@ -226,7 +243,7 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.isFirstTimeUser() } returns true
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val introState = viewModel.routingState.first()
@@ -238,7 +255,7 @@ class OnboardingRoutingIntegrationTest {
             hasSeenIntroduction = true
         )
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val equipmentState = viewModel.routingState.first()
@@ -248,7 +265,7 @@ class OnboardingRoutingIntegrationTest {
         // Step 3: User goes back to introduction (should be allowed)
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val backToIntroState = viewModel.routingState.first()
@@ -265,7 +282,7 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
         coEvery { onboardingManager.markOnboardingComplete() } returns Unit
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val introState = viewModel.routingState.first()
@@ -291,10 +308,11 @@ class OnboardingRoutingIntegrationTest {
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
-            hasCreatedFirstBean = true
+            hasCreatedFirstBean = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         val firstShotState = viewModel.routingState.first()
@@ -308,10 +326,11 @@ class OnboardingRoutingIntegrationTest {
             hasSeenIntroduction = true,
             hasCompletedEquipmentSetup = true,
             hasCreatedFirstBean = true,
-            hasRecordedFirstShot = true
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
         )
 
-        viewModel = MainActivityViewModel(onboardingManager)
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         advanceUntilIdle()
 
         // Then: Should be in normal flow with no way to navigate back to onboarding
@@ -319,5 +338,113 @@ class OnboardingRoutingIntegrationTest {
         assertTrue(completedState is RoutingState.Success)
         assertEquals(NavigationDestinations.RecordShot.route, (completedState as RoutingState.Success).route)
         assertTrue(!completedState.isFirstTimeUser)
+    }
+    
+    @Test
+    fun `existing user with outdated equipment setup is forced through equipment setup flow`() = runTest {
+        // Given: Existing user with outdated equipment setup version
+        coEvery { onboardingManager.isFirstTimeUser() } returns false
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = true,
+            hasCreatedFirstBean = true,
+            hasRecordedFirstShot = true,
+            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1 // Outdated
+        )
+        
+        // Mock that they have existing beans
+        coEvery { beanRepository.getActiveBeanCount() } returns Result.success(3)
+
+        // When: ViewModel is initialized
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
+        advanceUntilIdle()
+
+        // Then: Should route to equipment setup but marked as existing user
+        val state = viewModel.routingState.first()
+        assertTrue("Expected Success state but got $state", state is RoutingState.Success)
+        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (state as RoutingState.Success).route)
+        assertFalse(state.isFirstTimeUser) // Should be marked as existing user
+    }
+    
+    @Test
+    fun `existing user who completes equipment setup with beans goes directly to main app`() = runTest {
+        // Given: Existing user with outdated equipment setup
+        coEvery { onboardingManager.isFirstTimeUser() } returns false
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = false,
+            hasCreatedFirstBean = false,
+            hasRecordedFirstShot = false,
+            equipmentSetupVersion = 1
+        )
+        coEvery { beanRepository.getActiveBeanCount() } returns Result.success(2) // Has beans
+        coEvery { onboardingManager.updateOnboardingProgress(any()) } returns Unit
+
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
+        advanceUntilIdle()
+
+        // Verify they're routed to equipment setup
+        val initialState = viewModel.routingState.first()
+        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (initialState as RoutingState.Success).route)
+        assertFalse(initialState.isFirstTimeUser)
+        
+        var resultCallback: Boolean? = null
+        
+        // When: They complete equipment setup
+        viewModel.handleEquipmentSetupComplete { shouldSkipBeanCreation ->
+            resultCallback = shouldSkipBeanCreation
+        }
+        advanceUntilIdle()
+        
+        // Then: Should indicate user should skip bean creation and update progress
+        assertEquals(true, resultCallback)
+        coVerify { 
+            onboardingManager.updateOnboardingProgress(match { progress ->
+                progress.hasCompletedEquipmentSetup &&
+                progress.hasCreatedFirstBean && // Should mark bean creation complete since they have beans
+                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+            })
+        }
+    }
+    
+    @Test
+    fun `existing user who completes equipment setup without beans should continue to bean creation`() = runTest {
+        // Given: Existing user with no beans
+        coEvery { onboardingManager.isFirstTimeUser() } returns false
+        coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress(
+            hasSeenIntroduction = true,
+            hasCompletedEquipmentSetup = false,
+            hasCreatedFirstBean = false,
+            hasRecordedFirstShot = false,
+            equipmentSetupVersion = 1
+        )
+        coEvery { beanRepository.getActiveBeanCount() } returns Result.success(0) // No beans
+        coEvery { onboardingManager.updateOnboardingProgress(any()) } returns Unit
+
+        viewModel = MainActivityViewModel(onboardingManager, beanRepository)
+        advanceUntilIdle()
+
+        // Verify they're routed to equipment setup
+        val initialState = viewModel.routingState.first()
+        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (initialState as RoutingState.Success).route)
+        assertFalse(initialState.isFirstTimeUser)
+        
+        var resultCallback: Boolean? = null
+        
+        // When: They complete equipment setup
+        viewModel.handleEquipmentSetupComplete { shouldSkipBeanCreation ->
+            resultCallback = shouldSkipBeanCreation
+        }
+        advanceUntilIdle()
+        
+        // Then: Should not skip bean creation since they have no beans
+        assertEquals(false, resultCallback)
+        coVerify { 
+            onboardingManager.updateOnboardingProgress(match { progress ->
+                progress.hasCompletedEquipmentSetup &&
+                !progress.hasCreatedFirstBean && // Should NOT mark bean creation complete since they have no beans
+                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+            })
+        }
     }
 }
