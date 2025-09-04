@@ -5,10 +5,10 @@ on:
     branches: [main]
     tags: ["v*"]
     paths-ignore:
-      - 'docs/**'
-      - '*.md'
-      - '.github/**'
-      - '.kiro/**'
+      - "docs/**"
+      - "*.md"
+      - ".github/**"
+      - ".kiro/**"
   workflow_dispatch:
     inputs:
       version_name:
@@ -30,23 +30,33 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Extract version and determine deployment
         id: version
+        env:
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_RUN_NUMBER: ${{ github.run_number }}
+          VERSION_NAME_INPUT: ${{ github.event.inputs.version_name }}
         run: |
-          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
-            VERSION_NAME="${{ github.ref_name }}"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION_NAME="$GITHUB_REF_NAME"
             VERSION_NAME="${VERSION_NAME#v}"  # Remove 'v' prefix
             DEPLOY_TARGET="production"
             IS_TAG_BUILD="true"
             echo "Tag build detected: $VERSION_NAME -> production release"
-          elif [[ "${{ github.ref }}" == refs/heads/main ]]; then
-            VERSION_NAME="main-${{ github.run_number }}"
+          elif [[ "$GITHUB_REF" == refs/heads/main ]]; then
+            VERSION_NAME="main-$GITHUB_RUN_NUMBER"
             DEPLOY_TARGET="beta"
             IS_TAG_BUILD="false"
             echo "Main branch build: $VERSION_NAME -> open testing"
           else
-            VERSION_NAME="${{ github.event.inputs.version_name || 'manual-build' }}"
+            if [[ -z "$VERSION_NAME_INPUT" ]]; then
+              VERSION_NAME="manual-build"
+            else
+              VERSION_NAME="$VERSION_NAME_INPUT"
+            fi
             DEPLOY_TARGET="internal"
             IS_TAG_BUILD="false"
             echo "Manual build: $VERSION_NAME -> internal testing"
@@ -57,7 +67,7 @@ jobs:
           echo "is_tag_build=$IS_TAG_BUILD" >> $GITHUB_OUTPUT
 
       - name: Set Version
-        uses: chkfung/android-version-actions@v1.2.1
+        uses: chkfung/android-version-actions@fcf89abef1c7afba2083146dcca0c6da4705ba4b
         with:
           gradlePath: app/build.gradle.kts
           versionCode: ${{ github.run_number }}
@@ -78,6 +88,8 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+          save: false
+          lookup-only: true
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -115,10 +127,13 @@ jobs:
 
       - name: Generate GitHub release notes
         id: gen_release_notes
+        env:
+          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
+          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
         run: |
           set -euo pipefail
-          VERSION_NAME="${{ steps.version.outputs.version_name }}"
-          IS_TAG_BUILD="${{ steps.version.outputs.is_tag_build }}"
+          VERSION_NAME="$VERSION_NAME_OUTPUT"
+          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
           NOTES_FILE="RELEASE_NOTES.md"
 
           if [[ ! -f CHANGELOG.md ]]; then
@@ -156,20 +171,27 @@ jobs:
           echo "notes_file=$NOTES_FILE" >> $GITHUB_OUTPUT
 
       - name: Print extracted release notes
+        env:
+          NOTES_FILE_OUTPUT: ${{ steps.gen_release_notes.outputs.notes_file }}
         run: |
-          echo "=== Extracted release notes (${{ steps.gen_release_notes.outputs.notes_file }}) ==="
-          cat "${{ steps.gen_release_notes.outputs.notes_file }}"
+          echo "=== Extracted release notes ($NOTES_FILE_OUTPUT) ==="
+          cat "$NOTES_FILE_OUTPUT"
           echo "=== End of release notes ==="
 
       - name: Create or update GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
+          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
+          APK_PATH_OUTPUT: ${{ steps.artifacts.outputs.apk_path }}
+          AAB_PATH_OUTPUT: ${{ steps.artifacts.outputs.aab_path }}
+          NOTES_FILE_OUTPUT: ${{ steps.gen_release_notes.outputs.notes_file }}
         run: |
-          VERSION_NAME="${{ steps.version.outputs.version_name }}"
-          IS_TAG_BUILD="${{ steps.version.outputs.is_tag_build }}"
-          APK_PATH="${{ steps.artifacts.outputs.apk_path }}"
-          AAB_PATH="${{ steps.artifacts.outputs.aab_path }}"
-          NOTES_FILE="${{ steps.gen_release_notes.outputs.notes_file }}"
+          VERSION_NAME="$VERSION_NAME_OUTPUT"
+          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
+          APK_PATH="$APK_PATH_OUTPUT"
+          AAB_PATH="$AAB_PATH_OUTPUT"
+          NOTES_FILE="$NOTES_FILE_OUTPUT"
 
           if [[ "$IS_TAG_BUILD" == "true" ]]; then
             # Tag build - create new release
@@ -211,9 +233,11 @@ jobs:
 
       - name: Prepare Play Store what's new (en-US)
         id: play_whatsnew
+        env:
+          NOTES_FILE_OUTPUT: ${{ steps.gen_release_notes.outputs.notes_file }}
         run: |
           set -euo pipefail
-          NOTES_FILE="${{ steps.gen_release_notes.outputs.notes_file }}"
+          NOTES_FILE="$NOTES_FILE_OUTPUT"
           WHATSNEW_DIR="whatsnew"
           mkdir -p "$WHATSNEW_DIR"
           # Convert Markdown to plain text suitable for Play Console:
@@ -231,7 +255,7 @@ jobs:
           echo "whatsnew_dir=$WHATSNEW_DIR" >> $GITHUB_OUTPUT
 
       - name: Deploy to Google Play Console
-        uses: r0adkll/upload-google-play@v1.1.3
+        uses: r0adkll/upload-google-play@935ef9c68bb393a8e6116b1575626a7f5be3a7fb
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.jodli.coffeeshottimer
