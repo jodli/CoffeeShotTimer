@@ -289,7 +289,20 @@ fun CoffeeWeightOutSlider(
 }
 
 /**
- * Specialized slider for grinder settings with 0.5 increment steps.
+ * Format grind value according to the step size precision.
+ */
+private fun formatGrindValueForStepSize(value: Float, stepSize: Float): String {
+    return when {
+        stepSize >= 1.0f && value % 1.0f == 0.0f -> value.toInt().toString()
+        stepSize >= 0.5f -> String.format(java.util.Locale.US, "%.1f", value)
+        stepSize >= 0.1f -> String.format(java.util.Locale.US, "%.1f", value) 
+        stepSize >= 0.01f -> String.format(java.util.Locale.US, "%.2f", value)
+        else -> String.format(java.util.Locale.US, "%.2f", value)
+    }
+}
+
+/**
+ * Specialized slider for grinder settings with configurable increment steps.
  */
 @Composable
 fun GrinderSettingSlider(
@@ -301,7 +314,8 @@ fun GrinderSettingSlider(
     suggestedSetting: String? = null,
     previousSuccessfulSettings: List<String> = emptyList(),
     minSetting: Float = GrinderSliderConstants.GRINDER_MIN_SETTING,
-    maxSetting: Float = GrinderSliderConstants.GRINDER_MAX_SETTING
+    maxSetting: Float = GrinderSliderConstants.GRINDER_MAX_SETTING,
+    stepSize: Float = 0.5f
 ) {
     val spacing = LocalSpacing.current
     val hapticFeedback = LocalHapticFeedback.current
@@ -313,8 +327,13 @@ fun GrinderSettingSlider(
     // Convert string value to float, supporting both decimal point and comma
     val currentValue = parseLocaleAwareFloat(value)?.coerceIn(safeMin, safeMax) ?: defaultValue
 
-    // Ensure the value follows 0.5 increment steps
-    val displayValue = (currentValue * 2).roundToInt() / 2.0f
+    // Ensure the value follows the configured step size increments using integer tenths to avoid float drift
+    val tenthsStep = (stepSize * 10f).roundToInt().coerceAtLeast(1)
+    val minTenths = (safeMin * 10f).roundToInt()
+    val currentTenths = (currentValue * 10f).roundToInt()
+    val stepsFromMinInt = ((currentTenths - minTenths + tenthsStep / 2) / tenthsStep)
+    val displayTenths = minTenths + (stepsFromMinInt * tenthsStep)
+    val displayValue = displayTenths / 10f
 
     // Track previous value for haptic feedback
     var previousValue by remember { mutableStateOf(currentValue) }
@@ -384,12 +403,17 @@ fun GrinderSettingSlider(
 
         Spacer(modifier = Modifier.height(spacing.small))
 
-        // Slider with 0.5 increments
+        // Slider with configurable step size increments
         Slider(
             value = displayValue,
             onValueChange = { newValue ->
-                // Round to nearest 0.5 increment
-                val roundedValue = (newValue * 2).roundToInt() / 2.0f
+                // Round to nearest step increment using integer tenths to avoid float drift
+                val tenthsStep = (stepSize * 10f).roundToInt().coerceAtLeast(1)
+                val minTenths = (safeMin * 10f).roundToInt()
+                val newTenths = (newValue * 10f).roundToInt()
+                val stepsFromMinInt = ((newTenths - minTenths + tenthsStep / 2) / tenthsStep)
+                val roundedTenths = minTenths + (stepsFromMinInt * tenthsStep)
+                val roundedValue = roundedTenths / 10f
 
                 // Provide haptic feedback when value changes
                 if (roundedValue != previousValue) {
@@ -397,18 +421,18 @@ fun GrinderSettingSlider(
                     previousValue = roundedValue
                 }
 
-                // Format output using locale-independent decimal point notation
-                val formattedValue = if (roundedValue == roundedValue.toInt().toFloat()) {
-                    roundedValue.toInt().toString()
-                } else {
-                    // Use US locale to ensure decimal point (.) instead of comma (,)
-                    String.format(java.util.Locale.US, "%.1f", roundedValue)
-                }
+                // Format output using appropriate precision based on step size
+                val formattedValue = formatGrindValueForStepSize(roundedValue, stepSize)
 
                 onValueChange(formattedValue)
             },
             valueRange = safeMin..safeMax,
-            steps = (kotlin.math.max(0, (((safeMax - safeMin) / 0.5f).roundToInt() - 1))),
+            steps = run {
+                val tenthsStep = (stepSize * 10f).roundToInt().coerceAtLeast(1)
+                val minTenths = (safeMin * 10f).roundToInt()
+                val maxTenths = (safeMax * 10f).roundToInt()
+                kotlin.math.max(0, ((maxTenths - minTenths) / tenthsStep) - 1)
+            },
             enabled = enabled,
             colors = SliderDefaults.colors(
                 thumbColor = MaterialTheme.colorScheme.primary,

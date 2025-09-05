@@ -22,7 +22,7 @@ import com.jodli.coffeeshottimer.data.model.Shot
  */
 @Database(
     entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
-    version = 5,
+    version = 6,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -44,7 +44,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_1_2,
                 MIGRATION_2_3,
                 MIGRATION_3_4,
-                MIGRATION_4_5
+                MIGRATION_4_5,
+                MIGRATION_5_6
             )
         }
 
@@ -243,6 +244,60 @@ abstract class AppDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 4->5 failed: ${e.message}. This migration fixes date format consistency in basket_configuration table.", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 5 to 6: Add stepSize column to grinder_configuration table.
+         * This enables users to configure custom step sizes for their grinders (0.1, 0.2, 0.25, 0.5, 1.0, etc.)
+         */
+        private val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Ensure all existing indices are properly in place before making changes
+                    // This is necessary because Room validates the entire schema after migration
+                    
+                    // Clean up any legacy bean indices that might exist
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
+                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
+
+                    // Ensure all canonical bean indices exist
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
+                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
+
+                    // Clean up any legacy shot indices
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
+                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
+
+                    // Ensure all canonical shot indices exist
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
+
+                    // Ensure grinder_configuration indices are in place
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_grinder_configuration_createdAt ON grinder_configuration (createdAt)")
+
+                    // Ensure basket_configuration indices are in place
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_createdAt ON basket_configuration (createdAt)")
+                    db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_isActive ON basket_configuration (isActive)")
+                    
+                    // Now add the stepSize column with default value of 0.5 to maintain backward compatibility
+                    db.execSQL("""
+                        ALTER TABLE grinder_configuration 
+                        ADD COLUMN stepSize REAL NOT NULL DEFAULT 0.5
+                    """)
+
+                } catch (e: Exception) {
+                    // Surface the failure so Room can handle it and report clearly
+                    throw RuntimeException("Migration 5->6 failed: ${e.message}. This migration adds stepSize column to grinder_configuration table and ensures all indices are properly aligned.", e)
                 }
             }
         }
