@@ -26,16 +26,21 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 fun GrinderScaleSetup(
     scaleMin: String,
     scaleMax: String,
+    stepSize: String = "0.5",
     onScaleMinChange: (String) -> Unit,
     onScaleMaxChange: (String) -> Unit,
+    onStepSizeChange: (String) -> Unit = {},
     onPresetSelected: (Int, Int) -> Unit,
+    onStepSizePresetSelected: (Double) -> Unit = {},
     minError: String?,
     maxError: String?,
+    stepSizeError: String? = null,
     generalError: String?,
     validationSuggestion: String?,
     modifier: Modifier = Modifier,
     showDescription: Boolean = true,
-    showPresets: Boolean = true
+    showPresets: Boolean = true,
+    showStepSize: Boolean = true
 ) {
     val spacing = LocalSpacing.current
 
@@ -144,6 +149,21 @@ fun GrinderScaleSetup(
             )
         }
 
+        // Step size selector
+        if (showStepSize) {
+            Spacer(modifier = Modifier.height(spacing.medium))
+            
+            StepSizeSelector(
+                stepSize = stepSize,
+                onStepSizeChange = onStepSizeChange,
+                onPresetSelected = onStepSizePresetSelected,
+                stepSizeError = stepSizeError,
+                scaleMin = scaleMin.toIntOrNull(),
+                scaleMax = scaleMax.toIntOrNull(),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
         if (generalError != null) {
             Spacer(modifier = Modifier.height(spacing.medium))
             GentleValidationMessage(
@@ -156,18 +176,6 @@ fun GrinderScaleSetup(
                 )
             )
             Spacer(modifier = Modifier.height(spacing.small))
-        } else if (scaleMin.isNotBlank() && scaleMax.isNotBlank()) {
-            val minValue = scaleMin.toIntOrNull()
-            val maxValue = scaleMax.toIntOrNull()
-            if (minValue != null && maxValue != null && minValue < maxValue) {
-                Spacer(modifier = Modifier.height(spacing.small))
-                Text(
-                    text = stringResource(R.string.text_range_validation_success, maxValue - minValue),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
         }
     }
 }

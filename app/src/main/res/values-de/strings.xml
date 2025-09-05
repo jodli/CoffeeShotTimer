@@ -559,6 +559,12 @@
     <string name="label_grinder_maximum">Maximum</string>
     <string name="placeholder_grinder_min">z.B. 1</string>
     <string name="placeholder_grinder_max">z.B. 10</string>
+    <string name="text_step_size">Schrittgröße</string>
+    <string name="text_step_size_description">Wie präzise sind die Einstellungen an deiner Mühle? Dies bestimmt die Schrittweite zwischen jeder Mahlgradeinstellung.</string>
+    <string name="text_common_step_sizes">Gängige Schrittgrößen</string>
+    <string name="label_custom_step_size">Benutzerdefinierte Schrittgröße</string>
+    <string name="placeholder_step_size">z.B. 0.5</string>
+    <string name="text_step_size_info">Deine Mühle hat %1$d Schritte von %2$d (Schrittweite: %3$s) bis %4$d</string>
     <string name="text_range_validation_success">✓ Bereich sieht gut aus! Du hast %1$d Schritte zur Verfügung.</string>
     <string name="button_continue">Weiter</string>
 

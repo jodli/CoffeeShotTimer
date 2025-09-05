@@ -182,6 +182,7 @@ fun RecordShotScreen(
                     onUseSuggestion = { suggestion -> viewModel.updateGrinderSetting(suggestion) },
                     grinderScaleMin = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
                     grinderScaleMax = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
+                    grinderStepSize = viewModel.grinderStepSize.collectAsStateWithLifecycle().value,
                     basketCoffeeInMin = basketCoffeeInMin,
                     basketCoffeeInMax = basketCoffeeInMax,
                     basketCoffeeOutMin = basketCoffeeOutMin,
@@ -256,6 +257,7 @@ fun RecordShotScreen(
                         onUseSuggestion = { suggestion -> viewModel.updateGrinderSetting(suggestion) },
                         grinderScaleMin = viewModel.grinderScaleMin.collectAsStateWithLifecycle().value,
                         grinderScaleMax = viewModel.grinderScaleMax.collectAsStateWithLifecycle().value,
+                        grinderStepSize = viewModel.grinderStepSize.collectAsStateWithLifecycle().value,
                         basketCoffeeInMin = basketCoffeeInMin,
                         basketCoffeeInMax = basketCoffeeInMax,
                         basketCoffeeOutMin = basketCoffeeOutMin,
@@ -523,6 +525,7 @@ private fun GrinderSettingSection(
     onUseSuggestion: (String) -> Unit,
     minSetting: Float,
     maxSetting: Float,
+    stepSize: Float = 0.5f,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -557,6 +560,7 @@ private fun GrinderSettingSection(
             previousSuccessfulSettings = previousSuccessfulSettings,
             minSetting = minSetting,
             maxSetting = maxSetting,
+            stepSize = stepSize,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -722,6 +726,7 @@ private fun RecordShotPortraitContent(
     onUseSuggestion: (String) -> Unit,
     grinderScaleMin: Float,
     grinderScaleMax: Float,
+    grinderStepSize: Float,
     basketCoffeeInMin: Float,
     basketCoffeeInMax: Float,
     basketCoffeeOutMin: Float,
@@ -793,6 +798,7 @@ private fun RecordShotPortraitContent(
         onUseSuggestion = onUseSuggestion,
         minSetting = grinderScaleMin,
         maxSetting = grinderScaleMax,
+        stepSize = grinderStepSize,
         modifier = Modifier.fillMaxWidth()
     )
 
@@ -884,6 +890,7 @@ private fun RecordShotFormContent(
     onUseSuggestion: (String) -> Unit,
     grinderScaleMin: Float,
     grinderScaleMax: Float,
+    grinderStepSize: Float,
     basketCoffeeInMin: Float,
     basketCoffeeInMax: Float,
     basketCoffeeOutMin: Float,
@@ -940,6 +947,7 @@ private fun RecordShotFormContent(
         onUseSuggestion = onUseSuggestion,
         minSetting = grinderScaleMin,
         maxSetting = grinderScaleMax,
+        stepSize = grinderStepSize,
         modifier = Modifier.fillMaxWidth()
     )
 

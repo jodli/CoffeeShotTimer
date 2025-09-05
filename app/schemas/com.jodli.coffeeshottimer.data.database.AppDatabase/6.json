@@ -1,0 +1,357 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 6,
+    "identityHash": "c28dbe881f87e9a1422b4a46c964b76a",
+    "entities": [
+      {
+        "tableName": "beans",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `roastDate` TEXT NOT NULL, `notes` TEXT NOT NULL, `isActive` INTEGER NOT NULL, `lastGrinderSetting` TEXT, `photoPath` TEXT, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "roastDate",
+            "columnName": "roastDate",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastGrinderSetting",
+            "columnName": "lastGrinderSetting",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "photoPath",
+            "columnName": "photoPath",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_beans_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_beans_name` ON `${TABLE_NAME}` (`name`)"
+          },
+          {
+            "name": "index_beans_isActive",
+            "unique": false,
+            "columnNames": [
+              "isActive"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_beans_isActive` ON `${TABLE_NAME}` (`isActive`)"
+          },
+          {
+            "name": "index_beans_roastDate",
+            "unique": false,
+            "columnNames": [
+              "roastDate"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_beans_roastDate` ON `${TABLE_NAME}` (`roastDate`)"
+          },
+          {
+            "name": "index_beans_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_beans_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          },
+          {
+            "name": "index_beans_photoPath",
+            "unique": false,
+            "columnNames": [
+              "photoPath"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_beans_photoPath` ON `${TABLE_NAME}` (`photoPath`)"
+          }
+        ]
+      },
+      {
+        "tableName": "shots",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `beanId` TEXT NOT NULL, `coffeeWeightIn` REAL NOT NULL, `coffeeWeightOut` REAL NOT NULL, `extractionTimeSeconds` INTEGER NOT NULL, `grinderSetting` TEXT NOT NULL, `notes` TEXT NOT NULL, `timestamp` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`beanId`) REFERENCES `beans`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "beanId",
+            "columnName": "beanId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coffeeWeightIn",
+            "columnName": "coffeeWeightIn",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coffeeWeightOut",
+            "columnName": "coffeeWeightOut",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "extractionTimeSeconds",
+            "columnName": "extractionTimeSeconds",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "grinderSetting",
+            "columnName": "grinderSetting",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_shots_beanId",
+            "unique": false,
+            "columnNames": [
+              "beanId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shots_beanId` ON `${TABLE_NAME}` (`beanId`)"
+          },
+          {
+            "name": "index_shots_timestamp",
+            "unique": false,
+            "columnNames": [
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shots_timestamp` ON `${TABLE_NAME}` (`timestamp`)"
+          },
+          {
+            "name": "index_shots_grinderSetting",
+            "unique": false,
+            "columnNames": [
+              "grinderSetting"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shots_grinderSetting` ON `${TABLE_NAME}` (`grinderSetting`)"
+          },
+          {
+            "name": "index_shots_beanId_timestamp",
+            "unique": false,
+            "columnNames": [
+              "beanId",
+              "timestamp"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_shots_beanId_timestamp` ON `${TABLE_NAME}` (`beanId`, `timestamp`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "beans",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "beanId"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "grinder_configuration",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `scaleMin` INTEGER NOT NULL, `scaleMax` INTEGER NOT NULL, `stepSize` REAL NOT NULL, `createdAt` TEXT NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scaleMin",
+            "columnName": "scaleMin",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "scaleMax",
+            "columnName": "scaleMax",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stepSize",
+            "columnName": "stepSize",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_grinder_configuration_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_grinder_configuration_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          }
+        ]
+      },
+      {
+        "tableName": "basket_configuration",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `coffeeInMin` REAL NOT NULL, `coffeeInMax` REAL NOT NULL, `coffeeOutMin` REAL NOT NULL, `coffeeOutMax` REAL NOT NULL, `createdAt` TEXT NOT NULL, `isActive` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coffeeInMin",
+            "columnName": "coffeeInMin",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coffeeInMax",
+            "columnName": "coffeeInMax",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coffeeOutMin",
+            "columnName": "coffeeOutMin",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "coffeeOutMax",
+            "columnName": "coffeeOutMax",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "createdAt",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "isActive",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_basket_configuration_createdAt",
+            "unique": false,
+            "columnNames": [
+              "createdAt"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_basket_configuration_createdAt` ON `${TABLE_NAME}` (`createdAt`)"
+          },
+          {
+            "name": "index_basket_configuration_isActive",
+            "unique": false,
+            "columnNames": [
+              "isActive"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_basket_configuration_isActive` ON `${TABLE_NAME}` (`isActive`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c28dbe881f87e9a1422b4a46c964b76a')"
+    ]
+  }
+}

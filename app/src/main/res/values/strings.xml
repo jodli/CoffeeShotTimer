@@ -557,6 +557,12 @@
     <string name="label_grinder_maximum">Maximum</string>
     <string name="placeholder_grinder_min">e.g., 1</string>
     <string name="placeholder_grinder_max">e.g., 10</string>
+    <string name="text_step_size">Step Size</string>
+    <string name="text_step_size_description">How precise are the adjustments on your grinder? This determines the increment between each grind setting.</string>
+    <string name="text_common_step_sizes">Common Step Sizes</string>
+    <string name="label_custom_step_size">Custom Step Size</string>
+    <string name="placeholder_step_size">e.g., 0.5</string>
+    <string name="text_step_size_info">Your grinder will have %1$d steps from %2$d (increment: %3$s) to %4$d</string>
     <string name="text_range_validation_success">✓ Range looks good! You\'ll have %1$d steps to work with.</string>
     <string name="button_continue">Continue</string>
 

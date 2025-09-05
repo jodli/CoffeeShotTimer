@@ -142,6 +142,9 @@ class ShotRecordingViewModel @Inject constructor(
     private val _grinderScaleMax = MutableStateFlow(20.0f)
     val grinderScaleMax: StateFlow<Float> = _grinderScaleMax.asStateFlow()
     
+    private val _grinderStepSize = MutableStateFlow(0.5f)
+    val grinderStepSize: StateFlow<Float> = _grinderStepSize.asStateFlow()
+    
     // Basket configuration for weight ranges
     private val _basketCoffeeInMin = MutableStateFlow(5f)
     val basketCoffeeInMin: StateFlow<Float> = _basketCoffeeInMin.asStateFlow()
@@ -265,6 +268,7 @@ class ShotRecordingViewModel @Inject constructor(
                         if (config != null) {
                             _grinderScaleMin.value = config.scaleMin.toFloat()
                             _grinderScaleMax.value = config.scaleMax.toFloat()
+                            _grinderStepSize.value = config.stepSize.toFloat()
                         } else {
                             // Create default config if none exists
                             val createResult = grinderConfigRepository.getOrCreateDefaultConfig()
@@ -272,12 +276,14 @@ class ShotRecordingViewModel @Inject constructor(
                                 onSuccess = { defaultConfig ->
                                     _grinderScaleMin.value = defaultConfig.scaleMin.toFloat()
                                     _grinderScaleMax.value = defaultConfig.scaleMax.toFloat()
+                                    _grinderStepSize.value = defaultConfig.stepSize.toFloat()
                                 },
                                 onFailure = {
                                     // Fallback to hardcoded defaults if repository fails
                                     val fallbackConfig = com.jodli.coffeeshottimer.data.model.GrinderConfiguration.DEFAULT_CONFIGURATION
                                     _grinderScaleMin.value = fallbackConfig.scaleMin.toFloat()
                                     _grinderScaleMax.value = fallbackConfig.scaleMax.toFloat()
+                                    _grinderStepSize.value = fallbackConfig.stepSize.toFloat()
                                 }
                             )
                         }
@@ -287,6 +293,7 @@ class ShotRecordingViewModel @Inject constructor(
                         val fallbackConfig = com.jodli.coffeeshottimer.data.model.GrinderConfiguration.DEFAULT_CONFIGURATION
                         _grinderScaleMin.value = fallbackConfig.scaleMin.toFloat()
                         _grinderScaleMax.value = fallbackConfig.scaleMax.toFloat()
+                        _grinderStepSize.value = fallbackConfig.stepSize.toFloat()
                     }
                 )
             }

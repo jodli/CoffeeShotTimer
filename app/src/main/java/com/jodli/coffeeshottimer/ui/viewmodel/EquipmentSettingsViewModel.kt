@@ -32,6 +32,7 @@ class EquipmentSettingsViewModel @Inject constructor(
                         _uiState.value = _uiState.value.copy(
                             scaleMin = config.scaleMin.toString(),
                             scaleMax = config.scaleMax.toString(),
+                            stepSize = config.stepSize.toString(),
                             isLoading = false
                         )
                     } else {
@@ -42,6 +43,7 @@ class EquipmentSettingsViewModel @Inject constructor(
                                 _uiState.value = _uiState.value.copy(
                                     scaleMin = defaultConfig.scaleMin.toString(),
                                     scaleMax = defaultConfig.scaleMax.toString(),
+                                    stepSize = defaultConfig.stepSize.toString(),
                                     isLoading = false
                                 )
                             },
@@ -80,19 +82,36 @@ class EquipmentSettingsViewModel @Inject constructor(
         validateForm()
     }
 
+    fun updateStepSize(value: String) {
+        _uiState.value = _uiState.value.copy(stepSize = value, stepSizeError = null, generalError = null)
+        validateForm()
+    }
+
+    fun setStepSizePreset(stepSize: Double) {
+        _uiState.value = _uiState.value.copy(
+            stepSize = stepSize.toString(),
+            stepSizeError = null,
+            generalError = null
+        )
+        validateForm()
+    }
+
     private fun validateForm() {
         val current = _uiState.value
         var minError: String? = null
         var maxError: String? = null
+        var stepSizeError: String? = null
         var generalError: String? = null
         val minVal = current.scaleMin.toIntOrNull()
         val maxVal = current.scaleMax.toIntOrNull()
+        val stepSizeVal = current.stepSize.toDoubleOrNull()
 
         if (current.scaleMin.isNotBlank() && minVal == null) minError = getValidationNumberError()
         if (current.scaleMax.isNotBlank() && maxVal == null) maxError = getValidationNumberError()
+        if (current.stepSize.isNotBlank() && stepSizeVal == null) stepSizeError = getValidationNumberError()
 
-        if (minVal != null && maxVal != null) {
-            val config = GrinderConfiguration(scaleMin = minVal, scaleMax = maxVal)
+        if (minVal != null && maxVal != null && stepSizeVal != null) {
+            val config = GrinderConfiguration(scaleMin = minVal, scaleMax = maxVal, stepSize = stepSizeVal)
             val validation = config.validate()
             if (!validation.isValid) generalError = validation.errors.firstOrNull()
         }
@@ -100,8 +119,10 @@ class EquipmentSettingsViewModel @Inject constructor(
         _uiState.value = current.copy(
             minError = minError,
             maxError = maxError,
+            stepSizeError = stepSizeError,
             generalError = generalError,
-            isFormValid = minError == null && maxError == null && generalError == null && minVal != null && maxVal != null
+            isFormValid = minError == null && maxError == null && stepSizeError == null && 
+                         generalError == null && minVal != null && maxVal != null && stepSizeVal != null
         )
     }
 
@@ -110,17 +131,18 @@ class EquipmentSettingsViewModel @Inject constructor(
         val current = _uiState.value
         val minVal = current.scaleMin.toIntOrNull()
         val maxVal = current.scaleMax.toIntOrNull()
+        val stepSizeVal = current.stepSize.toDoubleOrNull()
         
-        Log.d(TAG, "save: Current state - scaleMin=${current.scaleMin}, scaleMax=${current.scaleMax}, isFormValid=${current.isFormValid}")
-        Log.d(TAG, "save: Parsed values - minVal=$minVal, maxVal=$maxVal")
+        Log.d(TAG, "save: Current state - scaleMin=${current.scaleMin}, scaleMax=${current.scaleMax}, stepSize=${current.stepSize}, isFormValid=${current.isFormValid}")
+        Log.d(TAG, "save: Parsed values - minVal=$minVal, maxVal=$maxVal, stepSizeVal=$stepSizeVal")
         
-        if (!current.isFormValid || minVal == null || maxVal == null) {
+        if (!current.isFormValid || minVal == null || maxVal == null || stepSizeVal == null) {
             Log.e(TAG, "save: Form validation failed")
             _uiState.value = current.copy(generalError = getFixValidationErrorsMessage())
             return
         }
         
-        val config = GrinderConfiguration(scaleMin = minVal, scaleMax = maxVal)
+        val config = GrinderConfiguration(scaleMin = minVal, scaleMax = maxVal, stepSize = stepSizeVal)
         Log.d(TAG, "save: Created GrinderConfiguration - $config")
         
         _uiState.value = current.copy(isLoading = true)
@@ -169,8 +191,10 @@ class EquipmentSettingsViewModel @Inject constructor(
 data class EquipmentSettingsUiState(
     val scaleMin: String = "",
     val scaleMax: String = "",
+    val stepSize: String = "0.5",
     val minError: String? = null,
     val maxError: String? = null,
+    val stepSizeError: String? = null,
     val generalError: String? = null,
     val isFormValid: Boolean = false,
     val isLoading: Boolean = false

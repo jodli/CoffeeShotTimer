@@ -112,8 +112,8 @@ class GrinderConfigRepository @Inject constructor(
                 )
             }
 
-            // Check for duplicate range configuration
-            Log.d(TAG, "saveConfig: Checking for existing config with same range")
+            // Check for duplicate range and step size configuration
+            Log.d(TAG, "saveConfig: Checking for existing config with same range and step size")
             val existingConfig = try {
                 grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
             } catch (e: Exception) {
@@ -122,10 +122,10 @@ class GrinderConfigRepository @Inject constructor(
             }
             Log.d(TAG, "saveConfig: Existing config found: $existingConfig")
             
-            if (existingConfig != null) {
-                // If duplicate exists, insert a new one with current timestamp to make it "current"
+            if (existingConfig != null && existingConfig.stepSize == config.stepSize) {
+                // If exact duplicate exists (same range and step size), insert a new one with current timestamp to make it "current"
                 // This ensures the Flow emits a new value and UI updates
-                Log.d(TAG, "saveConfig: Duplicate config found, inserting new one with current timestamp")
+                Log.d(TAG, "saveConfig: Duplicate config found (same range and step size), inserting new one with current timestamp")
                 val result = executeWithRetry(
                     operation = { 
                         Log.d(TAG, "saveConfig: Inserting new config with current timestamp")

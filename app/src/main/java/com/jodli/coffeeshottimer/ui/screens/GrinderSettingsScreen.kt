@@ -102,15 +102,20 @@ fun GrinderSettingsScreen(
                 com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
                     scaleMin = uiState.scaleMin,
                     scaleMax = uiState.scaleMax,
+                    stepSize = uiState.stepSize,
                     onScaleMinChange = viewModel::updateScaleMin,
                     onScaleMaxChange = viewModel::updateScaleMax,
+                    onStepSizeChange = viewModel::updateStepSize,
                     onPresetSelected = viewModel::setPreset,
+                    onStepSizePresetSelected = viewModel::setStepSizePreset,
                     minError = uiState.minError,
                     maxError = uiState.maxError,
+                    stepSizeError = uiState.stepSizeError,
                     generalError = uiState.generalError,
                     validationSuggestion = GrinderValidationHelpers.getValidationSuggestion(uiState.generalError),
                     showDescription = true,
-                    showPresets = true
+                    showPresets = true,
+                    showStepSize = true
                 )
 
                 CoffeePrimaryButton(
