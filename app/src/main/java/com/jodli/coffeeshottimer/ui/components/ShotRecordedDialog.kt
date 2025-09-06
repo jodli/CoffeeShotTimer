@@ -12,6 +12,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
@@ -23,6 +25,8 @@ fun ShotRecordedDialog(
     brewRatio: String,
     extractionTime: String,
     recommendations: List<ShotRecommendation> = emptyList(),
+    recommendedTaste: TastePrimary? = null,
+    onTasteSelected: ((TastePrimary, TasteSecondary?) -> Unit)? = null,
     onDismiss: () -> Unit,
     onViewDetails: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -58,6 +62,21 @@ fun ShotRecordedDialog(
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
+
+                // Taste feedback section
+                if (onTasteSelected != null) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
+                    
+                    TasteQuickPick(
+                        recommended = recommendedTaste,
+                        onSelectPrimary = { primary ->
+                            onTasteSelected(primary, null)
+                            onDismiss()
+                        },
+                        onSkip = onDismiss,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
                 // Next steps based on this shot
                 if (recommendations.isNotEmpty()) {

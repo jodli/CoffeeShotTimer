@@ -22,7 +22,7 @@ import com.jodli.coffeeshottimer.data.model.Shot
  */
 @Database(
     entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
-    version = 6,
+    version = 7,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -45,7 +45,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_2_3,
                 MIGRATION_3_4,
                 MIGRATION_4_5,
-                MIGRATION_5_6
+                MIGRATION_5_6,
+                MIGRATION_6_7
             )
         }
 
@@ -298,6 +299,31 @@ abstract class AppDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 5->6 failed: ${e.message}. This migration adds stepSize column to grinder_configuration table and ensures all indices are properly aligned.", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 6 to 7: Add taste feedback fields to shots table.
+         * Adds tastePrimary and tasteSecondary columns for one-tap taste feedback feature.
+         * This migration builds on top of version 6 which includes the stepSize field from main branch.
+         */
+        private val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Add taste feedback columns to shots table
+                    // Both are nullable TEXT columns that will store enum names
+                    db.execSQL("ALTER TABLE shots ADD COLUMN tastePrimary TEXT")
+                    db.execSQL("ALTER TABLE shots ADD COLUMN tasteSecondary TEXT")
+                    
+                    // Note: SQLite doesn't support CHECK constraints via ALTER TABLE,
+                    // so validation will be enforced at the application layer
+                    // Valid values for tastePrimary: SOUR, PERFECT, BITTER (or NULL)
+                    // Valid values for tasteSecondary: WEAK, STRONG (or NULL)
+                    
+                } catch (e: Exception) {
+                    // Surface the failure so Room can handle it and report clearly
+                    throw RuntimeException("Migration 6->7 failed: ${e.message}. This migration adds taste feedback fields to shots table.", e)
                 }
             }
         }

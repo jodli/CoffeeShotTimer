@@ -28,6 +28,16 @@ Commands you’ll use often
 - Install on device/emulator
   - Dev debug: gradle :app:installDevDebug
 
+- Release artifacts
+  - Assemble APK (prod): .\gradlew :app:assembleProdRelease
+  - Build App Bundle (AAB, prod): .\gradlew :app:bundleProdRelease
+  - Note: app/build.gradle.kts renames outputs to coffee-shot-timer[-dev]-<version>.apk / .aab automatically.
+
+- Security checks (GitHub Actions workflows)
+  - Check for security findings: zizmor .
+  - Apply automatic security fixes: zizmor . --fix=all
+  - ALWAYS run zizmor when modifying .github/workflows/ files to ensure security best practices
+
 Build/variant notes
 
 - Flavors: dev, prod. Build types: debug, release. Common variants: devDebug, prodDebug, devRelease, prodRelease.

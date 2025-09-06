@@ -3,6 +3,8 @@ package com.jodli.coffeeshottimer.data.model
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.math.round
@@ -35,7 +37,9 @@ data class Shot(
     val extractionTimeSeconds: Int,
     val grinderSetting: String,
     val notes: String = "",
-    val timestamp: LocalDateTime = LocalDateTime.now()
+    val timestamp: LocalDateTime = LocalDateTime.now(),
+    val tastePrimary: TastePrimary? = null,  // Primary taste feedback (Sour/Perfect/Bitter)
+    val tasteSecondary: TasteSecondary? = null  // Optional secondary qualifier (Weak/Strong)
 ) {
     /**
      * Calculates the brew ratio (output weight / input weight).

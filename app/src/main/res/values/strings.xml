@@ -88,6 +88,23 @@
     <string name="text_typical_extraction">Typical espresso range</string>
     <string name="text_record_successfully">Shot recorded successfully! Brew ratio: %1$s, Time: %2$s</string>
 
+    <!-- Taste Feedback -->
+    <string name="text_how_did_it_taste">How did it taste?</string>
+    <string name="taste_sour">Sour</string>
+    <string name="taste_perfect">Perfect</string>
+    <string name="taste_bitter">Bitter</string>
+    <string name="taste_weak">Weak</string>
+    <string name="taste_strong">Strong</string>
+    <string name="button_skip_taste">Skip</string>
+    <string name="text_recommended_based_on_time">Recommended based on extraction time</string>
+    <string name="text_taste_feedback">Taste Feedback</string>
+    <string name="text_no_taste_recorded">No taste recorded</string>
+    <string name="text_strength_modifier_optional">Strength modifier (optional)</string>
+    <string name="text_suggested">Suggested</string>
+    <string name="text_extraction_time_sour_hint">Based on %1$ds extraction time, the shot might taste sour (under-extracted)</string>
+    <string name="text_extraction_time_perfect_hint">Based on %1$ds extraction time, this is in the optimal extraction range</string>
+    <string name="text_extraction_time_bitter_hint">Based on %1$ds extraction time, the shot might taste bitter (over-extracted)</string>
+
     <!-- Labels -->
     <string name="label_ratio">Ratio</string>
     <string name="label_ratio_trend">Ratio Trend</string>
@@ -194,22 +211,23 @@
     <string name="button_create_bean">Create Bean</string>
     <string name="button_continue_to_shot">Let\'s Pull a Shot</string>
     <string name="button_back">Back</string>
+    <string name="button_view_details">View Details</string>
+    <string name="button_manage">Manage</string>
+    <string name="button_dismiss">Dismiss</string>
 
     <!-- Content Descriptions -->
     <string name="cd_bean_education_freshness">Coffee bean freshness illustration</string>
     <string name="cd_bean_creation_success">Bean creation success animation</string>
+    <string name="cd_shot_recorded_success">Shot recorded successfully</string>
     <string name="cd_onboarding_progress">Onboarding progress indicator</string>
     <string name="button_clear_all">Clear All</string>
     <string name="button_apply_filters">Apply Filters</string>
     <string name="button_clear_start">Clear Start</string>
     <string name="button_clear_end">Clear End</string>
-    <string name="button_dismiss">Dismiss</string>
-    <string name="button_manage">Manage</string>
     <string name="button_cancel">Cancel</string>
     <string name="button_delete_bean">Delete Bean</string>
     <string name="button_permanently_delete_bean">Permanently delete Bean</string>
     <string name="button_delete_shot">Delete Shot</string>
-    <string name="button_view_details">View Details</string>
     <string name="button_skip">Skip</string>
     <string name="button_previous">Previous</string>
     <string name="button_next">Next</string>
@@ -250,7 +268,6 @@
     <string name="cd_analysis">Show shot analysis</string>
     <string name="cd_no_shots">No shots found</string>
     <string name="cd_no_shots_recorded">No shots recorded</string>
-    <string name="cd_shot_recorded_success">Shot recorded successfully</string>
 
     <!-- Error Messages -->
     <string name="error_bean_id_cannot_be_empty">Bean ID cannot be empty</string>
@@ -420,6 +437,17 @@
     <string name="placeholder_optional_grinder_setting">Optional initial grinder setting</string>
     <string name="placeholder_shot_notes">Add notes about this shot…</string>
 
+    <!-- Dialog Messages -->
+    <string name="dialog_shot_recorded_title">Shot Recorded!</string>
+    <string name="dialog_shot_recorded_successfully">Shot Recorded Successfully</string>
+    <string name="dialog_view_details_for_more_recommendations">View details for more recommendations</string>
+    <string name="text_next_steps_based_on_shot">Next steps based on this shot</string>
+    
+    <!-- Next Steps and Recommendations -->
+    <string name="text_next_steps">Next Steps</string>
+    <string name="text_recommendations_for_next_shot">Recommendations for next shot</string>
+    <string name="text_and_more_recommendations">+%1$d more recommendations</string>
+
     <!-- Format Strings -->
     <string name="format_days_since_roast">%1$d days since roast</string>
     <string name="format_roasted_days_ago">Roasted: %1$d days ago</string>
@@ -528,17 +556,6 @@
     <string name="recommendation_ratio_inconsistency">This shot\'s ratio differs significantly from your average (deviation: %1$s, average: 1:%2$s)</string>
     <string name="recommendation_dose_adjustment">Consider adjusting your coffee dose for better consistency</string>
     <string name="recommendation_timing_consistency">Focus on consistent timing for more predictable results</string>
-
-    <!-- Shot Recorded Dialog -->
-    <string name="dialog_shot_recorded_title">Shot Recorded!</string>
-    <string name="dialog_shot_recorded_successfully">Shot Recorded Successfully!</string>
-    <string name="dialog_view_details_for_more_recommendations">View details for more recommendations</string>
-
-    <!-- Next Steps and Recommendations -->
-    <string name="text_next_steps">Next Steps</string>
-    <string name="text_recommendations_for_next_shot">Recommendations for next shot</string>
-    <string name="text_next_steps_based_on_shot">Based on this shot:</string>
-    <string name="text_and_more_recommendations">+%1$d more recommendations</string>
 
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Equipment Setup</string>

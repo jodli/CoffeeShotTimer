@@ -4,7 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +25,7 @@ import com.jodli.coffeeshottimer.R
 @HiltViewModel
 class ShotDetailsViewModel @Inject constructor(
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
+    private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
     private val shotRepository: ShotRepository,
     private val stringResourceProvider: StringResourceProvider,
     private val domainErrorTranslator: DomainErrorTranslator
@@ -194,6 +198,36 @@ class ShotDetailsViewModel @Inject constructor(
             onNavigate(nextShot.id)
         }
     }
+    
+    /**
+     * Update taste feedback for the current shot
+     */
+    fun updateTasteFeedback(
+        tastePrimary: TastePrimary?,
+        tasteSecondary: TasteSecondary?
+    ) {
+        val currentShot = _uiState.value.shotDetails?.shot ?: return
+        
+        _uiState.value = _uiState.value.copy(isUpdatingTaste = true)
+        
+        viewModelScope.launch {
+            if (tastePrimary != null) {
+                // Record taste feedback
+                recordTasteFeedbackUseCase(
+                    shotId = currentShot.id,
+                    tastePrimary = tastePrimary,
+                    tasteSecondary = tasteSecondary
+                )
+            } else {
+                // Clear taste feedback
+                recordTasteFeedbackUseCase.clearTasteFeedback(currentShot.id)
+            }
+            
+            // Always refresh to show updated taste
+            _uiState.value = _uiState.value.copy(isUpdatingTaste = false)
+            refreshShotDetails()
+        }
+    }
 }
 
 /**
@@ -203,7 +237,8 @@ data class ShotDetailsUiState(
     val isLoading: Boolean = false,
     val shotDetails: ShotDetails? = null,
     val error: String? = null,
-    val isDeletingShot: Boolean = false
+    val isDeletingShot: Boolean = false,
+    val isUpdatingTaste: Boolean = false
 )
 
 /**

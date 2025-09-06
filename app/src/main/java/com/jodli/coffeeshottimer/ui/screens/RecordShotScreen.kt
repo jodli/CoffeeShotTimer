@@ -273,15 +273,26 @@ fun RecordShotScreen(
         }
     )
 
-    // Shot Recorded Dialog with Recommendations
+    // Shot Recorded Dialog with Taste Feedback
     if (showShotRecordedDialog && recordedShotData != null) {
+        val data = recordedShotData!!
+        val recommendedTaste = viewModel.getTastePreselectionFor(data.extractionTimeSeconds)
+        
         ShotRecordedDialog(
-            brewRatio = recordedShotData!!.brewRatio,
-            extractionTime = recordedShotData!!.extractionTime,
-            recommendations = recordedShotData!!.recommendations,
+            brewRatio = data.brewRatio,
+            extractionTime = data.extractionTime,
+            recommendations = data.recommendations,
+            recommendedTaste = recommendedTaste,
+            onTasteSelected = { primary, secondary ->
+                viewModel.recordTasteFeedback(
+                    shotId = data.shotId,
+                    tastePrimary = primary,
+                    tasteSecondary = secondary
+                )
+            },
             onDismiss = { viewModel.hideShotRecordedDialog() },
             onViewDetails = {
-                onNavigateToShotDetails(recordedShotData!!.shotId)
+                onNavigateToShotDetails(data.shotId)
             }
         )
     }
@@ -779,14 +790,8 @@ private fun RecordShotPortraitContent(
         modifier = Modifier.fillMaxWidth()
     )
 
-    // Notes (Optional)
-    NotesSection(
-        notes = notes,
-        onNotesChange = onNotesChange,
-        bringIntoViewRequester = bringIntoViewRequester,
-        coroutineScope = coroutineScope,
-        modifier = Modifier.fillMaxWidth()
-    )
+    // Notes section removed - taste feedback replaces notes
+    // Future: Add notes editing in shot details screen
 
     // Save Button
     SaveShotButton(
@@ -928,14 +933,8 @@ private fun RecordShotFormContent(
         modifier = Modifier.fillMaxWidth()
     )
 
-    // Notes (Optional)
-    NotesSection(
-        notes = notes,
-        onNotesChange = onNotesChange,
-        bringIntoViewRequester = bringIntoViewRequester,
-        coroutineScope = coroutineScope,
-        modifier = Modifier.fillMaxWidth()
-    )
+    // Notes section removed - taste feedback replaces notes
+    // Future: Add notes editing in shot details screen
 
     // Save Button
     SaveShotButton(

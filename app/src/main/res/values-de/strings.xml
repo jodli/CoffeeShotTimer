@@ -88,7 +88,7 @@
     <string name="text_strong_extraction">Starke Extraktion</string>
     <string name="text_weak_extraction">Schwache Extraktion</string>
     <string name="text_typical_extraction">Typischer Espresso-Bereich</string>
-    <string name="text_record_successfully">Shot erfolgreich aufgenommen! Brühverhältnis: %1$s, Zeit: %2$s</string>
+	<string name="text_record_successfully">Shot erfolgreich aufgenommen! Brühverhältnis: %1$s, Zeit: %2$s</string>
 
     <!-- Labels -->
     <string name="label_ratio">Verhältnis</string>
@@ -149,6 +149,22 @@
     <string name="text_dialog_cancel">Abbrechen</string>
     <string name="text_dialog_retry">Wiederholen</string>
     <string name="text_dialog_dismiss">Schließen</string>
+
+    <string name="text_how_did_it_taste">Wie hat es geschmeckt?</string>
+    <string name="taste_sour">Sauer</string>
+    <string name="taste_perfect">Perfekt</string>
+    <string name="taste_bitter">Bitter</string>
+    <string name="taste_weak">Schwach</string>
+    <string name="taste_strong">Stark</string>
+    <string name="button_skip_taste">Überspringen</string>
+    <string name="text_recommended_based_on_time">Empfohlen basierend auf Extraktionszeit</string>
+    <string name="text_taste_feedback">Geschmacks-Feedback</string>
+    <string name="text_no_taste_recorded">Kein Geschmack aufgezeichnet</string>
+    <string name="text_strength_modifier_optional">Stärke-Modifikator (optional)</string>
+    <string name="text_suggested">Vorgeschlagen</string>
+    <string name="text_extraction_time_sour_hint">Basierend auf %1$ds Extraktionszeit könnte der Shot sauer schmecken (unterextrahiert)</string>
+    <string name="text_extraction_time_perfect_hint">Basierend auf %1$ds Extraktionszeit liegt dies im optimalen Extraktionsbereich</string>
+    <string name="text_extraction_time_bitter_hint">Basierend auf %1$ds Extraktionszeit könnte der Shot bitter schmecken (überextrahiert)</string>
 
     <!-- Bean Management Dialog -->
     <string name="text_bean_management_delete">Löschen</string>
@@ -212,7 +228,7 @@
     <string name="button_permanently_delete_bean">Bohne endgültig löschen</string>
     <string name="button_delete_shot">Shot löschen</string>
     <string name="button_view_details">Details anzeigen</string>
-    <string name="button_skip">Überspringen</string>
+		<string name="button_skip">Überspringen</string>
     <string name="button_previous">Zurück</string>
     <string name="button_next">Weiter</string>
     <string name="button_get_started">Los geht\'s</string>

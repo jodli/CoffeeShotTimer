@@ -9,8 +9,12 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -56,6 +60,8 @@ data class ShotDraft(
 class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
+    private val getTastePreselectionUseCase: GetTastePreselectionUseCase,
+    private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
     private val domainErrorTranslator: DomainErrorTranslator,
@@ -846,11 +852,13 @@ class ShotRecordingViewModel @Inject constructor(
      * Load shot details with recommendations and show the success dialog.
      */
     private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String) {
+        val extractionSeconds = timerState.value.elapsedTimeSeconds
         getShotDetailsUseCase.getShotDetails(shotId).fold(
             onSuccess = { shotDetails ->
                 _recordedShotData.value = RecordedShotData(
                     brewRatio = brewRatio,
                     extractionTime = extractionTime,
+                    extractionTimeSeconds = extractionSeconds,
                     recommendations = shotDetails.analysis.recommendations,
                     shotId = shotId
                 )
@@ -873,6 +881,39 @@ class ShotRecordingViewModel @Inject constructor(
     fun hideShotRecordedDialog() {
         _showShotRecordedDialog.value = false
         _recordedShotData.value = null
+    }
+
+    /**
+     * Get taste preselection based on extraction time.
+     */
+    fun getTastePreselectionFor(extractionTimeSeconds: Int): TastePrimary? {
+        return getTastePreselectionUseCase(extractionTimeSeconds)
+    }
+
+    /**
+     * Record taste feedback for the recently recorded shot.
+     */
+    fun recordTasteFeedback(
+        shotId: String,
+        tastePrimary: TastePrimary,
+        tasteSecondary: TasteSecondary? = null
+    ) {
+        viewModelScope.launch {
+            recordTasteFeedbackUseCase(
+                shotId = shotId,
+                tastePrimary = tastePrimary,
+                tasteSecondary = tasteSecondary
+            ).fold(
+                onSuccess = {
+                    // Taste feedback recorded successfully
+                    // Could emit analytics event here
+                },
+                onFailure = { exception ->
+                    // Handle error silently or show a non-blocking message
+                    // We don't want to block the user flow for taste feedback failures
+                }
+            )
+        }
     }
 
     /**
@@ -970,6 +1011,7 @@ class ShotRecordingViewModel @Inject constructor(
 data class RecordedShotData(
     val brewRatio: String,
     val extractionTime: String,
+    val extractionTimeSeconds: Int,  // Added for taste preselection
     val recommendations: List<ShotRecommendation>,
     val shotId: String
 )

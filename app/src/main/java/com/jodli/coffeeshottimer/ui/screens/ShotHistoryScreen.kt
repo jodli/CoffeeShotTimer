@@ -60,7 +60,9 @@ import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.SectionHeader
 import com.jodli.coffeeshottimer.ui.components.ShotHistoryFilterDialog
+import com.jodli.coffeeshottimer.ui.components.CompactTasteDisplay
 import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -873,6 +875,12 @@ private fun ShotHistoryItem(
                             isNeutral = true
                         )
                     }
+                    
+                    // Taste feedback display
+                    CompactTasteDisplay(
+                        tastePrimary = shot.tastePrimary,
+                        tasteSecondary = shot.tasteSecondary
+                    )
                 }
             }
 
