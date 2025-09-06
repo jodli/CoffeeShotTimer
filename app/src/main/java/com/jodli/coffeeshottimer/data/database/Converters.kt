@@ -1,6 +1,8 @@
 package com.jodli.coffeeshottimer.data.database
 
 import androidx.room.TypeConverter
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -35,5 +37,37 @@ class Converters {
     @TypeConverter
     fun toLocalDateTime(dateTimeString: String?): LocalDateTime? {
         return dateTimeString?.let { LocalDateTime.parse(it, dateTimeFormatter) }
+    }
+
+    @TypeConverter
+    fun fromTastePrimary(taste: TastePrimary?): String? {
+        return taste?.name
+    }
+
+    @TypeConverter
+    fun toTastePrimary(tasteString: String?): TastePrimary? {
+        return tasteString?.let { 
+            try {
+                TastePrimary.valueOf(it)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
+    }
+
+    @TypeConverter
+    fun fromTasteSecondary(taste: TasteSecondary?): String? {
+        return taste?.name
+    }
+
+    @TypeConverter
+    fun toTasteSecondary(tasteString: String?): TasteSecondary? {
+        return tasteString?.let { 
+            try {
+                TasteSecondary.valueOf(it)
+            } catch (e: IllegalArgumentException) {
+                null
+            }
+        }
     }
 }

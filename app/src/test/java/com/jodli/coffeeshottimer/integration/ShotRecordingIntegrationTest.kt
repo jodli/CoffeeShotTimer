@@ -12,6 +12,8 @@ import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
 import com.jodli.coffeeshottimer.data.repository.BasketConfigRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecordingState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
@@ -45,6 +47,8 @@ class ShotRecordingIntegrationTest {
     
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
+    private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
+    private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -64,6 +68,8 @@ class ShotRecordingIntegrationTest {
         // Create mock dependencies
         recordShotUseCase = mockk(relaxed = true)
         getShotDetailsUseCase = mockk(relaxed = true)
+        getTastePreselectionUseCase = mockk(relaxed = true)
+        recordTasteFeedbackUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         shotRepository = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
@@ -135,6 +141,8 @@ class ShotRecordingIntegrationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase,
             getShotDetailsUseCase,
+            getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,

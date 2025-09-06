@@ -69,6 +69,8 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.TasteFeedbackDisplay
+import com.jodli.coffeeshottimer.ui.components.TasteFeedbackEditSheet
 import com.jodli.coffeeshottimer.ui.util.formatForDisplay
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
@@ -87,6 +89,7 @@ fun ShotDetailsScreen(
     val editNotesState by viewModel.editNotesState.collectAsState()
 
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var showTasteEditor by remember { mutableStateOf(false) }
 
     // Load shot details when screen is first displayed
     LaunchedEffect(shotId) {
@@ -194,6 +197,7 @@ fun ShotDetailsScreen(
                                 onUpdateNotes = { viewModel.updateNotes(it) },
                                 onSaveNotes = { viewModel.saveNotes() },
                                 onCancelEditingNotes = { viewModel.cancelEditingNotes() },
+                                onEditTaste = { showTasteEditor = true },
                                 modifier = Modifier.fillMaxSize()
                             )
                         },
@@ -205,6 +209,7 @@ fun ShotDetailsScreen(
                                 onUpdateNotes = { viewModel.updateNotes(it) },
                                 onSaveNotes = { viewModel.saveNotes() },
                                 onCancelEditingNotes = { viewModel.cancelEditingNotes() },
+                                onEditTaste = { showTasteEditor = true },
                                 modifier = Modifier.fillMaxSize()
                             )
                         }
@@ -259,6 +264,19 @@ fun ShotDetailsScreen(
             viewModel.clearError()
         }
     }
+    
+    // Taste feedback editor sheet
+    if (showTasteEditor && uiState.shotDetails != null) {
+        TasteFeedbackEditSheet(
+            currentTastePrimary = uiState.shotDetails!!.shot.tastePrimary,
+            currentTasteSecondary = uiState.shotDetails!!.shot.tasteSecondary,
+            extractionTimeSeconds = uiState.shotDetails!!.shot.extractionTimeSeconds,
+            onSave = { primary, secondary ->
+                viewModel.updateTasteFeedback(primary, secondary)
+            },
+            onDismiss = { showTasteEditor = false }
+        )
+    }
 }
 
 @Composable
@@ -269,6 +287,7 @@ private fun ShotDetailsContent(
     onUpdateNotes: (String) -> Unit,
     onSaveNotes: () -> Unit,
     onCancelEditingNotes: () -> Unit,
+    onEditTaste: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -280,7 +299,10 @@ private fun ShotDetailsContent(
     ) {
         // Shot Overview Card
         item {
-            ShotOverviewCard(shotDetails = shotDetails)
+            ShotOverviewCard(
+                shotDetails = shotDetails,
+                onEditTaste = onEditTaste
+            )
         }
 
         // Bean Information Card
@@ -322,6 +344,7 @@ private fun ShotDetailsContent(
 @Composable
 private fun ShotOverviewCard(
     shotDetails: ShotDetails,
+    onEditTaste: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -369,6 +392,26 @@ private fun ShotOverviewCard(
                 }
             }
 
+            Spacer(modifier = Modifier.height(spacing.small))
+            
+            // Taste feedback display
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.text_taste_feedback),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                TasteFeedbackDisplay(
+                    tastePrimary = shot.tastePrimary,
+                    tasteSecondary = shot.tasteSecondary,
+                    onEditClick = onEditTaste
+                )
+            }
+            
             Spacer(modifier = Modifier.height(spacing.small))
 
             // Quality score - moved outside columns for full width
@@ -1009,6 +1052,7 @@ private fun ShotDetailsLandscapeContent(
     onUpdateNotes: (String) -> Unit,
     onSaveNotes: () -> Unit,
     onCancelEditingNotes: () -> Unit,
+    onEditTaste: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -1027,7 +1071,10 @@ private fun ShotDetailsLandscapeContent(
         ) {
             // Shot Overview Card
             item {
-                ShotOverviewCard(shotDetails = shotDetails)
+                ShotOverviewCard(
+                    shotDetails = shotDetails,
+                    onEditTaste = onEditTaste
+                )
             }
 
             // Shot Parameters Card

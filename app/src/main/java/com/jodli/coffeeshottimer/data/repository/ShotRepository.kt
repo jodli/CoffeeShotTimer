@@ -3,10 +3,13 @@ package com.jodli.coffeeshottimer.data.repository
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
 import com.jodli.coffeeshottimer.data.dao.ShotStatistics
+import com.jodli.coffeeshottimer.data.dao.TasteDistribution
 import com.jodli.coffeeshottimer.data.model.PaginatedResult
 import com.jodli.coffeeshottimer.data.model.PaginationConfig
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -429,6 +432,86 @@ class ShotRepository @Inject constructor(
                 )
             )
         }
+
+    /**
+     * Update taste feedback for a specific shot.
+     * @param shotId The ID of the shot to update
+     * @param tastePrimary The primary taste feedback
+     * @param tasteSecondary The optional secondary taste feedback
+     * @return Result indicating success or failure
+     */
+    suspend fun updateTasteFeedback(
+        shotId: String,
+        tastePrimary: TastePrimary?,
+        tasteSecondary: TasteSecondary? = null
+    ): Result<Unit> {
+        return try {
+            if (shotId.isBlank()) {
+                return Result.failure(RepositoryException.ValidationError("Shot ID cannot be empty"))
+            }
+
+            // Verify shot exists
+            val existingShot = shotDao.getShotById(shotId)
+                ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))
+
+            shotDao.updateTasteFeedback(shotId, tastePrimary, tasteSecondary)
+            Result.success(Unit)
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to update taste feedback",
+                    exception
+                )
+            )
+        }
+    }
+
+    /**
+     * Get shots with specific taste feedback.
+     * @param tastePrimary The primary taste to filter by (optional)
+     * @param beanId Optional bean ID filter
+     * @return Flow of shots with the specified taste feedback
+     */
+    fun getShotsByTaste(
+        tastePrimary: TastePrimary? = null,
+        beanId: String? = null
+    ): Flow<Result<List<Shot>>> = flow {
+        shotDao.getShotsByTaste(tastePrimary, beanId).collect { shots ->
+            emit(Result.success(shots))
+        }
+    }.catch { exception ->
+        emit(
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get shots by taste",
+                    exception
+                )
+            )
+        )
+    }
+
+    /**
+     * Get taste distribution statistics for a bean.
+     * @param beanId The ID of the bean
+     * @return Result containing taste distribution or error
+     */
+    suspend fun getTasteDistributionForBean(beanId: String): Result<List<TasteDistribution>> {
+        return try {
+            if (beanId.isBlank()) {
+                Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
+            } else {
+                val distribution = shotDao.getTasteDistributionForBean(beanId)
+                Result.success(distribution)
+            }
+        } catch (exception: Exception) {
+            Result.failure(
+                RepositoryException.DatabaseError(
+                    "Failed to get taste distribution",
+                    exception
+                )
+            )
+        }
+    }
 
     /**
      * Validate shot data without saving.

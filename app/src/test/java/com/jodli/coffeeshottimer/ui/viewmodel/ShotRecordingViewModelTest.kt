@@ -5,6 +5,8 @@ import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -29,6 +31,8 @@ class ShotRecordingViewModelTest {
     
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
+    private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
+    private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -44,6 +48,8 @@ class ShotRecordingViewModelTest {
         // Create mock dependencies
         recordShotUseCase = mockk<RecordShotUseCase>(relaxed = true)
         getShotDetailsUseCase = mockk<GetShotDetailsUseCase>(relaxed = true)
+        getTastePreselectionUseCase = mockk<GetTastePreselectionUseCase>(relaxed = true)
+        recordTasteFeedbackUseCase = mockk<RecordTasteFeedbackUseCase>(relaxed = true)
         beanRepository = mockk<BeanRepository>(relaxed = true)
         shotRepository = mockk<ShotRepository>(relaxed = true)
         context = mockk<Context>(relaxed = true)
@@ -57,6 +63,8 @@ class ShotRecordingViewModelTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase,
             getShotDetailsUseCase,
+            getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,

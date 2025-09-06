@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.jodli.coffeeshottimer.data.model.Shot
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDateTime
 
@@ -191,6 +193,54 @@ interface ShotDao {
     """
     )
     fun getShotsByExtractionTimeRange(minSeconds: Int, maxSeconds: Int): Flow<List<Shot>>
+
+    /**
+     * Update taste feedback for a specific shot.
+     */
+    @Query(
+        """
+        UPDATE shots 
+        SET tastePrimary = :tastePrimary, tasteSecondary = :tasteSecondary
+        WHERE id = :shotId
+    """
+    )
+    suspend fun updateTasteFeedback(
+        shotId: String,
+        tastePrimary: TastePrimary?,
+        tasteSecondary: TasteSecondary?
+    )
+
+    /**
+     * Get shots with specific taste feedback.
+     */
+    @Query(
+        """
+        SELECT * FROM shots 
+        WHERE (:tastePrimary IS NULL OR tastePrimary = :tastePrimary)
+        AND (:beanId IS NULL OR beanId = :beanId)
+        ORDER BY timestamp DESC
+    """
+    )
+    fun getShotsByTaste(
+        tastePrimary: TastePrimary?,
+        beanId: String?
+    ): Flow<List<Shot>>
+
+    /**
+     * Get taste distribution statistics for a bean.
+     */
+    @Query(
+        """
+        SELECT 
+            tastePrimary,
+            COUNT(*) as count
+        FROM shots 
+        WHERE beanId = :beanId 
+        AND tastePrimary IS NOT NULL
+        GROUP BY tastePrimary
+    """
+    )
+    suspend fun getTasteDistributionForBean(beanId: String): List<TasteDistribution>
 }
 
 /**
@@ -202,4 +252,12 @@ data class ShotStatistics(
     val avgWeightOut: Double,
     val avgExtractionTime: Double,
     val avgBrewRatio: Double
+)
+
+/**
+ * Data class for taste distribution statistics.
+ */
+data class TasteDistribution(
+    val tastePrimary: TastePrimary,
+    val count: Int
 )

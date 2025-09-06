@@ -6,7 +6,9 @@ import androidx.lifecycle.SavedStateHandle
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -39,6 +41,8 @@ class TimerStatePreservationTest {
 
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
+    private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
+    private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var domainErrorTranslator: DomainErrorTranslator
@@ -63,6 +67,8 @@ class TimerStatePreservationTest {
         shotRepository = mockk(relaxed = true)
         recordShotUseCase = RecordShotUseCase(shotRepository)
         getShotDetailsUseCase = mockk(relaxed = true)
+        getTastePreselectionUseCase = mockk(relaxed = true)
+        recordTasteFeedbackUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         domainErrorTranslator = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
@@ -95,6 +101,8 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -123,6 +131,8 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository), // New use case instance
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -148,6 +158,8 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -175,6 +187,8 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -199,6 +213,8 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -224,6 +240,8 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -248,6 +266,8 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -270,6 +290,8 @@ class TimerStatePreservationTest {
         var newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -292,6 +314,8 @@ class TimerStatePreservationTest {
         newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -316,6 +340,8 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -338,6 +364,8 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
+            getTastePreselectionUseCase = getTastePreselectionUseCase,
+            recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
