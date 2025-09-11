@@ -6,6 +6,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Added
+
+- Configurable grinder step sizes to match your specific grinder's precision (0.1, 0.2, 0.5, 1.0, or custom values).
+
 ## [1.4.1]
 
 ### Fixed
