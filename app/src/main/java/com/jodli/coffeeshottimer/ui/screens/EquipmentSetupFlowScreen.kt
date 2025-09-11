@@ -78,13 +78,17 @@ fun EquipmentSetupFlowScreen(
                         GrinderSetupStepScreen(
                             scaleMin = uiState.grinderScaleMin,
                             scaleMax = uiState.grinderScaleMax,
+                            stepSize = uiState.grinderStepSize,
                             minError = uiState.grinderMinError,
                             maxError = uiState.grinderMaxError,
+                            stepSizeError = uiState.grinderStepSizeError,
                             generalError = uiState.grinderGeneralError,
                             isValid = uiState.isGrinderValid,
                             onScaleMinChange = viewModel::updateGrinderMin,
                             onScaleMaxChange = viewModel::updateGrinderMax,
+                            onStepSizeChange = viewModel::updateGrinderStepSize,
                             onPresetSelected = viewModel::setGrinderPreset,
+                            onStepSizePresetSelected = viewModel::setGrinderStepSizePreset,
                             onBack = { viewModel.navigateBackward() },
                             onContinue = { viewModel.navigateForward() }
                         )

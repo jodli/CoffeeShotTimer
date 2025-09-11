@@ -104,13 +104,33 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         validateGrinder()
     }
 
+    fun updateGrinderStepSize(value: String) {
+        _uiState.value = _uiState.value.copy(
+            grinderStepSize = value,
+            grinderStepSizeError = null,
+            grinderGeneralError = null
+        )
+        validateGrinder()
+    }
+
+    fun setGrinderStepSizePreset(stepSize: Double) {
+        _uiState.value = _uiState.value.copy(
+            grinderStepSize = stepSize.toString(),
+            grinderStepSizeError = null,
+            grinderGeneralError = null
+        )
+        validateGrinder()
+    }
+
     private fun validateGrinder(): Boolean {
         val currentState = _uiState.value
         val minValue = currentState.grinderScaleMin.toIntOrNull()
         val maxValue = currentState.grinderScaleMax.toIntOrNull()
+        val stepSizeValue = currentState.grinderStepSize.toDoubleOrNull()
         
         var minError: String? = null
         var maxError: String? = null
+        var stepSizeError: String? = null
         var generalError: String? = null
         
         if (currentState.grinderScaleMin.isNotBlank() && minValue == null) {
@@ -119,10 +139,13 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         if (currentState.grinderScaleMax.isNotBlank() && maxValue == null) {
             maxError = "Please enter a valid number"
         }
+        if (currentState.grinderStepSize.isNotBlank() && stepSizeValue == null) {
+            stepSizeError = "Please enter a valid number"
+        }
         
         var isValid = false
-        if (minValue != null && maxValue != null) {
-            val config = GrinderConfiguration(scaleMin = minValue, scaleMax = maxValue)
+        if (minValue != null && maxValue != null && stepSizeValue != null) {
+            val config = GrinderConfiguration(scaleMin = minValue, scaleMax = maxValue, stepSize = stepSizeValue)
             val validation = config.validate()
             if (!validation.isValid) {
                 generalError = validation.errors.firstOrNull()
@@ -134,6 +157,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         _uiState.value = currentState.copy(
             grinderMinError = minError,
             grinderMaxError = maxError,
+            grinderStepSizeError = stepSizeError,
             grinderGeneralError = generalError,
             isGrinderValid = isValid
         )
@@ -257,12 +281,13 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         // Parse all values
         val grinderMin = currentState.grinderScaleMin.toIntOrNull()
         val grinderMax = currentState.grinderScaleMax.toIntOrNull()
+        val grinderStepSize = currentState.grinderStepSize.toDoubleOrNull()
         val coffeeInMin = currentState.coffeeInMin.toIntOrNull()?.toFloat()
         val coffeeInMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
         val coffeeOutMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
         val coffeeOutMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
         
-        if (grinderMin == null || grinderMax == null || 
+        if (grinderMin == null || grinderMax == null || grinderStepSize == null ||
             coffeeInMin == null || coffeeInMax == null || 
             coffeeOutMin == null || coffeeOutMax == null) {
             onError("Please complete all configuration fields")
@@ -274,7 +299,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 // Save grinder configuration
-                val grinderConfig = GrinderConfiguration(scaleMin = grinderMin, scaleMax = grinderMax)
+                val grinderConfig = GrinderConfiguration(scaleMin = grinderMin, scaleMax = grinderMax, stepSize = grinderStepSize)
                 val grinderResult = grinderConfigRepository.saveConfig(grinderConfig)
                 
                 grinderResult.fold(
@@ -409,8 +434,10 @@ data class EquipmentSetupFlowUiState(
     // Grinder configuration state
     val grinderScaleMin: String = "",
     val grinderScaleMax: String = "",
+    val grinderStepSize: String = "0.5",
     val grinderMinError: String? = null,
     val grinderMaxError: String? = null,
+    val grinderStepSizeError: String? = null,
     val grinderGeneralError: String? = null,
     val isGrinderValid: Boolean = false,
     
