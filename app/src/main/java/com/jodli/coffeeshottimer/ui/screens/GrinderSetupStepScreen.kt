@@ -32,13 +32,17 @@ import com.jodli.coffeeshottimer.ui.validation.GrinderValidationHelpers
 fun GrinderSetupStepScreen(
     scaleMin: String,
     scaleMax: String,
+    stepSize: String,
     minError: String?,
     maxError: String?,
+    stepSizeError: String?,
     generalError: String?,
     isValid: Boolean,
     onScaleMinChange: (String) -> Unit,
     onScaleMaxChange: (String) -> Unit,
+    onStepSizeChange: (String) -> Unit,
     onPresetSelected: (Int, Int) -> Unit,
+    onStepSizePresetSelected: (Double) -> Unit,
     onBack: () -> Unit,
     onContinue: () -> Unit,
     modifier: Modifier = Modifier
@@ -76,15 +80,20 @@ fun GrinderSetupStepScreen(
         GrinderScaleSetup(
             scaleMin = scaleMin,
             scaleMax = scaleMax,
+            stepSize = stepSize,
             onScaleMinChange = onScaleMinChange,
             onScaleMaxChange = onScaleMaxChange,
+            onStepSizeChange = onStepSizeChange,
             onPresetSelected = onPresetSelected,
+            onStepSizePresetSelected = onStepSizePresetSelected,
             minError = minError,
             maxError = maxError,
+            stepSizeError = stepSizeError,
             generalError = generalError,
             validationSuggestion = GrinderValidationHelpers.getValidationSuggestion(generalError),
             showDescription = false, // Already shown above
-            showPresets = true
+            showPresets = true,
+            showStepSize = true
         )
         
         Spacer(modifier = Modifier.weight(1f))
