@@ -120,7 +120,5 @@ fun BasketSetupStepScreen(
                 modifier = Modifier.weight(1f)
             )
         }
-        
-        Spacer(modifier = Modifier.height(spacing.large))
     }
 }

@@ -113,8 +113,6 @@ fun EquipmentSetupWelcomeScreen(
                 modifier = Modifier.weight(1f)
             )
         }
-        
-        Spacer(modifier = Modifier.height(spacing.large))
     }
 }
 
