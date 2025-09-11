@@ -120,6 +120,7 @@ fun EquipmentSetupFlowScreen(
                         EquipmentSetupSummaryScreen(
                             grinderMin = uiState.grinderScaleMin,
                             grinderMax = uiState.grinderScaleMax,
+                            grinderStepSize = uiState.grinderStepSize,
                             coffeeInMin = uiState.coffeeInMin,
                             coffeeInMax = uiState.coffeeInMax,
                             coffeeOutMin = uiState.coffeeOutMin,

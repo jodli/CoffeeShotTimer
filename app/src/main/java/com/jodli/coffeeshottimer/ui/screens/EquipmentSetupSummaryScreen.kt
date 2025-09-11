@@ -41,6 +41,7 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 fun EquipmentSetupSummaryScreen(
     grinderMin: String,
     grinderMax: String,
+    grinderStepSize: String,
     coffeeInMin: String,
     coffeeInMax: String,
     coffeeOutMin: String,
@@ -121,8 +122,8 @@ fun EquipmentSetupSummaryScreen(
             title = stringResource(R.string.equipment_setup_grinder_title),
             items = listOf(
                 stringResource(R.string.summary_grinder_range_format, grinderMin, grinderMax),
-                stringResource(R.string.summary_grinder_steps_format, 
-                    (grinderMax.toIntOrNull() ?: 0) - (grinderMin.toIntOrNull() ?: 0))
+                stringResource(R.string.summary_grinder_step_size_format, grinderStepSize),
+                stringResource(R.string.summary_grinder_steps_format, calculateGrinderSteps(grinderMin, grinderMax, grinderStepSize))
             )
         )
         
@@ -208,6 +209,20 @@ fun ConfigurationSummaryCard(
             }
         }
     }
+}
+
+/**
+ * Calculate the number of grinder steps based on range and step size
+ */
+private fun calculateGrinderSteps(grinderMin: String, grinderMax: String, stepSize: String): Int {
+    val minValue = grinderMin.toIntOrNull() ?: return 0
+    val maxValue = grinderMax.toIntOrNull() ?: return 0
+    val stepSizeValue = stepSize.toDoubleOrNull() ?: return 0
+    
+    if (stepSizeValue <= 0) return 0
+    
+    val rangeSize = maxValue - minValue
+    return (rangeSize / stepSizeValue).toInt() + 1  // +1 because we include both endpoints
 }
 
 @Composable

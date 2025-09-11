@@ -610,6 +610,7 @@
     <string name="button_save_and_continue">Save &amp; Continue</string>
     <string name="error_saving_configuration">Configuration Error</string>
     <string name="summary_grinder_range_format">Scale range: %1$s to %2$s</string>
+    <string name="summary_grinder_step_size_format">Step size: %1$s</string>
     <string name="summary_grinder_steps_format">%1$d adjustment steps available</string>
     <string name="summary_coffee_in_format">Coffee in: %1$sg – %2$sg</string>
     <string name="summary_coffee_out_format">Coffee out: %1$sg – %2$sg</string>
