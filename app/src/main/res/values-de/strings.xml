@@ -612,6 +612,7 @@
     <string name="button_save_and_continue">Speichern &amp; Fortfahren</string>
     <string name="error_saving_configuration">Konfigurationsfehler</string>
     <string name="summary_grinder_range_format">Skalenbereich: %1$s bis %2$s</string>
+    <string name="summary_grinder_step_size_format">Schrittgröße: %1$s</string>
     <string name="summary_grinder_steps_format">%1$d Anpassungsschritte verfügbar</string>
     <string name="summary_coffee_in_format">Kaffee rein: %1$sg – %2$sg</string>
     <string name="summary_coffee_out_format">Kaffee raus: %1$sg – %2$sg</string>
