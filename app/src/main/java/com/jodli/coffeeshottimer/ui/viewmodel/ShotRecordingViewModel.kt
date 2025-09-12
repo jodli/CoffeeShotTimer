@@ -19,9 +19,6 @@ import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
-import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightIn
-import com.jodli.coffeeshottimer.ui.validation.validateCoffeeWeightOut
-import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -483,42 +480,36 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Update coffee weight in and validate using enhanced validation.
+     * Update coffee weight in.
+     * No validation needed as sliders constrain values to basket configuration ranges.
      */
     fun updateCoffeeWeightIn(value: String) {
         _coffeeWeightIn.value = value
-
-        // Use enhanced validation with contextual tips
-        val validationResult = value.validateCoffeeWeightIn(validationUtils)
-        _coffeeWeightInError.value = validationResult.errors.firstOrNull()
+        _coffeeWeightInError.value = null // Clear any previous errors
 
         calculateBrewRatio()
         validateForm()
     }
 
     /**
-     * Update coffee weight out and validate using enhanced validation.
+     * Update coffee weight out.
+     * No validation needed as sliders constrain values to basket configuration ranges.
      */
     fun updateCoffeeWeightOut(value: String) {
         _coffeeWeightOut.value = value
-
-        // Use enhanced validation with contextual tips
-        val validationResult = value.validateCoffeeWeightOut(validationUtils)
-        _coffeeWeightOutError.value = validationResult.errors.firstOrNull()
+        _coffeeWeightOutError.value = null // Clear any previous errors
 
         calculateBrewRatio()
         validateForm()
     }
 
     /**
-     * Update grinder setting and validate using enhanced validation.
+     * Update grinder setting.
+     * No validation needed as slider constrains values to grinder configuration ranges.
      */
     fun updateGrinderSetting(value: String) {
         _grinderSetting.value = value
-
-        // Use enhanced validation with helpful tips
-        val validationResult = value.validateGrinderSettingEnhanced(validationUtils)
-        _grinderSettingError.value = validationResult.errors.firstOrNull()
+        _grinderSettingError.value = null // Clear any previous errors
 
         validateForm()
     }

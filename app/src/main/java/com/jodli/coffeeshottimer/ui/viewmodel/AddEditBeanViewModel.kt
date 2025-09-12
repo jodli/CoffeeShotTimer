@@ -14,7 +14,6 @@ import android.content.Intent
 import android.net.Uri
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.validation.validateBeanNameEnhanced
-import com.jodli.coffeeshottimer.ui.validation.validateGrinderSettingEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateNotesEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateRoastDateEnhanced
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
@@ -472,15 +471,13 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     /**
-     * Validate grinder setting input using enhanced validation.
+     * Update grinder setting.
+     * No validation needed as slider constrains values to grinder configuration ranges.
      */
     fun updateAndValidateGrinderSetting(setting: String) {
-        // Use enhanced validation with helpful tips
-        val validationResult = setting.validateGrinderSettingEnhanced(validationUtils, false) // Not required for beans
-
         _uiState.value = _uiState.value.copy(
             lastGrinderSetting = setting,
-            grinderSettingError = if (validationResult.errors.isNotEmpty()) validationResult.errors.joinToString("\n") else null
+            grinderSettingError = null
         )
     }
 

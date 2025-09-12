@@ -60,8 +60,7 @@ class AddEditBeanViewModelTest {
     fun setup() {
         Dispatchers.setMain(testDispatcher)
 
-        // Setup mock responses for validation string provider
-        io.mockk.every { validationStringProvider.getGrinderSettingMaximumLengthError(50) } returns "Grinder setting cannot exceed 50 characters"
+        // Setup mock responses for validation string provider (if needed)
 
         viewModel = AddEditBeanViewModel(
             addBeanUseCase,
@@ -169,21 +168,6 @@ class AddEditBeanViewModelTest {
         viewModel.updateLastGrinderSetting(testSetting)
 
         assertEquals(testSetting, viewModel.uiState.value.lastGrinderSetting)
-    }
-
-    @Test
-    fun `updateAndValidateGrinderSetting should validate correctly`() = runTest(testDispatcher) {
-        // Test valid grinder setting
-        viewModel.updateAndValidateGrinderSetting("15")
-        assertEquals("15", viewModel.uiState.value.lastGrinderSetting)
-        assertNull(viewModel.uiState.value.grinderSettingError)
-
-        // Test too long grinder setting
-        val longSetting = "a".repeat(51)
-        viewModel.updateAndValidateGrinderSetting(longSetting)
-        assertEquals(longSetting, viewModel.uiState.value.lastGrinderSetting)
-        assertNotNull(viewModel.uiState.value.grinderSettingError)
-        assertTrue(viewModel.uiState.value.grinderSettingError!!.contains("cannot exceed 50 characters"))
     }
 
     @Test

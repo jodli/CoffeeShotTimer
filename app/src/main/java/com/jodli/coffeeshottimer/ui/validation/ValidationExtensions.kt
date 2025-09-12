@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.ui.validation
 
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
-import com.jodli.coffeeshottimer.ui.components.WeightSliderConstants
 import java.time.LocalDate
 
 /**
@@ -10,47 +9,8 @@ import java.time.LocalDate
  * These extensions work with ValidationUtils that require a ValidationStringProvider.
  */
 
-/**
- * Validates coffee input weight with contextual error messages.
- */
-fun String.validateCoffeeWeightIn(validationUtils: ValidationUtils): ValidationResult {
-    return validationUtils.validateCoffeeWeight(
-        value = this,
-        fieldName = validationUtils.stringProvider.getCoffeeInputWeightLabel(),
-        minWeight = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT.toDouble(),
-        maxWeight = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT.toDouble()
-    )
-}
-
-/**
- * Validates coffee output weight with contextual error messages.
- */
-fun String.validateCoffeeWeightOut(validationUtils: ValidationUtils): ValidationResult {
-    return validationUtils.validateCoffeeWeight(
-        value = this,
-        fieldName = validationUtils.stringProvider.getCoffeeOutputWeightLabel(),
-        minWeight = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT.toDouble(),
-        maxWeight = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT.toDouble()
-    )
-}
-
-/**
- * Validates grinder setting with enhanced error messages.
- */
-fun String.validateGrinderSettingEnhanced(validationUtils: ValidationUtils, isRequired: Boolean = true): ValidationResult {
-    return validationUtils.validateGrinderSetting(this, isRequired).let { result ->
-        if (!result.isValid) {
-            val enhancedErrors = result.errors.toMutableList()
-
-            // Add helpful tips for grinder settings
-            if (this.trim().isEmpty() && isRequired) {
-                enhancedErrors.add(validationUtils.stringProvider.getGrinderSettingTip())
-            }
-
-            ValidationResult(false, enhancedErrors)
-        } else result
-    }
-}
+// Weight validation functions removed - sliders now handle all weight validation by constraining values to basket configuration ranges
+// Grinder validation function removed - GrinderSettingSlider constrains values to grinder configuration ranges
 
 /**
  * Validates bean name with enhanced error messages and suggestions.
@@ -198,18 +158,12 @@ fun validateCompleteShot(
     val allErrors = mutableListOf<String>()
     val allWarnings = mutableListOf<String>()
 
-    // Validate individual fields
-    val weightInResult = coffeeWeightIn.validateCoffeeWeightIn(validationUtils)
-    val weightOutResult = coffeeWeightOut.validateCoffeeWeightOut(validationUtils)
+    // Validate individual fields (weight and grinder validation skipped - sliders constrain to valid ranges)
     val timeResult = extractionTimeSeconds.validateExtractionTimeEnhanced(validationUtils)
-    val grinderResult = grinderSetting.validateGrinderSettingEnhanced(validationUtils)
     val notesResult = notes.validateNotesEnhanced(validationUtils)
 
     // Collect errors
-    allErrors.addAll(weightInResult.errors)
-    allErrors.addAll(weightOutResult.errors)
     allErrors.addAll(timeResult.errors)
-    allWarnings.addAll(grinderResult.errors)
     allWarnings.addAll(notesResult.errors)
 
     // If basic validation passes, check relationships
@@ -251,13 +205,11 @@ fun validateCompleteBean(
     val nameResult = name.validateBeanNameEnhanced(validationUtils, existingNames)
     val dateResult = roastDate.validateRoastDateEnhanced(validationUtils)
     val notesResult = notes.validateNotesEnhanced(validationUtils)
-    val grinderResult = grinderSetting.validateGrinderSettingEnhanced(validationUtils, false) // Not required
 
     // Collect errors and warnings
     allErrors.addAll(nameResult.errors)
     allErrors.addAll(dateResult.errors)
     allWarnings.addAll(notesResult.errors)
-    allWarnings.addAll(grinderResult.errors)
 
     // Add contextual warnings
     val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(roastDate, LocalDate.now())

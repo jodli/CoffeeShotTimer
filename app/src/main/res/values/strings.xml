@@ -373,15 +373,8 @@
     <string name="validation_empty_id">ID cannot be empty</string>
     <string name="validation_fill_required">Please fill in all required fields</string>
 
-    <!-- Field Labels for Validation -->
-    <string name="validation_coffee_input_weight">Coffee input weight</string>
-    <string name="validation_coffee_output_weight">Coffee output weight</string>
-
     <!-- Validation Error Messages -->
     <string name="validation_field_required">%1$s is required</string>
-    <string name="validation_minimum_weight">%1$s must be at least %2$sg</string>
-    <string name="validation_maximum_weight">%1$s cannot exceed %2$sg</string>
-    <string name="validation_one_decimal_place">%1$s can have at most 1 decimal place</string>
     <string name="validation_extraction_time_minimum">Extraction time must be at least %1$d seconds</string>
     <string name="validation_extraction_time_maximum">Extraction time cannot exceed %1$d seconds</string>
     <string name="validation_bean_name_minimum_length">Bean name must be at least %1$d characters</string>
@@ -390,9 +383,6 @@
     <string name="validation_roast_date_future">Roast date cannot be in the future</string>
     <string name="validation_roast_date_too_old">Roast date cannot be more than 365 days ago</string>
     <string name="validation_notes_maximum_length">Notes cannot exceed %1$d characters</string>
-    <string name="validation_grinder_setting_required">Grinder setting is required</string>
-    <string name="validation_grinder_setting_maximum_length">Grinder setting cannot exceed %1$d characters</string>
-    <string name="validation_grinder_setting_invalid_characters">Grinder setting contains invalid characters</string>
     <string name="validation_output_weight_less_than_input">Output weight cannot be less than input weight</string>
 
     <!-- Validation Tips and Warnings -->

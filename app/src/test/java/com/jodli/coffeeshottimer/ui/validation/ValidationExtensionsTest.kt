@@ -21,13 +21,8 @@ class ValidationExtensionsTest {
         mockStringProvider = mockk<ValidationStringProvider>(relaxed = true)
 
         // Setup common mock responses
-        every { mockStringProvider.getCoffeeInputWeightLabel() } returns "Coffee input weight"
-        every { mockStringProvider.getCoffeeOutputWeightLabel() } returns "Coffee output weight"
         every { mockStringProvider.getValidNumberError() } returns "Please enter a valid number"
         every { mockStringProvider.getFieldRequiredError(any()) } returns "Field is required"
-        every { mockStringProvider.getMinimumWeightError(any(), any()) } returns "Weight must be at least 12g"
-        every { mockStringProvider.getMaximumWeightError(any(), any()) } returns "Weight cannot exceed 22g"
-        every { mockStringProvider.getOneDecimalPlaceError(any()) } returns "Only one decimal place allowed"
         every { mockStringProvider.getRatioConcentratedWarning() } returns "Ratio concentrated"
         every { mockStringProvider.getRatioDilutedWarning() } returns "Ratio diluted"
         every { mockStringProvider.getRatioHigherWarning() } returns "Consider higher ratio"
@@ -53,85 +48,8 @@ class ValidationExtensionsTest {
         validationUtils = ValidationUtils(mockStringProvider)
     }
 
-    @Test
-    fun `validateCoffeeWeightIn should pass for valid weights`() {
-        val result = "18.5".validateCoffeeWeightIn(validationUtils)
-        assertTrue("Valid weight should pass validation", result.isValid)
-        assertTrue("Valid weight should have no errors", result.errors.isEmpty())
-    }
+    // Weight validation tests removed - sliders now handle all weight validation by constraining values to basket configuration ranges
 
-    @Test
-    fun `validateCoffeeWeightIn should fail for empty input`() {
-        val result = "".validateCoffeeWeightIn(validationUtils)
-        assertFalse("Empty weight should fail validation", result.isValid)
-        assertTrue("Empty weight should have error", result.errors.isNotEmpty())
-        assertTrue("Error should mention requirement",
-            result.errors.any { it.contains("required", ignoreCase = true) })
-    }
-
-    @Test
-    fun `validateCoffeeWeightIn should fail for weight too low`() {
-        val result = "4.0".validateCoffeeWeightIn(validationUtils)
-        assertFalse("Weight too low should fail validation", result.isValid)
-        assertTrue("Should have minimum weight error",
-            result.errors.any { it.contains("at least", ignoreCase = true) })
-    }
-
-    @Test
-    fun `validateCoffeeWeightIn should fail for weight too high`() {
-        val result = "25.0".validateCoffeeWeightIn(validationUtils)
-        assertFalse("Weight too high should fail validation", result.isValid)
-        assertTrue("Should have maximum weight error",
-            result.errors.any { it.contains("exceed", ignoreCase = true) })
-    }
-
-    @Test
-    fun `validateCoffeeWeightIn should provide helpful tips for unusual weights`() {
-        val lowResult = "4.0".validateCoffeeWeightIn(validationUtils) // Below new 5.0 minimum
-        assertFalse("Weight below minimum should fail", lowResult.isValid)
-        assertTrue("Should have minimum weight error",
-            lowResult.errors.any { it.contains("at least", ignoreCase = true) })
-
-        val highResult = "35.0".validateCoffeeWeightIn(validationUtils) // Above 20.0 maximum
-        assertFalse("Weight above maximum should fail", highResult.isValid)
-        assertTrue("Should have maximum weight error",
-            highResult.errors.any { it.contains("exceed", ignoreCase = true) })
-    }
-
-    @Test
-    fun `validateCoffeeWeightOut should pass for valid weights`() {
-        val result = "35.0".validateCoffeeWeightOut(validationUtils)
-        assertTrue("Valid output weight should pass validation", result.isValid)
-        assertTrue("Valid weight should have no errors", result.errors.isEmpty())
-    }
-
-    @Test
-    fun `validateCoffeeWeightOut should provide helpful tips for unusual weights`() {
-        val lowResult = "9.0".validateCoffeeWeightOut(validationUtils) // Below new 10.0 minimum
-        assertFalse("Weight below minimum should fail", lowResult.isValid)
-        assertTrue("Should have minimum weight error",
-            lowResult.errors.any { it.contains("at least", ignoreCase = true) })
-
-        val highResult = "60.0".validateCoffeeWeightOut(validationUtils) // Above 55.0 maximum
-        assertFalse("Weight above maximum should fail", highResult.isValid)
-        assertTrue("Should have maximum weight error",
-            highResult.errors.any { it.contains("exceed", ignoreCase = true) })
-    }
-
-    @Test
-    fun `validateGrinderSettingEnhanced should pass for valid settings`() {
-        val result = "15".validateGrinderSettingEnhanced(validationUtils)
-        assertTrue("Valid grinder setting should pass", result.isValid)
-        assertTrue("Valid setting should have no errors", result.errors.isEmpty())
-    }
-
-    @Test
-    fun `validateGrinderSettingEnhanced should provide helpful tip for empty setting`() {
-        val result = "".validateGrinderSettingEnhanced(validationUtils, true)
-        assertFalse("Empty required setting should fail", result.isValid)
-        assertTrue("Should provide helpful tip",
-            result.errors.any { it.contains("remember", ignoreCase = true) })
-    }
 
     @Test
     fun `validateBeanNameEnhanced should pass for valid names`() {
@@ -234,22 +152,21 @@ class ValidationExtensionsTest {
             coffeeWeightIn = "18.0",
             coffeeWeightOut = "36.0",
             extractionTimeSeconds = 27,
-            grinderSetting = "15",
+            grinderSetting = "15", // Not validated - slider constrains values
             notes = "Perfect shot",
             validationUtils = validationUtils
         )
         assertTrue("Valid complete shot should pass", validResult.isValid)
 
         val invalidResult = validateCompleteShot(
-            coffeeWeightIn = "",
-            coffeeWeightOut = "60.0", // Above new max of 55g
-            extractionTimeSeconds = 200,
-            grinderSetting = "",
+            coffeeWeightIn = "18.0", // Valid weights - sliders constrain values
+            coffeeWeightOut = "36.0",
+            extractionTimeSeconds = 200, // Invalid time
+            grinderSetting = "15", // Not validated - slider constrains values
             notes = "",
             validationUtils = validationUtils
         )
-        assertFalse("Invalid complete shot should fail", invalidResult.isValid)
-        assertTrue("Should have multiple errors", invalidResult.errors.size > 1)
+        assertFalse("Invalid extraction time should fail", invalidResult.isValid)
     }
 
     @Test
@@ -311,22 +228,24 @@ class ValidationExtensionsTest {
     }
 
     @Test
-    fun `Weight slider constants should be reasonable for espresso`() {
-        // Test that our weight slider constants make sense for espresso
+    fun `BasketConfiguration defaults should be reasonable for espresso`() {
+        // Test that our basket configuration defaults make sense for espresso
+        val defaultBasket = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
+        
         assertTrue("Coffee in min weight should be reasonable",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MIN_WEIGHT >= 5.0f)
+            defaultBasket.coffeeInMin >= 5.0f)
         assertTrue("Coffee in max weight should be reasonable",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MAX_WEIGHT <= 25.0f)
+            defaultBasket.coffeeInMax <= 25.0f)
         assertTrue("Coffee out min weight should be reasonable",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT >= 10.0f)
+            defaultBasket.coffeeOutMin >= 10.0f)
         assertTrue("Coffee out max weight should be reasonable",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT <= 60.0f)
+            defaultBasket.coffeeOutMax <= 60.0f)
         assertTrue("Coffee in range should be valid",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MIN_WEIGHT <
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_IN_MAX_WEIGHT)
+            defaultBasket.coffeeInMin < defaultBasket.coffeeInMax)
         assertTrue("Coffee out range should be valid",
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT <
-            com.jodli.coffeeshottimer.ui.components.WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT)
+            defaultBasket.coffeeOutMin < defaultBasket.coffeeOutMax)
+        assertTrue("Default configuration should pass validation",
+            defaultBasket.validate().isValid)
     }
 
     @Test

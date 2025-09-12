@@ -15,6 +15,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 - Improved onboarding flow to guide existing users through equipment setup and bean configuration when new features are available.
 
+### Fixed
+
+- Fixed coffee input weight slider maximum limit for double baskets - you can now use up to 22g instead of being limited to 20g.
+
 ## [1.4.1]
 
 ### Fixed

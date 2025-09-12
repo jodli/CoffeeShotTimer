@@ -49,24 +49,7 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import kotlin.math.roundToInt
 import java.util.Locale
 
-/**
- * Default constants for weight slider bounds.
- * These are used as fallbacks when no basket configuration is available.
- */
-object WeightSliderConstants {
-    const val COFFEE_IN_MIN_WEIGHT = 5f
-    const val COFFEE_IN_MAX_WEIGHT = 20f
-    const val COFFEE_OUT_MIN_WEIGHT = 10f
-    const val COFFEE_OUT_MAX_WEIGHT = 55f
-}
-
-/**
- * Constants for grinder setting slider bounds
- */
-object GrinderSliderConstants {
-    const val GRINDER_MIN_SETTING = 0.5f
-    const val GRINDER_MAX_SETTING = 20.0f
-}
+// Constants removed - all slider ranges now come from basket and grinder configuration
 
 /**
  * Parse a float value that may use either decimal point (.) or comma (,) as decimal separator.
@@ -242,9 +225,9 @@ fun WeightSlider(
 fun CoffeeWeightInSlider(
     value: String,
     onValueChange: (String) -> Unit,
+    minWeight: Float,
+    maxWeight: Float,
     modifier: Modifier = Modifier,
-    minWeight: Float = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
-    maxWeight: Float = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
     errorMessage: String? = null,
     enabled: Boolean = true
 ) {
@@ -269,9 +252,9 @@ fun CoffeeWeightInSlider(
 fun CoffeeWeightOutSlider(
     value: String,
     onValueChange: (String) -> Unit,
+    minWeight: Float,
+    maxWeight: Float,
     modifier: Modifier = Modifier,
-    minWeight: Float = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
-    maxWeight: Float = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT,
     errorMessage: String? = null,
     enabled: Boolean = true
 ) {
@@ -313,8 +296,8 @@ fun GrinderSettingSlider(
     enabled: Boolean = true,
     suggestedSetting: String? = null,
     previousSuccessfulSettings: List<String> = emptyList(),
-    minSetting: Float = GrinderSliderConstants.GRINDER_MIN_SETTING,
-    maxSetting: Float = GrinderSliderConstants.GRINDER_MAX_SETTING,
+    minSetting: Float,
+    maxSetting: Float,
     stepSize: Float = 0.5f
 ) {
     val spacing = LocalSpacing.current
@@ -613,10 +596,10 @@ fun WeightSlidersSection(
     coffeeWeightOutError: String? = null,  // Now optional since sliders clamp values
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    basketCoffeeInMin: Float = WeightSliderConstants.COFFEE_IN_MIN_WEIGHT,
-    basketCoffeeInMax: Float = WeightSliderConstants.COFFEE_IN_MAX_WEIGHT,
-    basketCoffeeOutMin: Float = WeightSliderConstants.COFFEE_OUT_MIN_WEIGHT,
-    basketCoffeeOutMax: Float = WeightSliderConstants.COFFEE_OUT_MAX_WEIGHT
+    basketCoffeeInMin: Float,
+    basketCoffeeInMax: Float,
+    basketCoffeeOutMin: Float,
+    basketCoffeeOutMax: Float
 ) {
     val spacing = LocalSpacing.current
 
