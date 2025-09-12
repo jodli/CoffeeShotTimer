@@ -14,12 +14,7 @@ class ValidationStringProvider @Inject constructor(
     private val stringResourceProvider: StringResourceProvider
 ) {
 
-    // Field labels
-    fun getCoffeeInputWeightLabel(): String =
-        stringResourceProvider.getString(R.string.validation_coffee_input_weight)
-
-    fun getCoffeeOutputWeightLabel(): String =
-        stringResourceProvider.getString(R.string.validation_coffee_output_weight)
+    // Field labels removed - sliders now handle validation by constraining values
 
     // Basic validation errors
     fun getFieldRequiredError(fieldName: String): String =
@@ -28,14 +23,6 @@ class ValidationStringProvider @Inject constructor(
     fun getValidNumberError(): String =
         stringResourceProvider.getString(R.string.validation_valid_number)
 
-    fun getMinimumWeightError(fieldName: String, minWeight: String): String =
-        stringResourceProvider.getString(R.string.validation_minimum_weight, fieldName, minWeight)
-
-    fun getMaximumWeightError(fieldName: String, maxWeight: String): String =
-        stringResourceProvider.getString(R.string.validation_maximum_weight, fieldName, maxWeight)
-
-    fun getOneDecimalPlaceError(fieldName: String): String =
-        stringResourceProvider.getString(R.string.validation_one_decimal_place, fieldName)
 
     // Extraction time validation
     fun getExtractionTimeMinimumError(minTime: Int): String =
@@ -71,15 +58,6 @@ class ValidationStringProvider @Inject constructor(
     fun getNotesMaximumLengthError(maxLength: Int): String =
         stringResourceProvider.getString(R.string.validation_notes_maximum_length, maxLength)
 
-    // Grinder setting validation
-    fun getGrinderSettingRequiredError(): String =
-        stringResourceProvider.getString(R.string.validation_grinder_setting_required)
-
-    fun getGrinderSettingMaximumLengthError(maxLength: Int): String =
-        stringResourceProvider.getString(R.string.validation_grinder_setting_maximum_length, maxLength)
-
-    fun getGrinderSettingInvalidCharactersError(): String =
-        stringResourceProvider.getString(R.string.validation_grinder_setting_invalid_characters)
 
     // Cross-field validation
     fun getOutputWeightLessThanInputError(): String =

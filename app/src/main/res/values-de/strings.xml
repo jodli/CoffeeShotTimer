@@ -374,15 +374,8 @@
     <string name="validation_empty_id">ID darf nicht leer sein</string>
     <string name="validation_fill_required">Bitte fülle alle Pflichtfelder aus</string>
 
-    <!-- Field Labels for Validation -->
-    <string name="validation_coffee_input_weight">Kaffee-Eingabegewicht</string>
-    <string name="validation_coffee_output_weight">Kaffee-Ausgabegewicht</string>
-
     <!-- Validation Error Messages -->
     <string name="validation_field_required">%1$s ist erforderlich</string>
-    <string name="validation_minimum_weight">%1$s muss mindestens %2$sg betragen</string>
-    <string name="validation_maximum_weight">%1$s darf %2$sg nicht überschreiten</string>
-    <string name="validation_one_decimal_place">%1$s darf höchstens 1 Dezimalstelle haben</string>
     <string name="validation_extraction_time_minimum">Extraktionszeit muss mindestens %1$d Sekunden betragen</string>
     <string name="validation_extraction_time_maximum">Extraktionszeit darf %1$d Sekunden nicht überschreiten</string>
     <string name="validation_bean_name_minimum_length">Bohnenname muss mindestens %1$d Zeichen haben</string>
@@ -391,9 +384,6 @@
     <string name="validation_roast_date_future">Röstdatum darf nicht in der Zukunft liegen</string>
     <string name="validation_roast_date_too_old">Röstdatum darf nicht mehr als 365 Tage zurückliegen</string>
     <string name="validation_notes_maximum_length">Notizen dürfen %1$d Zeichen nicht überschreiten</string>
-    <string name="validation_grinder_setting_required">Mühleneinstellung ist erforderlich</string>
-    <string name="validation_grinder_setting_maximum_length">Mühleneinstellung darf %1$d Zeichen nicht überschreiten</string>
-    <string name="validation_grinder_setting_invalid_characters">Mühleneinstellung enthält ungültige Zeichen</string>
     <string name="validation_output_weight_less_than_input">Ausgabegewicht darf nicht geringer als Eingabegewicht sein</string>
 
     <!-- Validation Tips and Warnings -->

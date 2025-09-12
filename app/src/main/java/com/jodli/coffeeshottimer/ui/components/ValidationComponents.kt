@@ -53,7 +53,6 @@ class ValidationUtils(
         private const val MIN_BEAN_NAME_LENGTH = 2
         private const val MAX_BEAN_NAME_LENGTH = 100
         const val MAX_NOTES_LENGTH = 500
-        const val MAX_GRINDER_SETTING_LENGTH = 50
 
         // Brew ratio constants
         const val MIN_TYPICAL_BREW_RATIO = 1.5
@@ -73,7 +72,6 @@ class ValidationUtils(
     private val MIN_BEAN_NAME_LENGTH = 2
     private val MAX_BEAN_NAME_LENGTH = 100
     val MAX_NOTES_LENGTH = Companion.MAX_NOTES_LENGTH
-    val MAX_GRINDER_SETTING_LENGTH = Companion.MAX_GRINDER_SETTING_LENGTH
 
     // Brew ratio constants
     val MIN_TYPICAL_BREW_RATIO = Companion.MIN_TYPICAL_BREW_RATIO
@@ -83,42 +81,6 @@ class ValidationUtils(
 
     private val decimalFormat = DecimalFormat("#.#")
 
-    /**
-     * Validates coffee weight input with range checking.
-     */
-    fun validateCoffeeWeight(
-        value: String,
-        fieldName: String,
-        minWeight: Double,
-        maxWeight: Double,
-        isRequired: Boolean = true
-    ): ValidationResult {
-        val errors = mutableListOf<String>()
-
-        if (value.isBlank()) {
-            if (isRequired) {
-                errors.add(stringProvider.getFieldRequiredError(fieldName))
-            }
-            return ValidationResult(errors.isEmpty(), errors)
-        }
-
-        val weight = value.toDoubleOrNull()
-        when {
-            weight == null -> errors.add(stringProvider.getValidNumberError())
-            weight < minWeight -> errors.add(
-                stringProvider.getMinimumWeightError(fieldName, decimalFormat.format(minWeight))
-            )
-
-            weight > maxWeight -> errors.add(
-                stringProvider.getMaximumWeightError(fieldName, decimalFormat.format(maxWeight))
-            )
-
-            value.contains('.') && value.substringAfter('.').length > 1 ->
-                errors.add(stringProvider.getOneDecimalPlaceError(fieldName))
-        }
-
-        return ValidationResult(errors.isEmpty(), errors)
-    }
 
     /**
      * Validates extraction time with range checking.
@@ -194,25 +156,6 @@ class ValidationUtils(
         return ValidationResult(errors.isEmpty(), errors)
     }
 
-    /**
-     * Validates grinder setting with length and character checking.
-     * Supports both decimal points (.) and commas (,) for locale compatibility.
-     */
-    fun validateGrinderSetting(setting: String, isRequired: Boolean = true): ValidationResult {
-        val errors = mutableListOf<String>()
-        val trimmedSetting = setting.trim()
-
-        when {
-            trimmedSetting.isEmpty() && isRequired -> errors.add(stringProvider.getGrinderSettingRequiredError())
-            trimmedSetting.length > MAX_GRINDER_SETTING_LENGTH ->
-                errors.add(stringProvider.getGrinderSettingMaximumLengthError(MAX_GRINDER_SETTING_LENGTH))
-
-            trimmedSetting.isNotEmpty() && !trimmedSetting.matches(Regex("^[a-zA-Z0-9\\s\\-_.,#]+$")) ->
-                errors.add(stringProvider.getGrinderSettingInvalidCharactersError())
-        }
-
-        return ValidationResult(errors.isEmpty(), errors)
-    }
 
     /**
      * Formats a decimal number for display with appropriate precision.
