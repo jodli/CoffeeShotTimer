@@ -1,10 +1,12 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,10 @@ fun ShotRecordedDialog(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
+    
+    // State for taste selection
+    var selectedPrimary by remember { mutableStateOf<TastePrimary?>(null) }
+    var selectedSecondary by remember { mutableStateOf<TasteSecondary?>(null) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -53,6 +59,9 @@ fun ShotRecordedDialog(
         },
         text = {
             Column(
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState())
+                    .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(spacing.medium)
             ) {
@@ -63,20 +72,52 @@ fun ShotRecordedDialog(
                     textAlign = TextAlign.Center
                 )
 
-        // Taste feedback section
-        if (onTasteSelected != null) {
-            HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
-            
-            TasteQuickPick(
-                suggested = suggestedTaste,
-                onSelectPrimary = { primary ->
-                    onTasteSelected(primary, null)
-                    onDismiss()
-                },
-                onSkip = onDismiss,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+                // Taste feedback section
+                if (onTasteSelected != null) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
+                    
+                    Text(
+                        text = stringResource(R.string.text_how_did_it_taste),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(bottom = spacing.small)
+                    )
+                    
+                    // Primary taste buttons
+                    TastePrimaryButtonRow(
+                        suggestedTaste = suggestedTaste,
+                        selectedTaste = selectedPrimary,
+                        onTasteSelected = { taste ->
+                            selectedPrimary = taste
+                        },
+                        allowDeselection = true
+                    )
+                    
+                    // Secondary taste qualifiers (optional)
+                    if (selectedPrimary != null) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Spacer(modifier = Modifier.height(spacing.small))
+                            
+                            Text(
+                                text = stringResource(R.string.text_strength_modifier_optional),
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            
+                            Spacer(modifier = Modifier.height(spacing.extraSmall))
+                            
+                            TasteSecondaryChipRow(
+                                selectedSecondary = selectedSecondary,
+                                onSecondarySelected = { newValue ->
+                                    selectedSecondary = newValue
+                                }
+                            )
+                        }
+                    }
+                }
 
                 // Next steps based on this shot
                 if (recommendations.isNotEmpty()) {
@@ -112,28 +153,40 @@ fun ShotRecordedDialog(
                 CoffeePrimaryButton(
                     text = stringResource(R.string.button_view_details),
                     onClick = {
+                        // Save taste feedback if taste is selected
+                        val primary = selectedPrimary
+                        if (onTasteSelected != null && primary != null) {
+                            onTasteSelected(primary, selectedSecondary)
+                        }
                         onViewDetails()
                         onDismiss()
                     },
                     modifier = Modifier.widthIn(min = 120.dp)
                 )
-            } else {
-                CoffeePrimaryButton(
-                    text = stringResource(R.string.text_dialog_ok),
-                    onClick = onDismiss,
-                    modifier = Modifier.widthIn(min = 120.dp)
-                )
             }
         },
-        dismissButton = if (onViewDetails != null) {
-            {
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.text_dialog_dismiss),
-                    onClick = onDismiss,
-                    modifier = Modifier.widthIn(min = 120.dp)
-                )
-            }
-        } else null
+        dismissButton = {
+						if (onViewDetails != null) {
+									CoffeeSecondaryButton(
+											text = if (selectedPrimary != null) {
+													// When taste is selected: "Save" (save and close)
+													stringResource(R.string.button_save)
+											} else {
+													// When no taste selected: "Skip" (close without saving)
+													stringResource(R.string.button_skip_taste)
+											},
+											onClick = {
+													// Only save if taste is selected
+													val primary = selectedPrimary
+													if (onTasteSelected != null && primary != null) {
+															onTasteSelected(primary, selectedSecondary)
+													}
+													onDismiss()
+										},
+										modifier = Modifier.widthIn(min = 120.dp)
+						)
+                }
+        }
     )
 }
 

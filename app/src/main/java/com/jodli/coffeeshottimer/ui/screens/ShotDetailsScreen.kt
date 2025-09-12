@@ -395,21 +395,27 @@ private fun ShotOverviewCard(
             Spacer(modifier = Modifier.height(spacing.small))
             
             // Taste feedback display
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
                     text = stringResource(R.string.text_taste_feedback),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                TasteFeedbackDisplay(
-                    tastePrimary = shot.tastePrimary,
-                    tasteSecondary = shot.tasteSecondary,
-                    onEditClick = onEditTaste
-                )
+                
+                Spacer(modifier = Modifier.height(spacing.extraSmall))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TasteFeedbackDisplay(
+                        tastePrimary = shot.tastePrimary,
+                        tasteSecondary = shot.tasteSecondary,
+                        onEditClick = onEditTaste
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(spacing.small))
