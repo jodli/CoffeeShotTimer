@@ -9,6 +9,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Added
 
 - Configurable grinder step sizes to match your specific grinder's precision (0.1, 0.2, 0.5, 1.0, or custom values).
+- Track how your shots taste to build a complete picture of your brewing performance - record whether shots taste sour, perfect, or bitter with optional strength modifiers.
 
 ### Changed
 
