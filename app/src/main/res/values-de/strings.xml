@@ -157,11 +157,16 @@
     <string name="taste_weak">Schwach</string>
     <string name="taste_strong">Stark</string>
     <string name="button_skip_taste">Überspringen</string>
-    <string name="text_recommended_based_on_time">Empfohlen basierend auf Extraktionszeit</string>
+    <string name="text_suggested_based_on_time">Vorgeschlagen basierend auf Extraktionszeit</string>
     <string name="text_taste_feedback">Geschmacks-Feedback</string>
     <string name="text_no_taste_recorded">Kein Geschmack aufgezeichnet</string>
     <string name="text_strength_modifier_optional">Stärke-Modifikator (optional)</string>
     <string name="text_suggested">Vorgeschlagen</string>
+    <!-- Content descriptions for accessibility -->
+    <string name="cd_taste_selected">%1$s (ausgewählt)</string>
+    <string name="cd_taste_suggested">%1$s (vorgeschlagen)</string>
+    <string name="cd_taste_qualifier_selected">%1$s Qualifikator ausgewählt</string>
+    <string name="cd_taste_qualifier_not_selected">%1$s Qualifikator nicht ausgewählt</string>
     <string name="text_extraction_time_sour_hint">Basierend auf %1$ds Extraktionszeit könnte der Shot sauer schmecken (unterextrahiert)</string>
     <string name="text_extraction_time_perfect_hint">Basierend auf %1$ds Extraktionszeit liegt dies im optimalen Extraktionsbereich</string>
     <string name="text_extraction_time_bitter_hint">Basierend auf %1$ds Extraktionszeit könnte der Shot bitter schmecken (überextrahiert)</string>

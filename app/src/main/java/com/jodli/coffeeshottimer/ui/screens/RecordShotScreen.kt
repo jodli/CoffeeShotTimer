@@ -276,13 +276,12 @@ fun RecordShotScreen(
     // Shot Recorded Dialog with Taste Feedback
     if (showShotRecordedDialog && recordedShotData != null) {
         val data = recordedShotData!!
-        val recommendedTaste = viewModel.getTastePreselectionFor(data.extractionTimeSeconds)
         
         ShotRecordedDialog(
             brewRatio = data.brewRatio,
             extractionTime = data.extractionTime,
             recommendations = data.recommendations,
-            recommendedTaste = recommendedTaste,
+            suggestedTaste = data.suggestedTaste,
             onTasteSelected = { primary, secondary ->
                 viewModel.recordTasteFeedback(
                     shotId = data.shotId,
