@@ -37,14 +37,13 @@ class AddBeanUseCaseTest {
         val roastDate = LocalDate.now().minusDays(7)
         val notes = "Floral and citrusy"
         val isActive = true
-        val grinderSetting = "15"
 
         val validationResult = ValidationResult(isValid = true, errors = emptyList())
         coEvery { beanRepository.validateBean(any()) } returns validationResult
         coEvery { beanRepository.addBean(any()) } returns Result.success(Unit)
 
         // When
-        val result = addBeanUseCase.execute(name, roastDate, notes, isActive, grinderSetting)
+        val result = addBeanUseCase.execute(name, roastDate, notes, isActive)
 
         // Then
         assertTrue(result.isSuccess)
@@ -54,7 +53,6 @@ class AddBeanUseCaseTest {
         assertEquals(roastDate, createdBean?.roastDate)
         assertEquals(notes, createdBean?.notes)
         assertEquals(isActive, createdBean?.isActive)
-        assertEquals(grinderSetting, createdBean?.lastGrinderSetting)
 
         coVerify { beanRepository.validateBean(any()) }
         coVerify { beanRepository.addBean(any()) }
@@ -65,7 +63,6 @@ class AddBeanUseCaseTest {
         // Given
         val name = "  Ethiopian Yirgacheffe  "
         val notes = "  Floral and citrusy  "
-        val grinderSetting = "  15  "
         val roastDate = LocalDate.now().minusDays(7)
 
         val validationResult = ValidationResult(isValid = true, errors = emptyList())
@@ -73,14 +70,13 @@ class AddBeanUseCaseTest {
         coEvery { beanRepository.addBean(any()) } returns Result.success(Unit)
 
         // When
-        val result = addBeanUseCase.execute(name, roastDate, notes, true, grinderSetting)
+        val result = addBeanUseCase.execute(name, roastDate, notes, true)
 
         // Then
         assertTrue(result.isSuccess)
         val createdBean = result.getOrNull()
         assertEquals("Ethiopian Yirgacheffe", createdBean?.name)
         assertEquals("Floral and citrusy", createdBean?.notes)
-        assertEquals("15", createdBean?.lastGrinderSetting)
     }
 
     @Test
@@ -88,19 +84,17 @@ class AddBeanUseCaseTest {
         // Given
         val name = "Ethiopian Yirgacheffe"
         val roastDate = LocalDate.now().minusDays(7)
-        val grinderSetting = ""
 
         val validationResult = ValidationResult(isValid = true, errors = emptyList())
         coEvery { beanRepository.validateBean(any()) } returns validationResult
         coEvery { beanRepository.addBean(any()) } returns Result.success(Unit)
 
         // When
-        val result = addBeanUseCase.execute(name, roastDate, lastGrinderSetting = grinderSetting)
+        val result = addBeanUseCase.execute(name, roastDate)
 
         // Then
         assertTrue(result.isSuccess)
         val createdBean = result.getOrNull()
-        assertNull(createdBean?.lastGrinderSetting)
     }
 
     @Test
@@ -286,7 +280,6 @@ class AddBeanUseCaseTest {
         assertEquals(roastDate, createdBean?.roastDate)
         assertEquals("", createdBean?.notes)
         assertTrue(createdBean?.isActive == true)
-        assertNull(createdBean?.lastGrinderSetting)
     }
 
     @Test
@@ -318,11 +311,9 @@ class AddBeanUseCaseTest {
         assertTrue(rules.containsKey("name"))
         assertTrue(rules.containsKey("roastDate"))
         assertTrue(rules.containsKey("notes"))
-        assertTrue(rules.containsKey("grinderSetting"))
 
         assertEquals("Required, unique, max 100 characters", rules["name"])
         assertEquals("Cannot be future date, max 365 days ago", rules["roastDate"])
         assertEquals("Optional, max 500 characters", rules["notes"])
-        assertEquals("Optional, max 50 characters", rules["grinderSetting"])
     }
 }

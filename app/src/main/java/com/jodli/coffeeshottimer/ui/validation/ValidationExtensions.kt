@@ -151,7 +151,6 @@ fun validateCompleteShot(
     coffeeWeightIn: String,
     coffeeWeightOut: String,
     extractionTimeSeconds: Int,
-    grinderSetting: String,
     notes: String,
     validationUtils: ValidationUtils
 ): ValidationResult {
@@ -194,7 +193,6 @@ fun validateCompleteBean(
     name: String,
     roastDate: LocalDate,
     notes: String,
-    grinderSetting: String,
     validationUtils: ValidationUtils,
     existingNames: List<String> = emptyList()
 ): ValidationResult {

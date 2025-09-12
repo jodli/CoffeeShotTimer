@@ -25,15 +25,13 @@ class AddBeanUseCase @Inject constructor(
      * @param roastDate Date the bean was roasted (cannot be future, max 365 days ago)
      * @param notes Optional notes about the bean (max 500 characters)
      * @param isActive Whether the bean should be active (default: true)
-     * @param lastGrinderSetting Optional initial grinder setting
      * @return Result containing the created bean or validation errors
      */
     suspend fun execute(
         name: String,
         roastDate: LocalDate,
         notes: String = "",
-        isActive: Boolean = true,
-        lastGrinderSetting: String? = null
+        isActive: Boolean = true
     ): Result<Bean> {
         return try {
             // Create bean instance
@@ -42,7 +40,6 @@ class AddBeanUseCase @Inject constructor(
                 roastDate = roastDate,
                 notes = notes.trim(),
                 isActive = isActive,
-                lastGrinderSetting = lastGrinderSetting?.trim()?.takeIf { it.isNotEmpty() },
                 createdAt = LocalDateTime.now()
             )
 
@@ -151,8 +148,7 @@ class AddBeanUseCase @Inject constructor(
             name = name,
             roastDate = roastDate,
             notes = "",
-            isActive = true,
-            lastGrinderSetting = null
+            isActive = true
         )
     }
 

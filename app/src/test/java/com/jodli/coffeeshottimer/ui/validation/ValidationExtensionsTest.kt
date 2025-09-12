@@ -152,7 +152,6 @@ class ValidationExtensionsTest {
             coffeeWeightIn = "18.0",
             coffeeWeightOut = "36.0",
             extractionTimeSeconds = 27,
-            grinderSetting = "15", // Not validated - slider constrains values
             notes = "Perfect shot",
             validationUtils = validationUtils
         )
@@ -162,7 +161,6 @@ class ValidationExtensionsTest {
             coffeeWeightIn = "18.0", // Valid weights - sliders constrain values
             coffeeWeightOut = "36.0",
             extractionTimeSeconds = 200, // Invalid time
-            grinderSetting = "15", // Not validated - slider constrains values
             notes = "",
             validationUtils = validationUtils
         )
@@ -175,7 +173,6 @@ class ValidationExtensionsTest {
             coffeeWeightIn = "18.0",
             coffeeWeightOut = "15.0", // Less than input
             extractionTimeSeconds = 27,
-            grinderSetting = "15",
             notes = "",
             validationUtils = validationUtils
         )
@@ -188,7 +185,6 @@ class ValidationExtensionsTest {
             name = "Ethiopian Yirgacheffe",
             roastDate = LocalDate.now().minusDays(7),
             notes = "Floral and bright",
-            grinderSetting = "15",
             validationUtils = validationUtils
         )
         assertTrue("Valid complete bean should pass", validResult.isValid)
@@ -197,7 +193,6 @@ class ValidationExtensionsTest {
             name = "",
             roastDate = LocalDate.now().plusDays(1),
             notes = "x".repeat(600), // Too long
-            grinderSetting = "x".repeat(60), // Too long
             validationUtils = validationUtils
         )
         assertFalse("Invalid complete bean should fail", invalidResult.isValid)
@@ -210,7 +205,6 @@ class ValidationExtensionsTest {
             name = "Fresh Bean",
             roastDate = LocalDate.now().minusDays(10),
             notes = "",
-            grinderSetting = "",
             validationUtils = validationUtils
         )
         assertTrue("Fresh bean validation should pass", freshResult.isValid)
@@ -220,7 +214,6 @@ class ValidationExtensionsTest {
             name = "Old Bean",
             roastDate = LocalDate.now().minusDays(300),
             notes = "",
-            grinderSetting = "",
             validationUtils = validationUtils
         )
         assertTrue("Old bean validation should pass basic validation", oldResult.isValid)
