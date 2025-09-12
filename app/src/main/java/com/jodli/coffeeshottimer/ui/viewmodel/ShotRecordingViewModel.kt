@@ -640,12 +640,15 @@ class ShotRecordingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            // Capture extraction time BEFORE recording (it might be reset after recording)
+            val extractionTimeSeconds = timerState.value.elapsedTimeSeconds
+            
             // Validate parameters first
             val validationResult = recordShotUseCase.validateShotParameters(
                 beanId = bean.id,
                 coffeeWeightIn = weightIn,
                 coffeeWeightOut = weightOut,
-                extractionTimeSeconds = timerState.value.elapsedTimeSeconds,
+                extractionTimeSeconds = extractionTimeSeconds,
                 grinderSetting = grinder,
                 notes = shotNotes
             )
@@ -674,7 +677,8 @@ class ShotRecordingViewModel @Inject constructor(
                     _errorMessage.value = null
 
                     // Load shot details with recommendations and show dialog
-                    loadShotDetailsAndShowDialog(shot.id, shot.getFormattedBrewRatio(), shot.getFormattedExtractionTime())
+                    // Pass the captured extraction time instead of reading timer state
+                    loadShotDetailsAndShowDialog(shot.id, shot.getFormattedBrewRatio(), shot.getFormattedExtractionTime(), extractionTimeSeconds)
                 },
                 onFailure = { exception ->
                     _errorMessage.value = domainErrorTranslator.translateError(exception)
@@ -851,16 +855,20 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Load shot details with recommendations and show the success dialog.
      */
-    private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String) {
-        val extractionSeconds = timerState.value.elapsedTimeSeconds
+    private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String, extractionTimeSeconds: Int) {
+        // Pre-compute the suggested taste using shared utility
+        val suggestedTaste = com.jodli.coffeeshottimer.ui.components.TasteUtils.getTasteRecommendation(extractionTimeSeconds)
+        
+        
         getShotDetailsUseCase.getShotDetails(shotId).fold(
             onSuccess = { shotDetails ->
                 _recordedShotData.value = RecordedShotData(
                     brewRatio = brewRatio,
                     extractionTime = extractionTime,
-                    extractionTimeSeconds = extractionSeconds,
+                    extractionTimeSeconds = extractionTimeSeconds,
                     recommendations = shotDetails.analysis.recommendations,
-                    shotId = shotId
+                    shotId = shotId,
+                    suggestedTaste = suggestedTaste
                 )
                 _showShotRecordedDialog.value = true
             },
@@ -887,7 +895,7 @@ class ShotRecordingViewModel @Inject constructor(
      * Get taste preselection based on extraction time.
      */
     fun getTastePreselectionFor(extractionTimeSeconds: Int): TastePrimary? {
-        return getTastePreselectionUseCase(extractionTimeSeconds)
+        return com.jodli.coffeeshottimer.ui.components.TasteUtils.getTasteRecommendation(extractionTimeSeconds)
     }
 
     /**
@@ -1013,5 +1021,6 @@ data class RecordedShotData(
     val extractionTime: String,
     val extractionTimeSeconds: Int,  // Added for taste preselection
     val recommendations: List<ShotRecommendation>,
-    val shotId: String
+    val shotId: String,
+    val suggestedTaste: TastePrimary? // Pre-computed suggested taste
 )

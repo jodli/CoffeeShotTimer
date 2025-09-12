@@ -36,14 +36,8 @@ fun TasteFeedbackEditSheet(
     var selectedPrimary by remember { mutableStateOf(currentTastePrimary) }
     var selectedSecondary by remember { mutableStateOf(currentTasteSecondary) }
     
-    // Get recommended taste based on extraction time
-    val recommendedTaste = extractionTimeSeconds?.let { time ->
-        when {
-            time < 25 -> TastePrimary.SOUR
-            time <= 30 -> TastePrimary.PERFECT
-            else -> TastePrimary.BITTER
-        }
-    }
+    // Get the suggested taste using shared utility
+    val suggestedTaste = TasteUtils.getTasteRecommendation(extractionTimeSeconds)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -84,46 +78,14 @@ fun TasteFeedbackEditSheet(
             Spacer(modifier = Modifier.height(spacing.small))
             
             // Primary taste selection
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                TastePrimaryEditButton(
-                    taste = TastePrimary.SOUR,
-                    emoji = "😖",
-                    label = stringResource(R.string.taste_sour),
-                    isSelected = selectedPrimary == TastePrimary.SOUR,
-                    isRecommended = recommendedTaste == TastePrimary.SOUR,
-                    onClick = { 
-                        selectedPrimary = if (selectedPrimary == TastePrimary.SOUR) null else TastePrimary.SOUR
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-                
-                TastePrimaryEditButton(
-                    taste = TastePrimary.PERFECT,
-                    emoji = "😋",
-                    label = stringResource(R.string.taste_perfect),
-                    isSelected = selectedPrimary == TastePrimary.PERFECT,
-                    isRecommended = recommendedTaste == TastePrimary.PERFECT,
-                    onClick = { 
-                        selectedPrimary = if (selectedPrimary == TastePrimary.PERFECT) null else TastePrimary.PERFECT
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-                
-                TastePrimaryEditButton(
-                    taste = TastePrimary.BITTER,
-                    emoji = "😣",
-                    label = stringResource(R.string.taste_bitter),
-                    isSelected = selectedPrimary == TastePrimary.BITTER,
-                    isRecommended = recommendedTaste == TastePrimary.BITTER,
-                    onClick = { 
-                        selectedPrimary = if (selectedPrimary == TastePrimary.BITTER) null else TastePrimary.BITTER
-                    },
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            TastePrimaryButtonRow(
+                suggestedTaste = suggestedTaste,
+                selectedTaste = selectedPrimary,
+                onTasteSelected = { taste ->
+                    selectedPrimary = taste
+                },
+                allowDeselection = true
+            )
             
             // Secondary taste qualifiers (optional)
             if (selectedPrimary != null) {
@@ -139,34 +101,17 @@ fun TasteFeedbackEditSheet(
                     
                     Spacer(modifier = Modifier.height(spacing.extraSmall))
                     
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(spacing.small)
-                    ) {
-                        TasteSecondaryEditChip(
-                            taste = TasteSecondary.WEAK,
-                            emoji = "💧",
-                            label = stringResource(R.string.taste_weak),
-                            isSelected = selectedSecondary == TasteSecondary.WEAK,
-                            onClick = {
-                                selectedSecondary = if (selectedSecondary == TasteSecondary.WEAK) null else TasteSecondary.WEAK
-                            }
-                        )
-                        
-                        TasteSecondaryEditChip(
-                            taste = TasteSecondary.STRONG,
-                            emoji = "💪",
-                            label = stringResource(R.string.taste_strong),
-                            isSelected = selectedSecondary == TasteSecondary.STRONG,
-                            onClick = {
-                                selectedSecondary = if (selectedSecondary == TasteSecondary.STRONG) null else TasteSecondary.STRONG
-                            }
-                        )
-                    }
+                    TasteSecondaryChipRow(
+                        selectedSecondary = selectedSecondary,
+                        onSecondarySelected = { newValue ->
+                            selectedSecondary = newValue
+                        }
+                    )
                 }
             }
             
-            // Recommendation hint
-            if (recommendedTaste != null && extractionTimeSeconds != null) {
+            // Suggestion hint
+            if (suggestedTaste != null && extractionTimeSeconds != null) {
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
@@ -174,7 +119,7 @@ fun TasteFeedbackEditSheet(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = when(recommendedTaste) {
+                        text = when(suggestedTaste) {
                             TastePrimary.SOUR -> stringResource(R.string.text_extraction_time_sour_hint, extractionTimeSeconds)
                             TastePrimary.PERFECT -> stringResource(R.string.text_extraction_time_perfect_hint, extractionTimeSeconds)
                             TastePrimary.BITTER -> stringResource(R.string.text_extraction_time_bitter_hint, extractionTimeSeconds)
@@ -226,94 +171,6 @@ fun TasteFeedbackEditSheet(
             }
         }
     }
-}
-
-/**
- * Individual primary taste button for editing.
- */
-@Composable
-private fun TastePrimaryEditButton(
-    taste: TastePrimary,
-    emoji: String,
-    label: String,
-    isSelected: Boolean,
-    isRecommended: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val containerColor = when {
-        isSelected -> MaterialTheme.colorScheme.primaryContainer
-        isRecommended -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
-        else -> MaterialTheme.colorScheme.surface
-    }
-    
-    val borderColor = when {
-        isSelected -> MaterialTheme.colorScheme.primary
-        isRecommended -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-        else -> MaterialTheme.colorScheme.outline
-    }
-
-    OutlinedButton(
-        onClick = onClick,
-        modifier = modifier.height(80.dp),
-        border = BorderStroke(
-            width = if (isSelected || isRecommended) 2.dp else 1.dp,
-            color = borderColor
-        ),
-        colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = containerColor
-        )
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Text(
-                text = emoji,
-                fontSize = 24.sp
-            )
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
-            )
-            if (isRecommended && !isSelected) {
-                Text(
-                    text = stringResource(R.string.text_suggested),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                )
-            }
-        }
-    }
-}
-
-/**
- * Secondary taste qualifier chip for editing.
- */
-@Composable
-private fun TasteSecondaryEditChip(
-    taste: TasteSecondary,
-    emoji: String,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        label = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(text = emoji, fontSize = 16.sp)
-                Text(text = label)
-            }
-        },
-        modifier = modifier
-    )
 }
 
 @Preview(showBackground = true)

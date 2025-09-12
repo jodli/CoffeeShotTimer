@@ -96,11 +96,16 @@
     <string name="taste_weak">Weak</string>
     <string name="taste_strong">Strong</string>
     <string name="button_skip_taste">Skip</string>
-    <string name="text_recommended_based_on_time">Recommended based on extraction time</string>
+    <string name="text_suggested_based_on_time">Suggested based on extraction time</string>
     <string name="text_taste_feedback">Taste Feedback</string>
     <string name="text_no_taste_recorded">No taste recorded</string>
     <string name="text_strength_modifier_optional">Strength modifier (optional)</string>
     <string name="text_suggested">Suggested</string>
+    <!-- Content descriptions for accessibility -->
+    <string name="cd_taste_selected">%1$s (selected)</string>
+    <string name="cd_taste_suggested">%1$s (suggested)</string>
+    <string name="cd_taste_qualifier_selected">%1$s qualifier selected</string>
+    <string name="cd_taste_qualifier_not_selected">%1$s qualifier not selected</string>
     <string name="text_extraction_time_sour_hint">Based on %1$ds extraction time, the shot might taste sour (under-extracted)</string>
     <string name="text_extraction_time_perfect_hint">Based on %1$ds extraction time, this is in the optimal extraction range</string>
     <string name="text_extraction_time_bitter_hint">Based on %1$ds extraction time, the shot might taste bitter (over-extracted)</string>

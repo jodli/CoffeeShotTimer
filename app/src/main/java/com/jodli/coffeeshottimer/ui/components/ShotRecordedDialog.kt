@@ -25,7 +25,7 @@ fun ShotRecordedDialog(
     brewRatio: String,
     extractionTime: String,
     recommendations: List<ShotRecommendation> = emptyList(),
-    recommendedTaste: TastePrimary? = null,
+    suggestedTaste: TastePrimary? = null,
     onTasteSelected: ((TastePrimary, TasteSecondary?) -> Unit)? = null,
     onDismiss: () -> Unit,
     onViewDetails: (() -> Unit)? = null,
@@ -63,20 +63,20 @@ fun ShotRecordedDialog(
                     textAlign = TextAlign.Center
                 )
 
-                // Taste feedback section
-                if (onTasteSelected != null) {
-                    HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
-                    
-                    TasteQuickPick(
-                        recommended = recommendedTaste,
-                        onSelectPrimary = { primary ->
-                            onTasteSelected(primary, null)
-                            onDismiss()
-                        },
-                        onSkip = onDismiss,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+        // Taste feedback section
+        if (onTasteSelected != null) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
+            
+            TasteQuickPick(
+                suggested = suggestedTaste,
+                onSelectPrimary = { primary ->
+                    onTasteSelected(primary, null)
+                    onDismiss()
+                },
+                onSkip = onDismiss,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
                 // Next steps based on this shot
                 if (recommendations.isNotEmpty()) {
