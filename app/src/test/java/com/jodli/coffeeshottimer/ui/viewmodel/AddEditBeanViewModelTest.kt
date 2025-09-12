@@ -88,7 +88,6 @@ class AddEditBeanViewModelTest {
             every { roastDate } returns LocalDate.now()
             every { notes } returns ""
             every { isActive } returns true
-            every { lastGrinderSetting } returns null
             every { photoPath } returns existingPhotoPath
         }
 
@@ -104,7 +103,6 @@ class AddEditBeanViewModelTest {
         assertEquals(LocalDate.now(), initialState.roastDate)
         assertEquals("", initialState.notes)
         assertTrue(initialState.isActive)
-        assertEquals("", initialState.lastGrinderSetting)
         assertNull(initialState.nameError)
         assertNull(initialState.roastDateError)
         assertNull(initialState.notesError)
@@ -159,15 +157,6 @@ class AddEditBeanViewModelTest {
         viewModel.updateIsActive(true)
 
         assertTrue(viewModel.uiState.value.isActive)
-    }
-
-    @Test
-    fun `updateLastGrinderSetting should update grinder setting`() = runTest(testDispatcher) {
-        val testSetting = "15"
-
-        viewModel.updateLastGrinderSetting(testSetting)
-
-        assertEquals(testSetting, viewModel.uiState.value.lastGrinderSetting)
     }
 
     @Test
@@ -440,7 +429,7 @@ class AddEditBeanViewModelTest {
         viewModel.addPhoto(mockUri)
 
         // Mock successful bean creation and photo addition
-        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any()) } returns Result.success(mockBean)
         coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.success(photoPath)
         coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
 
@@ -451,7 +440,7 @@ class AddEditBeanViewModelTest {
         assertFalse(state.isSaving)
         assertNull(state.error)
 
-        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any()) }
         coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
     }
 
@@ -470,7 +459,7 @@ class AddEditBeanViewModelTest {
         viewModel.addPhoto(mockUri)
 
         // Mock successful bean creation but failed photo addition
-        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any()) } returns Result.success(mockBean)
         coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.failure(exception)
         coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
         every { domainErrorTranslator.translateResultError(any<Result<String>>()) } returns photoError
@@ -483,7 +472,7 @@ class AddEditBeanViewModelTest {
         assertEquals(photoError, state.photoError) // But photo error is shown
         assertNull(state.error) // Main error is null
 
-        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any()) }
         coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
     }
 
@@ -502,7 +491,7 @@ class AddEditBeanViewModelTest {
         viewModel.updateName("Test Bean")
 
         // Mock successful bean creation
-        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any()) } returns Result.success(mockBean)
         coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
 
         viewModel.saveBean()
@@ -513,7 +502,7 @@ class AddEditBeanViewModelTest {
         assertNull(state.error)
         assertEquals(mockBean, state.savedBean) // Should store the created bean
 
-        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any()) }
     }
 
     @Test
@@ -534,7 +523,7 @@ class AddEditBeanViewModelTest {
         viewModel.addPhoto(mockUri)
 
         // Mock successful bean creation and photo addition
-        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any()) } returns Result.success(mockBean)
         coEvery { addPhotoToBeanUseCase.execute(beanId, mockUri) } returns Result.success(photoPath)
         coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
 
@@ -546,7 +535,7 @@ class AddEditBeanViewModelTest {
         assertNull(state.error)
         assertEquals(mockBean, state.savedBean) // Should store the created bean
 
-        coVerify { addBeanUseCase.execute(any(), any(), any(), any(), any()) }
+        coVerify { addBeanUseCase.execute(any(), any(), any(), any()) }
         coVerify { addPhotoToBeanUseCase.execute(beanId, mockUri) }
     }
 
@@ -556,7 +545,7 @@ class AddEditBeanViewModelTest {
 
         // First set saveSuccess and savedBean by triggering a successful save
         viewModel.updateName("Test Bean")
-        coEvery { addBeanUseCase.execute(any(), any(), any(), any(), any()) } returns Result.success(mockBean)
+        coEvery { addBeanUseCase.execute(any(), any(), any(), any()) } returns Result.success(mockBean)
         coEvery { addBeanUseCase.isBeanNameAvailable(any()) } returns Result.success(true)
 
         viewModel.saveBean()

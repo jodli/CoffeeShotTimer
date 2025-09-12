@@ -331,19 +331,6 @@ fun AddEditBeanScreen(
                             maxLines = 4
                         )
 
-                        // Grinder Setting (hide in onboarding mode)
-                        if (!isOnboardingMode) {
-                            CoffeeTextField(
-                                value = uiState.lastGrinderSetting,
-                                onValueChange = viewModel::updateAndValidateGrinderSetting,
-                                label = stringResource(R.string.label_grinder_setting),
-                                placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
-                                leadingIcon = Icons.Filled.Engineering,
-                                isError = uiState.grinderSettingError != null,
-                                errorMessage = uiState.grinderSettingError
-                            )
-                        }
-
                         // Photo Section - available in both create and edit modes
                         BeanPhotoSection(
                             photoPath = uiState.photoPath,
@@ -485,19 +472,6 @@ fun AddEditBeanScreen(
                                     errorMessage = uiState.roastDateError,
                                     singleLine = true
                                 )
-
-                                // Grinder Setting (hide in onboarding mode)
-                                if (!isOnboardingMode) {
-                                    CoffeeTextField(
-                                        value = uiState.lastGrinderSetting,
-                                        onValueChange = viewModel::updateAndValidateGrinderSetting,
-                                        label = stringResource(R.string.label_grinder_setting),
-                                        placeholder = stringResource(R.string.placeholder_optional_grinder_setting),
-                                        leadingIcon = Icons.Filled.Engineering,
-                                        isError = uiState.grinderSettingError != null,
-                                        errorMessage = uiState.grinderSettingError
-                                    )
-                                }
 
                                 // Notes - give more space in landscape
                                 CoffeeTextField(

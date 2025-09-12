@@ -40,16 +40,7 @@ class EnhancedShotRecordingViewModel(
 
     private val _coffeeWeightOut = MutableStateFlow("")
 
-    private val _grinderSetting = MutableStateFlow("")
-
     private val _notes = MutableStateFlow("")
-
-    // Individual field errors for real-time feedback
-    private val _coffeeWeightInError = MutableStateFlow<String?>(null)
-
-    private val _coffeeWeightOutError = MutableStateFlow<String?>(null)
-
-    private val _grinderSettingError = MutableStateFlow<String?>(null)
 
     // Contextual warnings
     private val _brewRatioWarnings = MutableStateFlow<List<String>>(emptyList())
@@ -73,7 +64,6 @@ class EnhancedShotRecordingViewModel(
                 coffeeWeightIn = _coffeeWeightIn.value,
                 coffeeWeightOut = _coffeeWeightOut.value,
                 extractionTimeSeconds = 27, // Would come from timer
-                grinderSetting = _grinderSetting.value,
                 notes = _notes.value,
                 validationUtils
             )

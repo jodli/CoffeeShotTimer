@@ -78,7 +78,6 @@ class AddEditBeanViewModel @Inject constructor(
                         roastDate = bean.roastDate,
                         notes = bean.notes,
                         isActive = bean.isActive,
-                        lastGrinderSetting = bean.lastGrinderSetting ?: "",
                         photoPath = bean.photoPath,
                         pendingPhotoUri = null, // Clear any pending photo in edit mode
                         isLoading = false,
@@ -130,7 +129,7 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     fun updateLastGrinderSetting(setting: String) {
-        _uiState.value = _uiState.value.copy(lastGrinderSetting = setting)
+        _uiState.value = _uiState.value.copy()
     }
 
     private fun validateName(name: String) {
@@ -210,8 +209,6 @@ class AddEditBeanViewModel @Inject constructor(
                     roastDate = currentState.roastDate,
                     notes = currentState.notes.trim(),
                     isActive = currentState.isActive,
-                    lastGrinderSetting = currentState.lastGrinderSetting.trim()
-                        .takeIf { it.isNotEmpty() }
                 )
             } else {
                 // Create mode: add new bean
@@ -220,8 +217,6 @@ class AddEditBeanViewModel @Inject constructor(
                     roastDate = currentState.roastDate,
                     notes = currentState.notes.trim(),
                     isActive = currentState.isActive,
-                    lastGrinderSetting = currentState.lastGrinderSetting.trim()
-                        .takeIf { it.isNotEmpty() }
                 )
             }
 
@@ -471,17 +466,6 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     /**
-     * Update grinder setting.
-     * No validation needed as slider constrains values to grinder configuration ranges.
-     */
-    fun updateAndValidateGrinderSetting(setting: String) {
-        _uiState.value = _uiState.value.copy(
-            lastGrinderSetting = setting,
-            grinderSettingError = null
-        )
-    }
-
-    /**
      * Reset form to default values.
      */
     fun resetForm() {
@@ -499,14 +483,12 @@ class AddEditBeanViewModel @Inject constructor(
             // This would require storing original values, for now return true if any field has content
             currentState.name.isNotBlank() ||
                     currentState.notes.isNotBlank() ||
-                    currentState.lastGrinderSetting.isNotBlank() ||
                     currentState.pendingPhotoUri != null
         } else {
             // In add mode, check if any field has been modified from defaults
             currentState.name.isNotBlank() ||
                     currentState.roastDate != LocalDate.now() ||
                     currentState.notes.isNotBlank() ||
-                    currentState.lastGrinderSetting.isNotBlank() ||
                     !currentState.isActive ||
                     currentState.pendingPhotoUri != null
         }
@@ -561,7 +543,6 @@ data class AddEditBeanUiState(
     val roastDate: LocalDate = LocalDate.now(),
     val notes: String = "",
     val isActive: Boolean = true,
-    val lastGrinderSetting: String = "",
     val photoPath: String? = null,
     val pendingPhotoUri: Uri? = null, // Photo URI pending save in create mode
     val nameError: String? = null,
