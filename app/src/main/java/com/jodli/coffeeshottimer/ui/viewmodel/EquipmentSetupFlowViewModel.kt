@@ -31,6 +31,11 @@ class EquipmentSetupFlowViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(EquipmentSetupFlowUiState())
     val uiState: StateFlow<EquipmentSetupFlowUiState> = _uiState.asStateFlow()
+    
+    init {
+        // Pre-load existing configurations to make it easier for returning users
+        loadExistingConfigurations()
+    }
 
     /**
      * Navigate to the next step in the equipment setup flow
@@ -422,6 +427,53 @@ class EquipmentSetupFlowViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
+    }
+    
+    /**
+     * Loads existing equipment configurations from repositories
+     * and pre-fills the UI state to make it easier for returning users
+     * to update only the new fields they care about.
+     */
+    private fun loadExistingConfigurations() {
+        viewModelScope.launch {
+            try {
+                // Load existing grinder configuration if available
+                val grinderResult = grinderConfigRepository.getCurrentConfig()
+                grinderResult.fold(
+                    onSuccess = { grinderConfig ->
+                        if (grinderConfig != null) {
+                            _uiState.value = _uiState.value.copy(
+                                grinderScaleMin = grinderConfig.scaleMin.toString(),
+                                grinderScaleMax = grinderConfig.scaleMax.toString(),
+                                grinderStepSize = grinderConfig.stepSize.toString()
+                            )
+                            validateGrinder()
+                        }
+                    },
+                    onFailure = { /* Silently continue with defaults */ }
+                )
+                
+                // Load existing basket configuration if available
+                val basketResult = basketConfigRepository.getActiveConfig()
+                basketResult.fold(
+                    onSuccess = { basketConfig ->
+                        if (basketConfig != null) {
+                            _uiState.value = _uiState.value.copy(
+                                coffeeInMin = basketConfig.coffeeInMin.toInt().toString(),
+                                coffeeInMax = basketConfig.coffeeInMax.toInt().toString(),
+                                coffeeOutMin = basketConfig.coffeeOutMin.toInt().toString(),
+                                coffeeOutMax = basketConfig.coffeeOutMax.toInt().toString()
+                            )
+                            validateBasket()
+                        }
+                    },
+                    onFailure = { /* Silently continue with defaults */ }
+                )
+            } catch (e: Exception) {
+                // Silently continue with defaults if loading fails
+                // Users can still configure manually if needed
+            }
+        }
     }
 }
 
