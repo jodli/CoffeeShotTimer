@@ -52,9 +52,7 @@ object DatabaseModule {
 
         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
             super.onCreate(db)
-
-            // Create indexes for performance optimization
-            createIndexes(db)
+            // Indices are now created by Room annotations, no manual creation needed
         }
 
         override fun onOpen(db: androidx.sqlite.db.SupportSQLiteDatabase) {
@@ -62,32 +60,6 @@ object DatabaseModule {
 
             // Enable foreign key constraints
             db.execSQL("PRAGMA foreign_keys=ON")
-        }
-
-        /**
-         * Create database indexes for performance optimization.
-         */
-        private fun createIndexes(db: androidx.sqlite.db.SupportSQLiteDatabase) {
-            // Index on shots.beanId for foreign key performance
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_id ON shots(beanId)")
-
-            // Index on shots.timestamp for chronological queries
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_timestamp ON shots(timestamp)")
-
-            // Index on beans.isActive for filtering active beans
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_active ON beans(isActive)")
-
-            // Index on beans.name for name-based queries and uniqueness
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_name ON beans(name)")
-
-            // Index on shots.grinderSetting for grinder setting queries
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_grinder_setting ON shots(grinderSetting)")
-
-            // Composite index for shots filtered by bean and timestamp
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_shots_bean_timestamp ON shots(beanId, timestamp)")
-
-            // Index on beans.roastDate for date-based queries
-            db.execSQL("CREATE INDEX IF NOT EXISTS idx_beans_roast_date ON beans(roastDate)")
         }
     }
 

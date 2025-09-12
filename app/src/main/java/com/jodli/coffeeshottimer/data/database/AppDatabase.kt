@@ -22,7 +22,7 @@ import com.jodli.coffeeshottimer.data.model.Shot
  */
 @Database(
     entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
-    version = 7,
+    version = 8,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -35,6 +35,47 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "espresso_tracker_database"
+        
+        /**
+         * Helper method to clean up and recreate all indices.
+         * This is ONLY needed for migration 7→8 to fix databases that were corrupted 
+         * by the old DatabaseModule.createIndexes() method.
+         * 
+         * Future migrations should NOT use this - they should only touch indices
+         * they specifically need to change.
+         */
+        private fun cleanupAndRecreateAllIndices(db: SupportSQLiteDatabase) {
+            // Drop ALL possible index variations (both old and new naming patterns)
+            val indicesToDrop = listOf(
+                // Old bean indices from DatabaseModule bug
+                "idx_beans_active", "idx_beans_name", "idx_beans_roast_date",
+                // Current bean indices  
+                "index_beans_isActive", "index_beans_name", "index_beans_roastDate",
+                "index_beans_createdAt", "index_beans_photoPath",
+                // Old shot indices from DatabaseModule bug
+                "idx_shots_bean_id", "idx_shots_bean_timestamp", 
+                "idx_shots_grinder_setting", "idx_shots_timestamp",
+                // Current shot indices
+                "index_shots_beanId", "index_shots_timestamp",
+                "index_shots_grinderSetting", "index_shots_beanId_timestamp"
+            )
+            
+            indicesToDrop.forEach { index ->
+                db.execSQL("DROP INDEX IF EXISTS $index")
+            }
+            
+            // Recreate ONLY the canonical indices that Room expects
+            db.execSQL("CREATE INDEX index_beans_isActive ON beans (isActive)")
+            db.execSQL("CREATE UNIQUE INDEX index_beans_name ON beans (name)")
+            db.execSQL("CREATE INDEX index_beans_roastDate ON beans (roastDate)")
+            db.execSQL("CREATE INDEX index_beans_createdAt ON beans (createdAt)")
+            db.execSQL("CREATE INDEX index_beans_photoPath ON beans (photoPath)")
+            
+            db.execSQL("CREATE INDEX index_shots_beanId ON shots (beanId)")
+            db.execSQL("CREATE INDEX index_shots_timestamp ON shots (timestamp)")
+            db.execSQL("CREATE INDEX index_shots_grinderSetting ON shots (grinderSetting)")
+            db.execSQL("CREATE INDEX index_shots_beanId_timestamp ON shots (beanId, timestamp)")
+        }
 
         /**
          * Get all database migrations.
@@ -46,7 +87,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_3_4,
                 MIGRATION_4_5,
                 MIGRATION_5_6,
-                MIGRATION_6_7
+                MIGRATION_6_7,
+                MIGRATION_7_8
             )
         }
 
@@ -56,37 +98,8 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
-                    // 1) Add photoPath column to beans table (nullable, no explicit default)
-                    //    Room expects no explicit default for nullable columns.
+									// Add photoPath column to beans table
                     db.execSQL("ALTER TABLE beans ADD COLUMN photoPath TEXT")
-
-                    // 2) Ensure indexes match Room's expected (canonical) names.
-                    //    Drop any legacy/custom indexes if they exist, then (re)create the expected ones.
-                    //    These drops are safe as IF EXISTS and no-ops if not present.
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
-
-                    // 3) Create canonical indexes with the names Room generated from @Entity(indices=...)
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
-                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
-
-                    // 4) Add index for photoPath to optimize photo-related queries
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
-
-                    // 5) Normalize legacy index names on 'shots' table to match Room's expected schema
-                    //    Drop old custom names (if they exist) and create canonical ones.
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
-
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 1->2 failed: ${e.message}", e)
@@ -100,30 +113,6 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
-                    // Ensure legacy indices from older 2.x schemas are cleaned up so schema matches Room expectations
-                    // Drop old/custom bean indices if present
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
-
-                    // Recreate canonical bean indices that Room expects (idempotent)
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
-                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
-
-                    // Also normalize legacy index names on 'shots' table to match Room's expected schema
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
-
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
-
                     // Create grinder_configuration table
                     db.execSQL("""
                         CREATE TABLE IF NOT EXISTS grinder_configuration (
@@ -150,36 +139,6 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
-                    // Ensure all existing table indices are properly aligned with Room's expectations
-                    // This is critical because Room validates the entire schema, not just new additions
-                    
-                    // Clean up any legacy bean indices that might exist from older migrations
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
-
-                    // Ensure all canonical bean indices exist (idempotent operations)
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
-                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
-
-                    // Clean up any legacy shot indices that might exist
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
-
-                    // Ensure all canonical shot indices exist (idempotent operations)
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
-
-                    // Ensure grinder_configuration indices are properly in place
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_grinder_configuration_createdAt ON grinder_configuration (createdAt)")
-
                     // Create basket_configuration table
                     // Note: Room handles REAL for Float fields and INTEGER for Boolean fields
                     db.execSQL("""
@@ -256,41 +215,7 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 try {
-                    // Ensure all existing indices are properly in place before making changes
-                    // This is necessary because Room validates the entire schema after migration
-                    
-                    // Clean up any legacy bean indices that might exist
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_active")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_name")
-                    db.execSQL("DROP INDEX IF EXISTS idx_beans_roast_date")
-
-                    // Ensure all canonical bean indices exist
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_isActive ON beans (isActive)")
-                    db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_beans_name ON beans (name)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_roastDate ON beans (roastDate)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_createdAt ON beans (createdAt)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_beans_photoPath ON beans (photoPath)")
-
-                    // Clean up any legacy shot indices
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_id")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_bean_timestamp")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_grinder_setting")
-                    db.execSQL("DROP INDEX IF EXISTS idx_shots_timestamp")
-
-                    // Ensure all canonical shot indices exist
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId ON shots (beanId)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_timestamp ON shots (timestamp)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_grinderSetting ON shots (grinderSetting)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_shots_beanId_timestamp ON shots (beanId, timestamp)")
-
-                    // Ensure grinder_configuration indices are in place
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_grinder_configuration_createdAt ON grinder_configuration (createdAt)")
-
-                    // Ensure basket_configuration indices are in place
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_createdAt ON basket_configuration (createdAt)")
-                    db.execSQL("CREATE INDEX IF NOT EXISTS index_basket_configuration_isActive ON basket_configuration (isActive)")
-                    
-                    // Now add the stepSize column with default value of 0.5 to maintain backward compatibility
+                    // Add the stepSize column with default value of 0.5 to maintain backward compatibility
                     db.execSQL("""
                         ALTER TABLE grinder_configuration 
                         ADD COLUMN stepSize REAL NOT NULL DEFAULT 0.5
@@ -324,6 +249,26 @@ abstract class AppDatabase : RoomDatabase() {
                 } catch (e: Exception) {
                     // Surface the failure so Room can handle it and report clearly
                     throw RuntimeException("Migration 6->7 failed: ${e.message}. This migration adds taste feedback fields to shots table.", e)
+                }
+            }
+        }
+
+        /**
+         * Migration from version 7 to 8: Fix index issues caused by DatabaseModule bug.
+         * 
+         * This migration ONLY exists to clean up the mess caused by the old
+         * DatabaseModule.createIndexes() method that was creating indices with wrong names.
+         * 
+         * This is a one-time cleanup. Future migrations should NOT need to do this.
+         */
+        private val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Fix the index mess from the DatabaseModule bug
+                    cleanupAndRecreateAllIndices(db)
+                    
+                } catch (e: Exception) {
+                    throw RuntimeException("Migration 7->8 failed: ${e.message}. This migration fixes index issues.", e)
                 }
             }
         }
