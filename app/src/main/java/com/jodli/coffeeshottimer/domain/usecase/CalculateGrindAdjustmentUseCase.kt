@@ -99,14 +99,29 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             val timeDeviation = calculateTimeDeviation(extractionTimeSeconds)
             
             // Determine adjustment based on taste feedback and extraction time
+            // Prioritize taste feedback over timing when they conflict
             val recommendation = when {
-                shouldAdjustFiner(extractionTimeSeconds, tasteFeedback) -> {
+                // First priority: Taste feedback (direct indicator of extraction quality)
+                tasteFeedback == TastePrimary.BITTER -> {
+                    calculateCoarserAdjustment(
+                        grinderConfig, currentValue, timeDeviation,
+                        extractionTimeSeconds, tasteFeedback
+                    )
+                }
+                tasteFeedback == TastePrimary.SOUR -> {
                     calculateFinerAdjustment(
                         grinderConfig, currentValue, timeDeviation, 
                         extractionTimeSeconds, tasteFeedback
                     )
                 }
-                shouldAdjustCoarser(extractionTimeSeconds, tasteFeedback) -> {
+                // Second priority: Timing-based recommendations (when no taste feedback)
+                extractionTimeSeconds < OPTIMAL_MIN_TIME -> {
+                    calculateFinerAdjustment(
+                        grinderConfig, currentValue, timeDeviation, 
+                        extractionTimeSeconds, tasteFeedback
+                    )
+                }
+                extractionTimeSeconds > OPTIMAL_MAX_TIME -> {
                     calculateCoarserAdjustment(
                         grinderConfig, currentValue, timeDeviation,
                         extractionTimeSeconds, tasteFeedback
@@ -142,25 +157,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         }
     }
     
-    /**
-     * Determine if we should recommend a finer grind.
-     * @param extractionTimeSeconds The extraction time
-     * @param tasteFeedback The taste feedback
-     * @return true if should grind finer
-     */
-    private fun shouldAdjustFiner(extractionTimeSeconds: Int, tasteFeedback: TastePrimary?): Boolean {
-        return extractionTimeSeconds < OPTIMAL_MIN_TIME || tasteFeedback == TastePrimary.SOUR
-    }
-    
-    /**
-     * Determine if we should recommend a coarser grind.
-     * @param extractionTimeSeconds The extraction time
-     * @param tasteFeedback The taste feedback
-     * @return true if should grind coarser
-     */
-    private fun shouldAdjustCoarser(extractionTimeSeconds: Int, tasteFeedback: TastePrimary?): Boolean {
-        return extractionTimeSeconds > OPTIMAL_MAX_TIME || tasteFeedback == TastePrimary.BITTER
-    }
     
     /**
      * Calculate a finer grind adjustment recommendation.
