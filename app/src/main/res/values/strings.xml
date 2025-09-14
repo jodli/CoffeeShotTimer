@@ -693,4 +693,19 @@
     <string name="grind_adjustment_summary_coarser_multiple">%1$d steps coarser → %2$s</string>
     <string name="grind_adjustment_summary_no_change">Keep current setting</string>
 
+    <!-- Grind Adjustment Card Strings -->
+    <string name="text_grind_adjustment_recommendation">Grind Adjustment Recommendation</string>
+    <string name="text_current_setting">Current Setting</string>
+    <string name="text_try_next">Try Next</string>
+    <string name="text_current_short">Current</string>
+    <string name="text_try_short">Try</string>
+    <string name="text_suggested_grind_adjustment">Suggested Grind Adjustment</string>
+    <string name="button_apply_adjustment">Apply</string>
+    <string name="button_skip_adjustment">Skip</string>
+    
+    <!-- Content Descriptions for Accessibility -->
+    <string name="cd_grind_adjustment_finer">Grind finer recommendation</string>
+    <string name="cd_grind_adjustment_coarser">Grind coarser recommendation</string>
+    <string name="cd_grind_adjustment_no_change">No grind adjustment needed</string>
+
 </resources>
