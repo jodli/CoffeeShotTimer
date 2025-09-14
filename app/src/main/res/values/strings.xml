@@ -675,4 +675,22 @@
     <string name="text_basket_settings">Basket Settings</string>
     <string name="text_basket_settings_description">Configure weight slider ranges based on your basket size. This helps you stay within optimal parameters for consistent extraction.</string>
 
+    <!-- Grind Adjustment Errors -->
+    <string name="error_grinder_config_not_found">Grinder configuration not found. Please configure your grinder first.</string>
+    <string name="error_invalid_grind_setting">Invalid grind setting format. Please check your grinder configuration.</string>
+    <string name="error_invalid_extraction_time">Invalid extraction time. Time must be a positive number.</string>
+    <string name="error_calculation_failed">Failed to calculate grind adjustment. Please try again.</string>
+
+    <!-- Grind Adjustment UI Strings -->
+    <string name="grind_adjustment_finer_single">Grind 1 step finer</string>
+    <string name="grind_adjustment_finer_multiple">Grind %1$d steps finer</string>
+    <string name="grind_adjustment_coarser_single">Grind 1 step coarser</string>
+    <string name="grind_adjustment_coarser_multiple">Grind %1$d steps coarser</string>
+    <string name="grind_adjustment_no_change">No adjustment needed</string>
+    <string name="grind_adjustment_summary_finer_single">1 step finer → %1$s</string>
+    <string name="grind_adjustment_summary_finer_multiple">%1$d steps finer → %2$s</string>
+    <string name="grind_adjustment_summary_coarser_single">1 step coarser → %1$s</string>
+    <string name="grind_adjustment_summary_coarser_multiple">%1$d steps coarser → %2$s</string>
+    <string name="grind_adjustment_summary_no_change">Keep current setting</string>
+
 </resources>

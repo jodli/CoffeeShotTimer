@@ -676,4 +676,22 @@
     <string name="text_basket_settings">Siebeinstellungen</string>
     <string name="text_basket_settings_description">Konfiguriere die Gewichtsbereichsregler basierend auf deiner Siebgröße. Dies hilft dir, innerhalb optimaler Parameter für konsistente Extraktion zu bleiben.</string>
 
+    <!-- Grind Adjustment Errors -->
+    <string name="error_grinder_config_not_found">Mühlenkonfiguration nicht gefunden. Bitte konfiguriere zuerst deine Mühle.</string>
+    <string name="error_invalid_grind_setting">Ungültiges Mahlgradformat. Bitte überprüfe deine Mühlenkonfiguration.</string>
+    <string name="error_invalid_extraction_time">Ungültige Extraktionszeit. Zeit muss eine positive Zahl sein.</string>
+    <string name="error_calculation_failed">Berechnung der Mahlgradanpassung fehlgeschlagen. Bitte versuche es erneut.</string>
+
+    <!-- Grind Adjustment UI Strings -->
+    <string name="grind_adjustment_finer_single">1 Schritt feiner mahlen</string>
+    <string name="grind_adjustment_finer_multiple">%1$d Schritte feiner mahlen</string>
+    <string name="grind_adjustment_coarser_single">1 Schritt gröber mahlen</string>
+    <string name="grind_adjustment_coarser_multiple">%1$d Schritte gröber mahlen</string>
+    <string name="grind_adjustment_no_change">Keine Anpassung erforderlich</string>
+    <string name="grind_adjustment_summary_finer_single">1 Schritt feiner → %1$s</string>
+    <string name="grind_adjustment_summary_finer_multiple">%1$d Schritte feiner → %2$s</string>
+    <string name="grind_adjustment_summary_coarser_single">1 Schritt gröber → %1$s</string>
+    <string name="grind_adjustment_summary_coarser_multiple">%1$d Schritte gröber → %2$s</string>
+    <string name="grind_adjustment_summary_no_change">Aktuelle Einstellung beibehalten</string>
+
 </resources>
