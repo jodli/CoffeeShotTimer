@@ -694,4 +694,19 @@
     <string name="grind_adjustment_summary_coarser_multiple">%1$d Schritte gröber → %2$s</string>
     <string name="grind_adjustment_summary_no_change">Aktuelle Einstellung beibehalten</string>
 
+    <!-- Grind Adjustment Card Strings -->
+    <string name="text_grind_adjustment_recommendation">Mahlgrad-Anpassungsempfehlung</string>
+    <string name="text_current_setting">Aktuelle Einstellung</string>
+    <string name="text_try_next">Als Nächstes versuchen</string>
+    <string name="text_current_short">Aktuell</string>
+    <string name="text_try_short">Versuchen</string>
+    <string name="text_suggested_grind_adjustment">Vorgeschlagene Mahlgrad-Anpassung</string>
+    <string name="button_apply_adjustment">Anwenden</string>
+    <string name="button_skip_adjustment">Überspringen</string>
+    
+    <!-- Content Descriptions for Accessibility -->
+    <string name="cd_grind_adjustment_finer">Empfehlung feiner mahlen</string>
+    <string name="cd_grind_adjustment_coarser">Empfehlung gröber mahlen</string>
+    <string name="cd_grind_adjustment_no_change">Keine Mahlgrad-Anpassung erforderlich</string>
+
 </resources>
