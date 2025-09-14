@@ -60,6 +60,12 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.FAILED_TO_GET_SHOT -> context.getString(R.string.error_loading_shot_details)
             DomainErrorCode.ASSOCIATED_BEAN_NOT_FOUND -> context.getString(R.string.error_bean_not_found)
 
+            // Grinder adjustment errors
+            DomainErrorCode.GRINDER_CONFIG_NOT_FOUND -> context.getString(R.string.error_grinder_config_not_found)
+            DomainErrorCode.INVALID_GRIND_SETTING -> context.getString(R.string.error_invalid_grind_setting)
+            DomainErrorCode.INVALID_EXTRACTION_TIME -> context.getString(R.string.error_invalid_extraction_time)
+            DomainErrorCode.CALCULATION_ERROR -> context.getString(R.string.error_calculation_failed)
+
             // Photo operation errors
             DomainErrorCode.PHOTO_SAVE_FAILED -> context.getString(R.string.error_photo_save_failed)
             DomainErrorCode.PHOTO_DELETE_FAILED -> context.getString(R.string.error_photo_delete_failed)
