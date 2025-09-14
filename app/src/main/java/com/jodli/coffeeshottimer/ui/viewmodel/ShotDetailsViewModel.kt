@@ -6,8 +6,10 @@ import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
+import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +28,7 @@ import com.jodli.coffeeshottimer.R
 class ShotDetailsViewModel @Inject constructor(
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
     private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
+    private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase,
     private val shotRepository: ShotRepository,
     private val stringResourceProvider: StringResourceProvider,
     private val domainErrorTranslator: DomainErrorTranslator
@@ -36,6 +39,9 @@ class ShotDetailsViewModel @Inject constructor(
 
     private val _editNotesState = MutableStateFlow(EditNotesState())
     val editNotesState: StateFlow<EditNotesState> = _editNotesState.asStateFlow()
+
+    private val _grindAdjustmentRecommendation = MutableStateFlow<GrindAdjustmentRecommendation?>(null)
+    val grindAdjustmentRecommendation: StateFlow<GrindAdjustmentRecommendation?> = _grindAdjustmentRecommendation.asStateFlow()
 
     /**
      * Load shot details by ID
@@ -64,6 +70,8 @@ class ShotDetailsViewModel @Inject constructor(
                         notes = shotDetails.shot.notes,
                         originalNotes = shotDetails.shot.notes
                     )
+                    // Calculate grind adjustment recommendation if taste feedback exists
+                    calculateGrindAdjustmentRecommendation(shotDetails)
                 },
                 onFailure = { exception ->
                     _uiState.value = _uiState.value.copy(
@@ -226,6 +234,28 @@ class ShotDetailsViewModel @Inject constructor(
             // Always refresh to show updated taste
             _uiState.value = _uiState.value.copy(isUpdatingTaste = false)
             refreshShotDetails()
+        }
+    }
+
+    /**
+     * Calculate grind adjustment recommendation for the current shot.
+     * Uses the proper domain use case instead of hardcoded logic.
+     */
+    private fun calculateGrindAdjustmentRecommendation(shotDetails: ShotDetails) {
+        viewModelScope.launch {
+            calculateGrindAdjustmentUseCase.calculateAdjustment(
+                currentGrindSetting = shotDetails.shot.grinderSetting,
+                extractionTimeSeconds = shotDetails.shot.extractionTimeSeconds,
+                tasteFeedback = shotDetails.shot.tastePrimary
+            ).fold(
+                onSuccess = { recommendation ->
+                    _grindAdjustmentRecommendation.value = recommendation
+                },
+                onFailure = {
+                    // Clear recommendation on error (don't block UI)
+                    _grindAdjustmentRecommendation.value = null
+                }
+            )
         }
     }
 }
