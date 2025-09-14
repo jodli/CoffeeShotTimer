@@ -734,28 +734,6 @@ private fun ShotAnalysisAndRecommendationsCard(
                     color = MaterialTheme.colorScheme.primary
                 )
             }
-            
-            Spacer(modifier = Modifier.height(spacing.small))
-            
-            Column(
-                verticalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                analysis.recommendations.take(3).forEach { recommendation ->
-                    RecommendationItemInline(
-                        recommendation = recommendation,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                
-                if (analysis.recommendations.size > 3) {
-                    Text(
-                        text = stringResource(R.string.text_and_more_recommendations, analysis.recommendations.size - 3),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(start = spacing.medium)
-                    )
-                }
-            }
         }
     }
 }
@@ -1126,43 +1104,6 @@ private fun DeviationItem(
                 kotlin.math.abs(deviation) < 0.3 -> MaterialTheme.colorScheme.onSurface
                 else -> MaterialTheme.colorScheme.error
             }
-        )
-    }
-}
-
-@Composable
-private fun RecommendationItemInline(
-    recommendation: ShotRecommendation,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(spacing.small),
-        verticalAlignment = Alignment.Top
-    ) {
-        // Priority indicator with proper alignment
-        Box(
-            modifier = Modifier
-                .padding(top = spacing.priorityIndicator) // Align with text baseline
-                .size(spacing.priorityIndicator)
-                .background(
-                    color = when (recommendation.priority) {
-                        RecommendationPriority.HIGH -> MaterialTheme.colorScheme.error
-                        RecommendationPriority.MEDIUM -> MaterialTheme.colorScheme.tertiary
-                        RecommendationPriority.LOW -> MaterialTheme.colorScheme.primary
-                    },
-                    shape = CircleShape
-                )
-        )
-        
-        // Recommendation text
-        Text(
-            text = recommendation.formatForDisplay(),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f)
         )
     }
 }

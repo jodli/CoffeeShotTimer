@@ -30,7 +30,8 @@ fun ShotRecordedDialog(
     recommendations: List<ShotRecommendation> = emptyList(),
     suggestedTaste: TastePrimary? = null,
     grindAdjustment: GrindAdjustmentRecommendation? = null,
-    onTasteSelected: ((TastePrimary, TasteSecondary?) -> Unit)? = null,
+    onTasteSelected: ((TastePrimary, TasteSecondary?) -> Unit)? = null, // Reactive UI updates
+    onSubmit: ((TastePrimary?, TasteSecondary?) -> Unit)? = null, // Save to database
     onGrindAdjustmentApply: (() -> Unit)? = null,
     onGrindAdjustmentDismiss: (() -> Unit)? = null,
     onDismiss: () -> Unit,
@@ -93,13 +94,9 @@ fun ShotRecordedDialog(
                         selectedTaste = selectedPrimary,
                         onTasteSelected = { taste ->
                             selectedPrimary = taste
-                            // Immediately call the callback to calculate grind adjustment
+                            // Immediately calculate grind adjustment for UI reactivity
                             if (onTasteSelected != null && taste != null) {
                                 onTasteSelected(taste, selectedSecondary)
-                            }
-                            // If taste is deselected (null), clear the grind adjustment
-                            if (taste == null && onGrindAdjustmentDismiss != null) {
-                                onGrindAdjustmentDismiss()
                             }
                         },
                         allowDeselection = true
@@ -182,7 +179,10 @@ fun ShotRecordedDialog(
                 CoffeePrimaryButton(
                     text = stringResource(R.string.button_view_details),
                     onClick = {
-                        // Taste feedback is already saved when user selects it
+                        // Save taste feedback to database before navigating
+                        if (onSubmit != null) {
+                            onSubmit(selectedPrimary, selectedSecondary)
+                        }
                         onViewDetails()
                         onDismiss()
                     },
@@ -201,7 +201,10 @@ fun ShotRecordedDialog(
 													stringResource(R.string.button_skip_taste)
 											},
 											onClick = {
-													// Taste feedback is already saved when user selects it
+													// Save taste feedback to database
+													if (onSubmit != null) {
+															onSubmit(selectedPrimary, selectedSecondary)
+													}
 													onDismiss()
 										},
 										modifier = Modifier.widthIn(min = 120.dp)
