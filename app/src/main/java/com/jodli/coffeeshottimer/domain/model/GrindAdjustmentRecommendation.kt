@@ -10,7 +10,6 @@ data class GrindAdjustmentRecommendation(
     val suggestedGrindSetting: String,
     val adjustmentDirection: AdjustmentDirection,
     val adjustmentSteps: Int,
-    val explanation: String,
     val extractionTimeDeviation: Int, // seconds off from optimal (25-30s)
     val tasteIssue: TastePrimary?,
     val confidence: ConfidenceLevel
