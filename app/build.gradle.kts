@@ -28,7 +28,7 @@ android {
         versionCode = 1
         versionName = "0.0.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.jodli.coffeeshottimer.HiltTestRunner"
 
         // Enable vector drawable support for older Android versions
         vectorDrawables.useSupportLibrary = true
@@ -114,11 +114,11 @@ android {
             dimension = "version"
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            resValue("string", "app_name", "@string/app_name_dev")
+            resValue("string", "app_name", "Coffee Shot Timer DEV")
         }
         create("prod") {
             dimension = "version"
-            resValue("string", "app_name", "@string/app_name_prod")
+            resValue("string", "app_name", "Coffee Shot Timer")
         }
     }
     compileOptions {
@@ -277,6 +277,22 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    
+    // Additional Android test dependencies
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation("androidx.test:rules:1.5.0")
+    androidTestImplementation("androidx.test.ext:truth:1.5.0")
+    androidTestImplementation("org.jetbrains.kotlin:kotlin-test:${libs.versions.kotlin.get()}")
+    
+    // Hilt testing dependencies
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
+    
+    // Room testing dependencies
+    androidTestImplementation(libs.androidx.room.testing)
+    
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }
