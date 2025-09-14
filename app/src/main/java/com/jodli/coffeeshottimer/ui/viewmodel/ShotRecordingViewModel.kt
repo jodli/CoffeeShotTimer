@@ -898,6 +898,7 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Record taste feedback for the recently recorded shot.
+     * This saves the taste to the database but doesn't calculate grind adjustments.
      */
     fun recordTasteFeedback(
         shotId: String,
@@ -911,22 +912,7 @@ class ShotRecordingViewModel @Inject constructor(
                 tasteSecondary = tasteSecondary
             ).fold(
                 onSuccess = {
-                    // Calculate grind adjustment recommendation
-                    val recordedData = _recordedShotData.value
-                    if (recordedData != null) {
-                        calculateGrindAdjustmentUseCase.calculateAdjustment(
-                            currentGrindSetting = _grinderSetting.value,
-                            extractionTimeSeconds = recordedData.extractionTimeSeconds,
-                            tasteFeedback = tastePrimary
-                        ).fold(
-                            onSuccess = { recommendation ->
-                                _grindAdjustmentRecommendation.value = recommendation
-                            },
-                            onFailure = {
-                                // Silently handle error - don't block taste feedback
-                            }
-                        )
-                    }
+                    // Taste feedback successfully saved to database
                 },
                 onFailure = { exception ->
                     // Handle error silently or show a non-blocking message
@@ -978,6 +964,36 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun dismissGrindAdjustment() {
         _grindAdjustmentRecommendation.value = null
+    }
+
+    /**
+     * Calculate grind adjustment recommendation for given taste (reactive calculation).
+     * This is called when user changes taste selection in the dialog.
+     */
+    fun calculateGrindAdjustmentForTaste(tasteFeedback: TastePrimary?) {
+        viewModelScope.launch {
+            val recordedData = _recordedShotData.value
+            if (recordedData != null) {
+                if (tasteFeedback != null) {
+                    calculateGrindAdjustmentUseCase.calculateAdjustment(
+                        currentGrindSetting = _grinderSetting.value,
+                        extractionTimeSeconds = recordedData.extractionTimeSeconds,
+                        tasteFeedback = tasteFeedback
+                    ).fold(
+                        onSuccess = { recommendation ->
+                            _grindAdjustmentRecommendation.value = recommendation
+                        },
+                        onFailure = {
+                            // Clear recommendation on error
+                            _grindAdjustmentRecommendation.value = null
+                        }
+                    )
+                } else {
+                    // Clear recommendation when taste is deselected
+                    _grindAdjustmentRecommendation.value = null
+                }
+            }
+        }
     }
 
     /**

@@ -285,11 +285,18 @@ fun RecordShotScreen(
             suggestedTaste = data.suggestedTaste,
             grindAdjustment = grindAdjustmentRecommendation,
             onTasteSelected = { primary, secondary ->
-                viewModel.recordTasteFeedback(
-                    shotId = data.shotId,
-                    tastePrimary = primary,
-                    tasteSecondary = secondary
-                )
+                // Calculate grind adjustment reactively (for immediate UI update)
+                viewModel.calculateGrindAdjustmentForTaste(primary)
+            },
+            onSubmit = { primary, secondary ->
+                // Save taste feedback to database (when buttons are pressed)
+                if (primary != null) {
+                    viewModel.recordTasteFeedback(
+                        shotId = data.shotId,
+                        tastePrimary = primary,
+                        tasteSecondary = secondary
+                    )
+                }
             },
             onGrindAdjustmentApply = { viewModel.applyGrindAdjustment() },
             onGrindAdjustmentDismiss = { viewModel.dismissGrindAdjustment() },
