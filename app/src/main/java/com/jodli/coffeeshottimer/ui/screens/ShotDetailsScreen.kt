@@ -203,6 +203,7 @@ fun ShotDetailsScreen(
                                 onSaveNotes = { viewModel.saveNotes() },
                                 onCancelEditingNotes = { viewModel.cancelEditingNotes() },
                                 onEditTaste = { showTasteEditor = true },
+                                viewModel = viewModel,
                                 modifier = Modifier.fillMaxSize()
                             )
                         },
@@ -293,6 +294,7 @@ private fun ShotDetailsContent(
     onSaveNotes: () -> Unit,
     onCancelEditingNotes: () -> Unit,
     onEditTaste: () -> Unit,
+    viewModel: ShotDetailsViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -330,6 +332,7 @@ private fun ShotDetailsContent(
             item {
                 NextShotGrindAdjustmentCard(
                     shotDetails = shotDetails,
+                    viewModel = viewModel,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -707,34 +710,6 @@ private fun ShotAnalysisAndRecommendationsCard(
                 )
             }
         }
-
-        // Recommendations section (integrated)
-        if (analysis.recommendations.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(spacing.medium))
-            
-            HorizontalDivider(
-                modifier = Modifier.padding(vertical = spacing.small),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
-            
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Lightbulb,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(spacing.iconSmall)
-                )
-                Text(
-                    text = stringResource(R.string.text_recommendations_for_next_shot),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
     }
 }
 
@@ -874,20 +849,17 @@ private fun ShotContextCard(
 @Composable
 private fun NextShotGrindAdjustmentCard(
     shotDetails: ShotDetails,
+    viewModel: ShotDetailsViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     val shot = shotDetails.shot
     
-    // Generate grind adjustment recommendation based on taste feedback
-    val grindAdjustmentRecommendation = generateGrindAdjustmentRecommendation(
-        shot.grinderSetting,
-        shot.extractionTimeSeconds,
-        shot.tastePrimary
-    )
+    // Get grind adjustment recommendation from ViewModel
+    val grindAdjustmentRecommendation by viewModel.grindAdjustmentRecommendation.collectAsState()
     
     // Only show if we have a recommendation
-    if (grindAdjustmentRecommendation != null) {
+    grindAdjustmentRecommendation?.let { recommendation ->
         CoffeeCard(modifier = modifier) {
             CardHeader(
                 icon = Icons.Default.Lightbulb,
@@ -897,74 +869,9 @@ private fun NextShotGrindAdjustmentCard(
             Spacer(modifier = Modifier.height(spacing.medium))
             
             GrindAdjustmentCard(
-                recommendation = grindAdjustmentRecommendation,
+                recommendation = recommendation,
                 isCompact = false,
                 modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
-/**
- * Generate a grind adjustment recommendation based on current shot parameters and taste feedback.
- * This is a simplified version - in a real implementation, this would use the CalculateGrindAdjustmentUseCase.
- */
-private fun generateGrindAdjustmentRecommendation(
-    currentGrindSetting: String,
-    extractionTimeSeconds: Int,
-    tastePrimary: TastePrimary?
-): GrindAdjustmentRecommendation? {
-    if (tastePrimary == null) return null
-    
-    // Parse current grind setting to a number for calculation
-    val currentSetting = currentGrindSetting.toDoubleOrNull() ?: return null
-    
-    return when (tastePrimary) {
-        TastePrimary.SOUR -> {
-            // Sour = under-extracted = grind finer
-            val steps = if (extractionTimeSeconds < 25) 2 else 1
-            val suggestedSetting = (currentSetting - (0.5 * steps)).toString()
-            
-            GrindAdjustmentRecommendation(
-                currentGrindSetting = currentGrindSetting,
-                suggestedGrindSetting = suggestedSetting,
-                adjustmentDirection = AdjustmentDirection.FINER,
-                adjustmentSteps = steps,
-                explanation = "Under-extracted (Sour) - Shot ran ${Math.abs(extractionTimeSeconds - 27)}s from optimal. Try grinding finer.",
-                extractionTimeDeviation = extractionTimeSeconds - 27,
-                tasteIssue = tastePrimary,
-                confidence = ConfidenceLevel.HIGH
-            )
-        }
-        
-        TastePrimary.BITTER -> {
-            // Bitter = over-extracted = grind coarser
-            val steps = if (extractionTimeSeconds > 30) 2 else 1
-            val suggestedSetting = (currentSetting + (0.5 * steps)).toString()
-            
-            GrindAdjustmentRecommendation(
-                currentGrindSetting = currentGrindSetting,
-                suggestedGrindSetting = suggestedSetting,
-                adjustmentDirection = AdjustmentDirection.COARSER,
-                adjustmentSteps = steps,
-                explanation = "Over-extracted (Bitter) - Shot ran ${Math.abs(extractionTimeSeconds - 27)}s from optimal. Try grinding coarser.",
-                extractionTimeDeviation = extractionTimeSeconds - 27,
-                tasteIssue = tastePrimary,
-                confidence = ConfidenceLevel.HIGH
-            )
-        }
-        
-        TastePrimary.PERFECT -> {
-            // Perfect taste - no change needed
-            GrindAdjustmentRecommendation(
-                currentGrindSetting = currentGrindSetting,
-                suggestedGrindSetting = currentGrindSetting,
-                adjustmentDirection = AdjustmentDirection.NO_CHANGE,
-                adjustmentSteps = 0,
-                explanation = "Perfect extraction! Keep current grind setting.",
-                extractionTimeDeviation = extractionTimeSeconds - 27,
-                tasteIssue = tastePrimary,
-                confidence = ConfidenceLevel.HIGH
             )
         }
     }
