@@ -9,8 +9,10 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
+import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
@@ -59,6 +61,7 @@ class ShotRecordingViewModel @Inject constructor(
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
     private val getTastePreselectionUseCase: GetTastePreselectionUseCase,
     private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
+    private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
     private val domainErrorTranslator: DomainErrorTranslator,
@@ -188,6 +191,10 @@ class ShotRecordingViewModel @Inject constructor(
 
     private val _lastDraftSaveTime = MutableStateFlow<Long?>(null)
     val lastDraftSaveTime: StateFlow<Long?> = _lastDraftSaveTime.asStateFlow()
+
+    // Grind adjustment recommendation state
+    private val _grindAdjustmentRecommendation = MutableStateFlow<GrindAdjustmentRecommendation?>(null)
+    val grindAdjustmentRecommendation: StateFlow<GrindAdjustmentRecommendation?> = _grindAdjustmentRecommendation.asStateFlow()
 
     // Timer update job
     private var timerUpdateJob: Job? = null
@@ -904,8 +911,22 @@ class ShotRecordingViewModel @Inject constructor(
                 tasteSecondary = tasteSecondary
             ).fold(
                 onSuccess = {
-                    // Taste feedback recorded successfully
-                    // Could emit analytics event here
+                    // Calculate grind adjustment recommendation
+                    val recordedData = _recordedShotData.value
+                    if (recordedData != null) {
+                        calculateGrindAdjustmentUseCase.calculateAdjustment(
+                            currentGrindSetting = _grinderSetting.value,
+                            extractionTimeSeconds = recordedData.extractionTimeSeconds,
+                            tasteFeedback = tastePrimary
+                        ).fold(
+                            onSuccess = { recommendation ->
+                                _grindAdjustmentRecommendation.value = recommendation
+                            },
+                            onFailure = {
+                                // Silently handle error - don't block taste feedback
+                            }
+                        )
+                    }
                 },
                 onFailure = { exception ->
                     // Handle error silently or show a non-blocking message
@@ -934,6 +955,29 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun clearTimerValidation() {
         _showTimerValidation.value = false
+    }
+
+    /**
+     * Apply grind adjustment recommendation.
+     * Updates the current grinder setting with the suggested value.
+     */
+    fun applyGrindAdjustment() {
+        val recommendation = _grindAdjustmentRecommendation.value
+        if (recommendation?.hasAdjustment() == true) {
+            _suggestedGrinderSetting.value = recommendation.suggestedGrindSetting
+            _grinderSetting.value = recommendation.suggestedGrindSetting
+            _grindAdjustmentRecommendation.value = null
+            
+            // Validate form with new grinder setting
+            validateForm()
+        }
+    }
+
+    /**
+     * Dismiss grind adjustment recommendation.
+     */
+    fun dismissGrindAdjustment() {
+        _grindAdjustmentRecommendation.value = null
     }
 
     /**

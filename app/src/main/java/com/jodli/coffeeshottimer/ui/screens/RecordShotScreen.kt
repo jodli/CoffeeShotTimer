@@ -105,6 +105,7 @@ fun RecordShotScreen(
     val showTimerValidation by viewModel.showTimerValidation.collectAsStateWithLifecycle()
     val showShotRecordedDialog by viewModel.showShotRecordedDialog.collectAsStateWithLifecycle()
     val recordedShotData by viewModel.recordedShotData.collectAsStateWithLifecycle()
+    val grindAdjustmentRecommendation by viewModel.grindAdjustmentRecommendation.collectAsStateWithLifecycle()
 
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
@@ -282,6 +283,7 @@ fun RecordShotScreen(
             extractionTime = data.extractionTime,
             recommendations = data.recommendations,
             suggestedTaste = data.suggestedTaste,
+            grindAdjustment = grindAdjustmentRecommendation,
             onTasteSelected = { primary, secondary ->
                 viewModel.recordTasteFeedback(
                     shotId = data.shotId,
@@ -289,6 +291,8 @@ fun RecordShotScreen(
                     tasteSecondary = secondary
                 )
             },
+            onGrindAdjustmentApply = { viewModel.applyGrindAdjustment() },
+            onGrindAdjustmentDismiss = { viewModel.dismissGrindAdjustment() },
             onDismiss = { viewModel.hideShotRecordedDialog() },
             onViewDetails = {
                 onNavigateToShotDetails(data.shotId)

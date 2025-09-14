@@ -58,6 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import androidx.compose.ui.res.stringResource
+import com.jodli.coffeeshottimer.domain.model.AdjustmentDirection
+import com.jodli.coffeeshottimer.domain.model.ConfidenceLevel
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.domain.usecase.RecommendationPriority
@@ -67,6 +71,7 @@ import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorState
+import com.jodli.coffeeshottimer.ui.components.GrindAdjustmentCard
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackDisplay
@@ -318,6 +323,16 @@ private fun ShotDetailsContent(
         // Analysis & Recommendations Card (combined)
         item {
             ShotAnalysisAndRecommendationsCard(shotDetails = shotDetails)
+        }
+
+        // Grind Adjustment Recommendation (if taste feedback exists)
+        if (shotDetails.shot.tastePrimary != null) {
+            item {
+                NextShotGrindAdjustmentCard(
+                    shotDetails = shotDetails,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
         // Notes Card
@@ -870,6 +885,108 @@ private fun ShotContextCard(
                 text = stringResource(R.string.format_next_shot, nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm")), nextShot.getFormattedBrewRatio()),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * Card showing grind adjustment recommendation for the next shot based on taste feedback.
+ */
+@Composable
+private fun NextShotGrindAdjustmentCard(
+    shotDetails: ShotDetails,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val shot = shotDetails.shot
+    
+    // Generate grind adjustment recommendation based on taste feedback
+    val grindAdjustmentRecommendation = generateGrindAdjustmentRecommendation(
+        shot.grinderSetting,
+        shot.extractionTimeSeconds,
+        shot.tastePrimary
+    )
+    
+    // Only show if we have a recommendation
+    if (grindAdjustmentRecommendation != null) {
+        CoffeeCard(modifier = modifier) {
+            CardHeader(
+                icon = Icons.Default.Lightbulb,
+                title = stringResource(R.string.text_recommendations_for_next_shot)
+            )
+            
+            Spacer(modifier = Modifier.height(spacing.medium))
+            
+            GrindAdjustmentCard(
+                recommendation = grindAdjustmentRecommendation,
+                isCompact = false,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+/**
+ * Generate a grind adjustment recommendation based on current shot parameters and taste feedback.
+ * This is a simplified version - in a real implementation, this would use the CalculateGrindAdjustmentUseCase.
+ */
+private fun generateGrindAdjustmentRecommendation(
+    currentGrindSetting: String,
+    extractionTimeSeconds: Int,
+    tastePrimary: TastePrimary?
+): GrindAdjustmentRecommendation? {
+    if (tastePrimary == null) return null
+    
+    // Parse current grind setting to a number for calculation
+    val currentSetting = currentGrindSetting.toDoubleOrNull() ?: return null
+    
+    return when (tastePrimary) {
+        TastePrimary.SOUR -> {
+            // Sour = under-extracted = grind finer
+            val steps = if (extractionTimeSeconds < 25) 2 else 1
+            val suggestedSetting = (currentSetting - (0.5 * steps)).toString()
+            
+            GrindAdjustmentRecommendation(
+                currentGrindSetting = currentGrindSetting,
+                suggestedGrindSetting = suggestedSetting,
+                adjustmentDirection = AdjustmentDirection.FINER,
+                adjustmentSteps = steps,
+                explanation = "Under-extracted (Sour) - Shot ran ${Math.abs(extractionTimeSeconds - 27)}s from optimal. Try grinding finer.",
+                extractionTimeDeviation = extractionTimeSeconds - 27,
+                tasteIssue = tastePrimary,
+                confidence = ConfidenceLevel.HIGH
+            )
+        }
+        
+        TastePrimary.BITTER -> {
+            // Bitter = over-extracted = grind coarser
+            val steps = if (extractionTimeSeconds > 30) 2 else 1
+            val suggestedSetting = (currentSetting + (0.5 * steps)).toString()
+            
+            GrindAdjustmentRecommendation(
+                currentGrindSetting = currentGrindSetting,
+                suggestedGrindSetting = suggestedSetting,
+                adjustmentDirection = AdjustmentDirection.COARSER,
+                adjustmentSteps = steps,
+                explanation = "Over-extracted (Bitter) - Shot ran ${Math.abs(extractionTimeSeconds - 27)}s from optimal. Try grinding coarser.",
+                extractionTimeDeviation = extractionTimeSeconds - 27,
+                tasteIssue = tastePrimary,
+                confidence = ConfidenceLevel.HIGH
+            )
+        }
+        
+        TastePrimary.PERFECT -> {
+            // Perfect taste - no change needed
+            GrindAdjustmentRecommendation(
+                currentGrindSetting = currentGrindSetting,
+                suggestedGrindSetting = currentGrindSetting,
+                adjustmentDirection = AdjustmentDirection.NO_CHANGE,
+                adjustmentSteps = 0,
+                explanation = "Perfect extraction! Keep current grind setting.",
+                extractionTimeDeviation = extractionTimeSeconds - 27,
+                tasteIssue = tastePrimary,
+                confidence = ConfidenceLevel.HIGH
             )
         }
     }
