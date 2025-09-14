@@ -14,6 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
@@ -28,7 +29,10 @@ fun ShotRecordedDialog(
     extractionTime: String,
     recommendations: List<ShotRecommendation> = emptyList(),
     suggestedTaste: TastePrimary? = null,
+    grindAdjustment: GrindAdjustmentRecommendation? = null,
     onTasteSelected: ((TastePrimary, TasteSecondary?) -> Unit)? = null,
+    onGrindAdjustmentApply: (() -> Unit)? = null,
+    onGrindAdjustmentDismiss: (() -> Unit)? = null,
     onDismiss: () -> Unit,
     onViewDetails: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -89,6 +93,14 @@ fun ShotRecordedDialog(
                         selectedTaste = selectedPrimary,
                         onTasteSelected = { taste ->
                             selectedPrimary = taste
+                            // Immediately call the callback to calculate grind adjustment
+                            if (onTasteSelected != null && taste != null) {
+                                onTasteSelected(taste, selectedSecondary)
+                            }
+                            // If taste is deselected (null), clear the grind adjustment
+                            if (taste == null && onGrindAdjustmentDismiss != null) {
+                                onGrindAdjustmentDismiss()
+                            }
                         },
                         allowDeselection = true
                     )
@@ -113,10 +125,27 @@ fun ShotRecordedDialog(
                                 selectedSecondary = selectedSecondary,
                                 onSecondarySelected = { newValue ->
                                     selectedSecondary = newValue
+                                    // Update grind adjustment with new secondary taste
+                                    if (onTasteSelected != null && selectedPrimary != null) {
+                                        onTasteSelected(selectedPrimary!!, newValue)
+                                    }
                                 }
                             )
                         }
                     }
+                }
+
+                // Grind adjustment recommendation (show only after taste is selected)
+                if (grindAdjustment != null && selectedPrimary != null) {
+                    HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
+                    
+                    GrindAdjustmentCard(
+                        recommendation = grindAdjustment,
+                        onApply = onGrindAdjustmentApply,
+                        onDismiss = onGrindAdjustmentDismiss,
+                        isCompact = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
 
                 // Next steps based on this shot
@@ -153,11 +182,7 @@ fun ShotRecordedDialog(
                 CoffeePrimaryButton(
                     text = stringResource(R.string.button_view_details),
                     onClick = {
-                        // Save taste feedback if taste is selected
-                        val primary = selectedPrimary
-                        if (onTasteSelected != null && primary != null) {
-                            onTasteSelected(primary, selectedSecondary)
-                        }
+                        // Taste feedback is already saved when user selects it
                         onViewDetails()
                         onDismiss()
                     },
@@ -176,11 +201,7 @@ fun ShotRecordedDialog(
 													stringResource(R.string.button_skip_taste)
 											},
 											onClick = {
-													// Only save if taste is selected
-													val primary = selectedPrimary
-													if (onTasteSelected != null && primary != null) {
-															onTasteSelected(primary, selectedSecondary)
-													}
+													// Taste feedback is already saved when user selects it
 													onDismiss()
 										},
 										modifier = Modifier.widthIn(min = 120.dp)

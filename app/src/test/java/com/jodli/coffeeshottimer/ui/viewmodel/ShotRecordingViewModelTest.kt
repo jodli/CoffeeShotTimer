@@ -7,6 +7,7 @@ import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
+import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -33,6 +34,7 @@ class ShotRecordingViewModelTest {
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
     private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
+    private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -50,6 +52,7 @@ class ShotRecordingViewModelTest {
         getShotDetailsUseCase = mockk<GetShotDetailsUseCase>(relaxed = true)
         getTastePreselectionUseCase = mockk<GetTastePreselectionUseCase>(relaxed = true)
         recordTasteFeedbackUseCase = mockk<RecordTasteFeedbackUseCase>(relaxed = true)
+        calculateGrindAdjustmentUseCase = mockk<CalculateGrindAdjustmentUseCase>(relaxed = true)
         beanRepository = mockk<BeanRepository>(relaxed = true)
         shotRepository = mockk<ShotRepository>(relaxed = true)
         context = mockk<Context>(relaxed = true)
@@ -65,6 +68,7 @@ class ShotRecordingViewModelTest {
             getShotDetailsUseCase,
             getTastePreselectionUseCase,
             recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,

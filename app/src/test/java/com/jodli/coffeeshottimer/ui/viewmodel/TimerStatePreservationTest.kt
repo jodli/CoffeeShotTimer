@@ -9,6 +9,7 @@ import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
+import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -43,6 +44,7 @@ class TimerStatePreservationTest {
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
     private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
+    private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var domainErrorTranslator: DomainErrorTranslator
@@ -69,6 +71,7 @@ class TimerStatePreservationTest {
         getShotDetailsUseCase = mockk(relaxed = true)
         getTastePreselectionUseCase = mockk(relaxed = true)
         recordTasteFeedbackUseCase = mockk(relaxed = true)
+        calculateGrindAdjustmentUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         domainErrorTranslator = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
@@ -103,6 +106,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -133,6 +137,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -160,6 +165,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -189,6 +195,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -215,6 +222,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -242,6 +250,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -268,6 +277,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -292,6 +302,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -316,6 +327,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -342,6 +354,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
@@ -366,6 +379,7 @@ class TimerStatePreservationTest {
             getShotDetailsUseCase = getShotDetailsUseCase,
             getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
+            calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             beanRepository = beanRepository,
             shotRepository = shotRepository,
             domainErrorTranslator = domainErrorTranslator,
