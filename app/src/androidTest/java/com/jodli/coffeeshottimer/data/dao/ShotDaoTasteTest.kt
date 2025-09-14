@@ -291,9 +291,9 @@ class ShotDaoTasteTest {
         // Then
         assertEquals(3, distribution.size) // 3 different taste types
         
-        val sourCount = distribution.find { it.taste == TastePrimary.SOUR }?.count ?: 0
-        val perfectCount = distribution.find { it.taste == TastePrimary.PERFECT }?.count ?: 0
-        val bitterCount = distribution.find { it.taste == TastePrimary.BITTER }?.count ?: 0
+        val sourCount = distribution.find { it.tastePrimary == TastePrimary.SOUR }?.count ?: 0
+        val perfectCount = distribution.find { it.tastePrimary == TastePrimary.PERFECT }?.count ?: 0
+        val bitterCount = distribution.find { it.tastePrimary == TastePrimary.BITTER }?.count ?: 0
         
         assertEquals(1, sourCount)
         assertEquals(2, perfectCount)

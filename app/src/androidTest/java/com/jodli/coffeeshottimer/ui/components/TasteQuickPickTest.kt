@@ -60,14 +60,14 @@ class TasteQuickPickTest {
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 TasteQuickPick(
-                    recommended = TastePrimary.PERFECT,
+                    suggested = TastePrimary.PERFECT,
                     onSelectPrimary = {}
                 )
             }
         }
 
-        // Then - Perfect button should have accessibility text indicating it's recommended
-        composeTestRule.onNodeWithContentDescription("Perfect (recommended)").assertIsDisplayed()
+        // Then - Perfect button should have accessibility text indicating it's suggested
+        composeTestRule.onNodeWithContentDescription("Perfect (suggested)").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Sour").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Bitter").assertIsDisplayed()
     }
@@ -288,14 +288,14 @@ class TasteQuickPickTest {
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 TasteQuickPick(
-                    recommended = TastePrimary.SOUR,
+                    suggested = TastePrimary.SOUR,
                     onSelectPrimary = {}
                 )
             }
         }
 
         // Then
-        composeTestRule.onNodeWithText("Recommended based on extraction time").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Suggested based on extraction time").assertIsDisplayed()
     }
 
     @Test
@@ -304,14 +304,14 @@ class TasteQuickPickTest {
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 TasteQuickPick(
-                    recommended = null,
+                    suggested = null,
                     onSelectPrimary = {}
                 )
             }
         }
 
         // Then
-        composeTestRule.onNodeWithText("Recommended based on extraction time").assertDoesNotExist()
+        composeTestRule.onNodeWithText("Suggested based on extraction time").assertDoesNotExist()
     }
 
     @Test
@@ -335,7 +335,7 @@ class TasteQuickPickTest {
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 TasteQuickPick(
-                    recommended = TastePrimary.PERFECT,
+                    suggested = TastePrimary.PERFECT,
                     onSelectPrimary = {},
                     onSelectSecondary = {},
                     showSecondaryOptions = true,
@@ -345,7 +345,7 @@ class TasteQuickPickTest {
         }
 
         // Then - verify accessibility content descriptions
-        composeTestRule.onNodeWithContentDescription("Perfect (recommended)").assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription("Perfect (suggested)").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Sour").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Bitter").assertIsDisplayed()
         composeTestRule.onNodeWithContentDescription("Skip taste feedback").assertIsDisplayed()
@@ -402,33 +402,53 @@ class TasteQuickPickTest {
     }
 
     @Test
-    fun tasteQuickPick_allRecommendationStates_workCorrectly() {
-        val recommendations = listOf(
-            TastePrimary.SOUR,
-            TastePrimary.PERFECT,
-            TastePrimary.BITTER,
-            null
-        )
-
-        recommendations.forEach { recommendation ->
-            // Given
-            composeTestRule.setContent {
-                CoffeeShotTimerTheme {
-                    TasteQuickPick(
-                        recommended = recommendation,
-                        onSelectPrimary = {}
-                    )
-                }
-            }
-
-            // Then
-            if (recommendation != null) {
-                composeTestRule.onNodeWithContentDescription("${recommendation.name.lowercase().replaceFirstChar { it.uppercase() }} (recommended)")
-                    .assertIsDisplayed()
-                composeTestRule.onNodeWithText("Recommended based on extraction time").assertIsDisplayed()
-            } else {
-                composeTestRule.onNodeWithText("Recommended based on extraction time").assertDoesNotExist()
+    fun tasteQuickPick_withSourRecommendation_displaysCorrectly() {
+        // Given
+        composeTestRule.setContent {
+            CoffeeShotTimerTheme {
+                TasteQuickPick(
+                    suggested = TastePrimary.SOUR,
+                    onSelectPrimary = {}
+                )
             }
         }
+
+        // Then
+        composeTestRule.onNodeWithContentDescription("Sour (suggested)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Suggested based on extraction time").assertIsDisplayed()
+    }
+
+    @Test
+    fun tasteQuickPick_withPerfectRecommendation_displaysCorrectly() {
+        // Given
+        composeTestRule.setContent {
+            CoffeeShotTimerTheme {
+                TasteQuickPick(
+                    suggested = TastePrimary.PERFECT,
+                    onSelectPrimary = {}
+                )
+            }
+        }
+
+        // Then
+        composeTestRule.onNodeWithContentDescription("Perfect (suggested)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Suggested based on extraction time").assertIsDisplayed()
+    }
+
+    @Test
+    fun tasteQuickPick_withBitterRecommendation_displaysCorrectly() {
+        // Given
+        composeTestRule.setContent {
+            CoffeeShotTimerTheme {
+                TasteQuickPick(
+                    suggested = TastePrimary.BITTER,
+                    onSelectPrimary = {}
+                )
+            }
+        }
+
+        // Then
+        composeTestRule.onNodeWithContentDescription("Bitter (suggested)").assertIsDisplayed()
+        composeTestRule.onNodeWithText("Suggested based on extraction time").assertIsDisplayed()
     }
 }
