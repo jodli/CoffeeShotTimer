@@ -74,13 +74,6 @@ class CalculateGrindAdjustmentUseCaseTest {
         assertEquals("Should be high confidence", ConfidenceLevel.HIGH, recommendation.confidence)
         assertEquals("Should track extraction deviation", -3, recommendation.extractionTimeDeviation)
         assertEquals("Should track taste issue", TastePrimary.SOUR, recommendation.tasteIssue)
-        
-        assertTrue("Explanation should mention under-extraction", 
-            recommendation.explanation.contains("Under-extracted"))
-        assertTrue("Explanation should mention timing", 
-            recommendation.explanation.contains("too fast"))
-        assertTrue("Explanation should suggest action", 
-            recommendation.explanation.contains("Try grinding finer"))
     }
 
     @Test
@@ -133,10 +126,6 @@ class CalculateGrindAdjustmentUseCaseTest {
         assertEquals(ConfidenceLevel.HIGH, recommendation.confidence)
         assertEquals(5, recommendation.extractionTimeDeviation)
         assertEquals(TastePrimary.BITTER, recommendation.tasteIssue)
-        
-        assertTrue(recommendation.explanation.contains("Over-extracted"))
-        assertTrue(recommendation.explanation.contains("too slow"))
-        assertTrue(recommendation.explanation.contains("Try grinding coarser"))
     }
 
     @Test
@@ -187,9 +176,6 @@ class CalculateGrindAdjustmentUseCaseTest {
         assertEquals(0, recommendation.adjustmentSteps)
         assertEquals(ConfidenceLevel.HIGH, recommendation.confidence)
         assertFalse("Should not have adjustment", recommendation.hasAdjustment())
-        
-        assertTrue(recommendation.explanation.contains("Perfect extraction"))
-        assertTrue(recommendation.explanation.contains("Keep current"))
     }
 
     @Test
@@ -259,7 +245,6 @@ class CalculateGrindAdjustmentUseCaseTest {
         
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals(ConfidenceLevel.MEDIUM, recommendation.confidence) // Medium due to no taste feedback
-        assertTrue(recommendation.explanation.contains("Timing issue"))
     }
 
     // === STEP CALCULATION TESTS ===

@@ -552,6 +552,19 @@
     <string name="recommendation_dose_adjustment">Consider adjusting your coffee dose for better consistency</string>
     <string name="recommendation_timing_consistency">Focus on consistent timing for more predictable results</string>
 
+    <!-- Grind Adjustment Recommendations -->
+    <string name="recommendation_taste_sour">Under-extracted (Sour)</string>
+    <string name="recommendation_taste_bitter">Over-extracted (Bitter)</string>
+    <string name="recommendation_taste_perfect">Good extraction</string>
+    <string name="recommendation_timing_issue">Timing issue</string>
+    <string name="recommendation_time_too_fast">Shot ran %1$ds too fast</string>
+    <string name="recommendation_time_too_slow">Shot ran %1$ds too slow</string>
+    <string name="recommendation_time_good">Good timing (%1$ss)</string>
+    <string name="recommendation_action_finer">Try grinding finer</string>
+    <string name="recommendation_action_coarser">Try grinding coarser</string>
+    <string name="recommendation_action_no_change">Keep current setting</string>
+    <string name="recommendation_explanation_format">%1$s - %2$s. %3$s.</string>
+
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Equipment Setup</string>
     <string name="text_equipment_setup_description">Configure your grinder settings to personalize your brewing experience.</string>

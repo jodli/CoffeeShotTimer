@@ -159,7 +159,7 @@ fun GrindAdjustmentCard(
 
             // Explanation text
             Text(
-                text = recommendation.explanation,
+                text = formatter.formatExplanation(recommendation),
                 style = if (isCompact) MaterialTheme.typography.bodySmall
                        else MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
@@ -268,7 +268,6 @@ private fun GrindAdjustmentCardFinerPreview() {
                 suggestedGrindSetting = "14.5",
                 adjustmentDirection = AdjustmentDirection.FINER,
                 adjustmentSteps = 1,
-                explanation = "Under-extracted (Sour) - Shot ran 3s too fast. Try grinding finer.",
                 extractionTimeDeviation = -3,
                 tasteIssue = TastePrimary.SOUR,
                 confidence = ConfidenceLevel.HIGH
@@ -289,7 +288,6 @@ private fun GrindAdjustmentCardCoarserPreview() {
                 suggestedGrindSetting = "16.0",
                 adjustmentDirection = AdjustmentDirection.COARSER,
                 adjustmentSteps = 2,
-                explanation = "Over-extracted (Bitter) - Shot ran 5s too slow. Try grinding coarser.",
                 extractionTimeDeviation = 5,
                 tasteIssue = TastePrimary.BITTER,
                 confidence = ConfidenceLevel.HIGH
@@ -310,7 +308,6 @@ private fun GrindAdjustmentCardNoChangePreview() {
                 suggestedGrindSetting = "15.0",
                 adjustmentDirection = AdjustmentDirection.NO_CHANGE,
                 adjustmentSteps = 0,
-                explanation = "Perfect extraction! Keep current grind setting.",
                 extractionTimeDeviation = 0,
                 tasteIssue = TastePrimary.PERFECT,
                 confidence = ConfidenceLevel.HIGH
@@ -329,7 +326,6 @@ private fun GrindAdjustmentCardCompactPreview() {
                 suggestedGrindSetting = "14.5",
                 adjustmentDirection = AdjustmentDirection.FINER,
                 adjustmentSteps = 1,
-                explanation = "Under-extracted (Sour) - Shot ran 3s too fast. Try grinding finer.",
                 extractionTimeDeviation = -3,
                 tasteIssue = TastePrimary.SOUR,
                 confidence = ConfidenceLevel.HIGH

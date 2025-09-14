@@ -82,7 +82,6 @@ class GrindAdjustmentFormatterTest {
             suggestedGrindSetting = "14.5",
             adjustmentDirection = direction,
             adjustmentSteps = steps,
-            explanation = "Test explanation",
             extractionTimeDeviation = -3,
             tasteIssue = TastePrimary.SOUR,
             confidence = ConfidenceLevel.HIGH

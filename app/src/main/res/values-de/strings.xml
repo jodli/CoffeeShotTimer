@@ -542,6 +542,19 @@
     <string name="recommendation_dose_adjustment">Erwäge deine Kaffeemenge für bessere Konsistenz anzupassen</string>
     <string name="recommendation_timing_consistency">Konzentriere dich auf konsistentes Timing für vorhersagbarere Ergebnisse</string>
 
+    <!-- Grind Adjustment Recommendations -->
+    <string name="recommendation_taste_sour">Unterextrahiert (Sauer)</string>
+    <string name="recommendation_taste_bitter">Überextrahiert (Bitter)</string>
+    <string name="recommendation_taste_perfect">Gute Extraktion</string>
+    <string name="recommendation_timing_issue">Zeitproblem</string>
+    <string name="recommendation_time_too_fast">Der Shot lief %1$ds zu schnell</string>
+    <string name="recommendation_time_too_slow">Der Shot lief %1$ds zu langsam</string>
+    <string name="recommendation_time_good">Gute Zeit (%1$ss)</string>
+    <string name="recommendation_action_finer">Versuche, feiner zu mahlen</string>
+    <string name="recommendation_action_coarser">Versuche, gröber zu mahlen</string>
+    <string name="recommendation_action_no_change">Behalte die aktuelle Einstellung</string>
+    <string name="recommendation_explanation_format">%1$s - %2$s. %3$s.</string>
+
     <!-- Shot Recorded Dialog -->
     <string name="dialog_shot_recorded_title">Shot aufgenommen!</string>
     <string name="dialog_shot_recorded_successfully">Shot erfolgreich aufgenommen!</string>

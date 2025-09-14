@@ -180,10 +180,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         val actualAdjustmentAmount = currentValue - newValue
         val actualSteps = round(actualAdjustmentAmount / config.stepSize).toInt()
         
-        val explanation = generateExplanation(
-            AdjustmentDirection.FINER, timeDeviation, extractionTimeSeconds, tasteFeedback
-        )
-        
         val confidence = calculateConfidence(timeDeviation, tasteFeedback)
         
         return GrindAdjustmentRecommendation(
@@ -191,7 +187,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             suggestedGrindSetting = config.formatGrindValue(newValue),
             adjustmentDirection = AdjustmentDirection.FINER,
             adjustmentSteps = actualSteps,
-            explanation = explanation,
             extractionTimeDeviation = timeDeviation,
             tasteIssue = tasteFeedback,
             confidence = confidence
@@ -216,10 +211,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         val actualAdjustmentAmount = newValue - currentValue
         val actualSteps = round(actualAdjustmentAmount / config.stepSize).toInt()
         
-        val explanation = generateExplanation(
-            AdjustmentDirection.COARSER, timeDeviation, extractionTimeSeconds, tasteFeedback
-        )
-        
         val confidence = calculateConfidence(timeDeviation, tasteFeedback)
         
         return GrindAdjustmentRecommendation(
@@ -227,7 +218,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             suggestedGrindSetting = config.formatGrindValue(newValue),
             adjustmentDirection = AdjustmentDirection.COARSER,
             adjustmentSteps = actualSteps,
-            explanation = explanation,
             extractionTimeDeviation = timeDeviation,
             tasteIssue = tasteFeedback,
             confidence = confidence
@@ -242,19 +232,12 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         extractionTimeSeconds: Int,
         tasteFeedback: TastePrimary?
     ): GrindAdjustmentRecommendation {
-        val explanation = when (tasteFeedback) {
-            TastePrimary.PERFECT -> "Perfect extraction! Keep current grind setting."
-            null -> "Extraction time is optimal (${extractionTimeSeconds}s). Current grind setting is good."
-            else -> "Good extraction time (${extractionTimeSeconds}s). Current grind setting is working well."
-        }
-        
         return GrindAdjustmentRecommendation(
             currentGrindSetting = currentGrindSetting,
             suggestedGrindSetting = currentGrindSetting,
             adjustmentDirection = AdjustmentDirection.NO_CHANGE,
             adjustmentSteps = 0,
-            explanation = explanation,
-            extractionTimeDeviation = 0,
+            extractionTimeDeviation = calculateTimeDeviation(extractionTimeSeconds),
             tasteIssue = tasteFeedback,
             confidence = ConfidenceLevel.HIGH
         )
@@ -271,37 +254,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             deviationMagnitude <= MODERATE_DEVIATION_THRESHOLD -> MODERATE_ADJUSTMENT_STEPS
             else -> MAJOR_ADJUSTMENT_STEPS
         }
-    }
-    
-    /**
-     * Generate human-readable explanation for the recommendation.
-     */
-    private fun generateExplanation(
-        direction: AdjustmentDirection,
-        timeDeviation: Int,
-        extractionTime: Int,
-        tasteFeedback: TastePrimary?
-    ): String {
-        val tasteDescription = when (tasteFeedback) {
-            TastePrimary.SOUR -> "Under-extracted (Sour)"
-            TastePrimary.BITTER -> "Over-extracted (Bitter)"
-            TastePrimary.PERFECT -> "Good extraction"
-            null -> "Timing issue"
-        }
-        
-        val timeDescription = when {
-            timeDeviation < 0 -> "Shot ran ${abs(timeDeviation)}s too fast"
-            timeDeviation > 0 -> "Shot ran ${timeDeviation}s too slow"
-            else -> "Good timing (${extractionTime}s)"
-        }
-        
-        val actionDescription = when (direction) {
-            AdjustmentDirection.FINER -> "Try grinding finer"
-            AdjustmentDirection.COARSER -> "Try grinding coarser"
-            AdjustmentDirection.NO_CHANGE -> "Keep current setting"
-        }
-        
-        return "$tasteDescription - $timeDescription. $actionDescription."
     }
     
     /**
