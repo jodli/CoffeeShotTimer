@@ -675,8 +675,8 @@ class ShotRecordingViewModel @Inject constructor(
                     _errorMessage.value = null
 
                     // Load shot details with recommendations and show dialog
-                    // Pass the captured extraction time instead of reading timer state
-                    loadShotDetailsAndShowDialog(shot.id, shot.getFormattedBrewRatio(), shot.getFormattedExtractionTime(), extractionTimeSeconds)
+                    // Pass the captured extraction time and recorded grinder setting
+                    loadShotDetailsAndShowDialog(shot.id, shot.getFormattedBrewRatio(), shot.getFormattedExtractionTime(), extractionTimeSeconds, grinder)
                 },
                 onFailure = { exception ->
                     _errorMessage.value = domainErrorTranslator.translateError(exception)
@@ -853,7 +853,7 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Load shot details with recommendations and show the success dialog.
      */
-    private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String, extractionTimeSeconds: Int) {
+    private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String, extractionTimeSeconds: Int, grinderSetting: String) {
         // Pre-compute the suggested taste using shared utility
         val suggestedTaste = com.jodli.coffeeshottimer.ui.components.TasteUtils.getTasteRecommendation(extractionTimeSeconds)
         
@@ -866,9 +866,14 @@ class ShotRecordingViewModel @Inject constructor(
                     extractionTimeSeconds = extractionTimeSeconds,
                     recommendations = shotDetails.analysis.recommendations,
                     shotId = shotId,
-                    suggestedTaste = suggestedTaste
+                    suggestedTaste = suggestedTaste,
+                    grinderSetting = grinderSetting
                 )
                 _showShotRecordedDialog.value = true
+                
+                // Calculate initial grind adjustment based on extraction time alone
+                // This ensures beginners always get recommendations even without selecting taste
+                calculateInitialGrindAdjustment(extractionTimeSeconds, grinderSetting)
             },
             onFailure = {
                 // Fallback to simple success message if we can't load recommendations
@@ -880,7 +885,6 @@ class ShotRecordingViewModel @Inject constructor(
             }
         )
     }
-
     /**
      * Hide the shot recorded dialog.
      */
@@ -967,6 +971,28 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
+     * Calculate initial grind adjustment based on extraction time only.
+     * This is called immediately after recording a shot to provide timing-based recommendations.
+     */
+    private fun calculateInitialGrindAdjustment(extractionTimeSeconds: Int, grinderSetting: String) {
+        viewModelScope.launch {
+            calculateGrindAdjustmentUseCase.calculateAdjustment(
+                currentGrindSetting = grinderSetting,
+                extractionTimeSeconds = extractionTimeSeconds,
+                tasteFeedback = null // No taste feedback yet
+            ).fold(
+                onSuccess = { recommendation ->
+                    _grindAdjustmentRecommendation.value = recommendation
+                },
+                onFailure = {
+                    // Don't show recommendation on error, but don't block the dialog
+                    _grindAdjustmentRecommendation.value = null
+                }
+            )
+        }
+    }
+    
+    /**
      * Calculate grind adjustment recommendation for given taste (reactive calculation).
      * This is called when user changes taste selection in the dialog.
      */
@@ -974,24 +1000,20 @@ class ShotRecordingViewModel @Inject constructor(
         viewModelScope.launch {
             val recordedData = _recordedShotData.value
             if (recordedData != null) {
-                if (tasteFeedback != null) {
-                    calculateGrindAdjustmentUseCase.calculateAdjustment(
-                        currentGrindSetting = _grinderSetting.value,
-                        extractionTimeSeconds = recordedData.extractionTimeSeconds,
-                        tasteFeedback = tasteFeedback
-                    ).fold(
-                        onSuccess = { recommendation ->
-                            _grindAdjustmentRecommendation.value = recommendation
-                        },
-                        onFailure = {
-                            // Clear recommendation on error
-                            _grindAdjustmentRecommendation.value = null
-                        }
-                    )
-                } else {
-                    // Clear recommendation when taste is deselected
-                    _grindAdjustmentRecommendation.value = null
-                }
+                // Always calculate - even with null taste (falls back to timing-based)
+                calculateGrindAdjustmentUseCase.calculateAdjustment(
+                    currentGrindSetting = recordedData.grinderSetting,
+                    extractionTimeSeconds = recordedData.extractionTimeSeconds,
+                    tasteFeedback = tasteFeedback
+                ).fold(
+                    onSuccess = { recommendation ->
+                        _grindAdjustmentRecommendation.value = recommendation
+                    },
+                    onFailure = {
+                        // Keep existing recommendation on error
+                        // Don't clear it since we always want to show something
+                    }
+                )
             }
         }
     }
@@ -1073,5 +1095,6 @@ data class RecordedShotData(
     val extractionTimeSeconds: Int,  // Added for taste preselection
     val recommendations: List<ShotRecommendation>,
     val shotId: String,
-    val suggestedTaste: TastePrimary? // Pre-computed suggested taste
+    val suggestedTaste: TastePrimary?, // Pre-computed suggested taste
+    val grinderSetting: String // Grinder setting used for the recorded shot
 )

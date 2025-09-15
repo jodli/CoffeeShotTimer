@@ -70,7 +70,7 @@ class ShotDetailsViewModel @Inject constructor(
                         notes = shotDetails.shot.notes,
                         originalNotes = shotDetails.shot.notes
                     )
-                    // Calculate grind adjustment recommendation if taste feedback exists
+                    // Always calculate grind adjustment recommendation (timing-based if no taste)
                     calculateGrindAdjustmentRecommendation(shotDetails)
                 },
                 onFailure = { exception ->
