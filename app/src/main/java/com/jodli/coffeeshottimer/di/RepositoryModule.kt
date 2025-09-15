@@ -14,6 +14,8 @@ import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManagerImpl
 import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
 import com.jodli.coffeeshottimer.data.util.PerformanceMonitor
+import com.jodli.coffeeshottimer.data.preferences.GrindRecommendationPreferences
+import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -116,6 +118,26 @@ abstract class RepositoryModule {
         @Singleton
         fun providePerformanceMonitor(): PerformanceMonitor {
             return PerformanceMonitor()
+        }
+
+        /**
+         * Provides the ManageGrindRecommendationUseCase instance.
+         * Uses singleton scope to ensure consistent recommendation management.
+         *
+         * @param grindRecommendationPreferences The preferences storage dependency
+         * @param beanRepository The bean repository dependency
+         * @return ManageGrindRecommendationUseCase instance
+         */
+        @Provides
+        @Singleton
+        fun provideManageGrindRecommendationUseCase(
+            grindRecommendationPreferences: GrindRecommendationPreferences,
+            beanRepository: BeanRepository
+        ): ManageGrindRecommendationUseCase {
+            return ManageGrindRecommendationUseCase(
+                grindRecommendationPreferences,
+                beanRepository
+            )
         }
     }
 

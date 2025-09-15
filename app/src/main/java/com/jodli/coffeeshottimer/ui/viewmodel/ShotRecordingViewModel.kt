@@ -5,16 +5,19 @@ import android.os.SystemClock
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
+import com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
+import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
@@ -62,6 +65,7 @@ class ShotRecordingViewModel @Inject constructor(
     private val getTastePreselectionUseCase: GetTastePreselectionUseCase,
     private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
     private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase,
+    private val manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
     private val domainErrorTranslator: DomainErrorTranslator,
@@ -196,6 +200,10 @@ class ShotRecordingViewModel @Inject constructor(
     private val _grindAdjustmentRecommendation = MutableStateFlow<GrindAdjustmentRecommendation?>(null)
     val grindAdjustmentRecommendation: StateFlow<GrindAdjustmentRecommendation?> = _grindAdjustmentRecommendation.asStateFlow()
 
+    // Persistent grind recommendation state (Epic 4)
+    private val _persistentRecommendation = MutableStateFlow<PersistentGrindRecommendation?>(null)
+    val persistentRecommendation: StateFlow<PersistentGrindRecommendation?> = _persistentRecommendation.asStateFlow()
+
     // Timer update job
     private var timerUpdateJob: Job? = null
 
@@ -210,8 +218,6 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     init {
-        loadActiveBeans()
-        loadCurrentBean()
         loadGrinderConfiguration()
         loadBasketConfiguration()
         restoreTimerState()
@@ -219,10 +225,15 @@ class ShotRecordingViewModel @Inject constructor(
         observeRecordingState()
         startAutoSaveDraft()
         restoreDraftIfExists()
+        // Load beans and current bean - persistent recommendation will be loaded in selectBean()
+        loadActiveBeans()
+        loadCurrentBean()
+        // Note: loadPersistentRecommendation() is now called from selectBean() when a bean is selected
     }
 
     /**
      * Load active beans for selection.
+     * Epic 4: Enhanced to handle bean deactivation and ensure proper persistent recommendation cleanup.
      */
     private fun loadActiveBeans() {
         viewModelScope.launch {
@@ -230,10 +241,26 @@ class ShotRecordingViewModel @Inject constructor(
             beanRepository.getActiveBeans().collect { result ->
                 result.fold(
                     onSuccess = { beans ->
+                        val previousBeans = _activeBeans.value
                         _activeBeans.value = beans
-                        // Auto-select first bean if none selected and no current bean
-                        if (_selectedBean.value == null && beans.isNotEmpty()) {
-                            selectBean(beans.first())
+                        
+                        // Epic 4: Check if currently selected bean was deactivated
+                        val selectedBean = _selectedBean.value
+                        if (selectedBean != null && !beans.any { it.id == selectedBean.id }) {
+                            // Currently selected bean is no longer active, clear its recommendation
+                            _persistentRecommendation.value = null
+                            
+                            // Select first available bean or clear selection
+                            if (beans.isNotEmpty()) {
+                                selectBean(beans.first())
+                            } else {
+                                _selectedBean.value = null
+                            }
+                        } else {
+                            // Auto-select first bean if none selected and no current bean
+                            if (_selectedBean.value == null && beans.isNotEmpty()) {
+                                selectBean(beans.first())
+                            }
                         }
                         _errorMessage.value = null
                     },
@@ -249,6 +276,7 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Load the current bean from repository if one is set.
      * Implements requirement 3.2 for connecting bean selection between screens.
+     * Epic 4: Enhanced to verify current bean is still active before selecting it.
      */
     private fun loadCurrentBean() {
         viewModelScope.launch {
@@ -256,7 +284,16 @@ class ShotRecordingViewModel @Inject constructor(
             result.fold(
                 onSuccess = { currentBean ->
                     if (currentBean != null) {
-                        selectBean(currentBean)
+                        // Verify the current bean is still in the active beans list
+                        val activeBeans = _activeBeans.value
+                        val isBeanStillActive = activeBeans.any { it.id == currentBean.id }
+                        
+                        if (isBeanStillActive) {
+                            selectBean(currentBean)
+                        } else {
+                            // Current bean is no longer active, clear it from repository
+                            beanRepository.clearCurrentBean()
+                        }
                     }
                 },
                 onFailure = { exception ->
@@ -385,16 +422,28 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Select a bean and load its suggested settings.
      * Implements requirements 3.3 and 4.4 for remembering settings per bean.
+     * Epic 4: Also loads persistent grind recommendations for the bean.
      */
     fun selectBean(bean: Bean) {
         val previousBean = _selectedBean.value
         _selectedBean.value = bean
+        
+        // Epic 4: Immediately clear old persistent recommendation when switching beans
+        // This prevents showing stale recommendations from the previous bean
+        if (previousBean != null && previousBean.id != bean.id) {
+            _persistentRecommendation.value = null
+        }
 
         // Load suggested settings from last successful shot with this bean
         viewModelScope.launch {
             loadSuggestedSettingsForBean(bean.id, previousBean)
             // Load previous successful grinder settings for visual indicators
             loadPreviousSuccessfulSettings(bean.id)
+            // Epic 4: Load persistent grind recommendation for this bean
+            loadPersistentRecommendation()
+            
+            // Epic 4: Set current bean in repository for persistence across app restarts
+            setCurrentBeanInRepository(bean)
         }
 
         validateForm()
@@ -457,6 +506,21 @@ class ShotRecordingViewModel @Inject constructor(
         )
     }
 
+    /**
+     * Set the current bean in repository for persistence across app restarts.
+     * Epic 4: Ensures bean selection persists and recommendations load correctly.
+     */
+    private suspend fun setCurrentBeanInRepository(bean: Bean) {
+        beanRepository.setCurrentBean(bean.id).fold(
+            onSuccess = {
+                // Bean set successfully - no action needed
+            },
+            onFailure = {
+                // Silently handle error - bean selection still works locally
+            }
+        )
+    }
+    
     /**
      * Load previous successful grinder settings for a bean to show as visual indicators.
      */
@@ -611,6 +675,7 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Record the current shot with validation.
+     * Epic 4: Enhanced with recommendation tracking to learn user behavior.
      */
     fun recordShot() {
         val bean = _selectedBean.value
@@ -638,6 +703,10 @@ class ShotRecordingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            // Epic 4: Track if user followed persistent recommendation before recording
+            val currentRecommendation = _persistentRecommendation.value
+            val followedRecommendation = checkIfRecommendationFollowed(grinder, currentRecommendation)
+            
             // Capture extraction time BEFORE recording (it might be reset after recording)
             val extractionTimeSeconds = timerState.value.elapsedTimeSeconds
             
@@ -667,6 +736,27 @@ class ShotRecordingViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { shot ->
+                    // Epic 4: Handle recommendation follow-through tracking
+                    if (followedRecommendation && currentRecommendation != null) {
+                        // User followed the recommendation, mark it as followed
+                        manageGrindRecommendationUseCase.markRecommendationFollowed(currentRecommendation.beanId)
+                    }
+                    
+                    // Epic 4: Log analytics for future learning features
+                    currentRecommendation?.let { recommendation ->
+                        logRecommendationAnalytics(
+                            beanId = recommendation.beanId,
+                            recommendationFollowed = followedRecommendation,
+                            actualGrindSetting = grinder,
+                            recommendedGrindSetting = recommendation.suggestedGrindSetting,
+                            extractionTimeSeconds = extractionTimeSeconds
+                        )
+                    }
+                    
+                    // Epic 4: Clear old recommendation since we're recording a new shot
+                    // This clears the previous recommendation to make room for the new one
+                    _persistentRecommendation.value = null
+                    
                     // Clear draft after successful recording
                     clearDraft()
 
@@ -902,7 +992,8 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Record taste feedback for the recently recorded shot.
-     * This saves the taste to the database but doesn't calculate grind adjustments.
+     * This saves the taste to the database and updates persistent recommendations with taste data.
+     * Epic 4: Enhanced to update persistent recommendations with taste feedback.
      */
     fun recordTasteFeedback(
         shotId: String,
@@ -917,6 +1008,37 @@ class ShotRecordingViewModel @Inject constructor(
             ).fold(
                 onSuccess = {
                     // Taste feedback successfully saved to database
+                    
+                    // Epic 4: Update persistent recommendation with taste feedback
+                    val recordedData = _recordedShotData.value
+                    val currentBean = _selectedBean.value
+                    if (recordedData != null && currentBean != null) {
+                        // Calculate updated recommendation with taste feedback
+                        calculateGrindAdjustmentUseCase.calculateAdjustment(
+                            currentGrindSetting = recordedData.grinderSetting,
+                            extractionTimeSeconds = recordedData.extractionTimeSeconds,
+                            tasteFeedback = tastePrimary
+                        ).fold(
+                            onSuccess = { updatedRecommendation ->
+                                // Create updated shot object with taste feedback
+                                val updatedShot = com.jodli.coffeeshottimer.data.model.Shot(
+                                    id = shotId,
+                                    beanId = currentBean.id,
+                                    coffeeWeightIn = _coffeeWeightIn.value.toDoubleOrNull() ?: 0.0,
+                                    coffeeWeightOut = _coffeeWeightOut.value.toDoubleOrNull() ?: 0.0,
+                                    extractionTimeSeconds = recordedData.extractionTimeSeconds,
+                                    grinderSetting = recordedData.grinderSetting,
+                                    notes = _notes.value,
+                                    tastePrimary = tastePrimary,
+                                    tasteSecondary = tasteSecondary
+                                )
+                                updatePersistentRecommendationWithTaste(updatedRecommendation, updatedShot)
+                            },
+                            onFailure = {
+                                // Silently handle error - don't block taste feedback flow
+                            }
+                        )
+                    }
                 },
                 onFailure = { exception ->
                     // Handle error silently or show a non-blocking message
@@ -973,6 +1095,7 @@ class ShotRecordingViewModel @Inject constructor(
     /**
      * Calculate initial grind adjustment based on extraction time only.
      * This is called immediately after recording a shot to provide timing-based recommendations.
+     * Epic 4: Also saves persistent recommendation immediately.
      */
     private fun calculateInitialGrindAdjustment(extractionTimeSeconds: Int, grinderSetting: String) {
         viewModelScope.launch {
@@ -983,6 +1106,25 @@ class ShotRecordingViewModel @Inject constructor(
             ).fold(
                 onSuccess = { recommendation ->
                     _grindAdjustmentRecommendation.value = recommendation
+                    
+                    // Epic 4: Also save persistent recommendation immediately
+                    val recordedData = _recordedShotData.value
+                    if (recordedData != null) {
+                        // Create shot object from recorded data
+                        val currentBean = _selectedBean.value
+                        if (currentBean != null) {
+                            val shot = com.jodli.coffeeshottimer.data.model.Shot(
+                                beanId = currentBean.id,
+                                coffeeWeightIn = _coffeeWeightIn.value.toDoubleOrNull() ?: 0.0,
+                                coffeeWeightOut = _coffeeWeightOut.value.toDoubleOrNull() ?: 0.0,
+                                extractionTimeSeconds = extractionTimeSeconds,
+                                grinderSetting = grinderSetting,
+                                notes = _notes.value,
+                                tastePrimary = null // No taste feedback yet
+                            )
+                            savePersistentRecommendation(recommendation, shot)
+                        }
+                    }
                 },
                 onFailure = {
                     // Don't show recommendation on error, but don't block the dialog
@@ -1068,6 +1210,204 @@ class ShotRecordingViewModel @Inject constructor(
         savedStateHandle[TIMER_IS_RUNNING_KEY] = currentTimerState.isRunning
         savedStateHandle[TIMER_START_TIME_KEY] = currentTimerState.startTime
         savedStateHandle[TIMER_ELAPSED_SECONDS_KEY] = currentTimerState.elapsedTimeSeconds
+    }
+
+    // === PERSISTENT GRIND RECOMMENDATION METHODS (Epic 4) ===
+
+    /**
+     * Load the persistent grind recommendation for the currently active bean.
+     * Called when the ViewModel is initialized or when the bean changes.
+     * Epic 4: Enhanced to handle edge cases and ensure proper bean-specific recommendations.
+     */
+    private fun loadPersistentRecommendation() {
+        viewModelScope.launch {
+            val bean = _selectedBean.value
+            if (bean != null) {
+                manageGrindRecommendationUseCase.getRecommendation(bean.id).fold(
+                    onSuccess = { recommendation ->
+                        // Only set recommendation if it matches the currently selected bean
+                        // This prevents race conditions when switching beans quickly
+                        if (recommendation?.beanId == bean.id) {
+                            _persistentRecommendation.value = recommendation
+                        } else {
+                            // Recommendation is for a different bean, clear it
+                            _persistentRecommendation.value = null
+                        }
+                    },
+                    onFailure = {
+                        // Silently handle error - recommendation is optional
+                        _persistentRecommendation.value = null
+                    }
+                )
+            } else {
+                // No bean selected, clear any existing recommendation
+                _persistentRecommendation.value = null
+            }
+        }
+    }
+
+    /**
+     * Apply the persistent grind recommendation.
+     * Updates the current grinder setting and marks the recommendation as followed.
+     * Epic 4: Enhanced with analytics tracking.
+     */
+    fun applyPersistentRecommendation() {
+        val recommendation = _persistentRecommendation.value
+        if (recommendation != null) {
+            val oldSetting = _grinderSetting.value
+            
+            // Apply the grinder setting
+            _grinderSetting.value = recommendation.suggestedGrindSetting
+            _suggestedGrinderSetting.value = recommendation.suggestedGrindSetting
+            
+            // Mark as followed
+            viewModelScope.launch {
+                manageGrindRecommendationUseCase.markRecommendationFollowed(recommendation.beanId)
+                // Update the local state to reflect it was followed
+                _persistentRecommendation.value = recommendation.markAsFollowed()
+            }
+            
+            // Epic 4: Log that user explicitly applied the recommendation
+            if (BuildConfig.DEBUG) {
+                android.util.Log.d(
+                    "RecommendationTracking",
+                    "User applied recommendation: Bean=${recommendation.beanId}, "
+                            + "From=$oldSetting To=${recommendation.suggestedGrindSetting}"
+                )
+            }
+            
+            // Validate form with new grinder setting
+            validateForm()
+        }
+    }
+
+    /**
+     * Dismiss the persistent grind recommendation.
+     * Clears the recommendation from storage and UI.
+     */
+    fun dismissPersistentRecommendation() {
+        val recommendation = _persistentRecommendation.value
+        if (recommendation != null) {
+            viewModelScope.launch {
+                manageGrindRecommendationUseCase.clearRecommendation(recommendation.beanId)
+                _persistentRecommendation.value = null
+            }
+        }
+    }
+    
+    /**
+     * Clear the persistent recommendation state immediately (e.g., when switching beans).
+     * Epic 4: Used internally to prevent stale recommendation display during bean transitions.
+     */
+    private fun clearPersistentRecommendationState() {
+        _persistentRecommendation.value = null
+    }
+    
+    /**
+     * Refresh persistent recommendations for the currently selected bean.
+     * Epic 4: Called when returning from other screens to ensure recommendations are up-to-date.
+     */
+    fun refreshPersistentRecommendation() {
+        loadPersistentRecommendation()
+    }
+    
+    /**
+     * Check if the current grinder setting matches the persistent recommendation within tolerance.
+     * Epic 4: Used for tracking recommendation follow-through rates.
+     */
+    private fun checkIfRecommendationFollowed(
+        currentGrinderSetting: String,
+        recommendation: PersistentGrindRecommendation?
+    ): Boolean {
+        if (recommendation == null) return false
+        
+        val currentSetting = currentGrinderSetting.toDoubleOrNull() ?: return false
+        val recommendedSetting = recommendation.suggestedGrindSetting.toDoubleOrNull() ?: return false
+        
+        // Define tolerance for "following" the recommendation
+        // Allow ±0.5 step size difference to account for user adjustments
+        val tolerance = _grinderStepSize.value  // Use the actual step size from configuration
+        val difference = kotlin.math.abs(currentSetting - recommendedSetting)
+        
+        return difference <= tolerance
+    }
+    
+    /**
+     * Log recommendation follow-through analytics.
+     * Epic 4: Track user behavior for future learning features.
+     */
+    private fun logRecommendationAnalytics(
+        beanId: String,
+        recommendationFollowed: Boolean,
+        actualGrindSetting: String,
+        recommendedGrindSetting: String,
+        extractionTimeSeconds: Int
+    ) {
+        // Future enhancement: Send analytics to a learning system
+        // For now, we can log this information for debugging or future use
+        if (BuildConfig.DEBUG) {
+            android.util.Log.d(
+                "RecommendationTracking",
+                "Bean: $beanId, Followed: $recommendationFollowed, "
+                        + "Actual: $actualGrindSetting, Recommended: $recommendedGrindSetting, "
+                        + "Time: ${extractionTimeSeconds}s"
+            )
+        }
+        
+        // Future: Could aggregate statistics:
+        // - Follow-through rate per bean
+        // - Accuracy of recommendations (based on subsequent taste feedback)
+        // - Learning patterns (users tend to adjust +0.5 from recommendations)
+    }
+
+    /**
+     * Save a persistent grind recommendation after recording a shot.
+     * This is called from recordShot() to always save recommendations.
+     */
+    private fun savePersistentRecommendation(
+        recommendation: GrindAdjustmentRecommendation,
+        recordedShot: com.jodli.coffeeshottimer.data.model.Shot
+    ) {
+        viewModelScope.launch {
+            manageGrindRecommendationUseCase.saveRecommendation(
+                beanId = recordedShot.beanId,
+                recommendation = recommendation,
+                lastShot = recordedShot
+            ).fold(
+                onSuccess = { persistentRecommendation ->
+                    // Update UI with new persistent recommendation
+                    _persistentRecommendation.value = persistentRecommendation
+                },
+                onFailure = {
+                    // Silently handle error - don't block shot recording flow
+                }
+            )
+        }
+    }
+
+    /**
+     * Update a persistent recommendation when taste feedback is added.
+     * Called from recordTasteFeedback() to enhance recommendations with taste data.
+     */
+    private fun updatePersistentRecommendationWithTaste(
+        updatedRecommendation: GrindAdjustmentRecommendation,
+        updatedShot: com.jodli.coffeeshottimer.data.model.Shot
+    ) {
+        viewModelScope.launch {
+            manageGrindRecommendationUseCase.updateRecommendationWithTaste(
+                beanId = updatedShot.beanId,
+                updatedRecommendation = updatedRecommendation,
+                updatedShot = updatedShot
+            ).fold(
+                onSuccess = { updatedPersistent ->
+                    // Update UI with enhanced recommendation
+                    _persistentRecommendation.value = updatedPersistent
+                },
+                onFailure = {
+                    // Silently handle error - don't block taste feedback flow
+                }
+            )
+        }
     }
 
     override fun onCleared() {

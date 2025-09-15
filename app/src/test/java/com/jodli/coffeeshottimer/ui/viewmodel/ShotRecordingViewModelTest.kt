@@ -8,6 +8,7 @@ import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
+import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -35,6 +36,7 @@ class ShotRecordingViewModelTest {
     private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
+    private lateinit var manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -53,6 +55,7 @@ class ShotRecordingViewModelTest {
         getTastePreselectionUseCase = mockk<GetTastePreselectionUseCase>(relaxed = true)
         recordTasteFeedbackUseCase = mockk<RecordTasteFeedbackUseCase>(relaxed = true)
         calculateGrindAdjustmentUseCase = mockk<CalculateGrindAdjustmentUseCase>(relaxed = true)
+        manageGrindRecommendationUseCase = mockk<ManageGrindRecommendationUseCase>(relaxed = true)
         beanRepository = mockk<BeanRepository>(relaxed = true)
         shotRepository = mockk<ShotRepository>(relaxed = true)
         context = mockk<Context>(relaxed = true)
@@ -69,6 +72,7 @@ class ShotRecordingViewModelTest {
             getTastePreselectionUseCase,
             recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase,
+            manageGrindRecommendationUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,

@@ -41,7 +41,27 @@ abstract class OnboardingModule {
             )
         }
 
+        /**
+         * Provides SharedPreferences specifically for grind recommendation data.
+         * Uses a separate preferences file to isolate recommendation data from other app preferences.
+         *
+         * @param context Application context
+         * @return SharedPreferences instance for recommendations
+         */
+        @Provides
+        @Singleton
+        @RecommendationPrefs
+        fun provideRecommendationSharedPreferences(
+            @ApplicationContext context: Context
+        ): SharedPreferences {
+            return context.getSharedPreferences(
+                RECOMMENDATION_PREFERENCES_NAME,
+                Context.MODE_PRIVATE
+            )
+        }
+
         private const val ONBOARDING_PREFERENCES_NAME = "onboarding_preferences"
+        private const val RECOMMENDATION_PREFERENCES_NAME = "recommendation_preferences"
     }
 
     /**
@@ -64,3 +84,10 @@ abstract class OnboardingModule {
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class OnboardingPrefs
+
+/**
+ * Qualifier annotation to distinguish recommendation SharedPreferences from other SharedPreferences.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class RecommendationPrefs

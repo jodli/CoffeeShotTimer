@@ -227,6 +227,7 @@
     <string name="button_clear_start">Start löschen</string>
     <string name="button_clear_end">Ende löschen</string>
     <string name="button_dismiss">Schließen</string>
+    <string name="button_apply">Anwenden</string>
     <string name="button_manage">Verwalten</string>
     <string name="button_cancel">Abbrechen</string>
     <string name="button_delete_bean">Bohne löschen</string>
@@ -721,5 +722,16 @@
     <string name="cd_grind_adjustment_finer">Empfehlung feiner mahlen</string>
     <string name="cd_grind_adjustment_coarser">Empfehlung gröber mahlen</string>
     <string name="cd_grind_adjustment_no_change">Keine Mahlgrad-Anpassung erforderlich</string>
+
+    <!-- Next Shot Guidance Card Strings -->
+    <string name="next_shot_guidance">Nächster Shot-Tipp</string>
+    <string name="dose_grams">%.1fg</string>
+    <string name="target_time">Ziel: %1$s</string>
+    <string name="high_confidence">Hoch</string>
+    <string name="medium_confidence">Mittel</string>
+    <string name="low_confidence">Niedrig</string>
+    <string name="grind_finer">Feiner mahlen</string>
+    <string name="grind_coarser">Gröber mahlen</string>
+    <string name="no_change_needed">Keine Änderung nötig</string>
 
 </resources>

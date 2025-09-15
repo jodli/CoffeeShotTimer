@@ -219,6 +219,7 @@
     <string name="button_view_details">View Details</string>
     <string name="button_manage">Manage</string>
     <string name="button_dismiss">Dismiss</string>
+    <string name="button_apply">Apply</string>
 
     <!-- Content Descriptions -->
     <string name="cd_bean_education_freshness">Coffee bean freshness illustration</string>
@@ -720,5 +721,16 @@
     <string name="cd_grind_adjustment_finer">Grind finer recommendation</string>
     <string name="cd_grind_adjustment_coarser">Grind coarser recommendation</string>
     <string name="cd_grind_adjustment_no_change">No grind adjustment needed</string>
+
+    <!-- Next Shot Guidance Card Strings -->
+    <string name="next_shot_guidance">Next Shot Guidance</string>
+    <string name="dose_grams">%.1fg</string>
+    <string name="target_time">Target: %1$s</string>
+    <string name="high_confidence">High</string>
+    <string name="medium_confidence">Medium</string>
+    <string name="low_confidence">Low</string>
+    <string name="grind_finer">Grind finer</string>
+    <string name="grind_coarser">Grind coarser</string>
+    <string name="no_change_needed">No change needed</string>
 
 </resources>
