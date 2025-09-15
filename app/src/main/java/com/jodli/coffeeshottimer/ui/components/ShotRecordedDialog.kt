@@ -30,7 +30,7 @@ fun ShotRecordedDialog(
     recommendations: List<ShotRecommendation> = emptyList(),
     suggestedTaste: TastePrimary? = null,
     grindAdjustment: GrindAdjustmentRecommendation? = null,
-    onTasteSelected: ((TastePrimary, TasteSecondary?) -> Unit)? = null, // Reactive UI updates
+    onTasteSelected: ((TastePrimary?, TasteSecondary?) -> Unit)? = null, // Reactive UI updates
     onSubmit: ((TastePrimary?, TasteSecondary?) -> Unit)? = null, // Save to database
     onGrindAdjustmentApply: (() -> Unit)? = null,
     onGrindAdjustmentDismiss: (() -> Unit)? = null,
@@ -94,8 +94,12 @@ fun ShotRecordedDialog(
                         selectedTaste = selectedPrimary,
                         onTasteSelected = { taste ->
                             selectedPrimary = taste
-                            // Immediately calculate grind adjustment for UI reactivity
-                            if (onTasteSelected != null && taste != null) {
+                            // Clear secondary when primary is deselected
+                            if (taste == null) {
+                                selectedSecondary = null
+                            }
+                            // Always recalculate grind adjustment (even when null for timing-based)
+                            if (onTasteSelected != null) {
                                 onTasteSelected(taste, selectedSecondary)
                             }
                         },
@@ -123,8 +127,8 @@ fun ShotRecordedDialog(
                                 onSecondarySelected = { newValue ->
                                     selectedSecondary = newValue
                                     // Update grind adjustment with new secondary taste
-                                    if (onTasteSelected != null && selectedPrimary != null) {
-                                        onTasteSelected(selectedPrimary!!, newValue)
+                                    if (onTasteSelected != null) {
+                                        onTasteSelected(selectedPrimary, newValue)
                                     }
                                 }
                             )
@@ -132,8 +136,8 @@ fun ShotRecordedDialog(
                     }
                 }
 
-                // Grind adjustment recommendation (show only after taste is selected)
-                if (grindAdjustment != null && selectedPrimary != null) {
+                // Grind adjustment recommendation (always show when available)
+                if (grindAdjustment != null) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
                     
                     GrindAdjustmentCard(

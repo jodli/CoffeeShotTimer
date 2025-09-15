@@ -327,15 +327,13 @@ private fun ShotDetailsContent(
             ShotAnalysisAndRecommendationsCard(shotDetails = shotDetails)
         }
 
-        // Grind Adjustment Recommendation (if taste feedback exists)
-        if (shotDetails.shot.tastePrimary != null) {
-            item {
-                NextShotGrindAdjustmentCard(
-                    shotDetails = shotDetails,
-                    viewModel = viewModel,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        // Grind Adjustment Recommendation (always show when available)
+        item {
+            NextShotGrindAdjustmentCard(
+                shotDetails = shotDetails,
+                viewModel = viewModel,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
 
         // Notes Card
