@@ -69,6 +69,8 @@ import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.TimerControls
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
+import com.jodli.coffeeshottimer.ui.components.NextShotGuidanceCard
+import com.jodli.coffeeshottimer.ui.components.AnimatedNextShotGuidanceCard
 import com.jodli.coffeeshottimer.ui.components.RecordShotLandscapeLayout
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
@@ -106,6 +108,9 @@ fun RecordShotScreen(
     val showShotRecordedDialog by viewModel.showShotRecordedDialog.collectAsStateWithLifecycle()
     val recordedShotData by viewModel.recordedShotData.collectAsStateWithLifecycle()
     val grindAdjustmentRecommendation by viewModel.grindAdjustmentRecommendation.collectAsStateWithLifecycle()
+    
+    // Epic 4: Persistent grind recommendation state
+    val persistentRecommendation by viewModel.persistentRecommendation.collectAsStateWithLifecycle()
 
     val suggestedGrinderSetting by viewModel.suggestedGrinderSetting.collectAsStateWithLifecycle()
     val previousSuccessfulSettings by viewModel.previousSuccessfulSettings.collectAsStateWithLifecycle()
@@ -193,7 +198,11 @@ fun RecordShotScreen(
                     onClearSuccessMessage = { viewModel.clearSuccessMessage() },
                     errorMessage = errorMessage,
                     onClearErrorMessage = { viewModel.clearErrorMessage() },
-                    onRetryRecordShot = { viewModel.recordShot() }
+                    onRetryRecordShot = { viewModel.recordShot() },
+                    // Epic 4: Persistent grind recommendation parameters
+                    persistentRecommendation = persistentRecommendation,
+                    onApplyPersistentRecommendation = { viewModel.applyPersistentRecommendation() },
+                    onDismissPersistentRecommendation = { viewModel.dismissPersistentRecommendation() }
                 )
             }
         },
@@ -267,7 +276,11 @@ fun RecordShotScreen(
                         onClearSuccessMessage = { viewModel.clearSuccessMessage() },
                         errorMessage = errorMessage,
                         onClearErrorMessage = { viewModel.clearErrorMessage() },
-                        onRetryRecordShot = { viewModel.recordShot() }
+                        onRetryRecordShot = { viewModel.recordShot() },
+                        // Epic 4: Persistent grind recommendation parameters
+                        persistentRecommendation = persistentRecommendation,
+                        onApplyPersistentRecommendation = { viewModel.applyPersistentRecommendation() },
+                        onDismissPersistentRecommendation = { viewModel.dismissPersistentRecommendation() }
                     )
                 }
             )
@@ -741,9 +754,23 @@ private fun RecordShotPortraitContent(
     onClearSuccessMessage: () -> Unit,
     errorMessage: String?,
     onClearErrorMessage: () -> Unit,
-    onRetryRecordShot: () -> Unit
+    onRetryRecordShot: () -> Unit,
+    // Epic 4: Persistent grind recommendation parameters
+    persistentRecommendation: com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation?,
+    onApplyPersistentRecommendation: () -> Unit,
+    onDismissPersistentRecommendation: () -> Unit
 ) {
     val spacing = LocalSpacing.current
+    
+    // Epic 4: Next Shot Guidance Card (prominent at top)
+    persistentRecommendation?.let { recommendation ->
+        AnimatedNextShotGuidanceCard(
+            recommendation = recommendation,
+            onApply = onApplyPersistentRecommendation,
+            onDismiss = onDismissPersistentRecommendation,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
     
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
@@ -898,8 +925,22 @@ private fun RecordShotFormContent(
     onClearSuccessMessage: () -> Unit,
     errorMessage: String?,
     onClearErrorMessage: () -> Unit,
-    onRetryRecordShot: () -> Unit
+    onRetryRecordShot: () -> Unit,
+    // Epic 4: Persistent grind recommendation parameters
+    persistentRecommendation: com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation?,
+    onApplyPersistentRecommendation: () -> Unit,
+    onDismissPersistentRecommendation: () -> Unit
 ) {
+    // Epic 4: Next Shot Guidance Card (prominent at top)
+    persistentRecommendation?.let { recommendation ->
+        AnimatedNextShotGuidanceCard(
+            recommendation = recommendation,
+            onApply = onApplyPersistentRecommendation,
+            onDismiss = onDismissPersistentRecommendation,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+    
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
         selectedBean = selectedBean,

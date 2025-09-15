@@ -62,6 +62,9 @@ enum class DomainErrorCode(val code: String) {
     PHOTO_CAPTURE_FAILED("PHOTO_CAPTURE_FAILED"),
     PHOTO_SELECTION_CANCELLED("PHOTO_SELECTION_CANCELLED"),
 
+    // Storage errors
+    STORAGE_ERROR("STORAGE_ERROR"),
+    
     // Generic errors
     VALIDATION_FAILED("VALIDATION_FAILED"),
     UNKNOWN_ERROR("UNKNOWN_ERROR")

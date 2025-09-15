@@ -82,6 +82,9 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.PHOTO_CAPTURE_FAILED -> context.getString(R.string.error_photo_capture_failed)
             DomainErrorCode.PHOTO_SELECTION_CANCELLED -> context.getString(R.string.error_photo_selection_cancelled)
 
+            // Storage errors
+            DomainErrorCode.STORAGE_ERROR -> context.getString(R.string.error_saving_data)
+
             DomainErrorCode.VALIDATION_FAILED -> {
                 if (details != null) {
                     context.getString(R.string.error_bean_validation_failed, details)

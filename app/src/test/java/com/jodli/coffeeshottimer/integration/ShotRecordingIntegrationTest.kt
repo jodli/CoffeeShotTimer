@@ -15,10 +15,11 @@ import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
-import com.jodli.coffeeshottimer.domain.usecase.TimerState
-import com.jodli.coffeeshottimer.domain.usecase.ShotRecordingState
-import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
+import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.domain.usecase.ShotRecordingState
+import com.jodli.coffeeshottimer.domain.usecase.TimerState
+import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import io.mockk.*
@@ -51,6 +52,7 @@ class ShotRecordingIntegrationTest {
     private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
+    private lateinit var manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -73,6 +75,7 @@ class ShotRecordingIntegrationTest {
         getTastePreselectionUseCase = mockk(relaxed = true)
         recordTasteFeedbackUseCase = mockk(relaxed = true)
         calculateGrindAdjustmentUseCase = mockk(relaxed = true)
+        manageGrindRecommendationUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         shotRepository = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
@@ -147,6 +150,7 @@ class ShotRecordingIntegrationTest {
             getTastePreselectionUseCase,
             recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase,
+            manageGrindRecommendationUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,
