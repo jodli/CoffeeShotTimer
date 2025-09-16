@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -31,6 +32,7 @@ class BeanRepositoryTest {
     private lateinit var database: AppDatabase
     private lateinit var repository: BeanRepository
     private lateinit var mockPhotoStorageManager: PhotoStorageManager
+    private lateinit var mockSharedPreferences: SharedPreferences
     
     @Before
     fun setup() {
@@ -40,7 +42,8 @@ class BeanRepositoryTest {
         ).allowMainThreadQueries().build()
         
         mockPhotoStorageManager = mockk()
-        repository = BeanRepository(database.beanDao(), mockPhotoStorageManager)
+        mockSharedPreferences = mockk(relaxed = true)
+        repository = BeanRepository(database.beanDao(), mockPhotoStorageManager, mockSharedPreferences)
     }
     
     @After

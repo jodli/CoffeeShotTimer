@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.di
 
+import android.content.SharedPreferences
 import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
@@ -38,15 +39,17 @@ abstract class RepositoryModule {
          *
          * @param beanDao The BeanDao dependency
          * @param photoStorageManager The PhotoStorageManager dependency
+         * @param beanPrefs The SharedPreferences for bean selection persistence
          * @return BeanRepository instance
          */
         @Provides
         @Singleton
         fun provideBeanRepository(
             beanDao: BeanDao,
-            photoStorageManager: PhotoStorageManager
+            photoStorageManager: PhotoStorageManager,
+            @BeanPrefs beanPrefs: SharedPreferences
         ): BeanRepository {
-            return BeanRepository(beanDao, photoStorageManager)
+            return BeanRepository(beanDao, photoStorageManager, beanPrefs)
         }
 
         /**

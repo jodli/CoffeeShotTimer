@@ -227,23 +227,31 @@ class ShotRecordingViewModel @Inject constructor(
         startAutoSaveDraft()
         restoreDraftIfExists()
         // Load beans and current bean - persistent recommendation will be loaded in selectBean()
+        // Note: loadCurrentBean() will be called from loadActiveBeans() once the active beans are loaded
         loadActiveBeans()
-        loadCurrentBean()
         // Note: loadPersistentRecommendation() is now called from selectBean() when a bean is selected
     }
 
     /**
      * Load active beans for selection.
      * Epic 4: Enhanced to handle bean deactivation and ensure proper persistent recommendation cleanup.
+     * Now ensures proper sequencing by calling loadCurrentBean() after beans are loaded.
      */
     private fun loadActiveBeans() {
         viewModelScope.launch {
             _isLoading.value = true
+            var isFirstLoad = true
             beanRepository.getActiveBeans().collect { result ->
                 result.fold(
                     onSuccess = { beans ->
                         val previousBeans = _activeBeans.value
                         _activeBeans.value = beans
+                        
+                        // On first load, check for current bean from repository AFTER beans are loaded
+                        if (isFirstLoad) {
+                            isFirstLoad = false
+                            loadCurrentBeanAfterBeansLoaded()
+                        }
                         
                         // Epic 4: Check if currently selected bean was deactivated
                         val selectedBean = _selectedBean.value
@@ -257,8 +265,8 @@ class ShotRecordingViewModel @Inject constructor(
                             } else {
                                 _selectedBean.value = null
                             }
-                        } else {
-                            // Auto-select first bean if none selected and no current bean
+                        } else if (!isFirstLoad) {
+                            // For subsequent loads (not first load), auto-select first bean if none selected
                             if (_selectedBean.value == null && beans.isNotEmpty()) {
                                 selectBean(beans.first())
                             }
@@ -299,6 +307,51 @@ class ShotRecordingViewModel @Inject constructor(
                 },
                 onFailure = { exception ->
                     // Silently handle error - current bean is optional
+                }
+            )
+        }
+    }
+
+    /**
+     * Load the current bean from repository after active beans have been loaded.
+     * This prevents race conditions where current bean validation fails because
+     * active beans list is still empty.
+     */
+     private fun loadCurrentBeanAfterBeansLoaded() {
+        viewModelScope.launch {
+            val result = beanRepository.getCurrentBean()
+            result.fold(
+                onSuccess = { currentBean ->
+                    if (currentBean != null) {
+                        // Active beans are now guaranteed to be loaded
+                        val activeBeans = _activeBeans.value
+                        val isBeanStillActive = activeBeans.any { it.id == currentBean.id }
+                        
+                        if (isBeanStillActive) {
+                            selectBean(currentBean)
+                        } else {
+                            // Current bean is no longer active, clear it from repository
+                            beanRepository.clearCurrentBean()
+                            // Auto-select first available bean
+                            if (activeBeans.isNotEmpty()) {
+                                selectBean(activeBeans.first())
+                            }
+                        }
+                    } else {
+                        // No current bean set, auto-select first available bean
+                        val activeBeans = _activeBeans.value
+                        if (activeBeans.isNotEmpty() && _selectedBean.value == null) {
+                            selectBean(activeBeans.first())
+                        }
+                    }
+                },
+                onFailure = { exception ->
+                    // Silently handle error - current bean is optional
+                    // Auto-select first available bean as fallback
+                    val activeBeans = _activeBeans.value
+                    if (activeBeans.isNotEmpty() && _selectedBean.value == null) {
+                        selectBean(activeBeans.first())
+                    }
                 }
             )
         }

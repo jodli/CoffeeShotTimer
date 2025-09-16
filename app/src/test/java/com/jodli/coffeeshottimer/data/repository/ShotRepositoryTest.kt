@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.jodli.coffeeshottimer.data.database.AppDatabase
@@ -37,7 +38,7 @@ class ShotRepositoryTest {
         ).allowMainThreadQueries().build()
         
         shotRepository = ShotRepository(database.shotDao(), database.beanDao())
-        beanRepository = BeanRepository(database.beanDao(), mockk())
+        beanRepository = BeanRepository(database.beanDao(), mockk(), mockk(relaxed = true))
         
         // Create a test bean for shots
         testBean = createTestBean("Test Bean")
