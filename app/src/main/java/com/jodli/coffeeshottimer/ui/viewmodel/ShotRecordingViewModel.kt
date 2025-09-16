@@ -33,6 +33,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -525,29 +526,29 @@ class ShotRecordingViewModel @Inject constructor(
      * Load previous successful grinder settings for a bean to show as visual indicators.
      */
     private suspend fun loadPreviousSuccessfulSettings(beanId: String) {
-        shotRepository.getShotsByBean(beanId).collect { result ->
-            result.fold(
-                onSuccess = { shots ->
-                    // Get unique grinder settings from recent successful shots (last 10)
-                    // Consider shots with brew ratios in typical range as "successful"
-                    val successfulSettings = shots
-                        .asSequence()
-                        .filter { shot ->
-                            shot.brewRatio in 1.5..3.0 // Typical espresso range
-                        }
-                        .take(10) // Last 10 shots
-                        .map { it.grinderSetting }
-                        .distinct()
-                        .take(3)
-                        .toList() // Show max 3 previous settings
+        // Use first() instead of collect() to avoid infinite flow collection
+        val result = shotRepository.getShotsByBean(beanId).first()
+        result.fold(
+            onSuccess = { shots ->
+                // Get unique grinder settings from recent successful shots (last 10)
+                // Consider shots with brew ratios in typical range as "successful"
+                val successfulSettings = shots
+                    .asSequence()
+                    .filter { shot ->
+                        shot.brewRatio in 1.5..3.0 // Typical espresso range
+                    }
+                    .take(10) // Last 10 shots
+                    .map { it.grinderSetting }
+                    .distinct()
+                    .take(3)
+                    .toList() // Show max 3 previous settings
 
-                    _previousSuccessfulSettings.value = successfulSettings
-                },
-                onFailure = {
-                    _previousSuccessfulSettings.value = emptyList()
-                }
-            )
-        }
+                _previousSuccessfulSettings.value = successfulSettings
+            },
+            onFailure = {
+                _previousSuccessfulSettings.value = emptyList()
+            }
+        )
     }
 
     /**
@@ -1109,20 +1110,33 @@ class ShotRecordingViewModel @Inject constructor(
                     
                     // Epic 4: Also save persistent recommendation immediately
                     val recordedData = _recordedShotData.value
-                    if (recordedData != null) {
-                        // Create shot object from recorded data
-                        val currentBean = _selectedBean.value
-                        if (currentBean != null) {
-                            val shot = com.jodli.coffeeshottimer.data.model.Shot(
-                                beanId = currentBean.id,
-                                coffeeWeightIn = _coffeeWeightIn.value.toDoubleOrNull() ?: 0.0,
-                                coffeeWeightOut = _coffeeWeightOut.value.toDoubleOrNull() ?: 0.0,
-                                extractionTimeSeconds = extractionTimeSeconds,
-                                grinderSetting = grinderSetting,
-                                notes = _notes.value,
-                                tastePrimary = null // No taste feedback yet
+                    val currentBean = _selectedBean.value
+                    if (recordedData != null && currentBean != null) {
+                        // Get the actual shot from database instead of creating a fake one
+                        viewModelScope.launch {
+                            shotRepository.getShotById(recordedData.shotId).fold(
+                                onSuccess = { actualShot ->
+                                    if (actualShot != null) {
+                                        savePersistentRecommendation(recommendation, actualShot)
+                                    }
+                                },
+                                onFailure = {
+                                    // If we can't get the shot from DB, create a minimal one with required fields
+                                    val fallbackShot = com.jodli.coffeeshottimer.data.model.Shot(
+                                        id = recordedData.shotId,
+                                        beanId = currentBean.id,
+                                        coffeeWeightIn = _coffeeWeightIn.value.toDoubleOrNull() ?: 0.0,
+                                        coffeeWeightOut = _coffeeWeightOut.value.toDoubleOrNull() ?: 0.0,
+                                        extractionTimeSeconds = extractionTimeSeconds,
+                                        grinderSetting = grinderSetting,
+                                        notes = _notes.value,
+                                        timestamp = java.time.LocalDateTime.now(),
+                                        tastePrimary = null,
+                                        tasteSecondary = null
+                                    )
+                                    savePersistentRecommendation(recommendation, fallbackShot)
+                                }
                             )
-                            savePersistentRecommendation(recommendation, shot)
                         }
                     }
                 },
