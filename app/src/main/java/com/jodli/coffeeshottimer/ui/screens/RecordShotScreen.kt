@@ -762,7 +762,15 @@ private fun RecordShotPortraitContent(
 ) {
     val spacing = LocalSpacing.current
     
-    // Epic 4: Next Shot Guidance Card (prominent at top)
+    // Bean Selection with navigation to bean management
+    BeanSelectionCard(
+        selectedBean = selectedBean,
+        onBeanSelect = onShowBeanSelector,
+        onManageBeans = onNavigateToBeanManagement,
+        modifier = Modifier.fillMaxWidth()
+    )
+    
+    // Epic 4: Next Shot Guidance Card (shown after bean selection for logical flow)
     persistentRecommendation?.let { recommendation ->
         AnimatedNextShotGuidanceCard(
             recommendation = recommendation,
@@ -771,14 +779,6 @@ private fun RecordShotPortraitContent(
             modifier = Modifier.fillMaxWidth()
         )
     }
-    
-    // Bean Selection with navigation to bean management
-    BeanSelectionCard(
-        selectedBean = selectedBean,
-        onBeanSelect = onShowBeanSelector,
-        onManageBeans = onNavigateToBeanManagement,
-        modifier = Modifier.fillMaxWidth()
-    )
 
     // Timer Section
     TimerSection(
@@ -931,7 +931,15 @@ private fun RecordShotFormContent(
     onApplyPersistentRecommendation: () -> Unit,
     onDismissPersistentRecommendation: () -> Unit
 ) {
-    // Epic 4: Next Shot Guidance Card (prominent at top)
+    // Bean Selection with navigation to bean management
+    BeanSelectionCard(
+        selectedBean = selectedBean,
+        onBeanSelect = onShowBeanSelector,
+        onManageBeans = onNavigateToBeanManagement,
+        modifier = Modifier.fillMaxWidth()
+    )
+    
+    // Epic 4: Next Shot Guidance Card (shown after bean selection for logical flow)
     persistentRecommendation?.let { recommendation ->
         AnimatedNextShotGuidanceCard(
             recommendation = recommendation,
@@ -940,14 +948,6 @@ private fun RecordShotFormContent(
             modifier = Modifier.fillMaxWidth()
         )
     }
-    
-    // Bean Selection with navigation to bean management
-    BeanSelectionCard(
-        selectedBean = selectedBean,
-        onBeanSelect = onShowBeanSelector,
-        onManageBeans = onNavigateToBeanManagement,
-        modifier = Modifier.fillMaxWidth()
-    )
 
     // Weight Inputs with Sliders
     WeightSlidersSection(
