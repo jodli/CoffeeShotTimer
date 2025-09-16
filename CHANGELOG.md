@@ -16,10 +16,12 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Changed
 
 - Improved onboarding flow to guide existing users through equipment setup and bean configuration when new features are available.
+- Bean selection now persists across app restarts and navigation, ensuring your chosen bean remains selected when switching between screens.
 
 ### Fixed
 
 - Fixed coffee input weight slider maximum limit for double baskets.
+- Fixed "Use for Shot" button not reliably selecting the bean when navigating from Bean Management to Record Shot screen.
 
 ## [1.4.1]
 
