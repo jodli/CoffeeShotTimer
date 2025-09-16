@@ -1,10 +1,12 @@
 package com.jodli.coffeeshottimer.data.repository
 
+import android.content.SharedPreferences
 import android.net.Uri
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
+import com.jodli.coffeeshottimer.di.BeanPrefs
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
@@ -20,11 +22,13 @@ import javax.inject.Singleton
 @Singleton
 class BeanRepository @Inject constructor(
     private val beanDao: BeanDao,
-    private val photoStorageManager: PhotoStorageManager
+    private val photoStorageManager: PhotoStorageManager,
+    @param:BeanPrefs private val sharedPreferences: SharedPreferences
 ) {
 
-    // In-memory storage for current bean selection (could be replaced with SharedPreferences for persistence)
-    private var _currentBeanId: String? = null
+    companion object {
+        private const val KEY_CURRENT_BEAN_ID = "current_bean_id"
+    }
 
     /**
      * Get all beans ordered by creation date.
@@ -338,6 +342,7 @@ class BeanRepository @Inject constructor(
     /**
      * Set the current bean for shot recording.
      * Implements requirement 3.3 for remembering bean selection.
+     * Persists the selection to SharedPreferences for app restart resilience.
      * @param beanId The ID of the bean to set as current
      * @return Result indicating success or failure
      */
@@ -354,7 +359,11 @@ class BeanRepository @Inject constructor(
                 return Result.failure(RepositoryException.ValidationError("Cannot select inactive bean"))
             }
 
-            _currentBeanId = beanId
+            // Persist to SharedPreferences for app restart resilience
+            sharedPreferences.edit()
+                .putString(KEY_CURRENT_BEAN_ID, beanId)
+                .apply()
+            
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(
@@ -368,16 +377,17 @@ class BeanRepository @Inject constructor(
 
     /**
      * Get the current bean for shot recording.
+     * Reads from SharedPreferences to ensure persistence across app restarts.
      * @return Result containing the current bean or null if none selected
      */
     suspend fun getCurrentBean(): Result<Bean?> {
         return try {
-            val currentBeanId = _currentBeanId
+            val currentBeanId = sharedPreferences.getString(KEY_CURRENT_BEAN_ID, null)
             if (currentBeanId != null) {
                 val bean = beanDao.getBeanById(currentBeanId)
                 // If bean is no longer active or doesn't exist, clear current selection
                 if (bean == null || !bean.isActive) {
-                    _currentBeanId = null
+                    clearCurrentBean()
                     Result.success(null)
                 } else {
                     Result.success(bean)
@@ -397,17 +407,21 @@ class BeanRepository @Inject constructor(
 
     /**
      * Clear the current bean selection.
+     * Removes the selection from SharedPreferences.
      */
     fun clearCurrentBean() {
-        _currentBeanId = null
+        sharedPreferences.edit()
+            .remove(KEY_CURRENT_BEAN_ID)
+            .apply()
     }
 
     /**
      * Get the current bean ID.
+     * Reads from SharedPreferences to ensure persistence.
      * @return Current bean ID or null if none selected
      */
     fun getCurrentBeanId(): String? {
-        return _currentBeanId
+        return sharedPreferences.getString(KEY_CURRENT_BEAN_ID, null)
     }
 
     // Photo-related operations

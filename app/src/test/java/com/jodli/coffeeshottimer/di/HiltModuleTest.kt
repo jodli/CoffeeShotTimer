@@ -41,7 +41,7 @@ class HiltModuleTest {
         val shotDao = databaseModule.provideShotDao(database)
         
         // Test that the repository module can provide repository instances
-        val beanRepository = repositoryModule.provideBeanRepository(beanDao, mockk())
+        val beanRepository = repositoryModule.provideBeanRepository(beanDao, mockk(), mockk(relaxed = true))
         val shotRepository = repositoryModule.provideShotRepository(shotDao, beanDao)
         
         assertNotNull(beanRepository)

@@ -60,8 +60,28 @@ abstract class OnboardingModule {
             )
         }
 
+        /**
+         * Provides SharedPreferences specifically for bean selection data.
+         * Uses a separate preferences file to persist current bean selection across app restarts.
+         *
+         * @param context Application context
+         * @return SharedPreferences instance for bean selection
+         */
+        @Provides
+        @Singleton
+        @BeanPrefs
+        fun provideBeanSharedPreferences(
+            @ApplicationContext context: Context
+        ): SharedPreferences {
+            return context.getSharedPreferences(
+                BEAN_PREFERENCES_NAME,
+                Context.MODE_PRIVATE
+            )
+        }
+
         private const val ONBOARDING_PREFERENCES_NAME = "onboarding_preferences"
         private const val RECOMMENDATION_PREFERENCES_NAME = "recommendation_preferences"
+        private const val BEAN_PREFERENCES_NAME = "bean_preferences"
     }
 
     /**
@@ -91,3 +111,10 @@ annotation class OnboardingPrefs
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class RecommendationPrefs
+
+/**
+ * Qualifier annotation to distinguish bean selection SharedPreferences from other SharedPreferences.
+ */
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class BeanPrefs
