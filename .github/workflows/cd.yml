@@ -234,23 +234,38 @@ jobs:
       - name: Prepare Play Store what's new (en-US)
         id: play_whatsnew
         env:
-          NOTES_FILE_OUTPUT: ${{ steps.gen_release_notes.outputs.notes_file }}
+          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
+          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
         run: |
           set -euo pipefail
-          NOTES_FILE="$NOTES_FILE_OUTPUT"
+          VERSION_NAME="$VERSION_NAME_OUTPUT"
+          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
           WHATSNEW_DIR="whatsnew"
           mkdir -p "$WHATSNEW_DIR"
-          # Convert Markdown to plain text suitable for Play Console:
-          # - strip '###' headings
-          # - convert leading '- ' bullets to '• '
-          sed -E 's/^###[[:space:]]*//; s/^[[:space:]]*-[[:space:]]/• /' "$NOTES_FILE" > "$WHATSNEW_DIR/whatsnew-en-US"
-
-          # Play Console requires max 500 chars for what's new only for en-US (source of truth)
-          CHAR_COUNT=$(wc -m < "$WHATSNEW_DIR/whatsnew-en-US" | tr -d ' ')
-          if [[ "$CHAR_COUNT" -gt 500 ]]; then
-            echo "ERROR: en-US release notes exceed 500 characters ($CHAR_COUNT). Please shorten the notes in CHANGELOG.md."
+          
+          # Determine which version to extract from CHANGELOG.md
+          if [[ "$IS_TAG_BUILD" == "true" ]]; then
+            EXTRACT_VERSION="$VERSION_NAME"
+          else
+            EXTRACT_VERSION="unreleased"
+          fi
+          
+          # Use the extract-whatsnew.sh script to get priority items (or all items if no priorities)
+          # This extracts items marked with [*] in CHANGELOG.md for Play Store
+          ./scripts/extract-whatsnew.sh "$EXTRACT_VERSION" 500 > "$WHATSNEW_DIR/whatsnew-en-US"
+          
+          # Verify the extraction worked
+          if [[ ! -s "$WHATSNEW_DIR/whatsnew-en-US" ]]; then
+            echo "ERROR: Failed to extract Play Store release notes from CHANGELOG.md"
             exit 1
           fi
+          
+          # Character count is already enforced by the script (max 500)
+          CHAR_COUNT=$(wc -m < "$WHATSNEW_DIR/whatsnew-en-US" | tr -d ' ')
+          echo "Play Store release notes: $CHAR_COUNT characters"
+          echo "=== Play Store What's New (en-US) ==="
+          cat "$WHATSNEW_DIR/whatsnew-en-US"
+          echo "=== End of What's New ==="
 
           echo "whatsnew_dir=$WHATSNEW_DIR" >> $GITHUB_OUTPUT
 

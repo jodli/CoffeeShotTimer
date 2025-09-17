@@ -8,15 +8,15 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Added
 
-- Configurable grinder step sizes to match your specific grinder's precision.
-- Track how your shots taste to build a complete picture of your brewing performance.
-- Get personalized grind adjustment recommendations based on taste and extraction time after each shot.
+- [*] Configurable grinder step sizes to match your specific grinder's precision.
+- [*] Track how your shots taste to build a complete picture of your brewing performance.
+- [*] Get personalized grind adjustment recommendations based on taste and extraction time after each shot.
 - Persistent next-shot guidance that remembers your last recommendation for each bean, displayed prominently when switching between beans.
 
 ### Changed
 
 - Improved onboarding flow to guide existing users through equipment setup and bean configuration when new features are available.
-- Bean selection now persists across app restarts and navigation, ensuring your chosen bean remains selected when switching between screens.
+- [*] Bean selection now persists across app restarts and navigation, ensuring your chosen bean remains selected when switching between screens.
 
 ### Fixed
 
