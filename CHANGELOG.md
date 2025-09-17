@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [1.5.0]
+
 ### Added
 
 - [*] Configurable grinder step sizes to match your specific grinder's precision.
