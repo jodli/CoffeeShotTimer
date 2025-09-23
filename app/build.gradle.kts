@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.detekt)
 }
 
 // Load keystore properties
@@ -295,4 +296,60 @@ dependencies {
     
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Detekt formatting plugin for ktlint rules
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:${libs.versions.detekt.get()}")
+}
+
+// Detekt configuration
+detekt {
+    // Point to the configuration file
+    config.setFrom("$rootDir/config/detekt/detekt.yml")
+    
+    // Enable baseline for suppressing existing issues
+    baseline = file("$rootDir/config/detekt/baseline.xml")
+    
+    // Build upon the default detekt configuration
+    buildUponDefaultConfig = true
+    
+    // Enable all rules by default
+    allRules = false
+    
+    // Ignore test source sets
+    ignoreFailures = false
+}
+
+// Configure all detekt tasks to use JVM target 11 and custom reports
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+    // Ensure every Detekt task uses the shared baseline and config, even on CI
+    baseline.set(rootProject.layout.projectDirectory.file("config/detekt/baseline.xml"))
+    config.setFrom(rootProject.layout.projectDirectory.file("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+
+    // Set JVM target for compatibility
+    jvmTarget = "11"
+    
+    // Performance optimizations for CI
+    parallel = true
+    setIncludes(listOf("**/*.kt", "**/*.kts"))
+    setExcludes(listOf("**/build/**", "**/.*"))
+    
+    // Configure reports
+    reports {
+        // Enable XML report for GitHub Actions integration
+        xml.required.set(true)
+        xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
+        
+        // Enable HTML report for detailed developer review
+        html.required.set(true)
+        html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
+        
+        // Enable SARIF report for GitHub Security tab integration
+        sarif.required.set(true)
+        sarif.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.sarif"))
+        
+        // Disable text and markdown reports to reduce noise
+        txt.required.set(false)
+        md.required.set(false)
+    }
 }

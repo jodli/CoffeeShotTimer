@@ -6,4 +6,6 @@ plugins {
     alias(libs.plugins.hilt.android) apply false
     // KSP replaces KAPT in modules
     alias(libs.plugins.ksp) apply false
+    // Detekt static analysis
+    alias(libs.plugins.detekt) apply false
 }

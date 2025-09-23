@@ -48,6 +48,7 @@ Coffee Shot Timer is a precision Android app designed specifically for espresso 
 - 🏠 Home coffee enthusiasts serious about quality
 
 ## ☕ Support the Project
+
 Love Coffee Shot Timer? Consider supporting its development!
 
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support%20my%20work-FFDD00?style=flat&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jodli)
@@ -62,6 +63,7 @@ This is an Android application built with:
 - **Android Gradle Plugin** — build system
 - **Hilt** — dependency injection
 - **Room Database** — local data storage
+- **Detekt** — static code analysis
 
 ## Getting Started
 
@@ -94,6 +96,39 @@ cd CoffeeShotTimer
 ./gradlew installDevDebug
 ```
 
+### Code Quality & Static Analysis
+
+The project uses **Detekt** for static code analysis to maintain code quality:
+
+#### Running Detekt
+
+```bash
+# Run detekt analysis with Java 21
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk ./gradlew detekt
+
+# Or with default Java (requires Java 21+)
+./gradlew detekt
+```
+
+#### Detekt Reports
+
+Detekt generates multiple report formats:
+
+- **HTML Report**: `app/build/reports/detekt/detekt.html` - Human-readable report for local development
+- **XML Report**: `app/build/reports/detekt/detekt.xml` - For CI/CD integration
+- **SARIF Report**: `app/build/reports/detekt/detekt.sarif` - GitHub Security integration
+
+#### Baseline Management
+
+The project uses a baseline file to track existing issues and prevent regressions:
+
+```bash
+# Update the baseline (suppresses existing issues)
+./gradlew detektBaseline
+```
+
+**Note**: Only regenerate the baseline when necessary, as it suppresses existing issues. New code should meet quality standards without baseline suppression.
+
 ### Release Build
 
 The project includes configuration for release builds. A pre-built release is available in `app/release/app-release.aab`.
@@ -110,15 +145,29 @@ gradle/                 # Gradle configuration
 
 ## Development Workflow
 
-This project uses an automated CI/CD pipeline with three deployment tracks:
+This project uses an automated CI/CD pipeline with three deployment tracks and integrated code quality checks:
+
+### 🛠️ Code Quality Pipeline
+
+Every pull request and push triggers:
+
+1. **Build & Test**: Compilation and unit tests
+2. **Android Lint**: Built-in Android code analysis
+3. **Detekt Analysis**: Kotlin static code analysis with SARIF upload to GitHub Security
+
+Code quality reports are available as:
+
+- GitHub Actions artifacts (HTML reports)
+- GitHub Security tab (vulnerabilities and code quality issues)
+- PR checks (blocking on failure)
 
 ### 🎯 Deployment Tracks
 
-| Trigger | Track | Audience | Purpose |
-|---------|-------|----------|---------|
-| Manual dispatch (any branch) | Internal | Development team | Test risky changes |
-| Push to `main` (app changes) | Beta (Open Testing) | Public beta users | Public testing |
-| Version tag (`v*`) | Production | All users | Live releases |
+| Trigger                      | Track               | Audience          | Purpose            |
+| ---------------------------- | ------------------- | ----------------- | ------------------ |
+| Manual dispatch (any branch) | Internal            | Development team  | Test risky changes |
+| Push to `main` (app changes) | Beta (Open Testing) | Public beta users | Public testing     |
+| Version tag (`v*`)           | Production          | All users         | Live releases      |
 
 ## Contributing
 

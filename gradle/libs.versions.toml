@@ -23,6 +23,7 @@ androidxTestRules = "1.7.0"
 archCoreTesting = "2.2.0"
 kotlinxSerialization = "1.9.0"
 coil = "2.7.0"
+detekt = "1.23.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -89,4 +90,6 @@ hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 # KSP plugin
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+# Detekt plugin
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 

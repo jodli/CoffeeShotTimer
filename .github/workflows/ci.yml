@@ -2,14 +2,66 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
+  detekt:
+    name: Detekt Static Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: "17"
+          distribution: "temurin"
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Detekt analysis
+        run: ./gradlew detekt
+
+      - name: Upload Detekt reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: detekt-reports
+          path: |
+            app/build/reports/detekt/detekt.html
+            app/build/reports/detekt/detekt.xml
+            app/build/reports/detekt/detekt.sarif
+
+      - name: Upload SARIF to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: app/build/reports/detekt/detekt.sarif
+          category: detekt
+
   lint:
     name: Lint Check
     runs-on: ubuntu-latest
@@ -25,8 +77,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -56,7 +108,7 @@ jobs:
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest
-    needs: lint
+    needs: [lint, detekt]
     permissions:
       contents: read
 
@@ -69,8 +121,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -122,8 +174,8 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: "17"
+          distribution: "temurin"
 
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
@@ -148,3 +200,4 @@ jobs:
           path: |
             app/build/outputs/apk/dev/debug/*.apk
             app/build/outputs/apk/prod/debug/*.apk
+
