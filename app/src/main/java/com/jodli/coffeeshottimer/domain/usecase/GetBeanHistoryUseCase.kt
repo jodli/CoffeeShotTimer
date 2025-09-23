@@ -195,7 +195,7 @@ class GetBeanHistoryUseCase @Inject constructor(
                     val beans = result.getOrNull() ?: emptyList()
                     val recentBeans = beans.filter { bean ->
                         bean.createdAt.toLocalDate().isAfter(thirtyDaysAgo) ||
-                                bean.createdAt.toLocalDate().isEqual(thirtyDaysAgo)
+                            bean.createdAt.toLocalDate().isEqual(thirtyDaysAgo)
                     }
                     Result.success(recentBeans.sortedByDescending { it.createdAt })
                 } else {

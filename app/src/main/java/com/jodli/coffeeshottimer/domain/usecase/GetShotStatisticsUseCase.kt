@@ -80,8 +80,15 @@ class GetShotStatisticsUseCase @Inject constructor(
             )
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting overall statistics", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(
+                        DomainErrorCode.UNKNOWN_ERROR,
+                        "Unexpected error getting overall statistics",
+                        exception
+                    )
+                }
             )
         }
     }
@@ -116,8 +123,11 @@ class GetShotStatisticsUseCase @Inject constructor(
             )
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot trends", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot trends", exception)
+                }
             )
         }
     }
@@ -142,8 +152,15 @@ class GetShotStatisticsUseCase @Inject constructor(
             )
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting grinder setting analysis", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(
+                        DomainErrorCode.UNKNOWN_ERROR,
+                        "Unexpected error getting grinder setting analysis",
+                        exception
+                    )
+                }
             )
         }
     }
@@ -174,8 +191,15 @@ class GetShotStatisticsUseCase @Inject constructor(
             )
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting brew ratio analysis", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(
+                        DomainErrorCode.UNKNOWN_ERROR,
+                        "Unexpected error getting brew ratio analysis",
+                        exception
+                    )
+                }
             )
         }
     }
@@ -206,8 +230,15 @@ class GetShotStatisticsUseCase @Inject constructor(
             )
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting extraction time analysis", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(
+                        DomainErrorCode.UNKNOWN_ERROR,
+                        "Unexpected error getting extraction time analysis",
+                        exception
+                    )
+                }
             )
         }
     }
@@ -273,7 +304,9 @@ class GetShotStatisticsUseCase @Inject constructor(
         val recentShots = shots.sortedByDescending { it.timestamp }.take(7)
         val recentAvgRatio = if (recentShots.isNotEmpty()) {
             recentShots.map { it.brewRatio }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         return OverallStatistics(
             totalShots = totalShots,
@@ -303,19 +336,27 @@ class GetShotStatisticsUseCase @Inject constructor(
 
         val firstHalfAvgRatio = if (firstHalf.isNotEmpty()) {
             firstHalf.map { it.brewRatio }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val secondHalfAvgRatio = if (secondHalf.isNotEmpty()) {
             secondHalf.map { it.brewRatio }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val firstHalfAvgTime = if (firstHalf.isNotEmpty()) {
             firstHalf.map { it.extractionTimeSeconds }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val secondHalfAvgTime = if (secondHalf.isNotEmpty()) {
             secondHalf.map { it.extractionTimeSeconds }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val brewRatioTrend = secondHalfAvgRatio - firstHalfAvgRatio
         val extractionTimeTrend = secondHalfAvgTime - firstHalfAvgTime
@@ -349,8 +390,10 @@ class GetShotStatisticsUseCase @Inject constructor(
                 shotCount = settingShots.size,
                 avgBrewRatio = settingShots.map { it.brewRatio }.average(),
                 avgExtractionTime = settingShots.map { it.extractionTimeSeconds }.average(),
-                optimalExtractionPercentage = (settingShots.count { it.isOptimalExtractionTime() }
-                    .toDouble() / settingShots.size) * 100
+                optimalExtractionPercentage = (
+                    settingShots.count { it.isOptimalExtractionTime() }
+                        .toDouble() / settingShots.size
+                    ) * 100
             )
         }.sortedByDescending { it.shotCount }
 

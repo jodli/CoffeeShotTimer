@@ -8,8 +8,8 @@ import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.first
 import java.time.LocalDate
-import java.util.Locale
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -87,8 +87,11 @@ class GetShotDetailsUseCase @Inject constructor(
             Result.success(shotDetails)
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot details", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot details", exception)
+                }
             )
         }
     }
@@ -132,8 +135,11 @@ class GetShotDetailsUseCase @Inject constructor(
             Result.success(comparison)
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error comparing shots", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error comparing shots", exception)
+                }
             )
         }
     }
@@ -157,8 +163,15 @@ class GetShotDetailsUseCase @Inject constructor(
             getShotDetails(lastShot.id)
         } catch (exception: Exception) {
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting last shot for bean", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(
+                        DomainErrorCode.UNKNOWN_ERROR,
+                        "Unexpected error getting last shot for bean",
+                        exception
+                    )
+                }
             )
         }
     }
@@ -176,19 +189,27 @@ class GetShotDetailsUseCase @Inject constructor(
         // Calculate averages for this bean
         val avgBrewRatio = if (beanShots.isNotEmpty()) {
             beanShots.map { it.brewRatio }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val avgExtractionTime = if (beanShots.isNotEmpty()) {
             beanShots.map { it.extractionTimeSeconds }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val avgWeightIn = if (beanShots.isNotEmpty()) {
             beanShots.map { it.coffeeWeightIn }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         val avgWeightOut = if (beanShots.isNotEmpty()) {
             beanShots.map { it.coffeeWeightOut }.average()
-        } else 0.0
+        } else {
+            0.0
+        }
 
         // Calculate deviations from average
         val brewRatioDeviation = shot.brewRatio - avgBrewRatio
@@ -200,7 +221,7 @@ class GetShotDetailsUseCase @Inject constructor(
         val isOptimalExtraction = shot.isOptimalExtractionTime()
         val isTypicalRatio = shot.isTypicalBrewRatio()
         val isConsistentWithHistory = kotlin.math.abs(brewRatioDeviation) < 0.3 &&
-                kotlin.math.abs(extractionTimeDeviation) < 5
+            kotlin.math.abs(extractionTimeDeviation) < 5
 
         // Calculate quality score (0-100)
         var qualityScore = 50 // Base score
@@ -403,7 +424,7 @@ enum class RecommendationType {
  * Priority levels for recommendations.
  */
 enum class RecommendationPriority {
-    HIGH,    // Critical for shot quality
-    MEDIUM,  // Important for consistency
-    LOW      // Nice to have improvements
+    HIGH, // Critical for shot quality
+    MEDIUM, // Important for consistency
+    LOW // Nice to have improvements
 }

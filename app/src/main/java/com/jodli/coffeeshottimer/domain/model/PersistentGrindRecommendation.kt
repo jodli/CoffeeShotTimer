@@ -6,48 +6,48 @@ import java.time.LocalDateTime
  * Domain model representing a persistent grind recommendation for a specific bean.
  * This model extends the temporary GrindAdjustmentRecommendation with persistence capabilities
  * and additional context needed for displaying next-shot guidance.
- * 
+ *
  * Unlike GrindAdjustmentRecommendation which is calculated on-demand, this model is stored
  * and retrieved across app sessions to provide consistent guidance.
  */
 data class PersistentGrindRecommendation(
     /** The ID of the bean this recommendation applies to */
     val beanId: String,
-    
+
     /** The suggested grind setting (e.g., "5.5") */
     val suggestedGrindSetting: String,
-    
+
     /** Direction of adjustment from previous setting */
     val adjustmentDirection: AdjustmentDirection,
-    
+
     /** Human-readable explanation of why this adjustment is recommended */
     val reason: String,
-    
+
     /** Recommended dose for this bean (from bean settings) */
     val recommendedDose: Double,
-    
+
     /** Target extraction time range (typically 25-30s for espresso) */
     val targetExtractionTime: IntRange,
-    
+
     /** When this recommendation was created */
     val timestamp: LocalDateTime,
-    
+
     /** Whether the user has applied this recommendation */
     val wasFollowed: Boolean = false,
-    
+
     /** Whether this recommendation was based on taste feedback (true) or timing only (false) */
     val basedOnTaste: Boolean,
-    
+
     /** Confidence level of this recommendation */
     val confidence: ConfidenceLevel
 ) {
-    
+
     /**
      * Check if this recommendation suggests any change from current grind setting.
      * @return true if an adjustment is recommended, false for no-change recommendations
      */
     fun hasAdjustment(): Boolean = adjustmentDirection != AdjustmentDirection.NO_CHANGE
-    
+
     /**
      * Get a short description of the adjustment for UI display.
      * @return String like "Grind finer" or "No change needed"
@@ -59,7 +59,7 @@ data class PersistentGrindRecommendation(
             AdjustmentDirection.NO_CHANGE -> "No change needed"
         }
     }
-    
+
     /**
      * Get the target extraction time as a formatted string.
      * @return String like "25-30s"
@@ -67,7 +67,7 @@ data class PersistentGrindRecommendation(
     fun getFormattedTargetTime(): String {
         return "${targetExtractionTime.first}-${targetExtractionTime.last}s"
     }
-    
+
     /**
      * Get a confidence description for UI display.
      * @return String like "High confidence" or "Low confidence"
@@ -79,7 +79,7 @@ data class PersistentGrindRecommendation(
             ConfidenceLevel.LOW -> "Low confidence"
         }
     }
-    
+
     /**
      * Check if this recommendation is recent (within the last 7 days).
      * @return true if recommendation is recent, false if it's old
@@ -87,7 +87,7 @@ data class PersistentGrindRecommendation(
     fun isRecent(): Boolean {
         return timestamp.isAfter(LocalDateTime.now().minusDays(7))
     }
-    
+
     /**
      * Create a new recommendation marked as followed.
      * @return A copy of this recommendation with wasFollowed = true
@@ -95,7 +95,7 @@ data class PersistentGrindRecommendation(
     fun markAsFollowed(): PersistentGrindRecommendation {
         return copy(wasFollowed = true)
     }
-    
+
     /**
      * Get a detailed summary for logging or debugging.
      * @return Detailed string representation of this recommendation
@@ -113,12 +113,12 @@ data class PersistentGrindRecommendation(
             append(")")
         }
     }
-    
+
     companion object {
         /**
          * Create a PersistentGrindRecommendation from a GrindAdjustmentRecommendation
          * and additional bean/shot context.
-         * 
+         *
          * @param beanId The bean this recommendation is for
          * @param recommendation The calculated grind adjustment
          * @param recommendedDose The dose for this bean
@@ -146,10 +146,10 @@ data class PersistentGrindRecommendation(
                 confidence = recommendation.confidence
             )
         }
-        
+
         /**
          * Create a reason string based on shot data and taste feedback.
-         * 
+         *
          * @param extractionTimeSeconds The extraction time of the shot
          * @param tasteFeedback The taste feedback (null if none provided)
          * @return Human-readable reason string

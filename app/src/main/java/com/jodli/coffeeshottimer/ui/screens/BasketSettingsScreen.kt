@@ -42,17 +42,20 @@ fun BasketSettingsScreen(
 ) {
     val spacing = LocalSpacing.current
     val uiState by viewModel.uiState.collectAsState()
-    
+
     // Debug logging for UI state changes
     LaunchedEffect(uiState) {
-        android.util.Log.d("BasketSettingsScreen", "UI State changed: isLoading=${uiState.isLoading}, isBasketValid=${uiState.isBasketValid}, error=${uiState.error}")
+        android.util.Log.d(
+            "BasketSettingsScreen",
+            "UI State changed: isLoading=${uiState.isLoading}, isBasketValid=${uiState.isBasketValid}, error=${uiState.error}"
+        )
     }
 
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Text(
                         text = stringResource(R.string.title_basket_settings),
                         style = MaterialTheme.typography.headlineMedium,
@@ -61,7 +64,10 @@ fun BasketSettingsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.cd_back))
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
+                        )
                     }
                 }
             )
@@ -76,7 +82,10 @@ fun BasketSettingsScreen(
             verticalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
             if (uiState.isLoading) {
-                LoadingIndicator(message = stringResource(R.string.text_saving_configuration), modifier = Modifier.fillMaxWidth())
+                LoadingIndicator(
+                    message = stringResource(R.string.text_saving_configuration),
+                    modifier = Modifier.fillMaxWidth()
+                )
             } else {
                 Text(
                     text = stringResource(R.string.text_basket_settings_description),
@@ -108,8 +117,11 @@ fun BasketSettingsScreen(
 
                 CoffeePrimaryButton(
                     text = stringResource(id = R.string.button_save),
-                    onClick = { 
-                        android.util.Log.d("BasketSettingsScreen", "Save button clicked - isBasketValid=${uiState.isBasketValid}, isLoading=${uiState.isLoading}")
+                    onClick = {
+                        android.util.Log.d(
+                            "BasketSettingsScreen",
+                            "Save button clicked - isBasketValid=${uiState.isBasketValid}, isLoading=${uiState.isLoading}"
+                        )
                         viewModel.saveConfiguration(
                             onSuccess = {
                                 android.util.Log.d("BasketSettingsScreen", "Save successful, navigating back")

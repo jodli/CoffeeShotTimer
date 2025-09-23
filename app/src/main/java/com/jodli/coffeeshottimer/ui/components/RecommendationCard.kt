@@ -10,15 +10,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.usecase.RecommendationPriority
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
-import com.jodli.coffeeshottimer.ui.util.formatForDisplay
 import com.jodli.coffeeshottimer.ui.util.FormattedRecommendation
+import com.jodli.coffeeshottimer.ui.util.formatForDisplay
 
 /**
  * Card component for displaying shot recommendations.
@@ -42,9 +41,9 @@ fun RecommendationCard(
                     stringResource(R.string.text_recommendations)
                 }
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(spacing.small),
                 modifier = Modifier.fillMaxWidth()
@@ -69,7 +68,7 @@ private fun RecommendationItem(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(spacing.small),
@@ -80,7 +79,7 @@ private fun RecommendationItem(
             priority = recommendation.priority,
             modifier = Modifier.padding(top = 2.dp) // Align with text baseline
         )
-        
+
         // Recommendation text with proper typography hierarchy
         Text(
             text = recommendation.text,
@@ -101,7 +100,7 @@ private fun PriorityIndicator(
     modifier: Modifier = Modifier
 ) {
     val (color, contentDescription) = getPriorityColorAndDescription(priority)
-    
+
     Box(
         modifier = modifier
             .size(size)
@@ -119,7 +118,9 @@ private fun PriorityIndicator(
  * Get priority color and content description for consistent theming.
  */
 @Composable
-private fun getPriorityColorAndDescription(priority: RecommendationPriority): Pair<androidx.compose.ui.graphics.Color, String> {
+private fun getPriorityColorAndDescription(
+    priority: RecommendationPriority
+): Pair<androidx.compose.ui.graphics.Color, String> {
     return when (priority) {
         RecommendationPriority.HIGH -> MaterialTheme.colorScheme.error to "High priority"
         RecommendationPriority.MEDIUM -> MaterialTheme.colorScheme.tertiary to "Medium priority"
@@ -155,14 +156,14 @@ fun CompactRecommendationList(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.primary
             )
-            
+
             formattedRecommendations.forEach { recommendation ->
                 CompactRecommendationItem(
                     recommendation = recommendation,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            
+
             // Show "more" indicator if needed
             if (recommendations.size > maxItems) {
                 Text(
@@ -185,7 +186,7 @@ private fun CompactRecommendationItem(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall),
@@ -197,7 +198,7 @@ private fun CompactRecommendationItem(
             size = LocalSpacing.current.priorityIndicator,
             modifier = Modifier.padding(top = LocalSpacing.current.priorityIndicator) // Align with text baseline
         )
-        
+
         // Recommendation text with caption typography
         Text(
             text = recommendation.text,

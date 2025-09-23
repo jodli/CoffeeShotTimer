@@ -12,7 +12,7 @@ import com.jodli.coffeeshottimer.ui.navigation.getBottomNavigationItems
 
 /**
  * Navigation rail for landscape orientation following Material Design guidelines.
- * 
+ *
  * This component provides:
  * - Vertical navigation layout optimized for landscape mode
  * - Better space utilization than bottom navigation in landscape

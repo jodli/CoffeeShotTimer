@@ -21,41 +21,41 @@ import javax.inject.Singleton
 class GrindRecommendationPreferences @Inject constructor(
     @param:RecommendationPrefs private val sharedPreferences: SharedPreferences
 ) {
-    
+
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
     }
-    
+
     /**
      * Save a grind recommendation for a specific bean.
-     * 
+     *
      * @param beanId The ID of the bean this recommendation is for
      * @param recommendation The recommendation data to store
      */
     suspend fun saveRecommendation(
-        beanId: String, 
+        beanId: String,
         recommendation: SerializableGrindRecommendation
     ) = withContext(Dispatchers.IO) {
         val key = createRecommendationKey(beanId)
         val recommendationJson = json.encodeToString(recommendation)
-        
+
         sharedPreferences.edit()
             .putString(key, recommendationJson)
             .apply()
     }
-    
+
     /**
      * Get the stored grind recommendation for a specific bean.
-     * 
+     *
      * @param beanId The ID of the bean to get recommendation for
      * @return The stored recommendation, or null if none exists
      */
-    suspend fun getRecommendation(beanId: String): SerializableGrindRecommendation? = 
+    suspend fun getRecommendation(beanId: String): SerializableGrindRecommendation? =
         withContext(Dispatchers.IO) {
             val key = createRecommendationKey(beanId)
             val recommendationJson = sharedPreferences.getString(key, null)
-            
+
             if (recommendationJson != null) {
                 try {
                     json.decodeFromString<SerializableGrindRecommendation>(recommendationJson)
@@ -68,10 +68,10 @@ class GrindRecommendationPreferences @Inject constructor(
                 null
             }
         }
-    
+
     /**
      * Clear the stored recommendation for a specific bean.
-     * 
+     *
      * @param beanId The ID of the bean to clear recommendation for
      */
     suspend fun clearRecommendation(beanId: String) = withContext(Dispatchers.IO) {
@@ -80,10 +80,10 @@ class GrindRecommendationPreferences @Inject constructor(
             .remove(key)
             .apply()
     }
-    
+
     /**
      * Mark a recommendation as followed by updating the wasFollowed flag.
-     * 
+     *
      * @param beanId The ID of the bean to update recommendation for
      */
     suspend fun markRecommendationFollowed(beanId: String) = withContext(Dispatchers.IO) {
@@ -93,11 +93,11 @@ class GrindRecommendationPreferences @Inject constructor(
             saveRecommendation(beanId, updatedRecommendation)
         }
     }
-    
+
     /**
      * Get all bean IDs that have stored recommendations.
      * Useful for cleanup or analytics.
-     * 
+     *
      * @return List of bean IDs with stored recommendations
      */
     suspend fun getAllRecommendationBeanIds(): List<String> = withContext(Dispatchers.IO) {
@@ -105,7 +105,7 @@ class GrindRecommendationPreferences @Inject constructor(
             .filter { it.startsWith(RECOMMENDATION_KEY_PREFIX) }
             .map { it.removePrefix(RECOMMENDATION_KEY_PREFIX) }
     }
-    
+
     /**
      * Clear all stored recommendations.
      * Useful for testing or user data reset.
@@ -119,11 +119,11 @@ class GrindRecommendationPreferences @Inject constructor(
             }
         editor.apply()
     }
-    
+
     private fun createRecommendationKey(beanId: String): String {
         return "$RECOMMENDATION_KEY_PREFIX$beanId"
     }
-    
+
     companion object {
         private const val RECOMMENDATION_KEY_PREFIX = "grind_recommendation_"
     }
@@ -149,7 +149,7 @@ data class SerializableGrindRecommendation(
 ) {
     companion object {
         private val dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
-        
+
         /**
          * Create from domain data with current timestamp.
          */
@@ -176,7 +176,7 @@ data class SerializableGrindRecommendation(
                 confidence = confidence
             )
         }
-        
+
         /**
          * Parse timestamp from stored string.
          */
@@ -184,14 +184,14 @@ data class SerializableGrindRecommendation(
             return LocalDateTime.parse(timestampString, dateFormatter)
         }
     }
-    
+
     /**
      * Get the timestamp as LocalDateTime.
      */
     fun getTimestamp(): LocalDateTime {
         return parseTimestamp(timestamp)
     }
-    
+
     /**
      * Get the target extraction time as IntRange.
      */

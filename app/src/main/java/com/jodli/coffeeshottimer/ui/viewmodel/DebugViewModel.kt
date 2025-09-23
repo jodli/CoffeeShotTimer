@@ -3,17 +3,17 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.BuildConfig
-import com.jodli.coffeeshottimer.data.util.DatabasePopulator
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
+import com.jodli.coffeeshottimer.data.util.DatabasePopulator
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
-import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
-import com.jodli.coffeeshottimer.R
 
 /**
  * ViewModel for managing debug dialog state and database operations.
@@ -129,7 +129,6 @@ class DebugViewModel @Inject constructor(
         }
     }
 
-
     /**
      * Configures onboarding state to simulate an existing user who hasn't created beans.
      * Will skip introduction but show equipment setup and bean creation.
@@ -214,7 +213,6 @@ class DebugViewModel @Inject constructor(
             }
         }
     }
-
 
     /**
      * Clears any operation result message.

@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -24,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -45,12 +42,12 @@ fun StepSizeSelector(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     // Parse current step size for comparison with presets
     val currentStepSize by remember(stepSize) {
         derivedStateOf { stepSize.toDoubleOrNull() }
     }
-    
+
     Column(modifier = modifier) {
         // Title
         Text(
@@ -59,27 +56,27 @@ fun StepSizeSelector(
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Description
         Text(
             text = stringResource(R.string.text_step_size_description),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Preset chips
         Text(
             text = stringResource(R.string.text_common_step_sizes),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.small),
@@ -89,7 +86,7 @@ fun StepSizeSelector(
                 FilterChip(
                     selected = currentStepSize == preset,
                     onClick = { onPresetSelected(preset) },
-                    label = { 
+                    label = {
                         Text(
                             text = formatStepSize(preset),
                             style = MaterialTheme.typography.labelMedium
@@ -102,9 +99,9 @@ fun StepSizeSelector(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Custom input
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -122,16 +119,16 @@ fun StepSizeSelector(
                 modifier = Modifier.weight(1f)
             )
         }
-        
+
         // Show validation info if range is provided
         if (scaleMin != null && scaleMax != null && stepSize.isNotBlank()) {
             val stepValue = stepSize.toDoubleOrNull()
             if (stepValue != null && stepValue > 0) {
                 val rangeSize = scaleMax - scaleMin
                 val numberOfSteps = (rangeSize / stepValue).toInt()
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 Text(
                     text = stringResource(
                         R.string.text_step_size_info,
@@ -141,10 +138,11 @@ fun StepSizeSelector(
                         scaleMax
                     ),
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (stepSizeError != null) 
-                        MaterialTheme.colorScheme.error 
-                    else 
+                    color = if (stepSizeError != null) {
+                        MaterialTheme.colorScheme.error
+                    } else {
                         MaterialTheme.colorScheme.primary
+                    }
                 )
             }
         }

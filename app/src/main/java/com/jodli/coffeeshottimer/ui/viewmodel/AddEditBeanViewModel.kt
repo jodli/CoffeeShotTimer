@@ -1,26 +1,26 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
-import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
-import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.jodli.coffeeshottimer.R
+import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
+import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import com.jodli.coffeeshottimer.ui.validation.validateBeanNameEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateNotesEnhanced
 import com.jodli.coffeeshottimer.ui.validation.validateRoastDateEnhanced
-import com.jodli.coffeeshottimer.ui.components.ValidationUtils
-import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
-import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
-import com.jodli.coffeeshottimer.data.model.Bean
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -222,7 +222,7 @@ class AddEditBeanViewModel @Inject constructor(
 
             if (result.isSuccess) {
                 val savedBean = result.getOrNull()
-                
+
                 // If we're in create mode and have a pending photo, add it to the newly created bean
                 if (editingBeanId == null && currentState.pendingPhotoUri != null) {
                     if (savedBean != null) {
@@ -482,15 +482,15 @@ class AddEditBeanViewModel @Inject constructor(
             // In edit mode, check if any field has changed from original values
             // This would require storing original values, for now return true if any field has content
             currentState.name.isNotBlank() ||
-                    currentState.notes.isNotBlank() ||
-                    currentState.pendingPhotoUri != null
+                currentState.notes.isNotBlank() ||
+                currentState.pendingPhotoUri != null
         } else {
             // In add mode, check if any field has been modified from defaults
             currentState.name.isNotBlank() ||
-                    currentState.roastDate != LocalDate.now() ||
-                    currentState.notes.isNotBlank() ||
-                    !currentState.isActive ||
-                    currentState.pendingPhotoUri != null
+                currentState.roastDate != LocalDate.now() ||
+                currentState.notes.isNotBlank() ||
+                !currentState.isActive ||
+                currentState.pendingPhotoUri != null
         }
     }
 
@@ -503,7 +503,6 @@ class AddEditBeanViewModel @Inject constructor(
         return photoCaptureManager.isCameraPermissionGranted(context)
     }
 
-
     /**
      * Creates a camera capture intent with a temporary file URI.
      */
@@ -514,7 +513,6 @@ class AddEditBeanViewModel @Inject constructor(
             null
         }
     }
-
 
     /**
      * Cleans up a temporary camera file.
@@ -531,8 +529,6 @@ class AddEditBeanViewModel @Inject constructor(
     fun isCameraAvailable(context: Context): Boolean {
         return photoCaptureManager.isCameraAvailable(context)
     }
-
-
 }
 
 /**

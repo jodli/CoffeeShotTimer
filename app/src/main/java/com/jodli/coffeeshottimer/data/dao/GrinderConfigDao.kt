@@ -85,13 +85,15 @@ interface GrinderConfigDao {
      * Delete old configurations, keeping only the most recent N configurations.
      * Useful for cleanup to prevent unlimited configuration history.
      */
-    @Query("""
+    @Query(
+        """
         DELETE FROM grinder_configuration 
         WHERE id NOT IN (
             SELECT id FROM grinder_configuration 
             ORDER BY createdAt DESC 
             LIMIT :keepCount
         )
-    """)
+    """
+    )
     suspend fun deleteOldConfigs(keepCount: Int = 5)
 }

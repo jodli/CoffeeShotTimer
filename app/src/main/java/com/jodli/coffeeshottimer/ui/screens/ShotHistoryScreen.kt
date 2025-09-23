@@ -13,21 +13,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,28 +40,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalDensity
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
-import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
-import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
+import com.jodli.coffeeshottimer.ui.components.CompactTasteDisplay
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
-import com.jodli.coffeeshottimer.ui.components.SectionHeader
 import com.jodli.coffeeshottimer.ui.components.ShotHistoryFilterDialog
-import com.jodli.coffeeshottimer.ui.components.CompactTasteDisplay
 import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
-import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryViewModel
@@ -190,7 +182,7 @@ private fun ShotHistoryPortraitContent(
 }
 
 /**
- * Landscape layout content for ShotHistoryScreen  
+ * Landscape layout content for ShotHistoryScreen
  * Clean layout with landscape-aware spacing, no redundant title
  */
 @Composable
@@ -208,7 +200,7 @@ private fun ShotHistoryLandscapeContent(
     modifier: Modifier = Modifier
 ) {
     val landscapeSpacing = spacing.landscapeSpacing()
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -270,7 +262,13 @@ private fun ShotHistoryActionButtons(
         ) {
             Icon(
                 imageVector = if (showAnalysis) Icons.AutoMirrored.Filled.List else Icons.Default.Info,
-                contentDescription = if (showAnalysis) stringResource(R.string.cd_shot_list) else stringResource(R.string.cd_analysis),
+                contentDescription = if (showAnalysis) {
+                    stringResource(
+                        R.string.cd_shot_list
+                    )
+                } else {
+                    stringResource(R.string.cd_analysis)
+                },
                 tint = if (showAnalysis) {
                     MaterialTheme.colorScheme.primary
                 } else {
@@ -333,7 +331,13 @@ private fun ShotHistoryContent(
             uiState.isEmpty -> {
                 EmptyState(
                     icon = Icons.AutoMirrored.Filled.List,
-                    title = if (currentFilter.hasFilters()) stringResource(R.string.cd_no_shots) else stringResource(R.string.cd_no_shots_recorded),
+                    title = if (currentFilter.hasFilters()) {
+                        stringResource(
+                            R.string.cd_no_shots
+                        )
+                    } else {
+                        stringResource(R.string.cd_no_shots_recorded)
+                    },
                     description = if (currentFilter.hasFilters()) {
                         stringResource(R.string.text_search_beans_hint)
                     } else {
@@ -401,7 +405,13 @@ private fun ShotHistoryLandscapeList(
             uiState.isEmpty -> {
                 EmptyState(
                     icon = Icons.AutoMirrored.Filled.List,
-                    title = if (currentFilter.hasFilters()) stringResource(R.string.cd_no_shots) else stringResource(R.string.cd_no_shots_recorded),
+                    title = if (currentFilter.hasFilters()) {
+                        stringResource(
+                            R.string.cd_no_shots
+                        )
+                    } else {
+                        stringResource(R.string.cd_no_shots_recorded)
+                    },
                     description = if (currentFilter.hasFilters()) {
                         stringResource(R.string.text_search_beans_hint)
                     } else {
@@ -518,7 +528,7 @@ private fun ShotHistoryLandscapeItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             // Center section: Horizontal metric chips (main landscape enhancement)
             Row(
                 modifier = Modifier.weight(0.5f),
@@ -554,7 +564,11 @@ private fun ShotHistoryLandscapeItem(
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     Text(
-                        text = stringResource(R.string.format_weight_in_out, shot.coffeeWeightIn.toInt(), shot.coffeeWeightOut.toInt()),
+                        text = stringResource(
+                            R.string.format_weight_in_out,
+                            shot.coffeeWeightIn.toInt(),
+                            shot.coffeeWeightOut.toInt()
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -630,7 +644,7 @@ private fun ActiveFiltersPortraitDisplay(
 
         // Display active filters
         val filterTexts = getActiveFilterTexts(filter, availableBeans)
-        
+
         filterTexts.forEach { text ->
             Text(
                 text = stringResource(R.string.symbol_bullet, text),
@@ -684,7 +698,7 @@ private fun ActiveFiltersLandscapeDisplay(
                         modifier = Modifier
                     )
                 }
-                
+
                 if (filterTexts.size > 3) {
                     FilterChip(
                         text = stringResource(R.string.format_more_filters, filterTexts.size - 3),
@@ -875,7 +889,7 @@ private fun ShotHistoryItem(
                             isNeutral = true
                         )
                     }
-                    
+
                     // Taste feedback display
                     CompactTasteDisplay(
                         tastePrimary = shot.tastePrimary,
@@ -891,7 +905,11 @@ private fun ShotHistoryItem(
                     horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     Text(
-                        text = stringResource(R.string.format_weight_in_out, shot.coffeeWeightIn.toInt(), shot.coffeeWeightOut.toInt()),
+                        text = stringResource(
+                            R.string.format_weight_in_out,
+                            shot.coffeeWeightIn.toInt(),
+                            shot.coffeeWeightOut.toInt()
+                        ),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -1171,51 +1189,57 @@ private fun OverallStatisticsCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Key metrics grid
-                    Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = stringResource(R.string.label_total_shots),
-                    value = statistics.totalShots.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_beans_used),
-                    value = statistics.uniqueBeans.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_avg_ratio),
-                    value = stringResource(R.string.format_avg_brew_ratio_display, statistics.avgBrewRatio),
-                    modifier = Modifier.weight(1f)
-                )
-                    }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = stringResource(R.string.label_total_shots),
+                value = statistics.totalShots.toString(),
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = stringResource(R.string.label_beans_used),
+                value = statistics.uniqueBeans.toString(),
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = stringResource(R.string.label_avg_ratio),
+                value = stringResource(R.string.format_avg_brew_ratio_display, statistics.avgBrewRatio),
+                modifier = Modifier.weight(1f)
+            )
+        }
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-                    Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = stringResource(R.string.label_avg_time),
-                    value = stringResource(R.string.format_avg_extraction_time_display, statistics.avgExtractionTime.toInt()),
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_optimal_time),
-                    value = stringResource(R.string.format_optimal_extraction_percentage, statistics.optimalExtractionPercentage),
-                    isGood = statistics.optimalExtractionPercentage > 50,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_good_ratio),
-                    value = stringResource(R.string.format_typical_ratio_percentage, statistics.typicalRatioPercentage),
-                    isGood = statistics.typicalRatioPercentage > 50,
-                    modifier = Modifier.weight(1f)
-                )
-                    }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = stringResource(R.string.label_avg_time),
+                value = stringResource(
+                    R.string.format_avg_extraction_time_display,
+                    statistics.avgExtractionTime.toInt()
+                ),
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = stringResource(R.string.label_optimal_time),
+                value = stringResource(
+                    R.string.format_optimal_extraction_percentage,
+                    statistics.optimalExtractionPercentage
+                ),
+                isGood = statistics.optimalExtractionPercentage > 50,
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = stringResource(R.string.label_good_ratio),
+                value = stringResource(R.string.format_typical_ratio_percentage, statistics.typicalRatioPercentage),
+                isGood = statistics.typicalRatioPercentage > 50,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
         statistics.mostUsedGrinderSetting?.let { setting ->
             Spacer(modifier = Modifier.height(spacing.medium))
@@ -1244,40 +1268,48 @@ private fun ShotTrendsCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Trend indicators
-                    Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                TrendItem(
-                    label = stringResource(R.string.label_shots_per_day),
-                    value = String.format(java.util.Locale.ROOT, "%.1f", trends.shotsPerDay),
-                    modifier = Modifier.weight(1f)
-                )
-                TrendItem(
-                    label = stringResource(R.string.label_ratio_trend),
-                    value = if (trends.brewRatioTrend >= 0) "+${
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            TrendItem(
+                label = stringResource(R.string.label_shots_per_day),
+                value = String.format(java.util.Locale.ROOT, "%.1f", trends.shotsPerDay),
+                modifier = Modifier.weight(1f)
+            )
+            TrendItem(
+                label = stringResource(R.string.label_ratio_trend),
+                value = if (trends.brewRatioTrend >= 0) {
+                    "+${
                         String.format(
                             java.util.Locale.ROOT,
                             "%.2f",
                             trends.brewRatioTrend
                         )
-                    }" else String.format(java.util.Locale.ROOT, "%.2f", trends.brewRatioTrend),
-                    isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
-                    modifier = Modifier.weight(1f)
-                )
-                TrendItem(
-                    label = stringResource(R.string.label_time_trend),
-                    value = if (trends.extractionTimeTrend >= 0) "+${
+                    }"
+                } else {
+                    String.format(java.util.Locale.ROOT, "%.2f", trends.brewRatioTrend)
+                },
+                isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
+                modifier = Modifier.weight(1f)
+            )
+            TrendItem(
+                label = stringResource(R.string.label_time_trend),
+                value = if (trends.extractionTimeTrend >= 0) {
+                    "+${
                         String.format(
                             java.util.Locale.ROOT,
                             "%.1f",
                             trends.extractionTimeTrend
                         )
-                    }s" else stringResource(R.string.format_extraction_time_trend_display, trends.extractionTimeTrend),
-                    isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
-                    modifier = Modifier.weight(1f)
-                )
-                    }
+                    }s"
+                } else {
+                    stringResource(R.string.format_extraction_time_trend_display, trends.extractionTimeTrend)
+                },
+                isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -1299,7 +1331,13 @@ private fun ShotTrendsCard(
             )
             Spacer(modifier = Modifier.width(spacing.small))
             Text(
-                text = if (trends.isImproving) stringResource(R.string.text_improving_consistency) else stringResource(R.string.text_room_for_improvement),
+                text = if (trends.isImproving) {
+                    stringResource(
+                        R.string.text_improving_consistency
+                    )
+                } else {
+                    stringResource(R.string.text_room_for_improvement)
+                },
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (trends.isImproving) {
                     MaterialTheme.colorScheme.primary
@@ -1346,29 +1384,32 @@ private fun BrewRatioAnalysisCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Quality breakdown
-                    Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = stringResource(R.string.label_typical_range),
-                    value = stringResource(R.string.format_typical_ratio_percentage, analysis.typicalRatioPercentage),
-                    isGood = analysis.typicalRatioPercentage > 70,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_under_extracted),
-                    value = stringResource(R.string.format_under_extracted_percentage, analysis.underExtractedPercentage),
-                    isGood = analysis.underExtractedPercentage < 20,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_over_extracted),
-                    value = stringResource(R.string.format_over_extracted_percentage, analysis.overExtractedPercentage),
-                    isGood = analysis.overExtractedPercentage < 20,
-                    modifier = Modifier.weight(1f)
-                )
-                    }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatisticItem(
+                label = stringResource(R.string.label_typical_range),
+                value = stringResource(R.string.format_typical_ratio_percentage, analysis.typicalRatioPercentage),
+                isGood = analysis.typicalRatioPercentage > 70,
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = stringResource(R.string.label_under_extracted),
+                value = stringResource(
+                    R.string.format_under_extracted_percentage,
+                    analysis.underExtractedPercentage
+                ),
+                isGood = analysis.underExtractedPercentage < 20,
+                modifier = Modifier.weight(1f)
+            )
+            StatisticItem(
+                label = stringResource(R.string.label_over_extracted),
+                value = stringResource(R.string.format_over_extracted_percentage, analysis.overExtractedPercentage),
+                isGood = analysis.overExtractedPercentage < 20,
+                modifier = Modifier.weight(1f)
+            )
+        }
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -1438,29 +1479,32 @@ private fun ExtractionTimeAnalysisCard(
             Spacer(modifier = Modifier.height(spacing.medium))
 
             // Quality breakdown
-                            Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    StatisticItem(
-                        label = stringResource(R.string.label_optimal_time_range_short),
-                        value = stringResource(R.string.format_optimal_extraction_percentage, analysis.optimalTimePercentage),
-                        isGood = analysis.optimalTimePercentage > 50,
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatisticItem(
-                        label = stringResource(R.string.label_too_fast),
-                        value = stringResource(R.string.format_too_fast_percentage, analysis.tooFastPercentage),
-                        isGood = analysis.tooFastPercentage < 30,
-                        modifier = Modifier.weight(1f)
-                    )
-                    StatisticItem(
-                        label = stringResource(R.string.label_too_slow),
-                        value = stringResource(R.string.format_too_slow_percentage, analysis.tooSlowPercentage),
-                        isGood = analysis.tooSlowPercentage < 30,
-                        modifier = Modifier.weight(1f)
-                    )
-                            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                StatisticItem(
+                    label = stringResource(R.string.label_optimal_time_range_short),
+                    value = stringResource(
+                        R.string.format_optimal_extraction_percentage,
+                        analysis.optimalTimePercentage
+                    ),
+                    isGood = analysis.optimalTimePercentage > 50,
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_too_fast),
+                    value = stringResource(R.string.format_too_fast_percentage, analysis.tooFastPercentage),
+                    isGood = analysis.tooFastPercentage < 30,
+                    modifier = Modifier.weight(1f)
+                )
+                StatisticItem(
+                    label = stringResource(R.string.label_too_slow),
+                    value = stringResource(R.string.format_too_slow_percentage, analysis.tooSlowPercentage),
+                    isGood = analysis.tooSlowPercentage < 30,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
             Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -1608,7 +1652,10 @@ private fun GrinderSettingItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = stringResource(R.string.format_optimal_extraction_percentage_long, setting.optimalExtractionPercentage),
+                    text = stringResource(
+                        R.string.format_optimal_extraction_percentage_long,
+                        setting.optimalExtractionPercentage
+                    ),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -1768,7 +1815,7 @@ private fun calculateShotSuccessScore(shot: Shot): Int {
 
     // Consistency bonus (reasonable input/output weights) = 20 points
     val isReasonableWeights = shot.coffeeWeightIn in 15.0..25.0 &&
-            shot.coffeeWeightOut in 25.0..60.0
+        shot.coffeeWeightOut in 25.0..60.0
     if (isReasonableWeights) {
         score += 20
     }

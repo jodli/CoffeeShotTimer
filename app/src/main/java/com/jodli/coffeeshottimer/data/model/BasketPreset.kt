@@ -24,7 +24,7 @@ enum class BasketPreset(
         coffeeOutMin = 28f,
         coffeeOutMax = 55f
     );
-    
+
     fun toBasketConfiguration(): BasketConfiguration {
         return BasketConfiguration(
             coffeeInMin = coffeeInMin,

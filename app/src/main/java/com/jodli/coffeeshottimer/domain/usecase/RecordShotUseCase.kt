@@ -205,7 +205,9 @@ class RecordShotUseCase @Inject constructor(
                     error = error
                 )
 
-                Result.failure(result.exceptionOrNull() ?: DomainException(DomainErrorCode.SHOT_RECORDING_FAILED, error))
+                Result.failure(
+                    result.exceptionOrNull() ?: DomainException(DomainErrorCode.SHOT_RECORDING_FAILED, error)
+                )
             }
         } catch (exception: Exception) {
             // Update recording state with error
@@ -215,8 +217,11 @@ class RecordShotUseCase @Inject constructor(
             )
 
             Result.failure(
-                if (exception is DomainException) exception
-                else DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error recording shot", exception)
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error recording shot", exception)
+                }
             )
         }
     }

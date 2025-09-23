@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,11 +41,10 @@ fun TasteQuickPick(
     showSecondaryOptions: Boolean = false
 ) {
     val spacing = LocalSpacing.current
-    var localSelectedSecondary by remember(selectedSecondary) { 
-        mutableStateOf(selectedSecondary) 
+    var localSelectedSecondary by remember(selectedSecondary) {
+        mutableStateOf(selectedSecondary)
     }
 
-    
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -62,7 +60,7 @@ fun TasteQuickPick(
         // Primary taste buttons
         TastePrimaryButtonRow(
             suggestedTaste = suggested,
-            onTasteSelected = { taste -> 
+            onTasteSelected = { taste ->
                 if (taste != null) {
                     onSelectPrimary(taste)
                 }
@@ -73,7 +71,7 @@ fun TasteQuickPick(
         // Optional secondary qualifiers
         if (showSecondaryOptions && onSelectSecondary != null) {
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             TasteSecondaryChipRow(
                 selectedSecondary = localSelectedSecondary,
                 onSecondarySelected = { newValue ->
@@ -87,7 +85,7 @@ fun TasteQuickPick(
         // Skip button
         if (onSkip != null) {
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             TextButton(
                 onClick = onSkip,
                 modifier = Modifier.semantics {

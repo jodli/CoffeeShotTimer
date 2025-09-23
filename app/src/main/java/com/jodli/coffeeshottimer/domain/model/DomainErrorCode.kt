@@ -54,7 +54,7 @@ enum class DomainErrorCode(val code: String) {
     PHOTO_STORAGE_FULL("PHOTO_STORAGE_FULL"),
     PHOTO_INVALID_URI("PHOTO_INVALID_URI"),
     PHOTO_FILE_ACCESS_ERROR("PHOTO_FILE_ACCESS_ERROR"),
-    
+
     // Camera and permission errors
     CAMERA_UNAVAILABLE("CAMERA_UNAVAILABLE"),
     CAMERA_PERMISSION_DENIED("CAMERA_PERMISSION_DENIED"),
@@ -64,7 +64,7 @@ enum class DomainErrorCode(val code: String) {
 
     // Storage errors
     STORAGE_ERROR("STORAGE_ERROR"),
-    
+
     // Generic errors
     VALIDATION_FAILED("VALIDATION_FAILED"),
     UNKNOWN_ERROR("UNKNOWN_ERROR")

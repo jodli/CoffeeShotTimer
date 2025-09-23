@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.screens
 
+import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -11,22 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Engineering
-import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import com.jodli.coffeeshottimer.R
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,29 +36,29 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.res.stringResource
-import android.net.Uri
+import com.jodli.coffeeshottimer.R
+import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.ui.components.BeanPhotoSection
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
-import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
-import com.jodli.coffeeshottimer.ui.components.BeanPhotoSection
-import com.jodli.coffeeshottimer.ui.components.PhotoViewer
-import com.jodli.coffeeshottimer.ui.components.PhotoActionSheet
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
+import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
+import com.jodli.coffeeshottimer.ui.components.PhotoActionSheet
+import com.jodli.coffeeshottimer.ui.components.PhotoViewer
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.AddEditBeanViewModel
-import com.jodli.coffeeshottimer.data.model.Bean
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -258,7 +250,13 @@ fun AddEditBeanScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (uiState.isEditMode) stringResource(R.string.cd_edit_bean) else stringResource(R.string.text_add_bean),
+                        text = if (uiState.isEditMode) {
+                            stringResource(
+                                R.string.cd_edit_bean
+                            )
+                        } else {
+                            stringResource(R.string.text_add_bean)
+                        },
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -308,7 +306,13 @@ fun AddEditBeanScreen(
                         CoffeeTextField(
                             value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                             onValueChange = { }, // Read-only, handled by date picker
-                            label = if (isOnboardingMode) stringResource(R.string.bean_form_roast_date_label) else stringResource(R.string.label_roast_date_required),
+                            label = if (isOnboardingMode) {
+                                stringResource(
+                                    R.string.bean_form_roast_date_label
+                                )
+                            } else {
+                                stringResource(R.string.label_roast_date_required)
+                            },
                             placeholder = stringResource(R.string.placeholder_select_roast_date),
                             leadingIcon = Icons.Default.DateRange,
                             trailingIcon = Icons.Default.DateRange,
@@ -367,7 +371,13 @@ fun AddEditBeanScreen(
                                 Spacer(modifier = Modifier.height(spacing.small))
 
                                 Text(
-                                    text = if (uiState.isActive) stringResource(R.string.text_active_long) else stringResource(R.string.text_inactive),
+                                    text = if (uiState.isActive) {
+                                        stringResource(
+                                            R.string.text_active_long
+                                        )
+                                    } else {
+                                        stringResource(R.string.text_inactive)
+                                    },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -463,7 +473,13 @@ fun AddEditBeanScreen(
                                 CoffeeTextField(
                                     value = uiState.roastDate.format(DateTimeFormatter.ofPattern("MMM dd, yyyy")),
                                     onValueChange = { }, // Read-only, handled by date picker
-                                    label = if (isOnboardingMode) stringResource(R.string.bean_form_roast_date_label) else stringResource(R.string.label_roast_date_required),
+                                    label = if (isOnboardingMode) {
+                                        stringResource(
+                                            R.string.bean_form_roast_date_label
+                                        )
+                                    } else {
+                                        stringResource(R.string.label_roast_date_required)
+                                    },
                                     placeholder = stringResource(R.string.placeholder_select_roast_date),
                                     leadingIcon = Icons.Default.DateRange,
                                     trailingIcon = Icons.Default.DateRange,
@@ -505,7 +521,13 @@ fun AddEditBeanScreen(
                                         Spacer(modifier = Modifier.height(spacing.small))
 
                                         Text(
-                                            text = if (uiState.isActive) stringResource(R.string.text_active_long) else stringResource(R.string.text_inactive),
+                                            text = if (uiState.isActive) {
+                                                stringResource(
+                                                    R.string.text_active_long
+                                                )
+                                            } else {
+                                                stringResource(R.string.text_inactive)
+                                            },
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )

@@ -17,7 +17,6 @@ class PerformanceMonitor @Inject constructor() {
         private const val TAG = "PerformanceMonitor"
         private const val MAX_SAMPLES = 100
     }
-
 }
 
 /**
@@ -33,4 +32,3 @@ data class OperationStats(
     val p95Ms: Long,
     val totalMs: Long
 )
-

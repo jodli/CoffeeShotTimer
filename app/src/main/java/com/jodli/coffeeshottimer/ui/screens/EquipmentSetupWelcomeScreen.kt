@@ -43,7 +43,7 @@ fun EquipmentSetupWelcomeScreen(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -52,7 +52,7 @@ fun EquipmentSetupWelcomeScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
         Spacer(modifier = Modifier.height(spacing.large))
-        
+
         // Title
         Text(
             text = stringResource(R.string.equipment_setup_welcome_title),
@@ -61,9 +61,9 @@ fun EquipmentSetupWelcomeScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Description
         Text(
             text = stringResource(R.string.equipment_setup_welcome_description),
@@ -72,30 +72,30 @@ fun EquipmentSetupWelcomeScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // What we'll configure cards
         EquipmentSetupInfoCard(
             icon = Icons.Default.Settings,
             title = stringResource(R.string.equipment_setup_grinder_title),
             description = stringResource(R.string.equipment_setup_grinder_description)
         )
-        
+
         EquipmentSetupInfoCard(
             icon = Icons.Default.FilterAlt,
             title = stringResource(R.string.equipment_setup_basket_title),
             description = stringResource(R.string.equipment_setup_basket_description)
         )
-        
+
         EquipmentSetupInfoCard(
             icon = Icons.Default.Speed,
             title = stringResource(R.string.equipment_setup_benefits_title),
             description = stringResource(R.string.equipment_setup_benefits_description)
         )
-        
+
         Spacer(modifier = Modifier.weight(1f))
-        
+
         // Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -106,7 +106,7 @@ fun EquipmentSetupWelcomeScreen(
                 onClick = onSkip,
                 modifier = Modifier.weight(1f)
             )
-            
+
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_get_started),
                 onClick = onContinue,
@@ -127,7 +127,7 @@ fun EquipmentSetupInfoCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -141,16 +141,16 @@ fun EquipmentSetupInfoCard(
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-            
+
             Column {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.extraSmall))
-                
+
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,

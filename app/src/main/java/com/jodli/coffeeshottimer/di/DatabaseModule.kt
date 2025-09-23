@@ -111,7 +111,7 @@ object DatabaseModule {
      * Provides the DatabasePopulator instance for debug builds only.
      * This utility is used for populating the database with test data
      * and clearing database content during development and testing.
-     * 
+     *
      * The provider is conditionally compiled - it only exists in debug builds
      * to ensure no debug code is included in release builds.
      *

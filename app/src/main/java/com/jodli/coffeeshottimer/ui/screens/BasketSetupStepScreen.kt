@@ -50,7 +50,7 @@ fun BasketSetupStepScreen(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -59,7 +59,7 @@ fun BasketSetupStepScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Title
         Text(
             text = stringResource(R.string.equipment_setup_basket_step_title),
@@ -67,7 +67,7 @@ fun BasketSetupStepScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Description
         Text(
             text = stringResource(R.string.equipment_setup_basket_step_description),
@@ -75,9 +75,9 @@ fun BasketSetupStepScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Basket configuration card
         BasketSetup(
             coffeeInMin = coffeeInMin,
@@ -98,9 +98,9 @@ fun BasketSetupStepScreen(
             showDescription = false, // Already shown above
             showPresets = true
         )
-        
+
         Spacer(modifier = Modifier.weight(1f))
-        
+
         // Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -111,12 +111,14 @@ fun BasketSetupStepScreen(
                 onClick = onBack,
                 modifier = Modifier.weight(1f)
             )
-            
+
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_continue),
                 onClick = onContinue,
-                enabled = isValid || (coffeeInMin.isBlank() && coffeeInMax.isBlank() && 
-                         coffeeOutMin.isBlank() && coffeeOutMax.isBlank()),
+                enabled = isValid || (
+                    coffeeInMin.isBlank() && coffeeInMax.isBlank() &&
+                        coffeeOutMin.isBlank() && coffeeOutMax.isBlank()
+                    ),
                 modifier = Modifier.weight(1f)
             )
         }

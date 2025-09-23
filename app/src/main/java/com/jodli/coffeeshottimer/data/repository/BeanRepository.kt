@@ -222,7 +222,9 @@ class BeanRepository @Inject constructor(
                 return Result.failure(RepositoryException.ValidationError("Grinder setting cannot be empty"))
             }
             if (grinderSetting.length > 50) {
-                return Result.failure(RepositoryException.ValidationError("Grinder setting cannot exceed 50 characters"))
+                return Result.failure(
+                    RepositoryException.ValidationError("Grinder setting cannot exceed 50 characters")
+                )
             }
 
             // Check if bean exists
@@ -363,7 +365,7 @@ class BeanRepository @Inject constructor(
             sharedPreferences.edit()
                 .putString(KEY_CURRENT_BEAN_ID, beanId)
                 .apply()
-            
+
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(
@@ -609,7 +611,7 @@ class BeanRepository @Inject constructor(
             // Get all photo paths currently referenced by beans
             val allBeans = beanDao.getAllBeans()
             var referencedPhotoPaths = setOf<String>()
-            
+
             allBeans.collect { beans ->
                 referencedPhotoPaths = beans.mapNotNull { it.photoPath }.toSet()
             }

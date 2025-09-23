@@ -251,15 +251,15 @@ data class ShotHistoryFilter(
      */
     fun hasFilters(): Boolean {
         return beanId != null ||
-                startDate != null ||
-                endDate != null ||
-                grinderSetting != null ||
-                minBrewRatio != null ||
-                maxBrewRatio != null ||
-                minExtractionTime != null ||
-                maxExtractionTime != null ||
-                onlyOptimalExtractionTime == true ||
-                onlyTypicalBrewRatio == true
+            startDate != null ||
+            endDate != null ||
+            grinderSetting != null ||
+            minBrewRatio != null ||
+            maxBrewRatio != null ||
+            minExtractionTime != null ||
+            maxExtractionTime != null ||
+            onlyOptimalExtractionTime == true ||
+            onlyTypicalBrewRatio == true
     }
 
     /**

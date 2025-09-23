@@ -18,16 +18,16 @@ import javax.inject.Singleton
 class OnboardingPreferences @Inject constructor(
     @param:OnboardingPrefs private val sharedPreferences: SharedPreferences
 ) : OnboardingManager {
-    
+
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
     }
-    
+
     override suspend fun isFirstTimeUser(): Boolean = withContext(Dispatchers.IO) {
         !sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETE, false)
     }
-    
+
     override suspend fun markOnboardingComplete() = withContext(Dispatchers.IO) {
         val currentProgress = getOnboardingProgress()
         val completedProgress = currentProgress.copy(
@@ -37,16 +37,16 @@ class OnboardingPreferences @Inject constructor(
             hasRecordedFirstShot = true,
             lastUpdatedAt = System.currentTimeMillis()
         )
-        
+
         sharedPreferences.edit()
             .putBoolean(KEY_ONBOARDING_COMPLETE, true)
             .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(completedProgress.toSerializable()))
             .apply()
     }
-    
+
     override suspend fun getOnboardingProgress(): OnboardingProgress = withContext(Dispatchers.IO) {
         val progressJson = sharedPreferences.getString(KEY_ONBOARDING_PROGRESS, null)
-        
+
         if (progressJson != null) {
             try {
                 val serializable = json.decodeFromString<SerializableOnboardingProgress>(progressJson)
@@ -56,21 +56,21 @@ class OnboardingPreferences @Inject constructor(
                 return@withContext OnboardingProgress()
             }
         }
-        
+
         // Return default progress if no saved state exists
         OnboardingProgress()
     }
-    
+
     override suspend fun updateOnboardingProgress(progress: OnboardingProgress) = withContext(Dispatchers.IO) {
         val updatedProgress = progress.copy(lastUpdatedAt = System.currentTimeMillis())
         val progressJson = json.encodeToString(updatedProgress.toSerializable())
-        
+
         sharedPreferences.edit()
             .putString(KEY_ONBOARDING_PROGRESS, progressJson)
             .putBoolean(KEY_ONBOARDING_COMPLETE, updatedProgress.isComplete())
             .apply()
     }
-    
+
     override suspend fun resetOnboardingState() = withContext(Dispatchers.IO) {
         sharedPreferences.edit()
             .remove(KEY_ONBOARDING_COMPLETE)
@@ -78,48 +78,48 @@ class OnboardingPreferences @Inject constructor(
             .remove(KEY_GRINDER_CONFIG_ID)
             .apply()
     }
-    
+
     override suspend fun backupOnboardingState(): String = withContext(Dispatchers.IO) {
         val progress = getOnboardingProgress()
         val isComplete = sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETE, false)
-        
+
         val backupData = OnboardingBackup(
             progress = progress.toSerializable(),
             isComplete = isComplete,
             backupTimestamp = System.currentTimeMillis()
         )
-        
+
         json.encodeToString(backupData)
     }
-    
+
     override suspend fun restoreOnboardingState(backupData: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val backup = json.decodeFromString<OnboardingBackup>(backupData)
             val progress = backup.progress.toOnboardingProgress()
-            
+
             sharedPreferences.edit()
                 .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(backup.progress))
                 .putBoolean(KEY_ONBOARDING_COMPLETE, backup.isComplete)
                 .apply()
-            
+
             true
         } catch (e: Exception) {
             false
         }
     }
-    
+
     /**
      * Gets the stored grinder configuration ID from onboarding.
-     * 
+     *
      * @return The grinder configuration ID, or null if not set
      */
     suspend fun getGrinderConfigurationId(): String? = withContext(Dispatchers.IO) {
         sharedPreferences.getString(KEY_GRINDER_CONFIG_ID, null)
     }
-    
+
     /**
      * Stores the grinder configuration ID from equipment setup.
-     * 
+     *
      * @param configId The grinder configuration ID to store
      */
     suspend fun setGrinderConfigurationId(configId: String) = withContext(Dispatchers.IO) {
@@ -127,9 +127,9 @@ class OnboardingPreferences @Inject constructor(
             .putString(KEY_GRINDER_CONFIG_ID, configId)
             .apply()
     }
-    
+
     // DEBUG METHODS FOR TESTING ONBOARDING FLOWS
-    
+
     override suspend fun resetToNewUser() = withContext(Dispatchers.IO) {
         // Clear all onboarding state to simulate a completely new user
         sharedPreferences.edit()
@@ -138,7 +138,7 @@ class OnboardingPreferences @Inject constructor(
             .remove(KEY_GRINDER_CONFIG_ID)
             .apply()
     }
-    
+
     override suspend fun resetToExistingUserWithBeans() = withContext(Dispatchers.IO) {
         // Set state for existing user who has beans (skips intro and bean creation)
         val existingUserProgress = OnboardingProgress(
@@ -150,13 +150,13 @@ class OnboardingPreferences @Inject constructor(
             onboardingStartedAt = System.currentTimeMillis() - 86400000, // 24 hours ago
             lastUpdatedAt = System.currentTimeMillis()
         )
-        
+
         sharedPreferences.edit()
             .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(existingUserProgress.toSerializable()))
             .putBoolean(KEY_ONBOARDING_COMPLETE, false) // Not complete until first shot
             .apply()
     }
-    
+
     override suspend fun resetToExistingUserNoBeans() = withContext(Dispatchers.IO) {
         // Set state for existing user without beans (skips intro, shows equipment + bean creation)
         val existingUserProgress = OnboardingProgress(
@@ -168,13 +168,13 @@ class OnboardingPreferences @Inject constructor(
             onboardingStartedAt = System.currentTimeMillis() - 86400000, // 24 hours ago
             lastUpdatedAt = System.currentTimeMillis()
         )
-        
+
         sharedPreferences.edit()
             .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(existingUserProgress.toSerializable()))
             .putBoolean(KEY_ONBOARDING_COMPLETE, false)
             .apply()
     }
-    
+
     override suspend fun forceEquipmentSetup() = withContext(Dispatchers.IO) {
         // Set equipment setup version to older value to force it to appear
         val currentProgress = getOnboardingProgress()
@@ -182,13 +182,13 @@ class OnboardingPreferences @Inject constructor(
             equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1,
             lastUpdatedAt = System.currentTimeMillis()
         )
-        
+
         sharedPreferences.edit()
             .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(forcedProgress.toSerializable()))
             .putBoolean(KEY_ONBOARDING_COMPLETE, false)
             .apply()
     }
-    
+
     companion object {
         private const val KEY_ONBOARDING_COMPLETE = "onboarding_complete"
         private const val KEY_ONBOARDING_PROGRESS = "onboarding_progress"

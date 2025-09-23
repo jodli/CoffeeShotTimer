@@ -20,7 +20,7 @@ class AddPhotoToBeanUseCase @Inject constructor(
 
     /**
      * Adds a photo to a specific bean.
-     * 
+     *
      * @param beanId The ID of the bean to add the photo to
      * @param imageUri The URI of the image to add
      * @return Result containing the saved photo path or error
@@ -58,17 +58,17 @@ class AddPhotoToBeanUseCase @Inject constructor(
             if (saveResult.isFailure) {
                 val exception = saveResult.exceptionOrNull()
                 val errorCode = when {
-                    exception?.message?.contains("Insufficient storage", ignoreCase = true) == true -> 
+                    exception?.message?.contains("Insufficient storage", ignoreCase = true) == true ->
                         DomainErrorCode.PHOTO_STORAGE_FULL
-                    exception?.message?.contains("compression failed", ignoreCase = true) == true -> 
+                    exception?.message?.contains("compression failed", ignoreCase = true) == true ->
                         DomainErrorCode.PHOTO_COMPRESSION_FAILED
-                    exception?.message?.contains("Permission denied", ignoreCase = true) == true -> 
+                    exception?.message?.contains("Permission denied", ignoreCase = true) == true ->
                         DomainErrorCode.PHOTO_FILE_ACCESS_ERROR
-                    exception?.message?.contains("input stream", ignoreCase = true) == true -> 
+                    exception?.message?.contains("input stream", ignoreCase = true) == true ->
                         DomainErrorCode.PHOTO_INVALID_URI
                     else -> DomainErrorCode.PHOTO_SAVE_FAILED
                 }
-                
+
                 return Result.failure(
                     DomainException(errorCode, exception?.message ?: "Failed to save photo", exception)
                 )

@@ -1,7 +1,6 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.BasketPreset
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -176,25 +174,26 @@ fun BasketSetup(
                 )
             )
             Spacer(modifier = Modifier.height(spacing.small))
-        } else if (coffeeInMin.isNotBlank() && coffeeInMax.isNotBlank() && 
-                   coffeeOutMin.isNotBlank() && coffeeOutMax.isNotBlank()) {
+        } else if (coffeeInMin.isNotBlank() && coffeeInMax.isNotBlank() &&
+            coffeeOutMin.isNotBlank() && coffeeOutMax.isNotBlank()
+        ) {
             // Check if all values are valid numbers and within reasonable ranges
             val inMinVal = coffeeInMin.toFloatOrNull()
             val inMaxVal = coffeeInMax.toFloatOrNull()
             val outMinVal = coffeeOutMin.toFloatOrNull()
             val outMaxVal = coffeeOutMax.toFloatOrNull()
-            
+
             if (inMinVal != null && inMaxVal != null && outMinVal != null && outMaxVal != null &&
                 inMinVal < inMaxVal && outMinVal < outMaxVal &&
                 coffeeInMinError == null && coffeeInMaxError == null &&
-                coffeeOutMinError == null && coffeeOutMaxError == null) {
-                
+                coffeeOutMinError == null && coffeeOutMaxError == null
+            ) {
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 // Determine shot type based on average coffee in value
                 val avgIn = (inMinVal + inMaxVal) / 2
                 val shotType = if (avgIn < 13f) "single" else "double"
-                
+
                 Text(
                     text = stringResource(R.string.text_basket_validation_success, shotType),
                     style = MaterialTheme.typography.bodySmall,

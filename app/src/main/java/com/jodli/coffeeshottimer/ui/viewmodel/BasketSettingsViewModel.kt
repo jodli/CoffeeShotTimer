@@ -36,7 +36,7 @@ class BasketSettingsViewModel @Inject constructor(
      */
     private fun loadCurrentConfiguration() {
         _uiState.value = _uiState.value.copy(isLoading = true)
-        
+
         viewModelScope.launch {
             try {
                 val result = basketConfigRepository.getActiveConfig()
@@ -145,13 +145,13 @@ class BasketSettingsViewModel @Inject constructor(
         val inMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
         val outMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
         val outMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
-        
+
         var inMinError: String? = null
         var inMaxError: String? = null
         var outMinError: String? = null
         var outMaxError: String? = null
         var generalError: String? = null
-        
+
         if (currentState.coffeeInMin.isNotBlank() && inMin == null) {
             inMinError = "Please enter a valid whole number"
         }
@@ -164,7 +164,7 @@ class BasketSettingsViewModel @Inject constructor(
         if (currentState.coffeeOutMax.isNotBlank() && outMax == null) {
             outMaxError = "Please enter a valid whole number"
         }
-        
+
         var isValid = false
         if (inMin != null && inMax != null && outMin != null && outMax != null) {
             val config = BasketConfiguration(
@@ -181,7 +181,7 @@ class BasketSettingsViewModel @Inject constructor(
                 isValid = true
             }
         }
-        
+
         _uiState.value = currentState.copy(
             coffeeInMinError = inMinError,
             coffeeInMaxError = inMaxError,
@@ -190,7 +190,7 @@ class BasketSettingsViewModel @Inject constructor(
             basketGeneralError = generalError,
             isBasketValid = isValid
         )
-        
+
         return isValid
     }
 
@@ -200,27 +200,34 @@ class BasketSettingsViewModel @Inject constructor(
     fun saveConfiguration(onSuccess: () -> Unit, onError: (String) -> Unit) {
         Log.d(TAG, "saveConfiguration: Starting save process")
         val currentState = _uiState.value
-        
-        Log.d(TAG, "saveConfiguration: Current state - coffeeInMin=${currentState.coffeeInMin}, coffeeInMax=${currentState.coffeeInMax}, coffeeOutMin=${currentState.coffeeOutMin}, coffeeOutMax=${currentState.coffeeOutMax}")
-        
+
+        Log.d(
+            TAG,
+            "saveConfiguration: Current state - coffeeInMin=${currentState.coffeeInMin}, coffeeInMax=${currentState.coffeeInMax}, coffeeOutMin=${currentState.coffeeOutMin}, coffeeOutMax=${currentState.coffeeOutMax}"
+        )
+
         // Parse all values as integers then convert to floats
         val coffeeInMin = currentState.coffeeInMin.toIntOrNull()?.toFloat()
         val coffeeInMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
         val coffeeOutMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
         val coffeeOutMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
-        
-        Log.d(TAG, "saveConfiguration: Parsed values - coffeeInMin=$coffeeInMin, coffeeInMax=$coffeeInMax, coffeeOutMin=$coffeeOutMin, coffeeOutMax=$coffeeOutMax")
-        
-        if (coffeeInMin == null || coffeeInMax == null || 
-            coffeeOutMin == null || coffeeOutMax == null) {
+
+        Log.d(
+            TAG,
+            "saveConfiguration: Parsed values - coffeeInMin=$coffeeInMin, coffeeInMax=$coffeeInMax, coffeeOutMin=$coffeeOutMin, coffeeOutMax=$coffeeOutMax"
+        )
+
+        if (coffeeInMin == null || coffeeInMax == null ||
+            coffeeOutMin == null || coffeeOutMax == null
+        ) {
             Log.e(TAG, "saveConfiguration: Failed to parse values - some values are null")
             onError("Please complete all configuration fields")
             return
         }
-        
+
         Log.d(TAG, "saveConfiguration: Setting loading state to true")
         _uiState.value = currentState.copy(isLoading = true, error = null)
-        
+
         viewModelScope.launch {
             try {
                 val basketConfig = BasketConfiguration(
@@ -230,13 +237,13 @@ class BasketSettingsViewModel @Inject constructor(
                     coffeeOutMax = coffeeOutMax,
                     isActive = true
                 )
-                
+
                 Log.d(TAG, "saveConfiguration: Created BasketConfiguration - $basketConfig")
-                
+
                 val result = basketConfigRepository.saveConfig(basketConfig)
-                
+
                 Log.d(TAG, "saveConfiguration: Repository saveConfig returned - isSuccess=${result.isSuccess}")
-                
+
                 result.fold(
                     onSuccess = {
                         Log.d(TAG, "saveConfiguration: Save successful, calling onSuccess")
@@ -246,15 +253,15 @@ class BasketSettingsViewModel @Inject constructor(
                     onFailure = { exception ->
                         Log.e(TAG, "saveConfiguration: Save failed with exception", exception)
                         val errorMessage = when (exception) {
-                            is RepositoryException.ValidationError -> 
+                            is RepositoryException.ValidationError ->
                                 exception.message ?: "Configuration validation failed"
-                            is RepositoryException.DatabaseError -> 
+                            is RepositoryException.DatabaseError ->
                                 "Failed to save basket configuration"
                             else -> "An unexpected error occurred"
                         }
-                        
+
                         Log.e(TAG, "saveConfiguration: Error message: $errorMessage")
-                        
+
                         _uiState.value = currentState.copy(
                             isLoading = false,
                             error = errorMessage
@@ -298,7 +305,7 @@ data class BasketSettingsUiState(
     val coffeeOutMaxError: String? = null,
     val basketGeneralError: String? = null,
     val isBasketValid: Boolean = false,
-    
+
     // Overall state
     val isLoading: Boolean = false,
     val error: String? = null

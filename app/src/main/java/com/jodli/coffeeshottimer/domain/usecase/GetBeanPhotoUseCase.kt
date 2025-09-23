@@ -18,7 +18,7 @@ class GetBeanPhotoUseCase @Inject constructor(
 
     /**
      * Retrieves a photo file for a bean.
-     * 
+     *
      * @param photoPath The path of the photo file to retrieve
      * @return Result containing the photo File or error
      */
@@ -78,7 +78,7 @@ class GetBeanPhotoUseCase @Inject constructor(
 
     /**
      * Checks if a photo exists at the given path.
-     * 
+     *
      * @param photoPath The path of the photo file to check
      * @return Result containing true if photo exists and is accessible, false otherwise
      */

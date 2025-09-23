@@ -19,7 +19,7 @@ class RemovePhotoFromBeanUseCase @Inject constructor(
 
     /**
      * Removes a photo from a specific bean.
-     * 
+     *
      * @param beanId The ID of the bean to remove the photo from
      * @return Result indicating success or failure
      */

@@ -35,16 +35,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Stop
-
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -59,11 +56,11 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
@@ -91,7 +88,7 @@ fun CircularTimer(
     useLandscapeTimer: Boolean = false
 ) {
     val spacing = LocalSpacing.current
-    
+
     // Use adaptive sizing in landscape mode based on available space
     if (useLandscapeTimer) {
         BoxWithConstraints {
@@ -100,7 +97,7 @@ fun CircularTimer(
                 availableWidth = maxWidth,
                 isLandscape = true
             )
-            
+
             CircularTimerInternal(
                 currentTime = currentTime,
                 targetTime = targetTime,
@@ -130,7 +127,7 @@ fun CircularTimer(
 /**
  * Internal circular timer implementation with fixed size
  */
-@Composable 
+@Composable
 private fun CircularTimerInternal(
     currentTime: Long,
     targetTime: Long?,
@@ -235,7 +232,9 @@ private fun CircularTimerInternal(
                         indication = ripple(bounded = false, radius = timerSize / 2), // Adapt ripple to timer size
                         onClick = handleTimerClick
                     )
-                } else Modifier
+                } else {
+                    Modifier
+                }
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -285,7 +284,7 @@ private fun CircularTimerInternal(
             } else {
                 MaterialTheme.typography.headlineLarge
             }
-            
+
             Text(
                 text = formatExtractionTime(currentTime, stringResource(R.string.timer_seconds_suffix)),
                 style = textStyle,
@@ -334,12 +333,20 @@ private fun CircularTimerInternal(
                         Icon(
                             imageVector = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
                             contentDescription = null,
-                            modifier = Modifier.size(if (useLandscapeTimer) spacing.iconSmall / 2 else spacing.iconSmall),
+                            modifier = Modifier.size(
+                                if (useLandscapeTimer) spacing.iconSmall / 2 else spacing.iconSmall
+                            ),
                             tint = animatedColor.copy(alpha = 0.7f)
                         )
                         Spacer(modifier = Modifier.width(spacing.extraSmall))
                         Text(
-                            text = if (isRunning) stringResource(R.string.text_tap_to_stop) else stringResource(R.string.text_tap_to_start),
+                            text = if (isRunning) {
+                                stringResource(
+                                    R.string.text_tap_to_stop
+                                )
+                            } else {
+                                stringResource(R.string.text_tap_to_start)
+                            },
                             style = if (useLandscapeTimer) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
                             textAlign = TextAlign.Center
@@ -350,7 +357,10 @@ private fun CircularTimerInternal(
                 targetTime != null -> {
                     // Show target time for non-color-coded timers
                     Text(
-                        text = stringResource(R.string.format_extraction_time_with_target, formatExtractionTime(targetTime, stringResource(R.string.timer_seconds_suffix))),
+                        text = stringResource(
+                            R.string.format_extraction_time_with_target,
+                            formatExtractionTime(targetTime, stringResource(R.string.timer_seconds_suffix))
+                        ),
                         style = if (useLandscapeTimer) MaterialTheme.typography.labelSmall else MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -443,10 +453,11 @@ fun TimerControls(
             FloatingActionButton(
                 onClick = onStartPause,
                 modifier = Modifier.size(spacing.fabSize),
-                containerColor = if (isRunning)
+                containerColor = if (isRunning) {
                     MaterialTheme.colorScheme.secondary
-                else
+                } else {
                     MaterialTheme.colorScheme.primary
+                }
             ) {
                 if (isRunning) {
                     Icon(
@@ -526,9 +537,9 @@ fun EnhancedTimerControls(
  */
 enum class ExtractionQuality {
     UNDER_EXTRACTED, // < 20s - Yellow
-    OPTIMAL,         // 20-35s - Green
-    OVER_EXTRACTED,  // > 35s - Red
-    NEUTRAL          // Not running - Gray
+    OPTIMAL, // 20-35s - Green
+    OVER_EXTRACTED, // > 35s - Red
+    NEUTRAL // Not running - Gray
 }
 
 /**
@@ -538,7 +549,7 @@ enum class ExtractionQuality {
 fun formatExtractionTime(timeMs: Long, timer_seconds_suffix: String = "s"): String {
     val totalSeconds = maxOf(0, (timeMs / 1000).toInt()) // Handle negative values
     return when {
-        totalSeconds < 60 -> "${totalSeconds}" + timer_seconds_suffix
+        totalSeconds < 60 -> "$totalSeconds" + timer_seconds_suffix
         else -> {
             val minutes = totalSeconds / 60
             val seconds = totalSeconds % 60
@@ -599,7 +610,7 @@ data class TimerButtonState(
 @Composable
 fun rememberTimerButtonState(isRunning: Boolean): TimerButtonState {
     var lastActionTime by remember { mutableLongStateOf(0L) }
-    
+
     val stopDescription = stringResource(R.string.text_stop_timer)
     val startDescription = stringResource(R.string.text_start_timer)
 
@@ -780,7 +791,7 @@ fun ClickableTimerControls(
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
-    
+
     if (useLandscapeTimer) {
         // Use adaptive sizing in landscape mode
         BoxWithConstraints {
@@ -789,7 +800,7 @@ fun ClickableTimerControls(
                 availableWidth = maxWidth,
                 isLandscape = true
             )
-            
+
             ClickableTimerControlsInternal(
                 isRunning = isRunning,
                 currentTime = currentTime,
@@ -845,7 +856,6 @@ private fun ClickableTimerControlsInternal(
     modifier: Modifier = Modifier,
     useLandscapeTimer: Boolean = false
 ) {
-
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center

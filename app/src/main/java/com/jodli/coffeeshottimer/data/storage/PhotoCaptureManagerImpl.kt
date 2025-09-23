@@ -23,13 +23,13 @@ import javax.inject.Singleton
 class PhotoCaptureManagerImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : PhotoCaptureManager {
-    
+
     companion object {
         private const val TEMP_PHOTOS_DIR = "temp_photos"
         private const val TEMP_PHOTO_PREFIX = "temp_photo_"
         private const val PHOTO_EXTENSION = ".jpg"
     }
-    
+
     private val tempPhotosDir: File by lazy {
         File(context.cacheDir, TEMP_PHOTOS_DIR).apply {
             if (!exists()) {
@@ -37,13 +37,13 @@ class PhotoCaptureManagerImpl @Inject constructor(
             }
         }
     }
-    
+
     override fun createImageCaptureIntent(): Pair<Intent, Uri> {
         // Verify camera is available before creating intent
         if (!isCameraAvailable(context)) {
             throw IllegalStateException("Camera is not available on this device")
         }
-        
+
         // Create temporary file for camera capture
         val tempFile = try {
             File.createTempFile(
@@ -54,7 +54,7 @@ class PhotoCaptureManagerImpl @Inject constructor(
         } catch (e: IOException) {
             throw IllegalStateException("Cannot create temporary file for camera capture", e)
         }
-        
+
         // Create URI using FileProvider for security
         val tempUri = try {
             val authority = "${context.packageName}.fileprovider"
@@ -67,7 +67,7 @@ class PhotoCaptureManagerImpl @Inject constructor(
             tempFile.delete() // Clean up the temp file
             throw IllegalStateException("Cannot create file URI for camera capture", e)
         }
-        
+
         // Create camera intent
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
             putExtra(MediaStore.EXTRA_OUTPUT, tempUri)
@@ -75,27 +75,27 @@ class PhotoCaptureManagerImpl @Inject constructor(
             addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        
+
         // Verify that there's a camera app available to handle the intent
         if (intent.resolveActivity(context.packageManager) == null) {
             tempFile.delete() // Clean up the temp file
             throw IllegalStateException("No camera app available to handle photo capture")
         }
-        
+
         return Pair(intent, tempUri)
     }
-    
+
     override fun isCameraPermissionGranted(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
     }
-    
+
     override fun isCameraAvailable(context: Context): Boolean {
         return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
     }
-    
+
     override suspend fun cleanupTempFile(tempUri: Uri) = withContext(Dispatchers.IO) {
         try {
             // Extract file path from URI
@@ -108,7 +108,7 @@ class PhotoCaptureManagerImpl @Inject constructor(
             // In a real app, you might want to log this
         }
     }
-    
+
     /**
      * Cleans up all temporary photo files older than a specified time.
      * This can be called periodically to prevent temp files from accumulating.
@@ -116,7 +116,7 @@ class PhotoCaptureManagerImpl @Inject constructor(
     suspend fun cleanupOldTempFiles(maxAgeMillis: Long = 24 * 60 * 60 * 1000) = withContext(Dispatchers.IO) {
         try {
             if (!tempPhotosDir.exists()) return@withContext
-            
+
             val currentTime = System.currentTimeMillis()
             tempPhotosDir.listFiles()?.forEach { file ->
                 if (file.isFile && (currentTime - file.lastModified()) > maxAgeMillis) {

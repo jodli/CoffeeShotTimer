@@ -45,16 +45,30 @@ class GrindAdjustmentFormatter(private val context: Context) {
         return when (recommendation.adjustmentDirection) {
             AdjustmentDirection.FINER -> {
                 if (recommendation.adjustmentSteps == 1) {
-                    context.getString(R.string.grind_adjustment_summary_finer_single, recommendation.suggestedGrindSetting)
+                    context.getString(
+                        R.string.grind_adjustment_summary_finer_single,
+                        recommendation.suggestedGrindSetting
+                    )
                 } else {
-                    context.getString(R.string.grind_adjustment_summary_finer_multiple, recommendation.adjustmentSteps, recommendation.suggestedGrindSetting)
+                    context.getString(
+                        R.string.grind_adjustment_summary_finer_multiple,
+                        recommendation.adjustmentSteps,
+                        recommendation.suggestedGrindSetting
+                    )
                 }
             }
             AdjustmentDirection.COARSER -> {
                 if (recommendation.adjustmentSteps == 1) {
-                    context.getString(R.string.grind_adjustment_summary_coarser_single, recommendation.suggestedGrindSetting)
+                    context.getString(
+                        R.string.grind_adjustment_summary_coarser_single,
+                        recommendation.suggestedGrindSetting
+                    )
                 } else {
-                    context.getString(R.string.grind_adjustment_summary_coarser_multiple, recommendation.adjustmentSteps, recommendation.suggestedGrindSetting)
+                    context.getString(
+                        R.string.grind_adjustment_summary_coarser_multiple,
+                        recommendation.adjustmentSteps,
+                        recommendation.suggestedGrindSetting
+                    )
                 }
             }
             AdjustmentDirection.NO_CHANGE -> {
@@ -74,7 +88,7 @@ class GrindAdjustmentFormatter(private val context: Context) {
             TastePrimary.PERFECT -> context.getString(R.string.recommendation_taste_perfect)
             null -> context.getString(R.string.recommendation_timing_issue)
         }
-        
+
         val timeDescription = when {
             recommendation.extractionTimeDeviation < 0 -> {
                 context.getString(
@@ -94,13 +108,18 @@ class GrindAdjustmentFormatter(private val context: Context) {
                 context.getString(R.string.recommendation_time_good, "27")
             }
         }
-        
+
         val actionDescription = when (recommendation.adjustmentDirection) {
             AdjustmentDirection.FINER -> context.getString(R.string.recommendation_action_finer)
             AdjustmentDirection.COARSER -> context.getString(R.string.recommendation_action_coarser)
             AdjustmentDirection.NO_CHANGE -> context.getString(R.string.recommendation_action_no_change)
         }
-        
-        return context.getString(R.string.recommendation_explanation_format, tasteDescription, timeDescription, actionDescription)
+
+        return context.getString(
+            R.string.recommendation_explanation_format,
+            tasteDescription,
+            timeDescription,
+            actionDescription
+        )
     }
 }

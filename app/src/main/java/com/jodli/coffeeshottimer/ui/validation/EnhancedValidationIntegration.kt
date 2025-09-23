@@ -25,7 +25,6 @@ abstract class ValidatedViewModel(
 
     protected val _isFormValid = MutableStateFlow(true)
     val isFormValid: StateFlow<Boolean> = _isFormValid.asStateFlow()
-
 }
 
 /**
@@ -88,6 +87,4 @@ class EnhancedShotRecordingViewModel(
             _brewRatioWarnings.value = emptyList()
         }
     }
-
 }
-

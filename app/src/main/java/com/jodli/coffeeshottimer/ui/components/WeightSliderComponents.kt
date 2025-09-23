@@ -7,19 +7,17 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Input
-import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Engineering
+import androidx.compose.material.icons.filled.Output
 import androidx.compose.material.icons.filled.Scale
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -39,15 +37,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
-import kotlin.math.roundToInt
 import java.util.Locale
+import kotlin.math.roundToInt
 
 // Constants removed - all slider ranges now come from basket and grinder configuration
 
@@ -57,7 +54,7 @@ import java.util.Locale
  */
 private fun parseLocaleAwareFloat(value: String): Float? {
     if (value.isBlank()) return null
-    
+
     return try {
         // First try direct parsing (works for US locale with decimal point)
         value.toFloatOrNull() ?: run {
@@ -215,8 +212,6 @@ fun WeightSlider(
     }
 }
 
-
-
 /**
  * Specialized weight slider for coffee input weight.
  * Supports dynamic min/max values from basket configuration.
@@ -278,7 +273,7 @@ private fun formatGrindValueForStepSize(value: Float, stepSize: Float): String {
     return when {
         stepSize >= 1.0f && value % 1.0f == 0.0f -> value.toInt().toString()
         stepSize >= 0.5f -> String.format(java.util.Locale.US, "%.1f", value)
-        stepSize >= 0.1f -> String.format(java.util.Locale.US, "%.1f", value) 
+        stepSize >= 0.1f -> String.format(java.util.Locale.US, "%.1f", value)
         stepSize >= 0.01f -> String.format(java.util.Locale.US, "%.2f", value)
         else -> String.format(java.util.Locale.US, "%.2f", value)
     }
@@ -509,10 +504,11 @@ private fun GrinderSettingRangeIndicator(
                         )
                         .clip(RoundedCornerShape(spacing.cornerSmall - 1.dp))
                         .background(
-                            if (enabled)
+                            if (enabled) {
                                 MaterialTheme.colorScheme.tertiary.copy(alpha = 0.7f)
-                            else
+                            } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                            }
                         )
                 )
             }
@@ -529,10 +525,11 @@ private fun GrinderSettingRangeIndicator(
                         )
                         .clip(RoundedCornerShape(spacing.cornerSmall))
                         .background(
-                            if (enabled)
+                            if (enabled) {
                                 MaterialTheme.colorScheme.secondary
-                            else
+                            } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant
+                            }
                         )
                 )
             }
@@ -548,10 +545,11 @@ private fun GrinderSettingRangeIndicator(
                     )
                     .clip(RoundedCornerShape(spacing.cornerSmall + 1.dp))
                     .background(
-                        if (enabled)
+                        if (enabled) {
                             MaterialTheme.colorScheme.primary
-                        else
+                        } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                     )
             )
         }
@@ -590,10 +588,10 @@ private fun GrinderSettingRangeIndicator(
 fun WeightSlidersSection(
     coffeeWeightIn: String,
     onCoffeeWeightInChange: (String) -> Unit,
-    coffeeWeightInError: String? = null,  // Now optional since sliders clamp values
+    coffeeWeightInError: String? = null, // Now optional since sliders clamp values
     coffeeWeightOut: String,
     onCoffeeWeightOutChange: (String) -> Unit,
-    coffeeWeightOutError: String? = null,  // Now optional since sliders clamp values
+    coffeeWeightOutError: String? = null, // Now optional since sliders clamp values
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     basketCoffeeInMin: Float,
@@ -615,7 +613,7 @@ fun WeightSlidersSection(
         CoffeeWeightInSlider(
             value = coffeeWeightIn,
             onValueChange = onCoffeeWeightInChange,
-            errorMessage = null,  // Suppress validation errors since sliders clamp values
+            errorMessage = null, // Suppress validation errors since sliders clamp values
             enabled = enabled,
             minWeight = basketCoffeeInMin,
             maxWeight = basketCoffeeInMax,
@@ -628,7 +626,7 @@ fun WeightSlidersSection(
         CoffeeWeightOutSlider(
             value = coffeeWeightOut,
             onValueChange = onCoffeeWeightOutChange,
-            errorMessage = null,  // Suppress validation errors since sliders clamp values
+            errorMessage = null, // Suppress validation errors since sliders clamp values
             enabled = enabled,
             minWeight = basketCoffeeOutMin,
             maxWeight = basketCoffeeOutMax,

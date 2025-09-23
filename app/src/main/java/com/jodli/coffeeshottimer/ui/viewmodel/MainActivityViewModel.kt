@@ -40,11 +40,11 @@ class MainActivityViewModel @Inject constructor(
             try {
                 val isFirstTimeUser = onboardingManager.isFirstTimeUser()
                 val progress = onboardingManager.getOnboardingProgress()
-                
+
                 if (isFirstTimeUser) {
                     // New user - follow normal onboarding flow
                     val nextStep = progress.getNextStep()
-                    
+
                     val destination = when (nextStep) {
                         OnboardingStep.INTRODUCTION -> NavigationDestinations.OnboardingIntroduction.route
                         OnboardingStep.EQUIPMENT_SETUP -> NavigationDestinations.OnboardingEquipmentSetup.route
@@ -57,7 +57,7 @@ class MainActivityViewModel @Inject constructor(
                             NavigationDestinations.RecordShot.route
                         }
                     }
-                    
+
                     _routingState.value = RoutingState.Success(destination, isFirstTimeUser = true)
                 } else {
                     // Existing user - check if they need to complete new equipment setup
@@ -70,7 +70,7 @@ class MainActivityViewModel @Inject constructor(
                     } else {
                         // Existing user with up-to-date setup - route to normal app flow
                         _routingState.value = RoutingState.Success(
-                            NavigationDestinations.RecordShot.route, 
+                            NavigationDestinations.RecordShot.route,
                             isFirstTimeUser = false
                         )
                     }
@@ -125,18 +125,18 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val progress = onboardingManager.getOnboardingProgress()
-                
+
                 // Update progress to mark equipment setup as complete with current version
                 val updatedProgress = progress.copy(
                     hasCompletedEquipmentSetup = true,
                     equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
                 )
                 onboardingManager.updateOnboardingProgress(updatedProgress)
-                
+
                 // Check if user has existing beans - if so, they can skip bean creation
                 val beanCountResult = beanRepository.getActiveBeanCount()
                 val hasExistingBeans = beanCountResult.getOrNull() ?: 0 > 0
-                
+
                 if (hasExistingBeans) {
                     // User with beans - mark bean creation as complete and skip to main app
                     val finalProgress = updatedProgress.copy(hasCreatedFirstBean = true)
@@ -152,7 +152,7 @@ class MainActivityViewModel @Inject constructor(
             }
         }
     }
-    
+
     /**
      * Handles equipment setup skip and determines next step based on whether user needs bean creation.
      * Returns true if the user should skip bean creation (they already have beans).
@@ -161,7 +161,7 @@ class MainActivityViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val progress = onboardingManager.getOnboardingProgress()
-                
+
                 // Even when skipping, mark equipment setup as complete with current version
                 // so they don't get forced through it again
                 val updatedProgress = progress.copy(
@@ -169,11 +169,11 @@ class MainActivityViewModel @Inject constructor(
                     equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
                 )
                 onboardingManager.updateOnboardingProgress(updatedProgress)
-                
+
                 // Check if user has existing beans - if so, they can skip bean creation
                 val beanCountResult = beanRepository.getActiveBeanCount()
                 val hasExistingBeans = beanCountResult.getOrNull() ?: 0 > 0
-                
+
                 if (hasExistingBeans) {
                     // User with beans - mark bean creation as complete and skip to main app
                     val finalProgress = updatedProgress.copy(hasCreatedFirstBean = true)
@@ -200,7 +200,7 @@ class MainActivityViewModel @Inject constructor(
                 // Check if onboarding state is corrupted or inconsistent
                 val progress = onboardingManager.getOnboardingProgress()
                 val isFirstTimeUser = onboardingManager.isFirstTimeUser()
-                
+
                 // If user is marked as first-time but has completed all steps,
                 // mark onboarding as complete
                 if (isFirstTimeUser && progress.isComplete()) {
@@ -235,7 +235,7 @@ sealed class RoutingState {
 
     /**
      * Successfully determined the route.
-     * 
+     *
      * @param route The navigation route to use
      * @param isFirstTimeUser Whether this is a first-time user
      */
@@ -246,7 +246,7 @@ sealed class RoutingState {
 
     /**
      * Error occurred during routing determination.
-     * 
+     *
      * @param exception The exception that occurred
      * @param fallbackRoute The route to use as fallback
      */

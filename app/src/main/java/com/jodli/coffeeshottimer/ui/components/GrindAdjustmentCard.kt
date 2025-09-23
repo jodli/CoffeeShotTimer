@@ -18,13 +18,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.model.*
-import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
+import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.util.GrindAdjustmentFormatter
 
 /**
  * Card component displaying grind adjustment recommendation.
- * 
+ *
  * @param recommendation The grind adjustment recommendation to display
  * @param onApply Callback when user applies the adjustment
  * @param onDismiss Callback when user dismisses/skips the adjustment
@@ -97,16 +97,22 @@ fun GrindAdjustmentCard(
                 ) {
                     Text(
                         text = stringResource(
-                            if (isCompact) R.string.text_current_short
-                            else R.string.text_current_setting
+                            if (isCompact) {
+                                R.string.text_current_short
+                            } else {
+                                R.string.text_current_setting
+                            }
                         ),
                         style = MaterialTheme.typography.labelSmall,
                         color = cardColors.content.copy(alpha = 0.7f)
                     )
                     Text(
                         text = recommendation.currentGrindSetting,
-                        style = if (isCompact) MaterialTheme.typography.titleMedium
-                               else MaterialTheme.typography.titleLarge,
+                        style = if (isCompact) {
+                            MaterialTheme.typography.titleMedium
+                        } else {
+                            MaterialTheme.typography.titleLarge
+                        },
                         fontWeight = FontWeight.Bold,
                         color = cardColors.content
                     )
@@ -141,16 +147,22 @@ fun GrindAdjustmentCard(
                 ) {
                     Text(
                         text = stringResource(
-                            if (isCompact) R.string.text_try_short
-                            else R.string.text_try_next
+                            if (isCompact) {
+                                R.string.text_try_short
+                            } else {
+                                R.string.text_try_next
+                            }
                         ),
                         style = MaterialTheme.typography.labelSmall,
                         color = cardColors.content.copy(alpha = 0.7f)
                     )
                     Text(
                         text = recommendation.suggestedGrindSetting,
-                        style = if (isCompact) MaterialTheme.typography.titleMedium
-                               else MaterialTheme.typography.titleLarge,
+                        style = if (isCompact) {
+                            MaterialTheme.typography.titleMedium
+                        } else {
+                            MaterialTheme.typography.titleLarge
+                        },
                         fontWeight = FontWeight.Bold,
                         color = if (recommendation.hasAdjustment()) cardColors.accent else cardColors.content
                     )
@@ -160,8 +172,11 @@ fun GrindAdjustmentCard(
             // Explanation text
             Text(
                 text = formatter.formatExplanation(recommendation),
-                style = if (isCompact) MaterialTheme.typography.bodySmall
-                       else MaterialTheme.typography.bodyMedium,
+                style = if (isCompact) {
+                    MaterialTheme.typography.bodySmall
+                } else {
+                    MaterialTheme.typography.bodyMedium
+                },
                 textAlign = TextAlign.Center,
                 color = cardColors.content.copy(alpha = 0.8f),
                 modifier = Modifier.fillMaxWidth()

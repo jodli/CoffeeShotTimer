@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -21,11 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -63,10 +61,11 @@ fun BeanCard(
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
                         contentDescription = null,
-                        tint = if (isSelected)
+                        tint = if (isSelected) {
                             MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant,
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
                         modifier = Modifier.size(spacing.iconSmall + spacing.extraSmall)
                     )
 
@@ -74,10 +73,11 @@ fun BeanCard(
                         text = bean.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                        color = if (isSelected)
+                        color = if (isSelected) {
                             MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurface,
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -89,10 +89,11 @@ fun BeanCard(
                 Text(
                     text = stringResource(R.string.format_roasted_days_ago, daysSinceRoast),
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (bean.isFresh())
+                    color = if (bean.isFresh()) {
                         MaterialTheme.colorScheme.primary
-                    else
+                    } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
+                    }
                 )
 
                 if (bean.notes.isNotBlank()) {
@@ -138,4 +139,3 @@ fun BeanCard(
         }
     }
 }
-

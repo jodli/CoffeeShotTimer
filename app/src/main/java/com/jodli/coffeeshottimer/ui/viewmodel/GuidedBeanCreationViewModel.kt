@@ -115,10 +115,10 @@ class GuidedBeanCreationViewModel @Inject constructor(
      */
     fun createBean() {
         val formState = _uiState.value.formState
-        
+
         // Validate all fields before submission
         val validatedFormState = validateForm(formState)
-        
+
         if (!validatedFormState.isValid) {
             _uiState.value = _uiState.value.copy(
                 formState = validatedFormState,
@@ -146,7 +146,7 @@ class GuidedBeanCreationViewModel @Inject constructor(
                 )
 
                 val result = beanRepository.addBean(bean)
-                
+
                 result.fold(
                     onSuccess = {
                         // Update onboarding progress
@@ -212,7 +212,7 @@ class GuidedBeanCreationViewModel @Inject constructor(
     private fun validateForm(formState: BeanFormState): BeanFormState {
         val nameError = validateBeanName(formState.name)
         val roastDateError = formState.roastDate?.let { validateRoastDate(it) }
-        
+
         return formState.copy(
             nameError = nameError,
             roastDateError = roastDateError
@@ -228,7 +228,7 @@ class GuidedBeanCreationViewModel @Inject constructor(
             trimmedName.isBlank() -> "Bean name is required"
             trimmedName.length < 2 -> "Bean name must be at least 2 characters"
             trimmedName.length > 100 -> "Bean name cannot exceed 100 characters"
-            !trimmedName.matches(Regex("^[a-zA-Z0-9\\s\\-_.'&()]+$")) -> 
+            !trimmedName.matches(Regex("^[a-zA-Z0-9\\s\\-_.'&()]+$")) ->
                 "Bean name contains invalid characters"
             else -> null
         }
@@ -240,7 +240,7 @@ class GuidedBeanCreationViewModel @Inject constructor(
     private fun validateRoastDate(date: LocalDate): String? {
         val today = LocalDate.now()
         val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(date, today)
-        
+
         return when {
             date.isAfter(today) -> "Roast date cannot be in the future"
             daysSinceRoast > 365 -> "Roast date cannot be more than 365 days ago"
@@ -254,12 +254,12 @@ class GuidedBeanCreationViewModel @Inject constructor(
     fun getFreshnessMessage(bean: Bean): String {
         val today = LocalDate.now()
         val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(bean.roastDate, today)
-        
+
         // If roast date is today (likely a default), show a neutral message
         if (daysSinceRoast == 0L) {
             return "Your bean is ready for brewing!"
         }
-        
+
         return when {
             daysSinceRoast < 4 -> domainErrorTranslator.getString(
                 com.jodli.coffeeshottimer.R.string.bean_creation_success_freshness_fresh

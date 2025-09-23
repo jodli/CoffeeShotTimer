@@ -19,7 +19,6 @@ data class GrindAdjustmentRecommendation(
      * @return true if an adjustment is recommended, false for no-change recommendations
      */
     fun hasAdjustment(): Boolean = adjustmentDirection != AdjustmentDirection.NO_CHANGE
-    
 }
 
 /**
@@ -29,10 +28,10 @@ data class GrindAdjustmentRecommendation(
 enum class AdjustmentDirection {
     /** Grind finer to increase extraction (for sour/under-extracted shots) */
     FINER,
-    
+
     /** Grind coarser to decrease extraction (for bitter/over-extracted shots) */
     COARSER,
-    
+
     /** No adjustment needed (optimal extraction achieved) */
     NO_CHANGE
 }
@@ -44,10 +43,10 @@ enum class AdjustmentDirection {
 enum class ConfidenceLevel {
     /** Strong evidence from both taste feedback and extraction time */
     HIGH,
-    
+
     /** Evidence from either taste feedback or extraction time */
     MEDIUM,
-    
+
     /** Limited evidence, edge case, or conflicting signals */
     LOW
 }

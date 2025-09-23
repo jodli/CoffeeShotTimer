@@ -15,7 +15,10 @@ import java.time.LocalDate
 /**
  * Validates bean name with enhanced error messages and suggestions.
  */
-fun String.validateBeanNameEnhanced(validationUtils: ValidationUtils, existingNames: List<String> = emptyList()): ValidationResult {
+fun String.validateBeanNameEnhanced(
+    validationUtils: ValidationUtils,
+    existingNames: List<String> = emptyList()
+): ValidationResult {
     return validationUtils.validateBeanName(this, existingNames).let { result ->
         if (!result.isValid) {
             val enhancedErrors = result.errors.toMutableList()
@@ -33,7 +36,9 @@ fun String.validateBeanNameEnhanced(validationUtils: ValidationUtils, existingNa
             }
 
             ValidationResult(false, enhancedErrors)
-        } else result
+        } else {
+            result
+        }
     }
 }
 
@@ -55,7 +60,9 @@ fun LocalDate.validateRoastDateEnhanced(validationUtils: ValidationUtils): Valid
             }
 
             ValidationResult(false, enhancedErrors)
-        } else result
+        } else {
+            result
+        }
     }
 }
 
@@ -97,7 +104,9 @@ fun Int.validateExtractionTimeEnhanced(validationUtils: ValidationUtils): Valida
             }
 
             ValidationResult(false, enhancedErrors)
-        } else result
+        } else {
+            result
+        }
     }
 }
 
@@ -167,10 +176,10 @@ fun validateCompleteShot(
 
     // If basic validation passes, check relationships
     if (allErrors.isEmpty()) {
-				val weightIn = coffeeWeightIn.toDoubleOrNull()
-				val weightOut = coffeeWeightOut.toDoubleOrNull()
+        val weightIn = coffeeWeightIn.toDoubleOrNull()
+        val weightOut = coffeeWeightOut.toDoubleOrNull()
 
-				if (weightIn != null && weightOut != null) {
+        if (weightIn != null && weightOut != null) {
             val brewRatio = weightOut / weightIn
             allWarnings.addAll(brewRatio.getBrewRatioWarnings(validationUtils))
         }

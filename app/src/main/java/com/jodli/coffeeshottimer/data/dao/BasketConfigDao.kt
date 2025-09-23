@@ -92,14 +92,16 @@ interface BasketConfigDao {
      * Check if a configuration with the same weight ranges already exists.
      * Useful for preventing duplicate configurations.
      */
-    @Query("""
+    @Query(
+        """
         SELECT * FROM basket_configuration 
         WHERE coffeeInMin = :coffeeInMin 
         AND coffeeInMax = :coffeeInMax 
         AND coffeeOutMin = :coffeeOutMin 
         AND coffeeOutMax = :coffeeOutMax 
         LIMIT 1
-    """)
+    """
+    )
     suspend fun getConfigByRanges(
         coffeeInMin: Float,
         coffeeInMax: Float,
@@ -111,13 +113,15 @@ interface BasketConfigDao {
      * Delete old configurations, keeping only the most recent N configurations.
      * Useful for cleanup to prevent unlimited configuration history.
      */
-    @Query("""
+    @Query(
+        """
         DELETE FROM basket_configuration 
         WHERE id NOT IN (
             SELECT id FROM basket_configuration 
             ORDER BY createdAt DESC 
             LIMIT :keepCount
         )
-    """)
+    """
+    )
     suspend fun deleteOldConfigs(keepCount: Int = 10)
 }

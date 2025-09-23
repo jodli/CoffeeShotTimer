@@ -2,23 +2,23 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
+import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
-import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
-import com.jodli.coffeeshottimer.domain.model.TastePrimary
-import com.jodli.coffeeshottimer.domain.model.TasteSecondary
-import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
-import com.jodli.coffeeshottimer.R
 
 /**
  * ViewModel for the Shot Details screen.
@@ -206,7 +206,7 @@ class ShotDetailsViewModel @Inject constructor(
             onNavigate(nextShot.id)
         }
     }
-    
+
     /**
      * Update taste feedback for the current shot
      */
@@ -215,9 +215,9 @@ class ShotDetailsViewModel @Inject constructor(
         tasteSecondary: TasteSecondary?
     ) {
         val currentShot = _uiState.value.shotDetails?.shot ?: return
-        
+
         _uiState.value = _uiState.value.copy(isUpdatingTaste = true)
-        
+
         viewModelScope.launch {
             if (tastePrimary != null) {
                 // Record taste feedback
@@ -230,7 +230,7 @@ class ShotDetailsViewModel @Inject constructor(
                 // Clear taste feedback
                 recordTasteFeedbackUseCase.clearTasteFeedback(currentShot.id)
             }
-            
+
             // Always refresh to show updated taste
             _uiState.value = _uiState.value.copy(isUpdatingTaste = false)
             refreshShotDetails()

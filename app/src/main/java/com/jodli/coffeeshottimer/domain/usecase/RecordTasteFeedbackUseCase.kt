@@ -15,7 +15,7 @@ class RecordTasteFeedbackUseCase @Inject constructor(
 
     /**
      * Record taste feedback for a specific shot.
-     * 
+     *
      * @param shotId The ID of the shot to update
      * @param tastePrimary The primary taste feedback (Sour/Perfect/Bitter)
      * @param tasteSecondary Optional secondary taste qualifier (Weak/Strong)
@@ -35,7 +35,7 @@ class RecordTasteFeedbackUseCase @Inject constructor(
 
     /**
      * Clear taste feedback for a specific shot.
-     * 
+     *
      * @param shotId The ID of the shot to update
      * @return Result indicating success or failure
      */
