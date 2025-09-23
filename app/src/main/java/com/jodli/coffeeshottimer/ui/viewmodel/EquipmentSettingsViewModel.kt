@@ -121,8 +121,8 @@ class EquipmentSettingsViewModel @Inject constructor(
             maxError = maxError,
             stepSizeError = stepSizeError,
             generalError = generalError,
-            isFormValid = minError == null && maxError == null && stepSizeError == null && 
-                         generalError == null && minVal != null && maxVal != null && stepSizeVal != null
+            isFormValid = minError == null && maxError == null && stepSizeError == null &&
+                generalError == null && minVal != null && maxVal != null && stepSizeVal != null
         )
     }
 
@@ -132,27 +132,30 @@ class EquipmentSettingsViewModel @Inject constructor(
         val minVal = current.scaleMin.toIntOrNull()
         val maxVal = current.scaleMax.toIntOrNull()
         val stepSizeVal = current.stepSize.toDoubleOrNull()
-        
-        Log.d(TAG, "save: Current state - scaleMin=${current.scaleMin}, scaleMax=${current.scaleMax}, stepSize=${current.stepSize}, isFormValid=${current.isFormValid}")
+
+        Log.d(
+            TAG,
+            "save: Current state - scaleMin=${current.scaleMin}, scaleMax=${current.scaleMax}, stepSize=${current.stepSize}, isFormValid=${current.isFormValid}"
+        )
         Log.d(TAG, "save: Parsed values - minVal=$minVal, maxVal=$maxVal, stepSizeVal=$stepSizeVal")
-        
+
         if (!current.isFormValid || minVal == null || maxVal == null || stepSizeVal == null) {
             Log.e(TAG, "save: Form validation failed")
             _uiState.value = current.copy(generalError = getFixValidationErrorsMessage())
             return
         }
-        
+
         val config = GrinderConfiguration(scaleMin = minVal, scaleMax = maxVal, stepSize = stepSizeVal)
         Log.d(TAG, "save: Created GrinderConfiguration - $config")
-        
+
         _uiState.value = current.copy(isLoading = true)
         Log.d(TAG, "save: Set loading state to true")
-        
+
         viewModelScope.launch {
             try {
                 val result = grinderConfigRepository.saveConfig(config)
                 Log.d(TAG, "save: Repository saveConfig returned - isSuccess=${result.isSuccess}")
-                
+
                 result.fold(
                     onSuccess = {
                         Log.d(TAG, "save: Save successful, calling onSuccess")
@@ -178,11 +181,11 @@ class EquipmentSettingsViewModel @Inject constructor(
     private fun getValidationNumberError(): String {
         return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.validation_valid_number)
     }
-    
+
     private fun getFixValidationErrorsMessage(): String {
         return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.error_fix_validation_errors)
     }
-    
+
     private fun getFailedToSaveConfigurationMessage(): String {
         return errorTranslator.getString(com.jodli.coffeeshottimer.R.string.error_failed_to_save_configuration)
     }
@@ -199,4 +202,3 @@ data class EquipmentSettingsUiState(
     val isFormValid: Boolean = false,
     val isLoading: Boolean = false
 )
-

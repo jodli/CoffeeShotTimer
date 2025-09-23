@@ -5,6 +5,7 @@ import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
+import com.jodli.coffeeshottimer.data.preferences.GrindRecommendationPreferences
 import com.jodli.coffeeshottimer.data.repository.BasketConfigRepository
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
@@ -15,7 +16,6 @@ import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManagerImpl
 import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
 import com.jodli.coffeeshottimer.data.util.PerformanceMonitor
-import com.jodli.coffeeshottimer.data.preferences.GrindRecommendationPreferences
 import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import dagger.Binds
 import dagger.Module

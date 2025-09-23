@@ -54,7 +54,7 @@ fun EquipmentSetupSummaryScreen(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -63,7 +63,7 @@ fun EquipmentSetupSummaryScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Success icon
         Icon(
             imageVector = Icons.Default.CheckCircle,
@@ -73,9 +73,9 @@ fun EquipmentSetupSummaryScreen(
                 .align(Alignment.CenterHorizontally),
             tint = MaterialTheme.colorScheme.primary
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Title
         Text(
             text = stringResource(R.string.equipment_setup_summary_title),
@@ -84,7 +84,7 @@ fun EquipmentSetupSummaryScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Description
         Text(
             text = stringResource(R.string.equipment_setup_summary_description),
@@ -93,9 +93,9 @@ fun EquipmentSetupSummaryScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Error card if present
         error?.let { errorMessage ->
             ErrorCard(
@@ -106,7 +106,7 @@ fun EquipmentSetupSummaryScreen(
             )
             Spacer(modifier = Modifier.height(spacing.medium))
         }
-        
+
         // Loading indicator
         if (isLoading) {
             LoadingIndicator(
@@ -115,7 +115,7 @@ fun EquipmentSetupSummaryScreen(
             )
             Spacer(modifier = Modifier.height(spacing.medium))
         }
-        
+
         // Grinder configuration summary
         ConfigurationSummaryCard(
             icon = Icons.Default.Settings,
@@ -123,10 +123,13 @@ fun EquipmentSetupSummaryScreen(
             items = listOf(
                 stringResource(R.string.summary_grinder_range_format, grinderMin, grinderMax),
                 stringResource(R.string.summary_grinder_step_size_format, grinderStepSize),
-                stringResource(R.string.summary_grinder_steps_format, calculateGrinderSteps(grinderMin, grinderMax, grinderStepSize))
+                stringResource(
+                    R.string.summary_grinder_steps_format,
+                    calculateGrinderSteps(grinderMin, grinderMax, grinderStepSize)
+                )
             )
         )
-        
+
         // Basket configuration summary
         ConfigurationSummaryCard(
             icon = Icons.Default.FilterAlt,
@@ -137,9 +140,9 @@ fun EquipmentSetupSummaryScreen(
                 stringResource(R.string.summary_basket_type_format, determineBasketType(coffeeInMin, coffeeInMax))
             )
         )
-        
+
         Spacer(modifier = Modifier.weight(1f))
-        
+
         // Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -151,7 +154,7 @@ fun EquipmentSetupSummaryScreen(
                 enabled = !isLoading,
                 modifier = Modifier.weight(1f)
             )
-            
+
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_save_and_continue),
                 onClick = onConfirm,
@@ -173,7 +176,7 @@ fun ConfigurationSummaryCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -187,7 +190,7 @@ fun ConfigurationSummaryCard(
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
-            
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
             ) {
@@ -196,7 +199,7 @@ fun ConfigurationSummaryCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
-                
+
                 items.forEach { item ->
                     Text(
                         text = "• $item",
@@ -216,18 +219,18 @@ private fun calculateGrinderSteps(grinderMin: String, grinderMax: String, stepSi
     val minValue = grinderMin.toIntOrNull() ?: return 0
     val maxValue = grinderMax.toIntOrNull() ?: return 0
     val stepSizeValue = stepSize.toDoubleOrNull() ?: return 0
-    
+
     if (stepSizeValue <= 0) return 0
-    
+
     val rangeSize = maxValue - minValue
-    return (rangeSize / stepSizeValue).toInt() + 1  // +1 because we include both endpoints
+    return (rangeSize / stepSizeValue).toInt() + 1 // +1 because we include both endpoints
 }
 
 @Composable
 private fun determineBasketType(coffeeInMin: String, coffeeInMax: String): String {
     val inMin = coffeeInMin.toFloatOrNull() ?: return stringResource(R.string.basket_type_custom)
     val inMax = coffeeInMax.toFloatOrNull() ?: return stringResource(R.string.basket_type_custom)
-    
+
     return when {
         inMin <= 10 && inMax <= 14 -> stringResource(R.string.basket_type_single)
         inMin >= 14 && inMax >= 20 -> stringResource(R.string.basket_type_double)

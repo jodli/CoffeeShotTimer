@@ -1,34 +1,28 @@
 package com.jodli.coffeeshottimer.ui.screens
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,16 +41,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.res.stringResource
-import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.ui.components.AnimatedNextShotGuidanceCard
 import com.jodli.coffeeshottimer.ui.components.BeanCard
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
@@ -64,18 +58,15 @@ import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.GrinderSettingSlider
-import com.jodli.coffeeshottimer.ui.components.SectionHeader
+import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
+import com.jodli.coffeeshottimer.ui.components.RecordShotLandscapeLayout
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.TimerControls
 import com.jodli.coffeeshottimer.ui.components.WeightSlidersSection
-import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
-import com.jodli.coffeeshottimer.ui.components.NextShotGuidanceCard
-import com.jodli.coffeeshottimer.ui.components.AnimatedNextShotGuidanceCard
-import com.jodli.coffeeshottimer.ui.components.RecordShotLandscapeLayout
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
-import com.jodli.coffeeshottimer.ui.theme.landscapeTimerSize
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -108,7 +99,7 @@ fun RecordShotScreen(
     val showShotRecordedDialog by viewModel.showShotRecordedDialog.collectAsStateWithLifecycle()
     val recordedShotData by viewModel.recordedShotData.collectAsStateWithLifecycle()
     val grindAdjustmentRecommendation by viewModel.grindAdjustmentRecommendation.collectAsStateWithLifecycle()
-    
+
     // Epic 4: Persistent grind recommendation state
     val persistentRecommendation by viewModel.persistentRecommendation.collectAsStateWithLifecycle()
 
@@ -120,7 +111,6 @@ fun RecordShotScreen(
     val basketCoffeeInMax by viewModel.basketCoffeeInMax.collectAsStateWithLifecycle()
     val basketCoffeeOutMin by viewModel.basketCoffeeOutMin.collectAsStateWithLifecycle()
     val basketCoffeeOutMax by viewModel.basketCoffeeOutMax.collectAsStateWithLifecycle()
-
 
     // Local UI state
     var showBeanSelector by remember { mutableStateOf(false) }
@@ -290,7 +280,7 @@ fun RecordShotScreen(
     // Shot Recorded Dialog with Taste Feedback
     if (showShotRecordedDialog && recordedShotData != null) {
         val data = recordedShotData!!
-        
+
         ShotRecordedDialog(
             brewRatio = data.brewRatio,
             extractionTime = data.extractionTime,
@@ -319,7 +309,6 @@ fun RecordShotScreen(
             }
         )
     }
-
 
     // Bean Selection Bottom Sheet
     if (showBeanSelector) {
@@ -380,10 +369,11 @@ private fun BeanSelectionCard(
                 Text(
                     text = selectedBean?.name ?: stringResource(R.string.text_tap_to_select_bean),
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (selectedBean != null)
+                    color = if (selectedBean != null) {
                         MaterialTheme.colorScheme.onSurface
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
                     fontWeight = if (selectedBean != null) FontWeight.Medium else FontWeight.Normal
                 )
 
@@ -392,10 +382,11 @@ private fun BeanSelectionCard(
                     Text(
                         text = stringResource(R.string.format_days_since_roast, daysSinceRoast),
                         style = MaterialTheme.typography.bodySmall,
-                        color = if (bean.isFresh())
+                        color = if (bean.isFresh()) {
                             MaterialTheme.colorScheme.primary
-                        else
+                        } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                     )
                 }
             }
@@ -481,7 +472,6 @@ private fun TimerSection(
     }
 }
 
-
 @Composable
 private fun BrewRatioCard(
     brewRatio: Double?,
@@ -500,10 +490,11 @@ private fun BrewRatioCard(
                     text = formattedBrewRatio ?: "--",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (isOptimal)
+                    color = if (isOptimal) {
                         MaterialTheme.colorScheme.primary
-                    else
+                    } else {
                         MaterialTheme.colorScheme.onSurfaceVariant
+                    }
                 )
             }
         )
@@ -702,7 +693,6 @@ private fun BeanSelectorBottomSheet(
     }
 }
 
-
 enum class TimerState {
     STOPPED, RUNNING, PAUSED
 }
@@ -761,7 +751,7 @@ private fun RecordShotPortraitContent(
     onDismissPersistentRecommendation: () -> Unit
 ) {
     val spacing = LocalSpacing.current
-    
+
     // Bean Selection with navigation to bean management
     BeanSelectionCard(
         selectedBean = selectedBean,
@@ -769,7 +759,7 @@ private fun RecordShotPortraitContent(
         onManageBeans = onNavigateToBeanManagement,
         modifier = Modifier.fillMaxWidth()
     )
-    
+
     // Epic 4: Next Shot Guidance Card (shown after bean selection for logical flow)
     persistentRecommendation?.let { recommendation ->
         AnimatedNextShotGuidanceCard(
@@ -938,7 +928,7 @@ private fun RecordShotFormContent(
         onManageBeans = onNavigateToBeanManagement,
         modifier = Modifier.fillMaxWidth()
     )
-    
+
     // Epic 4: Next Shot Guidance Card (shown after bean selection for logical flow)
     persistentRecommendation?.let { recommendation ->
         AnimatedNextShotGuidanceCard(

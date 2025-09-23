@@ -23,7 +23,6 @@ class ValidationStringProvider @Inject constructor(
     fun getValidNumberError(): String =
         stringResourceProvider.getString(R.string.validation_valid_number)
 
-
     // Extraction time validation
     fun getExtractionTimeMinimumError(minTime: Int): String =
         stringResourceProvider.getString(R.string.validation_extraction_time_minimum, minTime)
@@ -57,7 +56,6 @@ class ValidationStringProvider @Inject constructor(
     // Notes validation
     fun getNotesMaximumLengthError(maxLength: Int): String =
         stringResourceProvider.getString(R.string.validation_notes_maximum_length, maxLength)
-
 
     // Cross-field validation
     fun getOutputWeightLessThanInputError(): String =

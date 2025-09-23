@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
@@ -48,7 +47,7 @@ fun GrinderSetupStepScreen(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -57,7 +56,7 @@ fun GrinderSetupStepScreen(
         verticalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
         Spacer(modifier = Modifier.height(spacing.medium))
-        
+
         // Title
         Text(
             text = stringResource(R.string.equipment_setup_grinder_step_title),
@@ -65,7 +64,7 @@ fun GrinderSetupStepScreen(
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         // Description
         Text(
             text = stringResource(R.string.equipment_setup_grinder_step_description),
@@ -73,9 +72,9 @@ fun GrinderSetupStepScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.fillMaxWidth()
         )
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         // Grinder configuration card
         GrinderScaleSetup(
             scaleMin = scaleMin,
@@ -95,9 +94,9 @@ fun GrinderSetupStepScreen(
             showPresets = true,
             showStepSize = true
         )
-        
+
         Spacer(modifier = Modifier.weight(1f))
-        
+
         // Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -108,7 +107,7 @@ fun GrinderSetupStepScreen(
                 onClick = onBack,
                 modifier = Modifier.weight(1f)
             )
-            
+
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_continue),
                 onClick = onContinue,

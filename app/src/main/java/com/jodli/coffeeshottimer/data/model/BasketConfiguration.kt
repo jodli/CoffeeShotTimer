@@ -32,7 +32,7 @@ data class BasketConfiguration(
      */
     fun validate(): ValidationResult {
         val errors = mutableListOf<String>()
-        
+
         // Validate coffee in range
         if (coffeeInMin < 5f) {
             errors.add("Coffee in minimum cannot be less than 5g")
@@ -43,7 +43,7 @@ data class BasketConfiguration(
         if (coffeeInMin >= coffeeInMax) {
             errors.add("Coffee in minimum must be less than maximum")
         }
-        
+
         // Validate coffee out range
         if (coffeeOutMin < 10f) {
             errors.add("Coffee out minimum cannot be less than 10g")
@@ -54,26 +54,26 @@ data class BasketConfiguration(
         if (coffeeOutMin >= coffeeOutMax) {
             errors.add("Coffee out minimum must be less than maximum")
         }
-        
+
         // Ensure minimum range size
         val coffeeInRange = coffeeInMax - coffeeInMin
         if (coffeeInRange < 3f) {
             errors.add("Coffee in range must be at least 3g")
         }
-        
+
         val coffeeOutRange = coffeeOutMax - coffeeOutMin
         if (coffeeOutRange < 10f) {
             errors.add("Coffee out range must be at least 10g")
         }
-        
+
         // Ensure reasonable ratio range (at least 1:1 to 1:4 possible)
         if (coffeeOutMin / coffeeInMax < 0.8f) {
             errors.add("Weight ranges don't allow reasonable brew ratios")
         }
-        
+
         return ValidationResult(errors.isEmpty(), errors)
     }
-    
+
     /**
      * Gets the coffee in range size.
      * @return The range size in grams
@@ -81,7 +81,7 @@ data class BasketConfiguration(
     fun getCoffeeInRangeSize(): Float {
         return coffeeInMax - coffeeInMin
     }
-    
+
     /**
      * Gets the coffee out range size.
      * @return The range size in grams
@@ -89,7 +89,7 @@ data class BasketConfiguration(
     fun getCoffeeOutRangeSize(): Float {
         return coffeeOutMax - coffeeOutMin
     }
-    
+
     /**
      * Gets the middle value of the coffee in range.
      * @return The middle value, useful as a default starting point
@@ -97,7 +97,7 @@ data class BasketConfiguration(
     fun getCoffeeInMiddleValue(): Float {
         return (coffeeInMin + coffeeInMax) / 2
     }
-    
+
     /**
      * Gets the middle value of the coffee out range.
      * @return The middle value, useful as a default starting point
@@ -105,7 +105,7 @@ data class BasketConfiguration(
     fun getCoffeeOutMiddleValue(): Float {
         return (coffeeOutMin + coffeeOutMax) / 2
     }
-    
+
     /**
      * Checks if a coffee in value is within the configured range.
      * @param value The value to check
@@ -114,7 +114,7 @@ data class BasketConfiguration(
     fun isCoffeeInValueInRange(value: Float): Boolean {
         return value in coffeeInMin..coffeeInMax
     }
-    
+
     /**
      * Checks if a coffee out value is within the configured range.
      * @param value The value to check
@@ -123,7 +123,7 @@ data class BasketConfiguration(
     fun isCoffeeOutValueInRange(value: Float): Boolean {
         return value in coffeeOutMin..coffeeOutMax
     }
-    
+
     /**
      * Clamps a coffee in value to the configured range.
      * @param value The value to clamp
@@ -132,7 +132,7 @@ data class BasketConfiguration(
     fun clampCoffeeInValue(value: Float): Float {
         return value.coerceIn(coffeeInMin, coffeeInMax)
     }
-    
+
     /**
      * Clamps a coffee out value to the configured range.
      * @param value The value to clamp
@@ -141,7 +141,7 @@ data class BasketConfiguration(
     fun clampCoffeeOutValue(value: Float): Float {
         return value.coerceIn(coffeeOutMin, coffeeOutMax)
     }
-    
+
     companion object {
         /**
          * Single shot basket preset configuration.
@@ -152,7 +152,7 @@ data class BasketConfiguration(
             coffeeOutMin = 20f,
             coffeeOutMax = 40f
         )
-        
+
         /**
          * Double shot basket preset configuration.
          */
@@ -162,11 +162,10 @@ data class BasketConfiguration(
             coffeeOutMin = 28f,
             coffeeOutMax = 55f
         )
-        
+
         /**
          * Default configuration for new users (double shot).
          */
         val DEFAULT = DOUBLE_SHOT
     }
 }
-

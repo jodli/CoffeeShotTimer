@@ -63,7 +63,6 @@ class DatabasePopulator @Inject constructor(
                     shotDao.insertShot(shot)
                 }
             }
-
         } catch (e: Exception) {
             throw Exception("Failed to populate database: ${e.message}", e)
         }
@@ -97,7 +96,6 @@ class DatabasePopulator @Inject constructor(
                 val shot = createRandomShotForBean(randomBean)
                 shotDao.insertShot(shot)
             }
-
         } catch (e: Exception) {
             throw Exception("Failed to add more shots: ${e.message}", e)
         }
@@ -135,7 +133,6 @@ class DatabasePopulator @Inject constructor(
             currentConfig?.let { config ->
                 grinderConfigDao.deleteConfig(config)
             }
-
         } catch (e: Exception) {
             throw Exception("Failed to clear database: ${e.message}", e)
         }
@@ -147,13 +144,13 @@ class DatabasePopulator @Inject constructor(
      */
     private fun createRealisticGrinderConfiguration(): GrinderConfiguration {
         val commonConfigs = listOf(
-            GrinderConfiguration(scaleMin = 1, scaleMax = 10),   // Baratza Encore style
-            GrinderConfiguration(scaleMin = 30, scaleMax = 80),  // Comandante style
-            GrinderConfiguration(scaleMin = 0, scaleMax = 100),  // Generic percentage
-            GrinderConfiguration(scaleMin = 5, scaleMax = 15),   // Fine adjustment range
-            GrinderConfiguration(scaleMin = 20, scaleMax = 60)   // Mid-range burr grinder
+            GrinderConfiguration(scaleMin = 1, scaleMax = 10), // Baratza Encore style
+            GrinderConfiguration(scaleMin = 30, scaleMax = 80), // Comandante style
+            GrinderConfiguration(scaleMin = 0, scaleMax = 100), // Generic percentage
+            GrinderConfiguration(scaleMin = 5, scaleMax = 15), // Fine adjustment range
+            GrinderConfiguration(scaleMin = 20, scaleMax = 60) // Mid-range burr grinder
         )
-        
+
         return commonConfigs.random().copy(
             id = UUID.randomUUID().toString(),
             createdAt = LocalDateTime.now().minusDays(Random.nextLong(1, 30))
@@ -258,7 +255,11 @@ class DatabasePopulator @Inject constructor(
         // Calculate grinder setting with skill-level consistency
         val baseGrinderSetting = bean.lastGrinderSetting?.toDoubleOrNull() ?: 3.0
         val grinderVariation = Random.nextDouble(-skillVariations.grinderVariance, skillVariations.grinderVariance)
-        val grinderSetting = String.format(java.util.Locale.ROOT, "%.1f", (baseGrinderSetting + grinderVariation).coerceIn(1.0, 5.0))
+        val grinderSetting = String.format(
+            java.util.Locale.ROOT,
+            "%.1f",
+            (baseGrinderSetting + grinderVariation).coerceIn(1.0, 5.0)
+        )
 
         // Calculate output weight with skill-level appropriate ratio control
         val targetRatio = profile.targetRatio + ratioVariation

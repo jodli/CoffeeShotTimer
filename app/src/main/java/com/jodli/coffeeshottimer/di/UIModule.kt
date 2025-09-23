@@ -1,7 +1,6 @@
 package com.jodli.coffeeshottimer.di
 
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
-import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import dagger.Module

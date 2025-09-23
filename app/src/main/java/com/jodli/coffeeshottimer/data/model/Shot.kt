@@ -15,12 +15,14 @@ import kotlin.math.round
  */
 @Entity(
     tableName = "shots",
-    foreignKeys = [ForeignKey(
-        entity = Bean::class,
-        parentColumns = ["id"],
-        childColumns = ["beanId"],
-        onDelete = ForeignKey.CASCADE
-    )],
+    foreignKeys = [
+        ForeignKey(
+            entity = Bean::class,
+            parentColumns = ["id"],
+            childColumns = ["beanId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
     indices = [
         androidx.room.Index(value = ["beanId"]),
         androidx.room.Index(value = ["timestamp"]),
@@ -38,8 +40,8 @@ data class Shot(
     val grinderSetting: String,
     val notes: String = "",
     val timestamp: LocalDateTime = LocalDateTime.now(),
-    val tastePrimary: TastePrimary? = null,  // Primary taste feedback (Sour/Perfect/Bitter)
-    val tasteSecondary: TasteSecondary? = null  // Optional secondary qualifier (Weak/Strong)
+    val tastePrimary: TastePrimary? = null, // Primary taste feedback (Sour/Perfect/Bitter)
+    val tasteSecondary: TasteSecondary? = null // Optional secondary qualifier (Weak/Strong)
 ) {
     /**
      * Calculates the brew ratio (output weight / input weight).

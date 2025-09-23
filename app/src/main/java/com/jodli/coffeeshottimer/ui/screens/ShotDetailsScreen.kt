@@ -12,15 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -33,7 +29,6 @@ import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -51,20 +46,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
-import androidx.compose.ui.res.stringResource
-import com.jodli.coffeeshottimer.domain.model.AdjustmentDirection
-import com.jodli.coffeeshottimer.domain.model.ConfidenceLevel
-import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
-import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
-import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
-import com.jodli.coffeeshottimer.domain.usecase.RecommendationPriority
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
@@ -76,7 +67,6 @@ import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackDisplay
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackEditSheet
-import com.jodli.coffeeshottimer.ui.util.formatForDisplay
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
 import java.time.format.DateTimeFormatter
@@ -106,7 +96,7 @@ fun ShotDetailsScreen(
     ) {
         // Top App Bar
         TopAppBar(
-            title = { 
+            title = {
                 Text(
                     text = stringResource(R.string.title_shot_details),
                     style = MaterialTheme.typography.headlineMedium,
@@ -270,7 +260,7 @@ fun ShotDetailsScreen(
             viewModel.clearError()
         }
     }
-    
+
     // Taste feedback editor sheet
     if (showTasteEditor && uiState.shotDetails != null) {
         TasteFeedbackEditSheet(
@@ -374,9 +364,11 @@ private fun ShotOverviewCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Column(modifier = Modifier
-                    .weight(1f)
-                    .padding(end = spacing.medium)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(end = spacing.medium)
+                ) {
                     Text(
                         text = shot.timestamp.format(dateFormatter),
                         style = MaterialTheme.typography.titleLarge,
@@ -409,7 +401,7 @@ private fun ShotOverviewCard(
             }
 
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             // Taste feedback display
             Column(
                 modifier = Modifier.fillMaxWidth()
@@ -419,9 +411,9 @@ private fun ShotOverviewCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.extraSmall))
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
@@ -433,7 +425,7 @@ private fun ShotOverviewCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(spacing.small))
 
             // Quality score - moved outside columns for full width
@@ -767,7 +759,13 @@ private fun ShotNotesCard(
                 )
 
                 CoffeePrimaryButton(
-                    text = if (editNotesState.isSaving) stringResource(R.string.cd_saving) else stringResource(R.string.cd_save),
+                    text = if (editNotesState.isSaving) {
+                        stringResource(
+                            R.string.cd_saving
+                        )
+                    } else {
+                        stringResource(R.string.cd_save)
+                    },
                     onClick = onSaveNotes,
                     enabled = !editNotesState.isSaving && editNotesState.hasChanges,
                     icon = Icons.Default.Check,
@@ -817,7 +815,12 @@ private fun ShotContextCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         Text(
-            text = stringResource(R.string.format_shot_context, shotDetails.relatedShotsCount, shotDetails.relatedShotsCount, shotDetails.bean.name),
+            text = stringResource(
+                R.string.format_shot_context,
+                shotDetails.relatedShotsCount,
+                shotDetails.relatedShotsCount,
+                shotDetails.bean.name
+            ),
             style = MaterialTheme.typography.bodyMedium
         )
 
@@ -825,7 +828,11 @@ private fun ShotContextCard(
 
         shotDetails.previousShot?.let { previousShot ->
             Text(
-                text = stringResource(R.string.format_previous_shot, previousShot.timestamp.format( DateTimeFormatter.ofPattern( "MMM dd, HH:mm")), previousShot.getFormattedBrewRatio()),
+                text = stringResource(
+                    R.string.format_previous_shot,
+                    previousShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm")),
+                    previousShot.getFormattedBrewRatio()
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -833,7 +840,11 @@ private fun ShotContextCard(
 
         shotDetails.nextShot?.let { nextShot ->
             Text(
-                text = stringResource(R.string.format_next_shot, nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm")), nextShot.getFormattedBrewRatio()),
+                text = stringResource(
+                    R.string.format_next_shot,
+                    nextShot.timestamp.format(DateTimeFormatter.ofPattern("MMM dd, HH:mm")),
+                    nextShot.getFormattedBrewRatio()
+                ),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -852,10 +863,10 @@ private fun NextShotGrindAdjustmentCard(
 ) {
     val spacing = LocalSpacing.current
     val shot = shotDetails.shot
-    
+
     // Get grind adjustment recommendation from ViewModel
     val grindAdjustmentRecommendation by viewModel.grindAdjustmentRecommendation.collectAsState()
-    
+
     // Only show if we have a recommendation
     grindAdjustmentRecommendation?.let { recommendation ->
         CoffeeCard(modifier = modifier) {
@@ -863,9 +874,9 @@ private fun NextShotGrindAdjustmentCard(
                 icon = Icons.Default.Lightbulb,
                 title = stringResource(R.string.text_recommendations_for_next_shot)
             )
-            
+
             Spacer(modifier = Modifier.height(spacing.medium))
-            
+
             GrindAdjustmentCard(
                 recommendation = recommendation,
                 isCompact = false,
@@ -1002,7 +1013,11 @@ private fun DeviationItem(
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
         Text(
-            text = stringResource(R.string.format_deviation_display, if (deviation >= 0) "+" else "", format.format(deviation) + suffix),
+            text = stringResource(
+                R.string.format_deviation_display,
+                if (deviation >= 0) "+" else "",
+                format.format(deviation) + suffix
+            ),
             style = MaterialTheme.typography.bodySmall,
             color = when {
                 kotlin.math.abs(deviation) < 0.1 -> MaterialTheme.colorScheme.primary

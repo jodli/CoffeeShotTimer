@@ -16,8 +16,8 @@ import com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -265,8 +265,6 @@ class ShotHistoryViewModel @Inject constructor(
             startReactiveShotHistoryCollection()
         }
     }
-
-
 
     fun getBeanName(beanId: String): String {
         // If the bean isn't in availableBeans (which lists active beans), it may be inactive.

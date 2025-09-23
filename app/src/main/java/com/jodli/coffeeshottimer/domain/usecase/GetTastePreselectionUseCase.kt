@@ -11,7 +11,7 @@ class GetTastePreselectionUseCase @Inject constructor() {
 
     /**
      * Get the recommended taste preselection based on extraction time.
-     * 
+     *
      * @param extractionTimeSeconds The extraction time in seconds
      * @return The recommended TastePrimary, or null if extraction time is invalid
      */
@@ -21,9 +21,9 @@ class GetTastePreselectionUseCase @Inject constructor() {
         }
 
         return when {
-            extractionTimeSeconds < 25.0 -> TastePrimary.SOUR      // Under-extracted
-            extractionTimeSeconds <= 30.0 -> TastePrimary.PERFECT  // Optimal range
-            else -> TastePrimary.BITTER                            // Over-extracted
+            extractionTimeSeconds < 25.0 -> TastePrimary.SOUR // Under-extracted
+            extractionTimeSeconds <= 30.0 -> TastePrimary.PERFECT // Optimal range
+            else -> TastePrimary.BITTER // Over-extracted
         }
     }
 

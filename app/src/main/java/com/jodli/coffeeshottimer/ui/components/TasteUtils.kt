@@ -23,7 +23,7 @@ import com.jodli.coffeeshottimer.domain.model.TasteSecondary
  * Utility functions for taste feedback components
  */
 object TasteUtils {
-    
+
     /**
      * Get the recommended taste based on extraction time.
      * Uses the same logic as GetTastePreselectionUseCase.
@@ -32,13 +32,13 @@ object TasteUtils {
         if (extractionTimeSeconds == null || extractionTimeSeconds <= 0) {
             return null
         }
-        
+
         val result = when {
-            extractionTimeSeconds < 25 -> TastePrimary.SOUR      // Under-extracted
-            extractionTimeSeconds <= 30 -> TastePrimary.PERFECT  // Optimal range
-            else -> TastePrimary.BITTER                          // Over-extracted
+            extractionTimeSeconds < 25 -> TastePrimary.SOUR // Under-extracted
+            extractionTimeSeconds <= 30 -> TastePrimary.PERFECT // Optimal range
+            else -> TastePrimary.BITTER // Over-extracted
         }
-        
+
         return result
     }
 }
@@ -74,7 +74,7 @@ fun TastePrimaryButton(
         },
         label = "container_color"
     )
-    
+
     // Compute content description using string resources
     val contentDesc = when {
         isRecommended -> stringResource(R.string.cd_taste_suggested, label)
@@ -140,7 +140,7 @@ fun TasteSecondaryChip(
     } else {
         stringResource(R.string.cd_taste_qualifier_not_selected, label)
     }
-    
+
     FilterChip(
         selected = isSelected,
         onClick = onClick,
@@ -171,7 +171,6 @@ fun TastePrimaryButtonRow(
     buttonHeight: Int = 80, // dp
     allowDeselection: Boolean = false // For edit mode
 ) {
-    
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -182,7 +181,7 @@ fun TastePrimaryButtonRow(
             label = stringResource(R.string.taste_sour),
             isSelected = selectedTaste == TastePrimary.SOUR,
             isRecommended = suggestedTaste == TastePrimary.SOUR,
-            onClick = { 
+            onClick = {
                 if (allowDeselection && selectedTaste == TastePrimary.SOUR) {
                     onTasteSelected(null)
                 } else {
@@ -192,14 +191,14 @@ fun TastePrimaryButtonRow(
             modifier = Modifier.weight(1f),
             height = buttonHeight
         )
-        
+
         TastePrimaryButton(
             taste = TastePrimary.PERFECT,
             emoji = "😊",
             label = stringResource(R.string.taste_perfect),
             isSelected = selectedTaste == TastePrimary.PERFECT,
             isRecommended = suggestedTaste == TastePrimary.PERFECT,
-            onClick = { 
+            onClick = {
                 if (allowDeselection && selectedTaste == TastePrimary.PERFECT) {
                     onTasteSelected(null)
                 } else {
@@ -209,14 +208,14 @@ fun TastePrimaryButtonRow(
             modifier = Modifier.weight(1f),
             height = buttonHeight
         )
-        
+
         TastePrimaryButton(
             taste = TastePrimary.BITTER,
             emoji = "😣",
             label = stringResource(R.string.taste_bitter),
             isSelected = selectedTaste == TastePrimary.BITTER,
             isRecommended = suggestedTaste == TastePrimary.BITTER,
-            onClick = { 
+            onClick = {
                 if (allowDeselection && selectedTaste == TastePrimary.BITTER) {
                     onTasteSelected(null)
                 } else {
@@ -253,7 +252,7 @@ fun TasteSecondaryChipRow(
                 )
             }
         )
-        
+
         TasteSecondaryChip(
             taste = TasteSecondary.STRONG,
             emoji = "💪",

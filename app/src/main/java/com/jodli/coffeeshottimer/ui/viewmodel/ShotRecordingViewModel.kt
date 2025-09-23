@@ -22,10 +22,10 @@ import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
-import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
-import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
+import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -152,20 +152,20 @@ class ShotRecordingViewModel @Inject constructor(
 
     private val _grinderScaleMax = MutableStateFlow(20.0f)
     val grinderScaleMax: StateFlow<Float> = _grinderScaleMax.asStateFlow()
-    
+
     private val _grinderStepSize = MutableStateFlow(0.5f)
     val grinderStepSize: StateFlow<Float> = _grinderStepSize.asStateFlow()
-    
+
     // Basket configuration for weight ranges
     private val _basketCoffeeInMin = MutableStateFlow(5f)
     val basketCoffeeInMin: StateFlow<Float> = _basketCoffeeInMin.asStateFlow()
-    
+
     private val _basketCoffeeInMax = MutableStateFlow(22f)
     val basketCoffeeInMax: StateFlow<Float> = _basketCoffeeInMax.asStateFlow()
-    
+
     private val _basketCoffeeOutMin = MutableStateFlow(10f)
     val basketCoffeeOutMin: StateFlow<Float> = _basketCoffeeOutMin.asStateFlow()
-    
+
     private val _basketCoffeeOutMax = MutableStateFlow(55f)
     val basketCoffeeOutMax: StateFlow<Float> = _basketCoffeeOutMax.asStateFlow()
 
@@ -246,19 +246,19 @@ class ShotRecordingViewModel @Inject constructor(
                     onSuccess = { beans ->
                         val previousBeans = _activeBeans.value
                         _activeBeans.value = beans
-                        
+
                         // On first load, check for current bean from repository AFTER beans are loaded
                         if (isFirstLoad) {
                             isFirstLoad = false
                             loadCurrentBeanAfterBeansLoaded()
                         }
-                        
+
                         // Epic 4: Check if currently selected bean was deactivated
                         val selectedBean = _selectedBean.value
                         if (selectedBean != null && !beans.any { it.id == selectedBean.id }) {
                             // Currently selected bean is no longer active, clear its recommendation
                             _persistentRecommendation.value = null
-                            
+
                             // Select first available bean or clear selection
                             if (beans.isNotEmpty()) {
                                 selectBean(beans.first())
@@ -296,7 +296,7 @@ class ShotRecordingViewModel @Inject constructor(
                         // Verify the current bean is still in the active beans list
                         val activeBeans = _activeBeans.value
                         val isBeanStillActive = activeBeans.any { it.id == currentBean.id }
-                        
+
                         if (isBeanStillActive) {
                             selectBean(currentBean)
                         } else {
@@ -317,7 +317,7 @@ class ShotRecordingViewModel @Inject constructor(
      * This prevents race conditions where current bean validation fails because
      * active beans list is still empty.
      */
-     private fun loadCurrentBeanAfterBeansLoaded() {
+    private fun loadCurrentBeanAfterBeansLoaded() {
         viewModelScope.launch {
             val result = beanRepository.getCurrentBean()
             result.fold(
@@ -326,7 +326,7 @@ class ShotRecordingViewModel @Inject constructor(
                         // Active beans are now guaranteed to be loaded
                         val activeBeans = _activeBeans.value
                         val isBeanStillActive = activeBeans.any { it.id == currentBean.id }
-                        
+
                         if (isBeanStillActive) {
                             selectBean(currentBean)
                         } else {
@@ -400,7 +400,7 @@ class ShotRecordingViewModel @Inject constructor(
             }
         }
     }
-    
+
     /**
      * Load basket configuration for weight slider ranges.
      * Uses reactive Flow to automatically update when configuration changes.
@@ -447,7 +447,7 @@ class ShotRecordingViewModel @Inject constructor(
                 delay(100L) // Update every 100ms for smooth display
                 if (timerState.value.isRunning) {
                     recordShotUseCase.updateTimer()
-                    
+
                     // Save timer state every second to avoid excessive SavedStateHandle writes
                     val currentTime = SystemClock.elapsedRealtime()
                     if (currentTime - lastSaveTime >= 1000L) {
@@ -481,7 +481,7 @@ class ShotRecordingViewModel @Inject constructor(
     fun selectBean(bean: Bean) {
         val previousBean = _selectedBean.value
         _selectedBean.value = bean
-        
+
         // Epic 4: Immediately clear old persistent recommendation when switching beans
         // This prevents showing stale recommendations from the previous bean
         if (previousBean != null && previousBean.id != bean.id) {
@@ -495,7 +495,7 @@ class ShotRecordingViewModel @Inject constructor(
             loadPreviousSuccessfulSettings(bean.id)
             // Epic 4: Load persistent grind recommendation for this bean
             loadPersistentRecommendation()
-            
+
             // Epic 4: Set current bean in repository for persistence across app restarts
             setCurrentBeanInRepository(bean)
         }
@@ -518,7 +518,7 @@ class ShotRecordingViewModel @Inject constructor(
                 // 1. Current setting is empty, OR
                 // 2. We're switching from a different bean and have a suggestion
                 val shouldAutoFillGrinder = _grinderSetting.value.isEmpty() ||
-                        (previousBean != null && previousBean.id != beanId && suggestion != null)
+                    (previousBean != null && previousBean.id != beanId && suggestion != null)
 
                 if (shouldAutoFillGrinder && suggestion != null) {
                     updateGrinderSetting(suggestion)
@@ -541,7 +541,7 @@ class ShotRecordingViewModel @Inject constructor(
                     // 1. Current values are empty, OR
                     // 2. We're switching from a different bean
                     val shouldAutoFillWeights = (_coffeeWeightIn.value.isEmpty() && _coffeeWeightOut.value.isEmpty()) ||
-                            (previousBean != null && previousBean.id != beanId)
+                        (previousBean != null && previousBean.id != beanId)
 
                     if (shouldAutoFillWeights) {
                         updateCoffeeWeightIn(lastShot.coffeeWeightIn.toString())
@@ -574,7 +574,7 @@ class ShotRecordingViewModel @Inject constructor(
             }
         )
     }
-    
+
     /**
      * Load previous successful grinder settings for a bean to show as visual indicators.
      */
@@ -675,11 +675,11 @@ class ShotRecordingViewModel @Inject constructor(
     private fun validateForm() {
         val hasValidBean = _selectedBean.value != null
         val hasValidWeights = _coffeeWeightIn.value.isNotBlank() &&
-                _coffeeWeightOut.value.isNotBlank() &&
-                _coffeeWeightInError.value == null &&
-                _coffeeWeightOutError.value == null
+            _coffeeWeightOut.value.isNotBlank() &&
+            _coffeeWeightInError.value == null &&
+            _coffeeWeightOutError.value == null
         val hasValidGrinder = _grinderSetting.value.isNotBlank() &&
-                _grinderSettingError.value == null
+            _grinderSettingError.value == null
         val hasValidTimer = timerState.value.elapsedTimeSeconds >= ValidationUtils.MIN_EXTRACTION_TIME
 
         val isValid = hasValidBean && hasValidWeights && hasValidGrinder && hasValidTimer
@@ -688,7 +688,7 @@ class ShotRecordingViewModel @Inject constructor(
 
         // Show timer validation feedback if everything else is valid but timer is insufficient
         val shouldShowTimerValidation = hasValidBean && hasValidWeights && hasValidGrinder &&
-                !hasValidTimer && timerState.value.elapsedTimeSeconds > 0
+            !hasValidTimer && timerState.value.elapsedTimeSeconds > 0
 
         if (shouldShowTimerValidation && !_showTimerValidation.value) {
             _showTimerValidation.value = true
@@ -760,10 +760,10 @@ class ShotRecordingViewModel @Inject constructor(
             // Epic 4: Track if user followed persistent recommendation before recording
             val currentRecommendation = _persistentRecommendation.value
             val followedRecommendation = checkIfRecommendationFollowed(grinder, currentRecommendation)
-            
+
             // Capture extraction time BEFORE recording (it might be reset after recording)
             val extractionTimeSeconds = timerState.value.elapsedTimeSeconds
-            
+
             // Validate parameters first
             val validationResult = recordShotUseCase.validateShotParameters(
                 beanId = bean.id,
@@ -795,7 +795,7 @@ class ShotRecordingViewModel @Inject constructor(
                         // User followed the recommendation, mark it as followed
                         manageGrindRecommendationUseCase.markRecommendationFollowed(currentRecommendation.beanId)
                     }
-                    
+
                     // Epic 4: Log analytics for future learning features
                     currentRecommendation?.let { recommendation ->
                         logRecommendationAnalytics(
@@ -806,11 +806,11 @@ class ShotRecordingViewModel @Inject constructor(
                             extractionTimeSeconds = extractionTimeSeconds
                         )
                     }
-                    
+
                     // Epic 4: Clear old recommendation since we're recording a new shot
                     // This clears the previous recommendation to make room for the new one
                     _persistentRecommendation.value = null
-                    
+
                     // Clear draft after successful recording
                     clearDraft()
 
@@ -820,7 +820,13 @@ class ShotRecordingViewModel @Inject constructor(
 
                     // Load shot details with recommendations and show dialog
                     // Pass the captured extraction time and recorded grinder setting
-                    loadShotDetailsAndShowDialog(shot.id, shot.getFormattedBrewRatio(), shot.getFormattedExtractionTime(), extractionTimeSeconds, grinder)
+                    loadShotDetailsAndShowDialog(
+                        shot.id,
+                        shot.getFormattedBrewRatio(),
+                        shot.getFormattedExtractionTime(),
+                        extractionTimeSeconds,
+                        grinder
+                    )
                 },
                 onFailure = { exception ->
                     _errorMessage.value = domainErrorTranslator.translateError(exception)
@@ -880,10 +886,10 @@ class ShotRecordingViewModel @Inject constructor(
      */
     private suspend fun saveDraftIfNeeded() {
         val hasData = _coffeeWeightIn.value.isNotBlank() ||
-                _coffeeWeightOut.value.isNotBlank() ||
-                _grinderSetting.value.isNotBlank() ||
-                _notes.value.isNotBlank() ||
-                timerState.value.elapsedTimeSeconds > 0
+            _coffeeWeightOut.value.isNotBlank() ||
+            _grinderSetting.value.isNotBlank() ||
+            _notes.value.isNotBlank() ||
+            timerState.value.elapsedTimeSeconds > 0
 
         if (hasData) {
             saveDraft()
@@ -992,16 +998,21 @@ class ShotRecordingViewModel @Inject constructor(
         }
     }
 
-
-
     /**
      * Load shot details with recommendations and show the success dialog.
      */
-    private suspend fun loadShotDetailsAndShowDialog(shotId: String, brewRatio: String, extractionTime: String, extractionTimeSeconds: Int, grinderSetting: String) {
+    private suspend fun loadShotDetailsAndShowDialog(
+        shotId: String,
+        brewRatio: String,
+        extractionTime: String,
+        extractionTimeSeconds: Int,
+        grinderSetting: String
+    ) {
         // Pre-compute the suggested taste using shared utility
-        val suggestedTaste = com.jodli.coffeeshottimer.ui.components.TasteUtils.getTasteRecommendation(extractionTimeSeconds)
-        
-        
+        val suggestedTaste = com.jodli.coffeeshottimer.ui.components.TasteUtils.getTasteRecommendation(
+            extractionTimeSeconds
+        )
+
         getShotDetailsUseCase.getShotDetails(shotId).fold(
             onSuccess = { shotDetails ->
                 _recordedShotData.value = RecordedShotData(
@@ -1014,7 +1025,7 @@ class ShotRecordingViewModel @Inject constructor(
                     grinderSetting = grinderSetting
                 )
                 _showShotRecordedDialog.value = true
-                
+
                 // Calculate initial grind adjustment based on extraction time alone
                 // This ensures beginners always get recommendations even without selecting taste
                 calculateInitialGrindAdjustment(extractionTimeSeconds, grinderSetting)
@@ -1022,13 +1033,14 @@ class ShotRecordingViewModel @Inject constructor(
             onFailure = {
                 // Fallback to simple success message if we can't load recommendations
                 _successMessage.value = stringResourceProvider.getString(
-                    R.string.text_record_successfully, 
-                    brewRatio, 
+                    R.string.text_record_successfully,
+                    brewRatio,
                     extractionTime
                 )
             }
         )
     }
+
     /**
      * Hide the shot recorded dialog.
      */
@@ -1062,7 +1074,7 @@ class ShotRecordingViewModel @Inject constructor(
             ).fold(
                 onSuccess = {
                     // Taste feedback successfully saved to database
-                    
+
                     // Epic 4: Update persistent recommendation with taste feedback
                     val recordedData = _recordedShotData.value
                     val currentBean = _selectedBean.value
@@ -1133,7 +1145,7 @@ class ShotRecordingViewModel @Inject constructor(
             _suggestedGrinderSetting.value = recommendation.suggestedGrindSetting
             _grinderSetting.value = recommendation.suggestedGrindSetting
             _grindAdjustmentRecommendation.value = null
-            
+
             // Validate form with new grinder setting
             validateForm()
         }
@@ -1160,7 +1172,7 @@ class ShotRecordingViewModel @Inject constructor(
             ).fold(
                 onSuccess = { recommendation ->
                     _grindAdjustmentRecommendation.value = recommendation
-                    
+
                     // Epic 4: Also save persistent recommendation immediately
                     val recordedData = _recordedShotData.value
                     val currentBean = _selectedBean.value
@@ -1200,7 +1212,7 @@ class ShotRecordingViewModel @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Calculate grind adjustment recommendation for given taste (reactive calculation).
      * This is called when user changes taste selection in the dialog.
@@ -1322,27 +1334,27 @@ class ShotRecordingViewModel @Inject constructor(
         val recommendation = _persistentRecommendation.value
         if (recommendation != null) {
             val oldSetting = _grinderSetting.value
-            
+
             // Apply the grinder setting
             _grinderSetting.value = recommendation.suggestedGrindSetting
             _suggestedGrinderSetting.value = recommendation.suggestedGrindSetting
-            
+
             // Mark as followed
             viewModelScope.launch {
                 manageGrindRecommendationUseCase.markRecommendationFollowed(recommendation.beanId)
                 // Update the local state to reflect it was followed
                 _persistentRecommendation.value = recommendation.markAsFollowed()
             }
-            
+
             // Epic 4: Log that user explicitly applied the recommendation
             if (BuildConfig.DEBUG) {
                 android.util.Log.d(
                     "RecommendationTracking",
-                    "User applied recommendation: Bean=${recommendation.beanId}, "
-                            + "From=$oldSetting To=${recommendation.suggestedGrindSetting}"
+                    "User applied recommendation: Bean=${recommendation.beanId}, " +
+                        "From=$oldSetting To=${recommendation.suggestedGrindSetting}"
                 )
             }
-            
+
             // Validate form with new grinder setting
             validateForm()
         }
@@ -1361,7 +1373,7 @@ class ShotRecordingViewModel @Inject constructor(
             }
         }
     }
-    
+
     /**
      * Clear the persistent recommendation state immediately (e.g., when switching beans).
      * Epic 4: Used internally to prevent stale recommendation display during bean transitions.
@@ -1369,7 +1381,7 @@ class ShotRecordingViewModel @Inject constructor(
     private fun clearPersistentRecommendationState() {
         _persistentRecommendation.value = null
     }
-    
+
     /**
      * Refresh persistent recommendations for the currently selected bean.
      * Epic 4: Called when returning from other screens to ensure recommendations are up-to-date.
@@ -1377,7 +1389,7 @@ class ShotRecordingViewModel @Inject constructor(
     fun refreshPersistentRecommendation() {
         loadPersistentRecommendation()
     }
-    
+
     /**
      * Check if the current grinder setting matches the persistent recommendation within tolerance.
      * Epic 4: Used for tracking recommendation follow-through rates.
@@ -1387,18 +1399,18 @@ class ShotRecordingViewModel @Inject constructor(
         recommendation: PersistentGrindRecommendation?
     ): Boolean {
         if (recommendation == null) return false
-        
+
         val currentSetting = currentGrinderSetting.toDoubleOrNull() ?: return false
         val recommendedSetting = recommendation.suggestedGrindSetting.toDoubleOrNull() ?: return false
-        
+
         // Define tolerance for "following" the recommendation
         // Allow ±0.5 step size difference to account for user adjustments
-        val tolerance = _grinderStepSize.value  // Use the actual step size from configuration
+        val tolerance = _grinderStepSize.value // Use the actual step size from configuration
         val difference = kotlin.math.abs(currentSetting - recommendedSetting)
-        
+
         return difference <= tolerance
     }
-    
+
     /**
      * Log recommendation follow-through analytics.
      * Epic 4: Track user behavior for future learning features.
@@ -1415,12 +1427,12 @@ class ShotRecordingViewModel @Inject constructor(
         if (BuildConfig.DEBUG) {
             android.util.Log.d(
                 "RecommendationTracking",
-                "Bean: $beanId, Followed: $recommendationFollowed, "
-                        + "Actual: $actualGrindSetting, Recommended: $recommendedGrindSetting, "
-                        + "Time: ${extractionTimeSeconds}s"
+                "Bean: $beanId, Followed: $recommendationFollowed, " +
+                    "Actual: $actualGrindSetting, Recommended: $recommendedGrindSetting, " +
+                    "Time: ${extractionTimeSeconds}s"
             )
         }
-        
+
         // Future: Could aggregate statistics:
         // - Follow-through rate per bean
         // - Accuracy of recommendations (based on subsequent taste feedback)
@@ -1479,10 +1491,10 @@ class ShotRecordingViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        
+
         // Save timer state before clearing
         saveTimerState()
-        
+
         timerUpdateJob?.cancel()
         autoSaveDraftJob?.cancel()
 
@@ -1499,7 +1511,7 @@ class ShotRecordingViewModel @Inject constructor(
 data class RecordedShotData(
     val brewRatio: String,
     val extractionTime: String,
-    val extractionTimeSeconds: Int,  // Added for taste preselection
+    val extractionTimeSeconds: Int, // Added for taste preselection
     val recommendations: List<ShotRecommendation>,
     val shotId: String,
     val suggestedTaste: TastePrimary?, // Pre-computed suggested taste

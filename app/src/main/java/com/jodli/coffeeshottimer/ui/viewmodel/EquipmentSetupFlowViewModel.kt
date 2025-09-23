@@ -31,7 +31,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(EquipmentSetupFlowUiState())
     val uiState: StateFlow<EquipmentSetupFlowUiState> = _uiState.asStateFlow()
-    
+
     init {
         // Pre-load existing configurations to make it easier for returning users
         loadExistingConfigurations()
@@ -60,7 +60,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
             }
             EquipmentSetupStep.SUMMARY -> return // Can't go forward from summary
         }
-        
+
         _uiState.value = currentState.copy(currentStep = nextStep)
     }
 
@@ -75,7 +75,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
             EquipmentSetupStep.BASKET_SETUP -> EquipmentSetupStep.GRINDER_SETUP
             EquipmentSetupStep.SUMMARY -> EquipmentSetupStep.BASKET_SETUP
         }
-        
+
         _uiState.value = currentState.copy(currentStep = previousStep)
     }
 
@@ -132,12 +132,12 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         val minValue = currentState.grinderScaleMin.toIntOrNull()
         val maxValue = currentState.grinderScaleMax.toIntOrNull()
         val stepSizeValue = currentState.grinderStepSize.toDoubleOrNull()
-        
+
         var minError: String? = null
         var maxError: String? = null
         var stepSizeError: String? = null
         var generalError: String? = null
-        
+
         if (currentState.grinderScaleMin.isNotBlank() && minValue == null) {
             minError = "Please enter a valid number"
         }
@@ -147,7 +147,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         if (currentState.grinderStepSize.isNotBlank() && stepSizeValue == null) {
             stepSizeError = "Please enter a valid number"
         }
-        
+
         var isValid = false
         if (minValue != null && maxValue != null && stepSizeValue != null) {
             val config = GrinderConfiguration(scaleMin = minValue, scaleMax = maxValue, stepSize = stepSizeValue)
@@ -158,7 +158,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                 isValid = true
             }
         }
-        
+
         _uiState.value = currentState.copy(
             grinderMinError = minError,
             grinderMaxError = maxError,
@@ -166,7 +166,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
             grinderGeneralError = generalError,
             isGrinderValid = isValid
         )
-        
+
         return isValid
     }
 
@@ -228,13 +228,13 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         val inMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
         val outMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
         val outMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
-        
+
         var inMinError: String? = null
         var inMaxError: String? = null
         var outMinError: String? = null
         var outMaxError: String? = null
         var generalError: String? = null
-        
+
         if (currentState.coffeeInMin.isNotBlank() && inMin == null) {
             inMinError = "Please enter a valid whole number"
         }
@@ -247,7 +247,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         if (currentState.coffeeOutMax.isNotBlank() && outMax == null) {
             outMaxError = "Please enter a valid whole number"
         }
-        
+
         var isValid = false
         if (inMin != null && inMax != null && outMin != null && outMax != null) {
             val config = BasketConfiguration(
@@ -264,7 +264,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                 isValid = true
             }
         }
-        
+
         _uiState.value = currentState.copy(
             coffeeInMinError = inMinError,
             coffeeInMaxError = inMaxError,
@@ -273,7 +273,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
             basketGeneralError = generalError,
             isBasketValid = isValid
         )
-        
+
         return isValid
     }
 
@@ -282,7 +282,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
      */
     fun saveConfiguration(onSuccess: () -> Unit, onError: (String) -> Unit) {
         val currentState = _uiState.value
-        
+
         // Parse all values
         val grinderMin = currentState.grinderScaleMin.toIntOrNull()
         val grinderMax = currentState.grinderScaleMax.toIntOrNull()
@@ -291,22 +291,27 @@ class EquipmentSetupFlowViewModel @Inject constructor(
         val coffeeInMax = currentState.coffeeInMax.toIntOrNull()?.toFloat()
         val coffeeOutMin = currentState.coffeeOutMin.toIntOrNull()?.toFloat()
         val coffeeOutMax = currentState.coffeeOutMax.toIntOrNull()?.toFloat()
-        
+
         if (grinderMin == null || grinderMax == null || grinderStepSize == null ||
-            coffeeInMin == null || coffeeInMax == null || 
-            coffeeOutMin == null || coffeeOutMax == null) {
+            coffeeInMin == null || coffeeInMax == null ||
+            coffeeOutMin == null || coffeeOutMax == null
+        ) {
             onError("Please complete all configuration fields")
             return
         }
-        
+
         _uiState.value = currentState.copy(isLoading = true, error = null)
-        
+
         viewModelScope.launch {
             try {
                 // Save grinder configuration
-                val grinderConfig = GrinderConfiguration(scaleMin = grinderMin, scaleMax = grinderMax, stepSize = grinderStepSize)
+                val grinderConfig = GrinderConfiguration(
+                    scaleMin = grinderMin,
+                    scaleMax = grinderMax,
+                    stepSize = grinderStepSize
+                )
                 val grinderResult = grinderConfigRepository.saveConfig(grinderConfig)
-                
+
                 grinderResult.fold(
                     onSuccess = {
                         // Save basket configuration
@@ -317,9 +322,9 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                             coffeeOutMax = coffeeOutMax,
                             isActive = true
                         )
-                        
+
                         val basketResult = basketConfigRepository.saveConfig(basketConfig)
-                        
+
                         basketResult.fold(
                             onSuccess = {
                                 // Mark onboarding as complete
@@ -329,13 +334,13 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                             },
                             onFailure = { exception ->
                                 val errorMessage = when (exception) {
-                                    is RepositoryException.ValidationError -> 
+                                    is RepositoryException.ValidationError ->
                                         exception.message ?: "Basket configuration validation failed"
-                                    is RepositoryException.DatabaseError -> 
+                                    is RepositoryException.DatabaseError ->
                                         "Failed to save basket configuration"
                                     else -> "An unexpected error occurred"
                                 }
-                                
+
                                 _uiState.value = currentState.copy(
                                     isLoading = false,
                                     error = errorMessage
@@ -346,13 +351,13 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                     },
                     onFailure = { exception ->
                         val errorMessage = when (exception) {
-                            is RepositoryException.ValidationError -> 
+                            is RepositoryException.ValidationError ->
                                 exception.message ?: "Grinder configuration validation failed"
-                            is RepositoryException.DatabaseError -> 
+                            is RepositoryException.DatabaseError ->
                                 "Failed to save grinder configuration"
                             else -> "An unexpected error occurred"
                         }
-                        
+
                         _uiState.value = currentState.copy(
                             isLoading = false,
                             error = errorMessage
@@ -387,7 +392,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                         // Create and save default basket configuration using Double preset
                         val defaultBasketConfig = BasketPreset.DOUBLE.toBasketConfiguration()
                         val basketResult = basketConfigRepository.saveConfig(defaultBasketConfig)
-                        
+
                         basketResult.fold(
                             onSuccess = {
                                 // Mark onboarding as complete
@@ -428,7 +433,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
-    
+
     /**
      * Loads existing equipment configurations from repositories
      * and pre-fills the UI state to make it easier for returning users
@@ -452,7 +457,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
                     },
                     onFailure = { /* Silently continue with defaults */ }
                 )
-                
+
                 // Load existing basket configuration if available
                 val basketResult = basketConfigRepository.getActiveConfig()
                 basketResult.fold(
@@ -482,7 +487,7 @@ class EquipmentSetupFlowViewModel @Inject constructor(
  */
 data class EquipmentSetupFlowUiState(
     val currentStep: EquipmentSetupStep = EquipmentSetupStep.WELCOME,
-    
+
     // Grinder configuration state
     val grinderScaleMin: String = "",
     val grinderScaleMax: String = "",
@@ -492,7 +497,7 @@ data class EquipmentSetupFlowUiState(
     val grinderStepSizeError: String? = null,
     val grinderGeneralError: String? = null,
     val isGrinderValid: Boolean = false,
-    
+
     // Basket configuration state
     val coffeeInMin: String = "",
     val coffeeInMax: String = "",
@@ -504,9 +509,8 @@ data class EquipmentSetupFlowUiState(
     val coffeeOutMaxError: String? = null,
     val basketGeneralError: String? = null,
     val isBasketValid: Boolean = false,
-    
+
     // Overall state
     val isLoading: Boolean = false,
     val error: String? = null
 )
-

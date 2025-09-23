@@ -10,8 +10,7 @@ data class PaginatedResult<T>(
     val pageSize: Int,
     val hasNextPage: Boolean,
     val hasPreviousPage: Boolean
-) {
-}
+)
 
 /**
  * Configuration for pagination requests.

@@ -107,9 +107,8 @@ data class Bean(
         // Basic validation for photo path
         // Should not contain invalid characters and should have reasonable structure
         val invalidChars = listOf("<", ">", ":", "\"", "|", "?", "*")
-        return !invalidChars.any { path.contains(it) } && 
-               path.trim() == path && // No leading/trailing whitespace
-               !path.contains("..") // No directory traversal
+        return !invalidChars.any { path.contains(it) } &&
+            path.trim() == path && // No leading/trailing whitespace
+            !path.contains("..") // No directory traversal
     }
 }
-

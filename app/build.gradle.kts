@@ -1,5 +1,5 @@
-import java.util.Properties
 import java.util.Base64
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -46,7 +46,7 @@ android {
             val keyAlias = System.getenv("KEY_ALIAS") ?: keystoreProperties["keyAlias"]?.toString()
             val keyStorePassword = System.getenv("KEY_STORE_PASSWORD") ?: keystoreProperties["storePassword"]?.toString()
             val keyPassword = System.getenv("KEY_PASSWORD") ?: keystoreProperties["keyPassword"]?.toString()
-            
+
             if (signingKeyBase64 != null && keyAlias != null && keyStorePassword != null && keyPassword != null) {
                 // CI/CD signing using base64 encoded keystore
                 val keystoreFile = File.createTempFile("keystore", ".jks")
@@ -150,7 +150,7 @@ android {
     applicationVariants.all {
         val flavor = this.flavorName
         val versionName = this.versionName
-        
+
         this.outputs.all {
             val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
 
@@ -159,10 +159,10 @@ android {
 
             when (flavor) {
                 "dev" -> {
-                    output.outputFileName = "coffee-shot-timer-dev-${cleanVersion}.apk"
+                    output.outputFileName = "coffee-shot-timer-dev-$cleanVersion.apk"
                 }
                 "prod" -> {
-                    output.outputFileName = "coffee-shot-timer-${cleanVersion}.apk"
+                    output.outputFileName = "coffee-shot-timer-$cleanVersion.apk"
                 }
             }
         }
@@ -189,10 +189,10 @@ android {
                             // Get version from defaultConfig, clean it up
                             val versionName = android.defaultConfig.versionName ?: "0.0.0"
                             val cleanVersion = versionName.replace("-$flavor", "")
-                            
+
                             val newName = when (flavor) {
-                                "dev" -> "coffee-shot-timer-dev-${cleanVersion}.aab"
-                                "prod" -> "coffee-shot-timer-${cleanVersion}.aab"
+                                "dev" -> "coffee-shot-timer-dev-$cleanVersion.aab"
+                                "prod" -> "coffee-shot-timer-$cleanVersion.aab"
                                 else -> file.name
                             }
                             val newFile = File(bundleDir, newName)
@@ -278,7 +278,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    
+
     // Additional Android test dependencies
     androidTestImplementation(libs.androidx.test.core)
     androidTestImplementation(libs.androidx.test.runner)
@@ -286,14 +286,14 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.test.ext:truth:1.5.0")
     androidTestImplementation("org.jetbrains.kotlin:kotlin-test:${libs.versions.kotlin.get()}")
-    
+
     // Hilt testing dependencies
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.compiler)
-    
+
     // Room testing dependencies
     androidTestImplementation(libs.androidx.room.testing)
-    
+
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -305,16 +305,16 @@ dependencies {
 detekt {
     // Point to the configuration file
     config.setFrom("$rootDir/config/detekt/detekt.yml")
-    
+
     // Enable baseline for suppressing existing issues
     baseline = file("$rootDir/config/detekt/baseline.xml")
-    
+
     // Build upon the default detekt configuration
     buildUponDefaultConfig = true
-    
+
     // Enable all rules by default
     allRules = false
-    
+
     // Ignore test source sets
     ignoreFailures = false
 }
@@ -328,27 +328,59 @@ tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
 
     // Set JVM target for compatibility
     jvmTarget = "11"
-    
+
     // Performance optimizations for CI
     parallel = true
     setIncludes(listOf("**/*.kt", "**/*.kts"))
     setExcludes(listOf("**/build/**", "**/.*"))
-    
+
     // Configure reports
     reports {
         // Enable XML report for GitHub Actions integration
         xml.required.set(true)
         xml.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.xml"))
-        
+
         // Enable HTML report for detailed developer review
         html.required.set(true)
         html.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.html"))
-        
+
         // Enable SARIF report for GitHub Security tab integration
         sarif.required.set(true)
         sarif.outputLocation.set(layout.buildDirectory.file("reports/detekt/detekt.sarif"))
-        
+
         // Disable text and markdown reports to reduce noise
+        txt.required.set(false)
+        md.required.set(false)
+    }
+}
+
+// Local formatting task using Detekt auto-correct
+tasks.register<io.gitlab.arturbosch.detekt.Detekt>("detektFormat") {
+    description = "Applies auto-correctable Detekt/ktlint fixes locally"
+    group = "verification"
+
+    // Use the shared baseline and configuration
+    baseline.set(rootProject.layout.projectDirectory.file("config/detekt/baseline.xml"))
+    config.setFrom(rootProject.layout.projectDirectory.file("config/detekt/detekt.yml"))
+    buildUponDefaultConfig = true
+
+    // Execution settings
+    jvmTarget = "11"
+    parallel = true
+    autoCorrect = true
+
+    // Ensure the task has a source root; scan the whole module directory
+    setSource(files(projectDir))
+
+    // Scope of files
+    setIncludes(listOf("**/*.kt", "**/*.kts"))
+    setExcludes(listOf("**/build/**", "**/.*"))
+
+    // Disable reports for this local formatting task
+    reports {
+        xml.required.set(false)
+        html.required.set(false)
+        sarif.required.set(false)
         txt.required.set(false)
         md.required.set(false)
     }

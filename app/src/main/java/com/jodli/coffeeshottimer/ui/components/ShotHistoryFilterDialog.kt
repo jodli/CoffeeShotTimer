@@ -38,11 +38,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
@@ -164,7 +164,10 @@ fun ShotHistoryFilterDialog(
                                     Column {
                                         Text(bean.name)
                                         Text(
-                                            text = stringResource(R.string.format_days_since_roast_filter, bean.daysSinceRoast()),
+                                            text = stringResource(
+                                                R.string.format_days_since_roast_filter,
+                                                bean.daysSinceRoast()
+                                            ),
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )

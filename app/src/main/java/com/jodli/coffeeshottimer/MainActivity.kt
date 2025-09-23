@@ -15,7 +15,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,7 +23,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.jodli.coffeeshottimer.ui.components.AdaptiveNavigation
 import com.jodli.coffeeshottimer.ui.components.AppNavigationRail
 import com.jodli.coffeeshottimer.ui.components.BottomNavigationBar
 import com.jodli.coffeeshottimer.ui.navigation.AppNavigation
@@ -36,9 +34,9 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    
+
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         // Install splash screen before super.onCreate()
         installSplashScreen()
@@ -51,7 +49,7 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    
+
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         // Handle configuration changes (orientation, screen size, etc.)

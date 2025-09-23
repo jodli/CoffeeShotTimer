@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -680,7 +679,7 @@ fun BeanSummaryCard(
                 val dateText = if (daysSinceRoast == 0L) {
                     "Roasted today"
                 } else {
-                    "Roasted ${daysSinceRoast} day${if (daysSinceRoast != 1L) "s" else ""} ago"
+                    "Roasted $daysSinceRoast day${if (daysSinceRoast != 1L) "s" else ""} ago"
                 }
 
                 Text(

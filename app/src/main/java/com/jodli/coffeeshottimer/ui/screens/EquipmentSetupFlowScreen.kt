@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -20,15 +18,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
-import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
+import com.jodli.coffeeshottimer.ui.equipment.EquipmentSetupStep
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.EquipmentSetupFlowViewModel
-import com.jodli.coffeeshottimer.ui.equipment.EquipmentSetupStep
 
 /**
  * Main screen for the multi-step equipment setup flow during onboarding.
@@ -56,7 +50,7 @@ fun EquipmentSetupFlowScreen(
                     totalSteps = 4
                 )
             }
-            
+
             // Content based on current step
             Box(
                 modifier = Modifier.fillMaxSize()
@@ -73,7 +67,7 @@ fun EquipmentSetupFlowScreen(
                             }
                         )
                     }
-                    
+
                     EquipmentSetupStep.GRINDER_SETUP -> {
                         GrinderSetupStepScreen(
                             scaleMin = uiState.grinderScaleMin,
@@ -93,7 +87,7 @@ fun EquipmentSetupFlowScreen(
                             onContinue = { viewModel.navigateForward() }
                         )
                     }
-                    
+
                     EquipmentSetupStep.BASKET_SETUP -> {
                         BasketSetupStepScreen(
                             coffeeInMin = uiState.coffeeInMin,
@@ -115,7 +109,7 @@ fun EquipmentSetupFlowScreen(
                             onContinue = { viewModel.navigateForward() }
                         )
                     }
-                    
+
                     EquipmentSetupStep.SUMMARY -> {
                         EquipmentSetupSummaryScreen(
                             grinderMin = uiState.grinderScaleMin,
@@ -159,7 +153,7 @@ fun EquipmentSetupProgress(
         EquipmentSetupStep.BASKET_SETUP -> 3
         EquipmentSetupStep.SUMMARY -> 4
     }
-    
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -170,14 +164,19 @@ fun EquipmentSetupProgress(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = stringResource(R.string.onboarding_progress_step_title, currentStepNumber, totalSteps, getStepTitle(currentStep)),
+                text = stringResource(
+                    R.string.onboarding_progress_step_title,
+                    currentStepNumber,
+                    totalSteps,
+                    getStepTitle(currentStep)
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        
+
         Spacer(modifier = Modifier.height(spacing.small))
-        
+
         LinearProgressIndicator(
             progress = { currentStepNumber.toFloat() / totalSteps.toFloat() },
             modifier = Modifier.fillMaxWidth(),

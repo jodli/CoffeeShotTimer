@@ -39,7 +39,7 @@ fun ShotRecordedDialog(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     // State for taste selection
     var selectedPrimary by remember { mutableStateOf<TastePrimary?>(null) }
     var selectedSecondary by remember { mutableStateOf<TasteSecondary?>(null) }
@@ -80,14 +80,14 @@ fun ShotRecordedDialog(
                 // Taste feedback section
                 if (onTasteSelected != null) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
-                    
+
                     Text(
                         text = stringResource(R.string.text_how_did_it_taste),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Medium,
                         modifier = Modifier.padding(bottom = spacing.small)
                     )
-                    
+
                     // Primary taste buttons
                     TastePrimaryButtonRow(
                         suggestedTaste = suggestedTaste,
@@ -105,7 +105,7 @@ fun ShotRecordedDialog(
                         },
                         allowDeselection = true
                     )
-                    
+
                     // Secondary taste qualifiers (optional)
                     if (selectedPrimary != null) {
                         Column(
@@ -113,15 +113,15 @@ fun ShotRecordedDialog(
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Spacer(modifier = Modifier.height(spacing.small))
-                            
+
                             Text(
                                 text = stringResource(R.string.text_strength_modifier_optional),
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-                            
+
                             Spacer(modifier = Modifier.height(spacing.extraSmall))
-                            
+
                             TasteSecondaryChipRow(
                                 selectedSecondary = selectedSecondary,
                                 onSecondarySelected = { newValue ->
@@ -139,7 +139,7 @@ fun ShotRecordedDialog(
                 // Grind adjustment recommendation (always show when available)
                 if (grindAdjustment != null) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
-                    
+
                     GrindAdjustmentCard(
                         recommendation = grindAdjustment,
                         onApply = onGrindAdjustmentApply,
@@ -152,21 +152,21 @@ fun ShotRecordedDialog(
                 // Next steps based on this shot
                 if (recommendations.isNotEmpty()) {
                     HorizontalDivider()
-                    
+
                     Text(
                         text = stringResource(R.string.text_next_steps_based_on_shot),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     )
-                    
+
                     CompactRecommendationList(
                         recommendations = recommendations,
                         maxItems = 2,
                         showAsNextSteps = true,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    
+
                     if (recommendations.size > 2) {
                         Text(
                             text = stringResource(R.string.dialog_view_details_for_more_recommendations),
@@ -195,25 +195,25 @@ fun ShotRecordedDialog(
             }
         },
         dismissButton = {
-						if (onViewDetails != null) {
-									CoffeeSecondaryButton(
-											text = if (selectedPrimary != null) {
-													// When taste is selected: "Save" (save and close)
-													stringResource(R.string.button_save)
-											} else {
-													// When no taste selected: "Skip" (close without saving)
-													stringResource(R.string.button_skip_taste)
-											},
-											onClick = {
-													// Save taste feedback to database
-													if (onSubmit != null) {
-															onSubmit(selectedPrimary, selectedSecondary)
-													}
-													onDismiss()
-										},
-										modifier = Modifier.widthIn(min = 120.dp)
-						)
-                }
+            if (onViewDetails != null) {
+                CoffeeSecondaryButton(
+                    text = if (selectedPrimary != null) {
+                        // When taste is selected: "Save" (save and close)
+                        stringResource(R.string.button_save)
+                    } else {
+                        // When no taste selected: "Skip" (close without saving)
+                        stringResource(R.string.button_skip_taste)
+                    },
+                    onClick = {
+                        // Save taste feedback to database
+                        if (onSubmit != null) {
+                            onSubmit(selectedPrimary, selectedSecondary)
+                        }
+                        onDismiss()
+                    },
+                    modifier = Modifier.widthIn(min = 120.dp)
+                )
+            }
         }
     )
 }
@@ -269,7 +269,7 @@ fun ShotRecordedBottomSheet(
             // Next steps based on this shot
             if (recommendations.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 Text(
                     text = stringResource(R.string.text_next_steps_based_on_shot),
                     style = MaterialTheme.typography.titleSmall,
@@ -277,9 +277,9 @@ fun ShotRecordedBottomSheet(
                     fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center
                 )
-                
+
                 Spacer(modifier = Modifier.height(spacing.small))
-                
+
                 RecommendationCard(
                     recommendations = recommendations,
                     showAsNextSteps = true,

@@ -2,10 +2,10 @@ package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,11 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -80,7 +79,6 @@ class ValidationUtils(
     val OPTIMAL_BREW_RATIO_MAX = Companion.OPTIMAL_BREW_RATIO_MAX
 
     private val decimalFormat = DecimalFormat("#.#")
-
 
     /**
      * Validates extraction time with range checking.
@@ -156,7 +154,6 @@ class ValidationUtils(
         return ValidationResult(errors.isEmpty(), errors)
     }
 
-
     /**
      * Formats a decimal number for display with appropriate precision.
      */
@@ -167,7 +164,6 @@ class ValidationUtils(
             else -> "%.${maxDecimalPlaces}f".format(value)
         }
     }
-
 }
 
 /**
@@ -180,10 +176,12 @@ fun GentleValidationMessage(
     suggestion: String,
     onFixClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
-    extraContentPadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(0.dp)
+    extraContentPadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(
+        0.dp
+    )
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -204,7 +202,7 @@ fun GentleValidationMessage(
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp)
                 )
-                
+
                 Column(
                     verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
                 ) {
@@ -213,7 +211,7 @@ fun GentleValidationMessage(
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.error
                     )
-                    
+
                     if (suggestion.isNotBlank()) {
                         Text(
                             text = suggestion,
@@ -223,7 +221,7 @@ fun GentleValidationMessage(
                     }
                 }
             }
-            
+
             if (onFixClick != null) {
                 CoffeeSecondaryButton(
                     text = stringResource(R.string.text_try_again),
@@ -248,7 +246,7 @@ fun OnboardingErrorCard(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     CoffeeCard(
         modifier = modifier,
         colors = CardDefaults.cardColors(
@@ -268,7 +266,7 @@ fun OnboardingErrorCard(
                     tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(24.dp)
                 )
-                
+
                 Column(
                     verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
                 ) {
@@ -277,7 +275,7 @@ fun OnboardingErrorCard(
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.error
                     )
-                    
+
                     Text(
                         text = message,
                         style = MaterialTheme.typography.bodyMedium,
@@ -285,7 +283,7 @@ fun OnboardingErrorCard(
                     )
                 }
             }
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = if (onSkip != null) {
@@ -301,7 +299,7 @@ fun OnboardingErrorCard(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                
+
                 CoffeePrimaryButton(
                     text = stringResource(R.string.text_retry),
                     onClick = onRetry,
@@ -378,7 +376,9 @@ fun ValidatedTextField(
                         tint = if (hasError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
                     )
                 }
-            } else null,
+            } else {
+                null
+            },
             isError = hasError,
             singleLine = singleLine,
             enabled = enabled,
@@ -428,4 +428,3 @@ fun ValidatedTextField(
         )
     }
 }
-

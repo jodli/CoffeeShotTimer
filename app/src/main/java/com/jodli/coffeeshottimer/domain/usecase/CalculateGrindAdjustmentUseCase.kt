@@ -11,15 +11,15 @@ import kotlin.math.round
 
 /**
  * Use case for calculating grind adjustment recommendations based on shot performance.
- * 
+ *
  * This use case implements the core business logic for providing actionable grind advice
  * to users based on their taste feedback and extraction metrics. The recommendations
  * follow established espresso extraction principles:
- * 
+ *
  * - Sour taste or fast extraction (< 25s) → Grind finer to increase extraction
  * - Bitter taste or slow extraction (> 30s) → Grind coarser to decrease extraction
  * - Perfect taste with optimal timing (25-30s) → No change needed
- * 
+ *
  * The adjustment magnitude scales with the severity of the deviation, and all
  * recommendations respect the user's grinder configuration limits.
  */
@@ -27,25 +27,25 @@ import kotlin.math.round
 class CalculateGrindAdjustmentUseCase @Inject constructor(
     private val grinderConfigRepository: GrinderConfigRepository
 ) {
-    
+
     companion object {
         // Optimal extraction time range based on espresso brewing standards
         private const val OPTIMAL_MIN_TIME = 25
         private const val OPTIMAL_MAX_TIME = 30
-        
+
         // Deviation thresholds for adjustment step calculation
         private const val MINOR_DEVIATION_THRESHOLD = 3
         private const val MODERATE_DEVIATION_THRESHOLD = 6
-        
+
         // Step adjustment amounts
         private const val MINOR_ADJUSTMENT_STEPS = 1
         private const val MODERATE_ADJUSTMENT_STEPS = 2
         private const val MAJOR_ADJUSTMENT_STEPS = 3
     }
-    
+
     /**
      * Calculate grind adjustment recommendation based on shot performance.
-     * 
+     *
      * @param currentGrindSetting The grind setting used for the current shot
      * @param extractionTimeSeconds The extraction time in seconds
      * @param tasteFeedback Optional taste feedback from the user
@@ -67,7 +67,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                     )
                 )
             }
-            
+
             val grinderConfig = configResult.getOrNull()
                 ?: return Result.failure(
                     DomainException(
@@ -75,7 +75,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                         "No grinder configuration found"
                     )
                 )
-            
+
             // Validate current grind setting format
             val currentValue = currentGrindSetting.toDoubleOrNull()
                 ?: return Result.failure(
@@ -84,7 +84,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                         "Invalid grind setting format: $currentGrindSetting"
                     )
                 )
-            
+
             // Validate extraction time
             if (extractionTimeSeconds < 0) {
                 return Result.failure(
@@ -94,44 +94,56 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                     )
                 )
             }
-            
+
             // Calculate time deviation from optimal range
             val timeDeviation = calculateTimeDeviation(extractionTimeSeconds)
-            
+
             // Determine adjustment based on taste feedback and extraction time
             // Prioritize taste feedback over timing when they conflict
             val recommendation = when {
                 // First priority: Taste feedback (direct indicator of extraction quality)
                 tasteFeedback == TastePrimary.BITTER -> {
                     calculateCoarserAdjustment(
-                        grinderConfig, currentValue, timeDeviation,
-                        extractionTimeSeconds, tasteFeedback
+                        grinderConfig,
+                        currentValue,
+                        timeDeviation,
+                        extractionTimeSeconds,
+                        tasteFeedback
                     )
                 }
                 tasteFeedback == TastePrimary.SOUR -> {
                     calculateFinerAdjustment(
-                        grinderConfig, currentValue, timeDeviation, 
-                        extractionTimeSeconds, tasteFeedback
+                        grinderConfig,
+                        currentValue,
+                        timeDeviation,
+                        extractionTimeSeconds,
+                        tasteFeedback
                     )
                 }
                 // Second priority: Timing-based recommendations (when no taste feedback)
                 extractionTimeSeconds < OPTIMAL_MIN_TIME -> {
                     calculateFinerAdjustment(
-                        grinderConfig, currentValue, timeDeviation, 
-                        extractionTimeSeconds, tasteFeedback
+                        grinderConfig,
+                        currentValue,
+                        timeDeviation,
+                        extractionTimeSeconds,
+                        tasteFeedback
                     )
                 }
                 extractionTimeSeconds > OPTIMAL_MAX_TIME -> {
                     calculateCoarserAdjustment(
-                        grinderConfig, currentValue, timeDeviation,
-                        extractionTimeSeconds, tasteFeedback
+                        grinderConfig,
+                        currentValue,
+                        timeDeviation,
+                        extractionTimeSeconds,
+                        tasteFeedback
                     )
                 }
                 else -> {
                     createNoChangeRecommendation(currentGrindSetting, extractionTimeSeconds, tasteFeedback)
                 }
             }
-            
+
             Result.success(recommendation)
         } catch (exception: Exception) {
             Result.failure(
@@ -143,7 +155,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Calculate time deviation from optimal extraction range.
      * @param extractionTimeSeconds The actual extraction time
@@ -156,8 +168,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             else -> 0
         }
     }
-    
-    
+
     /**
      * Calculate a finer grind adjustment recommendation.
      */
@@ -171,13 +182,13 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         val adjustmentSteps = calculateAdjustmentSteps(abs(timeDeviation))
         val adjustmentAmount = adjustmentSteps * config.stepSize
         val newValue = (currentValue - adjustmentAmount).coerceAtLeast(config.scaleMin.toDouble())
-        
+
         // If we hit the minimum limit, adjust steps accordingly
         val actualAdjustmentAmount = currentValue - newValue
         val actualSteps = round(actualAdjustmentAmount / config.stepSize).toInt()
-        
+
         val confidence = calculateConfidence(timeDeviation, tasteFeedback)
-        
+
         return GrindAdjustmentRecommendation(
             currentGrindSetting = config.formatGrindValue(currentValue),
             suggestedGrindSetting = config.formatGrindValue(newValue),
@@ -188,7 +199,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             confidence = confidence
         )
     }
-    
+
     /**
      * Calculate a coarser grind adjustment recommendation.
      */
@@ -202,13 +213,13 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         val adjustmentSteps = calculateAdjustmentSteps(abs(timeDeviation))
         val adjustmentAmount = adjustmentSteps * config.stepSize
         val newValue = (currentValue + adjustmentAmount).coerceAtMost(config.scaleMax.toDouble())
-        
+
         // If we hit the maximum limit, adjust steps accordingly
         val actualAdjustmentAmount = newValue - currentValue
         val actualSteps = round(actualAdjustmentAmount / config.stepSize).toInt()
-        
+
         val confidence = calculateConfidence(timeDeviation, tasteFeedback)
-        
+
         return GrindAdjustmentRecommendation(
             currentGrindSetting = config.formatGrindValue(currentValue),
             suggestedGrindSetting = config.formatGrindValue(newValue),
@@ -219,7 +230,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             confidence = confidence
         )
     }
-    
+
     /**
      * Create a no-change recommendation for optimal shots.
      */
@@ -238,7 +249,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             confidence = ConfidenceLevel.HIGH
         )
     }
-    
+
     /**
      * Calculate the number of adjustment steps based on deviation magnitude.
      * @param deviationMagnitude Absolute value of the time deviation
@@ -251,7 +262,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
             else -> MAJOR_ADJUSTMENT_STEPS
         }
     }
-    
+
     /**
      * Calculate confidence level based on available evidence.
      * @param timeDeviation Deviation from optimal extraction time
@@ -261,7 +272,7 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
     private fun calculateConfidence(timeDeviation: Int, tasteFeedback: TastePrimary?): ConfidenceLevel {
         val hasStrongTimeEvidence = abs(timeDeviation) >= MINOR_DEVIATION_THRESHOLD
         val hasTasteEvidence = tasteFeedback != null && tasteFeedback != TastePrimary.PERFECT
-        
+
         return when {
             hasStrongTimeEvidence && hasTasteEvidence -> ConfidenceLevel.HIGH
             hasStrongTimeEvidence || hasTasteEvidence -> ConfidenceLevel.MEDIUM

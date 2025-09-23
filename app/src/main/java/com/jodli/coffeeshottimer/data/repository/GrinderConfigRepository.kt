@@ -4,10 +4,10 @@ import android.util.Log
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -101,8 +101,11 @@ class GrinderConfigRepository @Inject constructor(
             // Validate configuration data
             Log.d(TAG, "saveConfig: Validating configuration")
             val validationResult = config.validate()
-            Log.d(TAG, "saveConfig: Validation result - isValid=${validationResult.isValid}, errors=${validationResult.errors}")
-            
+            Log.d(
+                TAG,
+                "saveConfig: Validation result - isValid=${validationResult.isValid}, errors=${validationResult.errors}"
+            )
+
             if (!validationResult.isValid) {
                 Log.e(TAG, "saveConfig: Validation failed - ${validationResult.errors}")
                 return Result.failure(
@@ -121,13 +124,16 @@ class GrinderConfigRepository @Inject constructor(
                 throw e
             }
             Log.d(TAG, "saveConfig: Existing config found: $existingConfig")
-            
+
             if (existingConfig != null && existingConfig.stepSize == config.stepSize) {
                 // If exact duplicate exists (same range and step size), insert a new one with current timestamp to make it "current"
                 // This ensures the Flow emits a new value and UI updates
-                Log.d(TAG, "saveConfig: Duplicate config found (same range and step size), inserting new one with current timestamp")
+                Log.d(
+                    TAG,
+                    "saveConfig: Duplicate config found (same range and step size), inserting new one with current timestamp"
+                )
                 val result = executeWithRetry(
-                    operation = { 
+                    operation = {
                         Log.d(TAG, "saveConfig: Inserting new config with current timestamp")
                         grinderConfigDao.insertConfig(config)
                         Log.d(TAG, "saveConfig: New config inserted successfully")
@@ -141,7 +147,7 @@ class GrinderConfigRepository @Inject constructor(
 
             Log.d(TAG, "saveConfig: No duplicate found, proceeding with save")
             val result = executeWithRetry(
-                operation = { 
+                operation = {
                     Log.d(TAG, "saveConfig: Inserting new config")
                     grinderConfigDao.insertConfig(config)
                     Log.d(TAG, "saveConfig: Config inserted successfully")
@@ -189,7 +195,7 @@ class GrinderConfigRepository @Inject constructor(
             }
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     grinderConfigDao.updateConfig(config)
                     Unit
                 },
@@ -212,7 +218,7 @@ class GrinderConfigRepository @Inject constructor(
                 ?: return Result.failure(RepositoryException.NotFoundError("Grinder configuration not found"))
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     grinderConfigDao.deleteConfig(config)
                     Unit
                 },
@@ -229,7 +235,7 @@ class GrinderConfigRepository @Inject constructor(
      */
     suspend fun deleteAllConfigs(): Result<Unit> {
         return executeWithRetry(
-            operation = { 
+            operation = {
                 grinderConfigDao.deleteAllConfigs()
                 Unit
             },
@@ -257,7 +263,9 @@ class GrinderConfigRepository @Inject constructor(
     suspend fun getConfigByRange(scaleMin: Int, scaleMax: Int): Result<GrinderConfiguration?> {
         return try {
             if (scaleMin >= scaleMax) {
-                return Result.failure(RepositoryException.ValidationError("Minimum scale must be less than maximum scale"))
+                return Result.failure(
+                    RepositoryException.ValidationError("Minimum scale must be less than maximum scale")
+                )
             }
 
             executeWithRetry(
@@ -285,7 +293,9 @@ class GrinderConfigRepository @Inject constructor(
                 if (existingConfig != null && existingConfig.id != config.id) {
                     return ValidationResult(
                         isValid = false,
-                        errors = listOf("A configuration with range ${config.scaleMin}-${config.scaleMax} already exists")
+                        errors = listOf(
+                            "A configuration with range ${config.scaleMin}-${config.scaleMax} already exists"
+                        )
                     )
                 }
             } catch (exception: Exception) {
@@ -318,7 +328,7 @@ class GrinderConfigRepository @Inject constructor(
             // No configuration exists, create default
             val defaultConfig = GrinderConfiguration.DEFAULT_CONFIGURATION
             val saveResult = saveConfig(defaultConfig)
-            
+
             if (saveResult.isSuccess) {
                 Result.success(defaultConfig)
             } else {
@@ -328,7 +338,9 @@ class GrinderConfigRepository @Inject constructor(
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get or create default configuration", exception))
+            Result.failure(
+                RepositoryException.DatabaseError("Failed to get or create default configuration", exception)
+            )
         }
     }
 
@@ -362,7 +374,7 @@ class GrinderConfigRepository @Inject constructor(
             }
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     grinderConfigDao.deleteOldConfigs(keepCount)
                     Unit
                 },
@@ -404,7 +416,7 @@ class GrinderConfigRepository @Inject constructor(
         delayMs: Long = 100
     ): Result<T> {
         var lastException: Exception? = null
-        
+
         repeat(maxRetries) { attempt ->
             try {
                 val result = operation()
@@ -416,7 +428,7 @@ class GrinderConfigRepository @Inject constructor(
                 }
             }
         }
-        
+
         return Result.failure(
             RepositoryException.DatabaseError(
                 "$errorMessage (after $maxRetries attempts)",

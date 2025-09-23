@@ -384,7 +384,11 @@ class ShotRepository @Inject constructor(
                 return@flow
             }
             if (minRatio > maxRatio) {
-                emit(Result.failure(RepositoryException.ValidationError("Minimum ratio cannot be greater than maximum ratio")))
+                emit(
+                    Result.failure(
+                        RepositoryException.ValidationError("Minimum ratio cannot be greater than maximum ratio")
+                    )
+                )
                 return@flow
             }
 
@@ -415,7 +419,11 @@ class ShotRepository @Inject constructor(
                 return@flow
             }
             if (minSeconds > maxSeconds) {
-                emit(Result.failure(RepositoryException.ValidationError("Minimum time cannot be greater than maximum time")))
+                emit(
+                    Result.failure(
+                        RepositoryException.ValidationError("Minimum time cannot be greater than maximum time")
+                    )
+                )
                 return@flow
             }
 
@@ -625,8 +633,11 @@ class ShotRepository @Inject constructor(
             }
 
             val shots = shotDao.getFilteredShotsPaginated(
-                beanId, startDate, endDate,
-                paginationConfig.pageSize, paginationConfig.offset
+                beanId,
+                startDate,
+                endDate,
+                paginationConfig.pageSize,
+                paginationConfig.offset
             )
             val totalCount = shotDao.getFilteredShotsCount(beanId, startDate, endDate)
 

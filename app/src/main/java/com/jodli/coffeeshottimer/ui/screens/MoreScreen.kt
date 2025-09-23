@@ -6,29 +6,26 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Scale
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.font.FontWeight
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
@@ -207,7 +204,9 @@ private fun MoreScreenContent(
                     putExtra(Intent.EXTRA_TEXT, body)
                 }
                 try {
-                    context.startActivity(Intent.createChooser(intent, context.getString(R.string.button_send_feedback)))
+                    context.startActivity(
+                        Intent.createChooser(intent, context.getString(R.string.button_send_feedback))
+                    )
                 } catch (_: ActivityNotFoundException) {
                     // If no email app is available, fall back to opening a generic mailto URL without body
                     val fallback = Intent(Intent.ACTION_VIEW, Uri.parse("mailto:$recipient"))
@@ -227,7 +226,7 @@ private fun MoreScreenContent(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(spacing.medium)
                 ) {
-Icon(Icons.Filled.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Filled.Email, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                     Text(
                         text = stringResource(id = R.string.button_send_feedback),
                         style = MaterialTheme.typography.titleMedium,
@@ -246,4 +245,3 @@ Icon(Icons.Filled.Email, contentDescription = null, tint = MaterialTheme.colorSc
         Spacer(modifier = Modifier.height(spacing.large))
     }
 }
-

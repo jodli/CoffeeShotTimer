@@ -16,10 +16,10 @@ import dagger.hilt.android.HiltAndroidApp
  */
 @HiltAndroidApp
 class CoffeeShotTimerApplication : Application() {
-    
+
     override fun onCreate() {
         super.onCreate()
-        
+
         // Configure Coil for optimized image loading and caching
         val imageLoader = ImageLoader.Builder(this)
             .memoryCache {
@@ -51,7 +51,7 @@ class CoffeeShotTimerApplication : Application() {
                 }
             }
             .build()
-        
+
         // Set the configured ImageLoader as the default
         Coil.setImageLoader(imageLoader)
     }

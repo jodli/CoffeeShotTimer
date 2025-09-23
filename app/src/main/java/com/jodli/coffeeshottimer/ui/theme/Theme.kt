@@ -10,7 +10,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -93,7 +92,7 @@ fun Spacing.adaptiveTimerSize(
         // Use 85% of usable height or 70% of available width, whichever is smaller
         minOf(
             usableHeight, // 85% of usable height for maximum timer size
-            availableWidth,  // 70% of available width
+            availableWidth, // 70% of available width
             350.dp // Increased max size to allow larger timers
         ).coerceAtLeast(160.dp) // Never go below 160dp
     } else {
@@ -133,36 +132,36 @@ private val LightColorScheme = lightColorScheme(
     onSecondaryContainer = MediumCoffee,
     tertiary = TealAccent,
     onTertiary = Color.White,
-    background = CreamyBeige,     // Creamy beige background like icon
-    onBackground = RichEspresso,  // Dark brown text
-    surface = LightCream,         // Light cream cards
-    onSurface = RichEspresso,     // Dark brown text on cards
-    surfaceVariant = SoftBeige,   // Soft beige variants
+    background = CreamyBeige, // Creamy beige background like icon
+    onBackground = RichEspresso, // Dark brown text
+    surface = LightCream, // Light cream cards
+    onSurface = RichEspresso, // Dark brown text on cards
+    surfaceVariant = SoftBeige, // Soft beige variants
     onSurfaceVariant = MediumCoffee,
-    outline = MediumCoffee,       // Brown outlines
+    outline = MediumCoffee, // Brown outlines
     error = ErrorRed,
     onError = Color.White
 )
 
 // Dark coffee theme - rich espresso tones with warm accents
 private val DarkColorScheme = darkColorScheme(
-    primary = LightCaramel,       // Lighter caramel for visibility
+    primary = LightCaramel, // Lighter caramel for visibility
     onPrimary = DeepBrown,
     primaryContainer = MediumCoffee,
     onPrimaryContainer = DarkCream,
-    secondary = WarmTeal,         // Warm teal accent
+    secondary = WarmTeal, // Warm teal accent
     onSecondary = DeepBrown,
     secondaryContainer = RichEspresso,
     onSecondaryContainer = DarkCream,
     tertiary = TealAccent,
     onTertiary = DeepBrown,
-    background = DeepBrown,       // Deep coffee brown background
-    onBackground = DarkCream,     // Cream text on dark background
-    surface = RichEspresso,       // Rich espresso cards
-    onSurface = DarkCream,        // Cream text on dark cards
+    background = DeepBrown, // Deep coffee brown background
+    onBackground = DarkCream, // Cream text on dark background
+    surface = RichEspresso, // Rich espresso cards
+    onSurface = DarkCream, // Cream text on dark cards
     surfaceVariant = MediumCoffee, // Medium coffee variants
     onSurfaceVariant = LightCaramel,
-    outline = WarmAmber,          // Warm amber outlines
+    outline = WarmAmber, // Warm amber outlines
     error = ErrorRed,
     onError = Color.White
 )

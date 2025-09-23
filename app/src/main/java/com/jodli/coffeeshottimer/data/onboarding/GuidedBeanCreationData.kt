@@ -7,9 +7,9 @@ import java.time.LocalDate
  * Enum representing the different phases of guided bean creation
  */
 enum class BeanCreationPhase {
-    EDUCATION,  // Learning about bean tracking
-    FORM,       // Filling out bean details
-    SUCCESS     // Bean successfully created
+    EDUCATION, // Learning about bean tracking
+    FORM, // Filling out bean details
+    SUCCESS // Bean successfully created
 }
 
 /**
@@ -39,9 +39,9 @@ data class BeanFormState(
      * Only bean name is required - roast date, photo, and notes are optional
      */
     val isValid: Boolean
-        get() = name.isNotBlank() && 
-                nameError == null && 
-                roastDateError == null
+        get() = name.isNotBlank() &&
+            nameError == null &&
+            roastDateError == null
 
     /**
      * Checks if the form has any content (for dirty state detection)

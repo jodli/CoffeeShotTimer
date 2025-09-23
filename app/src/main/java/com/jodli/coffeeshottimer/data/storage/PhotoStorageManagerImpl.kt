@@ -4,8 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
-import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
+import androidx.exifinterface.media.ExifInterface
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -22,7 +22,7 @@ import javax.inject.Singleton
 class PhotoStorageManagerImpl @Inject constructor(
     @param:ApplicationContext private val context: Context
 ) : PhotoStorageManager {
-    
+
     companion object {
         private const val PHOTOS_DIR = "photos"
         private const val PHOTO_QUALITY = 85
@@ -31,7 +31,7 @@ class PhotoStorageManagerImpl @Inject constructor(
         private const val PHOTO_EXTENSION = ".jpg"
         private const val MIN_REQUIRED_SPACE = 10 * 1024 * 1024L // 10MB minimum space required
     }
-    
+
     private val photosDir: File by lazy {
         File(context.filesDir, PHOTOS_DIR).apply {
             if (!exists()) {
@@ -39,7 +39,7 @@ class PhotoStorageManagerImpl @Inject constructor(
             }
         }
     }
-    
+
     override suspend fun savePhoto(imageUri: Uri, beanId: String): Result<String> = withContext(Dispatchers.IO) {
         try {
             // Check available storage space before proceeding
@@ -49,18 +49,18 @@ class PhotoStorageManagerImpl @Inject constructor(
                     IOException("Insufficient storage space. Available: ${availableSpace / 1024 / 1024}MB")
                 )
             }
-            
+
             // Compress the image first
             val compressedUri = compressImage(imageUri).getOrElse { exception ->
                 return@withContext Result.failure(
                     IOException("Image compression failed: ${exception.message}", exception)
                 )
             }
-            
+
             // Generate filename
             val filename = "${beanId}_photo$PHOTO_EXTENSION"
             val photoFile = File(photosDir, filename)
-            
+
             // Copy compressed image to app storage
             context.contentResolver.openInputStream(compressedUri)?.use { inputStream ->
                 FileOutputStream(photoFile).use { outputStream ->
@@ -69,14 +69,14 @@ class PhotoStorageManagerImpl @Inject constructor(
             } ?: return@withContext Result.failure(
                 IOException("Failed to open input stream for image URI: $imageUri")
             )
-            
+
             // Verify the file was saved successfully
             if (!photoFile.exists() || photoFile.length() == 0L) {
                 return@withContext Result.failure(
                     IOException("Photo file was not saved properly")
                 )
             }
-            
+
             Result.success(photoFile.absolutePath)
         } catch (e: SecurityException) {
             Result.failure(IOException("Permission denied accessing photo storage", e))
@@ -86,7 +86,7 @@ class PhotoStorageManagerImpl @Inject constructor(
             Result.failure(IOException("Unexpected error saving photo: ${e.message}", e))
         }
     }
-    
+
     override suspend fun deletePhoto(photoPath: String): Result<Unit> = withContext(Dispatchers.IO) {
         try {
             val file = File(photoPath)
@@ -99,53 +99,53 @@ class PhotoStorageManagerImpl @Inject constructor(
             Result.failure(e)
         }
     }
-    
+
     override suspend fun getPhotoFile(photoPath: String): File? = withContext(Dispatchers.IO) {
         val file = File(photoPath)
         if (file.exists() && file.isFile) file else null
     }
-    
+
     override suspend fun compressImage(imageUri: Uri): Result<Uri> = withContext(Dispatchers.IO) {
         var inputStream: java.io.InputStream? = null
         var originalBitmap: Bitmap? = null
         var rotatedBitmap: Bitmap? = null
         var scaledBitmap: Bitmap? = null
-        
+
         try {
             // Read the original image
             inputStream = context.contentResolver.openInputStream(imageUri)
                 ?: return@withContext Result.failure(
                     IOException("Cannot open input stream for URI: $imageUri")
                 )
-            
+
             originalBitmap = BitmapFactory.decodeStream(inputStream)
                 ?: return@withContext Result.failure(
                     IOException("Cannot decode bitmap from URI: $imageUri. The file may be corrupted or not a valid image.")
                 )
-            
+
             inputStream.close()
             inputStream = null
-            
+
             // Validate bitmap dimensions
             if (originalBitmap.width <= 0 || originalBitmap.height <= 0) {
                 return@withContext Result.failure(
                     IOException("Invalid image dimensions: ${originalBitmap.width}x${originalBitmap.height}")
                 )
             }
-            
+
             // Handle image rotation based on EXIF data
             rotatedBitmap = handleImageRotation(imageUri, originalBitmap)
             if (rotatedBitmap != originalBitmap) {
                 originalBitmap.recycle()
                 originalBitmap = null
             }
-            
+
             // Calculate new dimensions while maintaining aspect ratio
             val (newWidth, newHeight) = calculateOptimalDimensions(
                 rotatedBitmap.width,
                 rotatedBitmap.height
             )
-            
+
             // Scale the bitmap if needed
             scaledBitmap = if (newWidth != rotatedBitmap.width || newHeight != rotatedBitmap.height) {
                 try {
@@ -165,14 +165,14 @@ class PhotoStorageManagerImpl @Inject constructor(
             } else {
                 rotatedBitmap
             }
-            
+
             // Verify scaledBitmap is not null
             if (scaledBitmap == null) {
                 return@withContext Result.failure(
                     IOException("Scaled bitmap is null")
                 )
             }
-            
+
             // Create temporary file for compressed image
             val tempFile = try {
                 File.createTempFile("compressed_", PHOTO_EXTENSION, context.cacheDir)
@@ -181,13 +181,13 @@ class PhotoStorageManagerImpl @Inject constructor(
                     IOException("Cannot create temporary file for compression", e)
                 )
             }
-            
+
             // Compress and save
             try {
                 FileOutputStream(tempFile).use { outputStream ->
                     val compressionSuccess = scaledBitmap?.compress(
-                        Bitmap.CompressFormat.JPEG, 
-                        PHOTO_QUALITY, 
+                        Bitmap.CompressFormat.JPEG,
+                        PHOTO_QUALITY,
                         outputStream
                     ) ?: false
                     if (!compressionSuccess) {
@@ -202,7 +202,7 @@ class PhotoStorageManagerImpl @Inject constructor(
                     IOException("Failed to write compressed image to file", e)
                 )
             }
-            
+
             // Verify the compressed file was created successfully
             if (!tempFile.exists() || tempFile.length() == 0L) {
                 tempFile.delete()
@@ -210,7 +210,7 @@ class PhotoStorageManagerImpl @Inject constructor(
                     IOException("Compressed image file was not created properly")
                 )
             }
-            
+
             Result.success(Uri.fromFile(tempFile))
         } catch (e: OutOfMemoryError) {
             Result.failure(IOException("Out of memory during image compression", e))
@@ -230,17 +230,19 @@ class PhotoStorageManagerImpl @Inject constructor(
             }
         }
     }
-    
-    override suspend fun cleanupOrphanedFiles(referencedPhotoPaths: Set<String>): Result<Int> = withContext(Dispatchers.IO) {
+
+    override suspend fun cleanupOrphanedFiles(referencedPhotoPaths: Set<String>): Result<Int> = withContext(
+        Dispatchers.IO
+    ) {
         try {
             if (!photosDir.exists()) {
                 return@withContext Result.success(0)
             }
-            
+
             val referencedFilenames = referencedPhotoPaths.map { path ->
                 File(path).name
             }.toSet()
-            
+
             var deletedCount = 0
             photosDir.listFiles()?.forEach { file ->
                 if (file.isFile && file.name !in referencedFilenames) {
@@ -249,21 +251,21 @@ class PhotoStorageManagerImpl @Inject constructor(
                     }
                 }
             }
-            
+
             Result.success(deletedCount)
         } catch (e: Exception) {
             Result.failure(e)
         }
     }
-    
+
     override suspend fun getTotalStorageSize(): Long = withContext(Dispatchers.IO) {
         if (!photosDir.exists()) return@withContext 0L
-        
+
         photosDir.listFiles()?.sumOf { file ->
             if (file.isFile) file.length() else 0L
         } ?: 0L
     }
-    
+
     private fun handleImageRotation(imageUri: Uri, bitmap: Bitmap): Bitmap {
         return try {
             val inputStream = context.contentResolver.openInputStream(imageUri)
@@ -273,7 +275,7 @@ class PhotoStorageManagerImpl @Inject constructor(
                 ExifInterface.ORIENTATION_NORMAL
             )
             inputStream.close()
-            
+
             val matrix = Matrix()
             when (orientation) {
                 ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
@@ -281,7 +283,7 @@ class PhotoStorageManagerImpl @Inject constructor(
                 ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
                 else -> return bitmap
             }
-            
+
             Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true).also {
                 if (it != bitmap) bitmap.recycle()
             }
@@ -290,14 +292,14 @@ class PhotoStorageManagerImpl @Inject constructor(
             bitmap
         }
     }
-    
+
     private fun calculateOptimalDimensions(originalWidth: Int, originalHeight: Int): Pair<Int, Int> {
         if (originalWidth <= MAX_IMAGE_WIDTH && originalHeight <= MAX_IMAGE_HEIGHT) {
             return Pair(originalWidth, originalHeight)
         }
-        
+
         val aspectRatio = originalWidth.toFloat() / originalHeight.toFloat()
-        
+
         return if (aspectRatio > 1) {
             // Landscape orientation
             val newWidth = MAX_IMAGE_WIDTH

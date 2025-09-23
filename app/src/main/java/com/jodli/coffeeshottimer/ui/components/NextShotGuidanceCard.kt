@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.TrendingFlat
 import androidx.compose.material.icons.filled.TrendingUp
@@ -31,10 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
@@ -47,7 +43,7 @@ import java.time.LocalDateTime
 /**
  * A prominent card that displays next-shot guidance based on the most recent shot.
  * This component implements Epic 4 requirements for persistent recommendation display.
- * 
+ *
  * Features:
  * - Visual prominence with elevated card design
  * - Direction indicator (↑/↓) for grind adjustments
@@ -96,13 +92,13 @@ fun NextShotGuidanceCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 ConfidenceIndicator(
                     confidence = recommendation.confidence,
                     modifier = Modifier
                 )
             }
-            
+
             // Main recommendation content
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -114,7 +110,7 @@ fun NextShotGuidanceCard(
                     direction = recommendation.adjustmentDirection,
                     modifier = Modifier.size(32.dp)
                 )
-                
+
                 // Recommendation details
                 Column(
                     modifier = Modifier.weight(1f),
@@ -143,7 +139,7 @@ fun NextShotGuidanceCard(
                     }
                 }
             }
-            
+
             // Context/reason explanation
             Text(
                 text = recommendation.reason,
@@ -151,9 +147,9 @@ fun NextShotGuidanceCard(
                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.9f),
                 modifier = Modifier.fillMaxWidth()
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // Action buttons
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -165,7 +161,7 @@ fun NextShotGuidanceCard(
                 ) {
                     Text(text = stringResource(R.string.button_apply))
                 }
-                
+
                 OutlinedButton(
                     onClick = onDismiss,
                     modifier = Modifier.weight(1f)
@@ -190,7 +186,7 @@ private fun AdjustmentDirectionIcon(
         AdjustmentDirection.COARSER -> Icons.Default.TrendingDown to MaterialTheme.colorScheme.secondary
         AdjustmentDirection.NO_CHANGE -> Icons.Default.TrendingFlat to MaterialTheme.colorScheme.tertiary
     }
-    
+
     Icon(
         imageVector = icon,
         contentDescription = when (direction) {
@@ -216,7 +212,7 @@ private fun ConfidenceIndicator(
         ConfidenceLevel.MEDIUM -> stringResource(R.string.medium_confidence) to MaterialTheme.colorScheme.secondary
         ConfidenceLevel.LOW -> stringResource(R.string.low_confidence) to MaterialTheme.colorScheme.tertiary
     }
-    
+
     Text(
         text = text,
         style = MaterialTheme.typography.labelSmall,
@@ -336,7 +332,7 @@ private fun AnimatedNextShotGuidanceCardPreview() {
                 text = "Content above the card",
                 style = MaterialTheme.typography.bodyLarge
             )
-            
+
             AnimatedNextShotGuidanceCard(
                 recommendation = PersistentGrindRecommendation(
                     beanId = "test_bean",
@@ -353,7 +349,7 @@ private fun AnimatedNextShotGuidanceCardPreview() {
                 onApply = {},
                 onDismiss = {}
             )
-            
+
             Text(
                 text = "Content below the card",
                 style = MaterialTheme.typography.bodyLarge

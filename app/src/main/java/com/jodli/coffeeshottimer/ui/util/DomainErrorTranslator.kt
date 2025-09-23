@@ -36,12 +36,20 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.FAILED_TO_GET_BEAN -> context.getString(R.string.error_failed_to_get_bean)
             DomainErrorCode.FAILED_TO_UPDATE_BEAN -> context.getString(R.string.error_failed_to_update_bean)
             DomainErrorCode.FAILED_TO_ADD_BEAN -> context.getString(R.string.error_failed_to_add_bean)
-            DomainErrorCode.FAILED_TO_UPDATE_GRINDER_SETTING -> context.getString(R.string.error_failed_to_update_grinder_setting)
-            DomainErrorCode.FAILED_TO_UPDATE_ACTIVE_STATUS -> context.getString(R.string.error_failed_to_update_active_status)
+            DomainErrorCode.FAILED_TO_UPDATE_GRINDER_SETTING -> context.getString(
+                R.string.error_failed_to_update_grinder_setting
+            )
+            DomainErrorCode.FAILED_TO_UPDATE_ACTIVE_STATUS -> context.getString(
+                R.string.error_failed_to_update_active_status
+            )
             DomainErrorCode.FAILED_TO_CHECK_BEAN_NAME -> context.getString(R.string.error_failed_to_check_bean_name)
             DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS -> context.getString(R.string.error_failed_to_get_active_beans)
-            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEAN_COUNT -> context.getString(R.string.error_failed_to_get_active_bean_count)
-            DomainErrorCode.FAILED_TO_CHECK_FOR_ACTIVE_BEANS -> context.getString(R.string.error_failed_to_check_for_active_beans)
+            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEAN_COUNT -> context.getString(
+                R.string.error_failed_to_get_active_bean_count
+            )
+            DomainErrorCode.FAILED_TO_CHECK_FOR_ACTIVE_BEANS -> context.getString(
+                R.string.error_failed_to_check_for_active_beans
+            )
 
             // Shot validation errors
             DomainErrorCode.SHOT_VALIDATION_FAILED -> context.getString(R.string.error_shot_validation_failed)
@@ -74,7 +82,7 @@ class DomainErrorTranslator @Inject constructor(
             DomainErrorCode.PHOTO_STORAGE_FULL -> context.getString(R.string.error_photo_storage_full)
             DomainErrorCode.PHOTO_INVALID_URI -> context.getString(R.string.error_photo_invalid_uri)
             DomainErrorCode.PHOTO_FILE_ACCESS_ERROR -> context.getString(R.string.error_photo_file_access_error)
-            
+
             // Camera and permission errors
             DomainErrorCode.CAMERA_UNAVAILABLE -> context.getString(R.string.error_camera_unavailable)
             DomainErrorCode.CAMERA_PERMISSION_DENIED -> context.getString(R.string.error_camera_permission_denied)

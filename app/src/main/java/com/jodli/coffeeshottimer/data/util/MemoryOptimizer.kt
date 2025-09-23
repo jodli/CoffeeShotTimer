@@ -128,7 +128,6 @@ class MemoryOptimizer @Inject constructor() {
             forceGarbageCollection()
         }
     }
-
 }
 
 /**
@@ -140,5 +139,4 @@ data class MemoryUsage(
     val usedMemory: Long,
     val maxMemory: Long,
     val usagePercentage: Double
-) {
-}
+)

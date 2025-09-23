@@ -11,25 +11,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import com.jodli.coffeeshottimer.R
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
-
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,11 +38,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.ui.res.stringResource
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.ui.components.BeanPhotoThumbnail
 import com.jodli.coffeeshottimer.ui.components.CardHeader
@@ -227,7 +223,9 @@ private fun BeanManagementContent(
                 trailingIcon = if (searchQuery.isNotEmpty()) Icons.Default.Clear else null,
                 onTrailingIconClick = if (searchQuery.isNotEmpty()) {
                     { onSearchQueryChange("") }
-                } else null,
+                } else {
+                    null
+                },
                 modifier = Modifier.weight(1f)
             )
 
@@ -236,7 +234,13 @@ private fun BeanManagementContent(
                 onClick = onToggleShowInactive,
                 label = {
                     Text(
-                        text = if (showInactive) stringResource(R.string.text_all) else stringResource(R.string.text_active),
+                        text = if (showInactive) {
+                            stringResource(
+                                R.string.text_all
+                            )
+                        } else {
+                            stringResource(R.string.text_active)
+                        },
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
@@ -306,7 +310,9 @@ private fun BeanManagementContent(
                                     onUseForShot = { onUseForShot(bean) },
                                     onReactivate = if (!bean.isActive) {
                                         { onReactivateBean(bean.id) }
-                                    } else null,
+                                    } else {
+                                        null
+                                    },
                                     onPhotoClick = { photoPath ->
                                         onPhotoClick(photoPath)
                                     }
@@ -333,7 +339,9 @@ private fun BeanManagementContent(
                                     onUseForShot = { onUseForShot(bean) },
                                     onReactivate = if (!bean.isActive) {
                                         { onReactivateBean(bean.id) }
-                                    } else null,
+                                    } else {
+                                        null
+                                    },
                                     onPhotoClick = { photoPath ->
                                         onPhotoClick(photoPath)
                                     }
@@ -417,7 +425,13 @@ private fun BeanListItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = if (bean.isActive) stringResource(R.string.button_delete_bean) else stringResource(R.string.button_permanently_delete_bean),
+                            contentDescription = if (bean.isActive) {
+                                stringResource(
+                                    R.string.button_delete_bean
+                                )
+                            } else {
+                                stringResource(R.string.button_permanently_delete_bean)
+                            },
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(spacing.iconSmall)
                         )
@@ -438,77 +452,85 @@ private fun BeanListItem(
                 photoPath = bean.photoPath,
                 onPhotoClick = if (bean.hasPhoto() && onPhotoClick != null) {
                     { onPhotoClick(bean.photoPath!!) }
-                } else null
+                } else {
+                    null
+                }
             )
 
             // Bean information
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                // Days since roast with freshness indicator
+                val daysSinceRoast = bean.daysSinceRoast()
+                val isFresh = bean.isFresh()
 
-            // Days since roast with freshness indicator
-            val daysSinceRoast = bean.daysSinceRoast()
-            val isFresh = bean.isFresh()
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                Text(
-                    text = stringResource(R.string.format_roasted_days_ago, daysSinceRoast),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (isFresh)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                // Freshness indicator
-                Surface(
-                    color = if (isFresh)
-                        MaterialTheme.colorScheme.primaryContainer
-                    else
-                        MaterialTheme.colorScheme.secondaryContainer,
-                    shape = androidx.compose.foundation.shape.CircleShape
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(spacing.small)
                 ) {
                     Text(
-                        text = if (isFresh) stringResource(R.string.text_fresh) else when {
-                            daysSinceRoast < 4 -> stringResource(R.string.text_too_fresh)
-                            daysSinceRoast <= 45 -> stringResource(R.string.text_good)
-                            daysSinceRoast <= 90 -> stringResource(R.string.text_dialog_ok)
-                            else -> stringResource(R.string.text_stale)
+                        text = stringResource(R.string.format_roasted_days_ago, daysSinceRoast),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (isFresh) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
+                    )
+
+                    // Freshness indicator
+                    Surface(
+                        color = if (isFresh) {
+                            MaterialTheme.colorScheme.primaryContainer
+                        } else {
+                            MaterialTheme.colorScheme.secondaryContainer
                         },
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (isFresh)
-                            MaterialTheme.colorScheme.onPrimaryContainer
-                        else
-                            MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
+                        shape = androidx.compose.foundation.shape.CircleShape
+                    ) {
+                        Text(
+                            text = if (isFresh) {
+                                stringResource(R.string.text_fresh)
+                            } else {
+                                when {
+                                    daysSinceRoast < 4 -> stringResource(R.string.text_too_fresh)
+                                    daysSinceRoast <= 45 -> stringResource(R.string.text_good)
+                                    daysSinceRoast <= 90 -> stringResource(R.string.text_dialog_ok)
+                                    else -> stringResource(R.string.text_stale)
+                                }
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = if (isFresh) {
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.onSecondaryContainer
+                            },
+                            modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall / 2)
+                        )
+                    }
+                }
+
+                // Grinder setting if available
+                if (!bean.lastGrinderSetting.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(spacing.extraSmall))
+                    Text(
+                        text = stringResource(R.string.format_last_grind, bean.lastGrinderSetting),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
 
-            // Grinder setting if available
-            if (!bean.lastGrinderSetting.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-                Text(
-                    text = stringResource(R.string.format_last_grind, bean.lastGrinderSetting),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // Notes if available
-            if (bean.notes.isNotBlank()) {
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-                Text(
-                    text = bean.notes,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                )
-            }
+                // Notes if available
+                if (bean.notes.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(spacing.extraSmall))
+                    Text(
+                        text = bean.notes,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }

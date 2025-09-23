@@ -53,7 +53,7 @@ data class BasketConfigState(
  * Utility functions for flow navigation
  */
 object EquipmentSetupFlowNavigator {
-    
+
     fun canNavigateForward(state: EquipmentSetupFlowState): Boolean {
         return when (state.currentStep) {
             EquipmentSetupStep.WELCOME -> true
@@ -62,11 +62,11 @@ object EquipmentSetupFlowNavigator {
             EquipmentSetupStep.SUMMARY -> true
         }
     }
-    
+
     fun canNavigateBackward(state: EquipmentSetupFlowState): Boolean {
         return state.currentStep != EquipmentSetupStep.WELCOME
     }
-    
+
     fun getNextStep(currentStep: EquipmentSetupStep): EquipmentSetupStep? {
         return when (currentStep) {
             EquipmentSetupStep.WELCOME -> EquipmentSetupStep.GRINDER_SETUP
@@ -75,7 +75,7 @@ object EquipmentSetupFlowNavigator {
             EquipmentSetupStep.SUMMARY -> null
         }
     }
-    
+
     fun getPreviousStep(currentStep: EquipmentSetupStep): EquipmentSetupStep? {
         return when (currentStep) {
             EquipmentSetupStep.WELCOME -> null
@@ -84,7 +84,7 @@ object EquipmentSetupFlowNavigator {
             EquipmentSetupStep.SUMMARY -> EquipmentSetupStep.BASKET_SETUP
         }
     }
-    
+
     fun getStepNumber(step: EquipmentSetupStep): Int {
         return when (step) {
             EquipmentSetupStep.WELCOME -> 1
@@ -93,6 +93,6 @@ object EquipmentSetupFlowNavigator {
             EquipmentSetupStep.SUMMARY -> 4
         }
     }
-    
+
     fun getTotalSteps(): Int = 4
 }

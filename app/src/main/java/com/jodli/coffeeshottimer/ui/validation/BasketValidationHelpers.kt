@@ -8,7 +8,7 @@ import com.jodli.coffeeshottimer.R
  * Shared validation helpers for basket configuration
  */
 object BasketValidationHelpers {
-    
+
     /**
      * Get a user-friendly validation suggestion based on the error message
      */
@@ -16,15 +16,15 @@ object BasketValidationHelpers {
     fun getValidationSuggestion(error: String?): String {
         if (error == null) return ""
         return when {
-            error.contains("minimum must be less than maximum") -> 
+            error.contains("minimum must be less than maximum") ->
                 stringResource(R.string.suggestion_basket_min_less_than_max)
-            error.contains("cannot be less than") -> 
+            error.contains("cannot be less than") ->
                 stringResource(R.string.suggestion_basket_check_minimum_values)
-            error.contains("cannot exceed") -> 
+            error.contains("cannot exceed") ->
                 stringResource(R.string.suggestion_basket_check_maximum_values)
-            error.contains("range must be at least") -> 
+            error.contains("range must be at least") ->
                 stringResource(R.string.suggestion_basket_increase_range)
-            error.contains("brew ratios") -> 
+            error.contains("brew ratios") ->
                 stringResource(R.string.suggestion_basket_check_ratios)
             else -> ""
         }

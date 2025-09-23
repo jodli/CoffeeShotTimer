@@ -5,10 +5,10 @@ import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.model.BasketConfiguration
 import com.jodli.coffeeshottimer.data.model.BasketPreset
 import com.jodli.coffeeshottimer.data.model.ValidationResult
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -103,8 +103,11 @@ class BasketConfigRepository @Inject constructor(
             // Validate configuration data
             Log.d(TAG, "saveConfig: Validating configuration")
             val validationResult = config.validate()
-            Log.d(TAG, "saveConfig: Validation result - isValid=${validationResult.isValid}, errors=${validationResult.errors}")
-            
+            Log.d(
+                TAG,
+                "saveConfig: Validation result - isValid=${validationResult.isValid}, errors=${validationResult.errors}"
+            )
+
             if (!validationResult.isValid) {
                 Log.e(TAG, "saveConfig: Validation failed - ${validationResult.errors}")
                 return Result.failure(
@@ -128,7 +131,7 @@ class BasketConfigRepository @Inject constructor(
                 throw e
             }
             Log.d(TAG, "saveConfig: Existing config found: $existingConfig")
-            
+
             if (existingConfig != null) {
                 Log.d(TAG, "saveConfig: Duplicate config found, checking if it's active: ${existingConfig.isActive}")
                 // If duplicate exists but it's not active, activate it
@@ -143,7 +146,7 @@ class BasketConfigRepository @Inject constructor(
 
             Log.d(TAG, "saveConfig: No duplicate found, proceeding with save")
             val result = executeWithRetry(
-                operation = { 
+                operation = {
                     Log.d(TAG, "saveConfig: Deactivating all existing configs")
                     // Deactivate all existing configurations
                     basketConfigDao.deactivateAllConfigs()
@@ -200,7 +203,7 @@ class BasketConfigRepository @Inject constructor(
             }
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     basketConfigDao.updateConfig(config)
                     Unit
                 },
@@ -223,7 +226,7 @@ class BasketConfigRepository @Inject constructor(
                 ?: return Result.failure(RepositoryException.NotFoundError("Basket configuration not found"))
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     basketConfigDao.deleteConfig(config)
                     Unit
                 },
@@ -240,7 +243,7 @@ class BasketConfigRepository @Inject constructor(
      */
     suspend fun deleteAllConfigs(): Result<Unit> {
         return executeWithRetry(
-            operation = { 
+            operation = {
                 basketConfigDao.deleteAllConfigs()
                 Unit
             },
@@ -275,7 +278,7 @@ class BasketConfigRepository @Inject constructor(
                 ?: return Result.failure(RepositoryException.NotFoundError("Basket configuration not found"))
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     // Deactivate all configurations first
                     basketConfigDao.deactivateAllConfigs()
                     // Activate the specified configuration
@@ -343,7 +346,7 @@ class BasketConfigRepository @Inject constructor(
             // No configuration exists, create default
             val defaultConfig = BasketConfiguration.DEFAULT
             val saveResult = saveConfig(defaultConfig)
-            
+
             if (saveResult.isSuccess) {
                 Result.success(defaultConfig)
             } else {
@@ -353,7 +356,9 @@ class BasketConfigRepository @Inject constructor(
                 )
             }
         } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get or create default configuration", exception))
+            Result.failure(
+                RepositoryException.DatabaseError("Failed to get or create default configuration", exception)
+            )
         }
     }
 
@@ -386,7 +391,7 @@ class BasketConfigRepository @Inject constructor(
             }
 
             executeWithRetry(
-                operation = { 
+                operation = {
                     basketConfigDao.deleteOldConfigs(keepCount)
                     Unit
                 },
@@ -429,7 +434,7 @@ class BasketConfigRepository @Inject constructor(
     ): Result<T> {
         Log.d(TAG, "executeWithRetry: Starting operation with maxRetries=$maxRetries")
         var lastException: Exception? = null
-        
+
         repeat(maxRetries) { attempt ->
             try {
                 Log.d(TAG, "executeWithRetry: Attempt ${attempt + 1} of $maxRetries")
@@ -446,7 +451,7 @@ class BasketConfigRepository @Inject constructor(
                 }
             }
         }
-        
+
         Log.e(TAG, "executeWithRetry: All attempts failed", lastException)
         return Result.failure(
             RepositoryException.DatabaseError(

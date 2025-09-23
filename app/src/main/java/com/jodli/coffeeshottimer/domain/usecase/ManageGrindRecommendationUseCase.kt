@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
-import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.preferences.GrindRecommendationPreferences
 import com.jodli.coffeeshottimer.data.preferences.SerializableGrindRecommendation
@@ -16,13 +15,13 @@ import javax.inject.Singleton
 
 /**
  * Use case for managing persistent grind recommendations.
- * 
+ *
  * This use case handles the business logic for:
  * - Converting temporary recommendations to persistent storage
  * - Loading bean-specific recommendations
  * - Tracking recommendation follow-through
  * - Managing recommendation lifecycle
- * 
+ *
  * Unlike temporary GrindAdjustmentRecommendation, persistent recommendations
  * survive app restarts and provide next-shot guidance.
  */
@@ -36,7 +35,7 @@ class ManageGrindRecommendationUseCase @Inject constructor(
      * Save a grind recommendation for a specific bean.
      * This method always saves regardless of whether taste feedback was provided,
      * ensuring beginners always get guidance.
-     * 
+     *
      * @param beanId The ID of the bean this recommendation is for
      * @param recommendation The calculated grind adjustment recommendation
      * @param lastShot The shot that generated this recommendation
@@ -58,7 +57,7 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                     )
                 )
             }
-            
+
             val bean = beanResult.getOrNull()
                 ?: return Result.failure(
                     DomainException(
@@ -66,14 +65,14 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                         "Bean data is null for ID: $beanId"
                     )
                 )
-            
+
             // Generate context-aware reason text
             val basedOnTaste = lastShot.tastePrimary != null
             val reason = PersistentGrindRecommendation.createReasonString(
                 extractionTimeSeconds = lastShot.extractionTimeSeconds,
                 tasteFeedback = lastShot.tastePrimary
             )
-            
+
             // Create persistent recommendation from temporary one
             // Use default espresso dose since Bean model doesn't have dose field yet
             val defaultDose = 18.0 // Standard espresso dose
@@ -84,7 +83,7 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                 reason = reason,
                 basedOnTaste = basedOnTaste
             )
-            
+
             // Convert to serializable format for storage
             val serializableRecommendation = SerializableGrindRecommendation.create(
                 beanId = persistentRecommendation.beanId,
@@ -95,10 +94,10 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                 basedOnTaste = persistentRecommendation.basedOnTaste,
                 confidence = persistentRecommendation.confidence.name
             )
-            
+
             // Save to persistent storage
             grindRecommendationPreferences.saveRecommendation(beanId, serializableRecommendation)
-            
+
             Result.success(persistentRecommendation)
         } catch (exception: Exception) {
             Result.failure(
@@ -110,21 +109,21 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Get the stored recommendation for a specific bean.
-     * 
+     *
      * @param beanId The ID of the bean to get recommendation for
      * @return Result containing the persistent recommendation or null if none exists
      */
     suspend fun getRecommendation(beanId: String): Result<PersistentGrindRecommendation?> {
         return try {
             val serializableRecommendation = grindRecommendationPreferences.getRecommendation(beanId)
-            
+
             if (serializableRecommendation == null) {
                 return Result.success(null)
             }
-            
+
             // Convert from serializable format to domain model
             val persistentRecommendation = convertToPersistentRecommendation(serializableRecommendation)
             Result.success(persistentRecommendation)
@@ -138,11 +137,11 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Mark a recommendation as followed by the user.
      * This is useful for tracking recommendation success rates.
-     * 
+     *
      * @param beanId The ID of the bean to update recommendation for
      * @return Result indicating success or failure
      */
@@ -160,11 +159,11 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Clear the stored recommendation for a specific bean.
      * Used when user dismisses recommendation or when it becomes obsolete.
-     * 
+     *
      * @param beanId The ID of the bean to clear recommendation for
      * @return Result indicating success or failure
      */
@@ -182,12 +181,12 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Update an existing recommendation with new taste feedback.
      * This is called when a user adds taste feedback after initially recording
      * a shot without it.
-     * 
+     *
      * @param beanId The ID of the bean to update recommendation for
      * @param updatedRecommendation New recommendation with taste feedback
      * @param updatedShot Shot with added taste feedback
@@ -205,19 +204,19 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                 // If no existing recommendation, create new one
                 return saveRecommendation(beanId, updatedRecommendation, updatedShot)
             }
-            
+
             val existing = existingResult.getOrNull()
             if (existing == null) {
                 // If no existing recommendation, create new one
                 return saveRecommendation(beanId, updatedRecommendation, updatedShot)
             }
-            
+
             // Create updated reason text with taste feedback
             val updatedReason = PersistentGrindRecommendation.createReasonString(
                 extractionTimeSeconds = updatedShot.extractionTimeSeconds,
                 tasteFeedback = updatedShot.tastePrimary
             )
-            
+
             // Create updated persistent recommendation, preserving some existing data
             val updatedPersistent = existing.copy(
                 suggestedGrindSetting = updatedRecommendation.suggestedGrindSetting,
@@ -227,7 +226,7 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                 confidence = updatedRecommendation.confidence
                 // Note: preserve timestamp, wasFollowed, and other fields
             )
-            
+
             // Convert to serializable format for storage
             val serializableRecommendation = SerializableGrindRecommendation(
                 beanId = updatedPersistent.beanId,
@@ -242,10 +241,10 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                 basedOnTaste = updatedPersistent.basedOnTaste,
                 confidence = updatedPersistent.confidence.name
             )
-            
+
             // Save updated recommendation
             grindRecommendationPreferences.saveRecommendation(beanId, serializableRecommendation)
-            
+
             Result.success(updatedPersistent)
         } catch (exception: Exception) {
             Result.failure(
@@ -257,11 +256,11 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Get all bean IDs that have stored recommendations.
      * Useful for cleanup operations or analytics.
-     * 
+     *
      * @return Result containing list of bean IDs with recommendations
      */
     suspend fun getAllRecommendationBeanIds(): Result<List<String>> {
@@ -278,11 +277,11 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Clear all stored recommendations.
      * Primarily used for testing or user data reset.
-     * 
+     *
      * @return Result indicating success or failure
      */
     suspend fun clearAllRecommendations(): Result<Unit> {
@@ -299,7 +298,7 @@ class ManageGrindRecommendationUseCase @Inject constructor(
             )
         }
     }
-    
+
     /**
      * Convert SerializableGrindRecommendation to PersistentGrindRecommendation.
      * Handles enum conversion and data validation.

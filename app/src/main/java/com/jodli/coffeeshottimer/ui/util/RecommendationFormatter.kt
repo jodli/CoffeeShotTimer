@@ -20,32 +20,32 @@ class RecommendationFormatter(private val context: Context) {
                 val currentTime = recommendation.context["currentTime"] ?: "unknown"
                 context.getString(R.string.recommendation_grind_finer, currentTime)
             }
-            
+
             RecommendationType.GRIND_COARSER -> {
                 val currentTime = recommendation.context["currentTime"] ?: "unknown"
                 context.getString(R.string.recommendation_grind_coarser, currentTime)
             }
-            
+
             RecommendationType.INCREASE_YIELD -> {
                 val currentRatio = recommendation.context["currentRatio"] ?: "unknown"
                 context.getString(R.string.recommendation_increase_yield, currentRatio)
             }
-            
+
             RecommendationType.DECREASE_YIELD -> {
                 val currentRatio = recommendation.context["currentRatio"] ?: "unknown"
                 context.getString(R.string.recommendation_decrease_yield, currentRatio)
             }
-            
+
             RecommendationType.RATIO_INCONSISTENCY -> {
                 val deviation = recommendation.context["deviation"] ?: "unknown"
                 val avgRatio = recommendation.context["avgRatio"] ?: "unknown"
                 context.getString(R.string.recommendation_ratio_inconsistency, deviation, avgRatio)
             }
-            
+
             RecommendationType.DOSE_ADJUSTMENT -> {
                 context.getString(R.string.recommendation_dose_adjustment)
             }
-            
+
             RecommendationType.TIMING_CONSISTENCY -> {
                 context.getString(R.string.recommendation_timing_consistency)
             }

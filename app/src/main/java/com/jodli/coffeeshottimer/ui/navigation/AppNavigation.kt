@@ -1,23 +1,18 @@
 package com.jodli.coffeeshottimer.ui.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.ui.screens.AddEditBeanScreen
 import com.jodli.coffeeshottimer.ui.screens.BeanManagementScreen
+import com.jodli.coffeeshottimer.ui.screens.EquipmentSetupFlowScreen
 import com.jodli.coffeeshottimer.ui.screens.IntroductionScreen
 import com.jodli.coffeeshottimer.ui.screens.RecordShotScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotDetailsScreen
 import com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen
-import com.jodli.coffeeshottimer.ui.screens.EquipmentSetupFlowScreen
 
 @Composable
 fun AppNavigation(
@@ -214,4 +209,3 @@ fun AppNavigation(
         }
     }
 }
-
