@@ -70,7 +70,7 @@ This app follows a Clean Architecture/MVVM structure with explicit separation of
   - Application class annotated with @HiltAndroidApp: CoffeeShotTimerApplication.
   - Modules:
     - DatabaseModule: provides Room database, DAOs, migration and index callbacks, and a debug-only DatabasePopulator.
-    - RepositoryModule: provides repositories, MemoryOptimizer, PerformanceMonitor, and binds PhotoStorageManager/PhotoCaptureManager implementations to interfaces.
+    - RepositoryModule: provides repositories, MemoryOptimizer, and binds PhotoStorageManager/PhotoCaptureManager implementations to interfaces.
 
 - Media/photo handling
   - PhotoCaptureManager and PhotoStorageManager abstractions wrap capture and storage of bean package photos. AndroidManifest configures a FileProvider for secure sharing and declares camera permissions.

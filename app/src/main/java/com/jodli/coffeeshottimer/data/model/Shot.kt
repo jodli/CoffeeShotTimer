@@ -127,7 +127,6 @@ data class Shot(
      * @return Formatted extraction time string
      */
     fun getFormattedExtractionTime(): String {
-        val timeMs = extractionTimeSeconds * 1000L
         val totalSeconds = maxOf(0, extractionTimeSeconds) // Handle negative values
         return when {
             totalSeconds < 60 -> "${totalSeconds}s"

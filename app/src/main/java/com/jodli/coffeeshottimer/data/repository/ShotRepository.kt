@@ -252,7 +252,7 @@ class ShotRepository @Inject constructor(
             }
 
             // Check if shot exists
-            val existingShot = shotDao.getShotById(shot.id)
+            shotDao.getShotById(shot.id)
                 ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))
 
             // Verify that the bean exists
@@ -274,7 +274,7 @@ class ShotRepository @Inject constructor(
     suspend fun deleteShot(shot: Shot): Result<Unit> {
         return try {
             // Check if shot exists
-            val existingShot = shotDao.getShotById(shot.id)
+            shotDao.getShotById(shot.id)
                 ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))
 
             shotDao.deleteShot(shot)
@@ -459,7 +459,7 @@ class ShotRepository @Inject constructor(
             }
 
             // Verify shot exists
-            val existingShot = shotDao.getShotById(shotId)
+            shotDao.getShotById(shotId)
                 ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))
 
             shotDao.updateTasteFeedback(shotId, tastePrimary, tasteSecondary)

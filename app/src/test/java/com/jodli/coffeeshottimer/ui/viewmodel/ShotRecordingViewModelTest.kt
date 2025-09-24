@@ -69,7 +69,6 @@ class ShotRecordingViewModelTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase,
             getShotDetailsUseCase,
-            getTastePreselectionUseCase,
             recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase,

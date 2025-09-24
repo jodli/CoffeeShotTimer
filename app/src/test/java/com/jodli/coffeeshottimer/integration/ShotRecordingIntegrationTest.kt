@@ -147,7 +147,6 @@ class ShotRecordingIntegrationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase,
             getShotDetailsUseCase,
-            getTastePreselectionUseCase,
             recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase,

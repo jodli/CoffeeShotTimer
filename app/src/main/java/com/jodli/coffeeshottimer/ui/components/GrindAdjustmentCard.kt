@@ -273,6 +273,7 @@ private fun getAdjustmentColors(direction: AdjustmentDirection): AdjustmentColor
 }
 
 // Preview functions
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Finer Adjustment", showBackground = true)
 @Composable
 private fun GrindAdjustmentCardFinerPreview() {
@@ -293,6 +294,7 @@ private fun GrindAdjustmentCardFinerPreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Coarser Adjustment", showBackground = true)
 @Composable
 private fun GrindAdjustmentCardCoarserPreview() {
@@ -313,6 +315,7 @@ private fun GrindAdjustmentCardCoarserPreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "No Change", showBackground = true)
 @Composable
 private fun GrindAdjustmentCardNoChangePreview() {
@@ -331,6 +334,7 @@ private fun GrindAdjustmentCardNoChangePreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Compact Mode", showBackground = true)
 @Composable
 private fun GrindAdjustmentCardCompactPreview() {

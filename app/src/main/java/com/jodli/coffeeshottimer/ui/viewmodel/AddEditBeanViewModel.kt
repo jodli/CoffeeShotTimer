@@ -11,7 +11,6 @@ import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
 import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
-import com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
@@ -48,7 +47,6 @@ class AddEditBeanViewModel @Inject constructor(
     private val updateBeanUseCase: UpdateBeanUseCase,
     private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase,
     private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase,
-    private val getBeanPhotoUseCase: GetBeanPhotoUseCase,
     private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase,
     private val photoCaptureManager: PhotoCaptureManager,
     private val stringResourceProvider: StringResourceProvider,

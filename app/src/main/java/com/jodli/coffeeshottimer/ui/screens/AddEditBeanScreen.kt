@@ -180,23 +180,6 @@ fun AddEditBeanScreen(
         }
     }
 
-    // Function to handle camera capture request
-    val handleCameraCapture = remember {
-        {
-            if (viewModel.isCameraAvailable(context)) {
-                if (cameraPermissionGranted) {
-                    launchCamera()
-                } else {
-                    // Request camera permission
-                    cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
-                }
-            } else {
-                // Camera not available, fallback to gallery
-                launchGallery()
-            }
-        }
-    }
-
     // Function to handle photo capture (shows action sheet)
     val handlePhotoCapture = remember {
         {

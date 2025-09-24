@@ -35,9 +35,9 @@
     <ID>LongMethod:ShotRecordedDialog.kt$@Composable fun ShotRecordedDialog( brewRatio: String, extractionTime: String, recommendations: List&lt;ShotRecommendation&gt; = emptyList(), suggestedTaste: TastePrimary? = null, grindAdjustment: GrindAdjustmentRecommendation? = null, onTasteSelected: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Reactive UI updates onSubmit: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Save to database onGrindAdjustmentApply: (() -&gt; Unit)? = null, onGrindAdjustmentDismiss: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, onViewDetails: (() -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
     <ID>LongMethod:WeightSliderComponents.kt$@Composable fun GrinderSettingSlider( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, errorMessage: String? = null, enabled: Boolean = true, suggestedSetting: String? = null, previousSuccessfulSettings: List&lt;String&gt; = emptyList(), minSetting: Float, maxSetting: Float, stepSize: Float = 0.5f )</ID>
-    <ID>LongParameterList:AddEditBeanViewModel.kt$AddEditBeanViewModel$( private val addBeanUseCase: AddBeanUseCase, private val updateBeanUseCase: UpdateBeanUseCase, private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase, private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase, private val getBeanPhotoUseCase: GetBeanPhotoUseCase, private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase, private val photoCaptureManager: PhotoCaptureManager, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val domainErrorTranslator: DomainErrorTranslator )</ID>
+    <ID>LongParameterList:AddEditBeanViewModel.kt$AddEditBeanViewModel$( private val addBeanUseCase: AddBeanUseCase, private val updateBeanUseCase: UpdateBeanUseCase, private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase, private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase, private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase, private val photoCaptureManager: PhotoCaptureManager, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val domainErrorTranslator: DomainErrorTranslator )</ID>
     <ID>LongParameterList:PersistentGrindRecommendationTest.kt$PersistentGrindRecommendationTest$( beanId: String = "test_bean", suggestedGrindSetting: String = "5.5", adjustmentDirection: AdjustmentDirection = AdjustmentDirection.FINER, reason: String = "Test reason", recommendedDose: Double = 18.0, targetExtractionTime: IntRange = 25..30, timestamp: LocalDateTime = LocalDateTime.now(), wasFollowed: Boolean = false, basedOnTaste: Boolean = true, confidence: ConfidenceLevel = ConfidenceLevel.HIGH )</ID>
-    <ID>LongParameterList:ShotRecordingViewModel.kt$ShotRecordingViewModel$( private val recordShotUseCase: RecordShotUseCase, private val getShotDetailsUseCase: GetShotDetailsUseCase, private val getTastePreselectionUseCase: GetTastePreselectionUseCase, private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase, private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase, private val manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase, private val beanRepository: BeanRepository, private val shotRepository: ShotRepository, private val domainErrorTranslator: DomainErrorTranslator, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository, private val basketConfigRepository: com.jodli.coffeeshottimer.data.repository.BasketConfigRepository, @param:ApplicationContext private val context: Context, private val savedStateHandle: SavedStateHandle )</ID>
+    <ID>LongParameterList:ShotRecordingViewModel.kt$ShotRecordingViewModel$( private val recordShotUseCase: RecordShotUseCase, private val getShotDetailsUseCase: GetShotDetailsUseCase, private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase, private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase, private val manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase, private val beanRepository: BeanRepository, private val shotRepository: ShotRepository, private val domainErrorTranslator: DomainErrorTranslator, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository, private val basketConfigRepository: com.jodli.coffeeshottimer.data.repository.BasketConfigRepository, @param:ApplicationContext private val context: Context, private val savedStateHandle: SavedStateHandle )</ID>
     <ID>MagicNumber:AddEditBeanScreen.kt$1000</ID>
     <ID>MagicNumber:AddEditBeanScreen.kt$24</ID>
     <ID>MagicNumber:AddEditBeanScreen.kt$60</ID>
@@ -203,7 +203,6 @@
     <ID>MagicNumber:Shot.kt$Shot$1.5</ID>
     <ID>MagicNumber:Shot.kt$Shot$100</ID>
     <ID>MagicNumber:Shot.kt$Shot$100.0</ID>
-    <ID>MagicNumber:Shot.kt$Shot$1000L</ID>
     <ID>MagicNumber:Shot.kt$Shot$120</ID>
     <ID>MagicNumber:Shot.kt$Shot$25</ID>
     <ID>MagicNumber:Shot.kt$Shot$3.0</ID>
@@ -481,42 +480,9 @@
     <ID>TooManyFunctions:BeanRepository.kt$BeanRepository</ID>
     <ID>TooManyFunctions:ShotDao.kt$ShotDao</ID>
     <ID>TooManyFunctions:ShotHistoryScreen.kt$com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen.kt</ID>
-    <ID>TooManyFunctions:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ShotRepository.kt$ShotRepository</ID>
     <ID>TooManyFunctions:ValidationStringProvider.kt$ValidationStringProvider</ID>
-    <ID>UnusedPrivateMember:EnhancedValidationIntegration.kt$EnhancedShotRecordingViewModel$private fun validateFormAndUpdateBrewRatio()</ID>
-    <ID>UnusedPrivateMember:GrindAdjustmentCard.kt$@Preview(name = "Coarser Adjustment", showBackground = true) @Composable private fun GrindAdjustmentCardCoarserPreview()</ID>
-    <ID>UnusedPrivateMember:GrindAdjustmentCard.kt$@Preview(name = "Compact Mode", showBackground = true) @Composable private fun GrindAdjustmentCardCompactPreview()</ID>
-    <ID>UnusedPrivateMember:GrindAdjustmentCard.kt$@Preview(name = "Finer Adjustment", showBackground = true) @Composable private fun GrindAdjustmentCardFinerPreview()</ID>
-    <ID>UnusedPrivateMember:GrindAdjustmentCard.kt$@Preview(name = "No Change", showBackground = true) @Composable private fun GrindAdjustmentCardNoChangePreview()</ID>
-    <ID>UnusedPrivateMember:NextShotGuidanceCard.kt$@Preview(name = "Animated Card Visible", showBackground = true) @Composable private fun AnimatedNextShotGuidanceCardPreview()</ID>
-    <ID>UnusedPrivateMember:NextShotGuidanceCard.kt$@Preview(name = "High Confidence Taste-Based", showBackground = true) @Composable private fun NextShotGuidanceCardTasteBasedPreview()</ID>
-    <ID>UnusedPrivateMember:NextShotGuidanceCard.kt$@Preview(name = "Low Confidence No Change", showBackground = true) @Composable private fun NextShotGuidanceCardNoChangePreview()</ID>
-    <ID>UnusedPrivateMember:NextShotGuidanceCard.kt$@Preview(name = "Medium Confidence Timing-Based", showBackground = true) @Composable private fun NextShotGuidanceCardTimingBasedPreview()</ID>
-    <ID>UnusedPrivateMember:RecordShotScreen.kt$@OptIn(ExperimentalFoundationApi::class) @Composable private fun NotesSection( notes: String, onNotesChange: (String) -&gt; Unit, bringIntoViewRequester: BringIntoViewRequester, coroutineScope: kotlinx.coroutines.CoroutineScope, modifier: Modifier = Modifier )</ID>
-    <ID>UnusedPrivateMember:ShotHistoryViewModel.kt$ShotHistoryViewModel$private fun loadInitialData()</ID>
-    <ID>UnusedPrivateMember:ShotRecordingViewModel.kt$ShotRecordingViewModel$private fun clearPersistentRecommendationState()</ID>
-    <ID>UnusedPrivateMember:ShotRecordingViewModel.kt$ShotRecordingViewModel$private fun loadCurrentBean()</ID>
-    <ID>UnusedPrivateProperty:AddEditBeanScreen.kt$val handleCameraCapture = remember { { if (viewModel.isCameraAvailable(context)) { if (cameraPermissionGranted) { launchCamera() } else { // Request camera permission cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA) } } else { // Camera not available, fallback to gallery launchGallery() } } }</ID>
-    <ID>UnusedPrivateProperty:AddEditBeanViewModel.kt$AddEditBeanViewModel$private val getBeanPhotoUseCase: GetBeanPhotoUseCase</ID>
-    <ID>UnusedPrivateProperty:BeanManagementViewModel.kt$BeanManagementViewModel$private val stringResourceProvider: StringResourceProvider</ID>
-    <ID>UnusedPrivateProperty:EnhancedValidationIntegration.kt$EnhancedShotRecordingViewModel$private val _extractionTimeWarnings = MutableStateFlow&lt;List&lt;String&gt;&gt;(emptyList())</ID>
-    <ID>UnusedPrivateProperty:GrindRecommendationPreferencesTest.kt$GrindRecommendationPreferencesTest$val existingRecommendation = SerializableGrindRecommendation.create( beanId = beanId, suggestedGrindSetting = "5.5", adjustmentDirection = "FINER", reason = "Last shot was sour (24s)", recommendedDose = 18.5, basedOnTaste = true, confidence = "HIGH" )</ID>
-    <ID>UnusedPrivateProperty:GrindRecommendationPreferencesTest.kt$GrindRecommendationPreferencesTest$val expectedRecommendation = SerializableGrindRecommendation.create( beanId = beanId, suggestedGrindSetting = "5.5", adjustmentDirection = "FINER", reason = "Last shot was sour (24s)", recommendedDose = 18.5, basedOnTaste = true, confidence = "HIGH" )</ID>
-    <ID>UnusedPrivateProperty:IntroductionScreen.kt$val availableHeight = maxHeight</ID>
-    <ID>UnusedPrivateProperty:IntroductionScreen.kt$val availableWidth = maxWidth</ID>
-    <ID>UnusedPrivateProperty:ManageGrindRecommendationUseCase.kt$ManageGrindRecommendationUseCase$val bean = beanResult.getOrNull() ?: return Result.failure( DomainException( DomainErrorCode.BEAN_NOT_FOUND, "Bean data is null for ID: $beanId" ) )</ID>
-    <ID>UnusedPrivateProperty:PerformanceMonitor.kt$PerformanceMonitor$private val operationTimes = ConcurrentHashMap&lt;String, MutableList&lt;Long&gt;&gt;()</ID>
-    <ID>UnusedPrivateProperty:PerformanceMonitor.kt$PerformanceMonitor.Companion$private const val MAX_SAMPLES = 100</ID>
-    <ID>UnusedPrivateProperty:PerformanceMonitor.kt$PerformanceMonitor.Companion$private const val TAG = "PerformanceMonitor"</ID>
-    <ID>UnusedPrivateProperty:Shot.kt$Shot$val timeMs = extractionTimeSeconds * 1000L</ID>
-    <ID>UnusedPrivateProperty:ShotRecordingViewModel.kt$ShotRecordingViewModel$private val getTastePreselectionUseCase: GetTastePreselectionUseCase</ID>
-    <ID>UnusedPrivateProperty:ShotRecordingViewModel.kt$ShotRecordingViewModel$val previousBeans = _activeBeans.value</ID>
-    <ID>UnusedPrivateProperty:ShotRepository.kt$ShotRepository$val existingShot = shotDao.getShotById(shot.id) ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))</ID>
-    <ID>UnusedPrivateProperty:ShotRepository.kt$ShotRepository$val existingShot = shotDao.getShotById(shotId) ?: return Result.failure(RepositoryException.NotFoundError("Shot not found"))</ID>
-    <ID>VariableNaming:EnhancedValidationIntegration.kt$ValidatedViewModel$protected val _isFormValid = MutableStateFlow(true)</ID>
-    <ID>VariableNaming:EnhancedValidationIntegration.kt$ValidatedViewModel$protected val _validationErrors = MutableStateFlow&lt;List&lt;String&gt;&gt;(emptyList())</ID>
     <ID>VariableNaming:ValidationComponents.kt$ValidationUtils$// Brew ratio constants val MIN_TYPICAL_BREW_RATIO = Companion.MIN_TYPICAL_BREW_RATIO</ID>
     <ID>VariableNaming:ValidationComponents.kt$ValidationUtils$// Text validation constants private val MIN_BEAN_NAME_LENGTH = 2</ID>
     <ID>VariableNaming:ValidationComponents.kt$ValidationUtils$// Time validation constants // NOTE: These are duplicated from companion object for instance access val MIN_EXTRACTION_TIME = Companion.MIN_EXTRACTION_TIME</ID>

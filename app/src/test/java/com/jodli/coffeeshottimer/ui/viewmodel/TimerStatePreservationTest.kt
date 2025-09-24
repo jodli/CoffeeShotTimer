@@ -107,7 +107,6 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -139,7 +138,6 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository), // New use case instance
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -168,7 +166,6 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -199,7 +196,6 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -227,7 +223,6 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -256,7 +251,6 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -284,7 +278,6 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -310,7 +303,6 @@ class TimerStatePreservationTest {
         var newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -336,7 +328,6 @@ class TimerStatePreservationTest {
         newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -364,7 +355,6 @@ class TimerStatePreservationTest {
         viewModel = ShotRecordingViewModel(
             recordShotUseCase = recordShotUseCase,
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,
@@ -390,7 +380,6 @@ class TimerStatePreservationTest {
         val newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
-            getTastePreselectionUseCase = getTastePreselectionUseCase,
             recordTasteFeedbackUseCase = recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase = calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase = manageGrindRecommendationUseCase,

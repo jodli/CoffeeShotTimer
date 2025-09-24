@@ -15,7 +15,6 @@ import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManagerImpl
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManagerImpl
 import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
-import com.jodli.coffeeshottimer.data.util.PerformanceMonitor
 import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import dagger.Binds
 import dagger.Module
@@ -109,18 +108,6 @@ abstract class RepositoryModule {
         @Singleton
         fun provideMemoryOptimizer(): MemoryOptimizer {
             return MemoryOptimizer()
-        }
-
-        /**
-         * Provides the PerformanceMonitor instance.
-         * Uses singleton scope to ensure consistent performance monitoring across the app.
-         *
-         * @return PerformanceMonitor instance
-         */
-        @Provides
-        @Singleton
-        fun providePerformanceMonitor(): PerformanceMonitor {
-            return PerformanceMonitor()
         }
 
         /**

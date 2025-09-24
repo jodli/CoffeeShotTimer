@@ -248,6 +248,7 @@ fun AnimatedNextShotGuidanceCard(
 }
 
 // Preview composables for different states
+@Suppress("UnusedPrivateMember")
 @Preview(name = "High Confidence Taste-Based", showBackground = true)
 @Composable
 private fun NextShotGuidanceCardTasteBasedPreview() {
@@ -272,6 +273,7 @@ private fun NextShotGuidanceCardTasteBasedPreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Medium Confidence Timing-Based", showBackground = true)
 @Composable
 private fun NextShotGuidanceCardTimingBasedPreview() {
@@ -296,6 +298,7 @@ private fun NextShotGuidanceCardTimingBasedPreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Low Confidence No Change", showBackground = true)
 @Composable
 private fun NextShotGuidanceCardNoChangePreview() {
@@ -320,6 +323,7 @@ private fun NextShotGuidanceCardNoChangePreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Animated Card Visible", showBackground = true)
 @Composable
 private fun AnimatedNextShotGuidanceCardPreview() {
