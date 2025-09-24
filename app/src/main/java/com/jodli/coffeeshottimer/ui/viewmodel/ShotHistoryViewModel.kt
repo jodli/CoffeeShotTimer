@@ -91,12 +91,6 @@ class ShotHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun loadInitialData() {
-        loadAvailableBeans()
-        // Start reactive shot history collection
-        startReactiveShotHistoryCollection()
-    }
-
     private fun loadShotHistory() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)

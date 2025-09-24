@@ -16,7 +16,6 @@ import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
-import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
@@ -63,7 +62,6 @@ data class ShotDraft(
 class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
-    private val getTastePreselectionUseCase: GetTastePreselectionUseCase,
     private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
     private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase,
     private val manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase,
@@ -227,9 +225,7 @@ class ShotRecordingViewModel @Inject constructor(
         startAutoSaveDraft()
         restoreDraftIfExists()
         // Load beans and current bean - persistent recommendation will be loaded in selectBean()
-        // Note: loadCurrentBean() will be called from loadActiveBeans() once the active beans are loaded
         loadActiveBeans()
-        // Note: loadPersistentRecommendation() is now called from selectBean() when a bean is selected
     }
 
     /**
@@ -244,7 +240,6 @@ class ShotRecordingViewModel @Inject constructor(
             beanRepository.getActiveBeans().collect { result ->
                 result.fold(
                     onSuccess = { beans ->
-                        val previousBeans = _activeBeans.value
                         _activeBeans.value = beans
 
                         // On first load, check for current bean from repository AFTER beans are loaded
@@ -279,36 +274,6 @@ class ShotRecordingViewModel @Inject constructor(
                 )
                 _isLoading.value = false
             }
-        }
-    }
-
-    /**
-     * Load the current bean from repository if one is set.
-     * Implements requirement 3.2 for connecting bean selection between screens.
-     * Epic 4: Enhanced to verify current bean is still active before selecting it.
-     */
-    private fun loadCurrentBean() {
-        viewModelScope.launch {
-            val result = beanRepository.getCurrentBean()
-            result.fold(
-                onSuccess = { currentBean ->
-                    if (currentBean != null) {
-                        // Verify the current bean is still in the active beans list
-                        val activeBeans = _activeBeans.value
-                        val isBeanStillActive = activeBeans.any { it.id == currentBean.id }
-
-                        if (isBeanStillActive) {
-                            selectBean(currentBean)
-                        } else {
-                            // Current bean is no longer active, clear it from repository
-                            beanRepository.clearCurrentBean()
-                        }
-                    }
-                },
-                onFailure = { exception ->
-                    // Silently handle error - current bean is optional
-                }
-            )
         }
     }
 
@@ -1372,14 +1337,6 @@ class ShotRecordingViewModel @Inject constructor(
                 _persistentRecommendation.value = null
             }
         }
-    }
-
-    /**
-     * Clear the persistent recommendation state immediately (e.g., when switching beans).
-     * Epic 4: Used internally to prevent stale recommendation display during bean transitions.
-     */
-    private fun clearPersistentRecommendationState() {
-        _persistentRecommendation.value = null
     }
 
     /**

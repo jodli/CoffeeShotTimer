@@ -330,10 +330,6 @@ fun IntroductionLandscapeLayout(
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Use available space from constraints for responsive layout
-        val availableWidth = maxWidth
-        val availableHeight = maxHeight
-
         // Main content with proper padding
         Row(
             modifier = Modifier

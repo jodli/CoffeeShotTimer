@@ -80,15 +80,6 @@ class GrindRecommendationPreferencesTest {
     fun `getRecommendation returns recommendation when valid JSON exists`() = runTest {
         // Given
         val beanId = "bean123"
-        val expectedRecommendation = SerializableGrindRecommendation.create(
-            beanId = beanId,
-            suggestedGrindSetting = "5.5",
-            adjustmentDirection = "FINER",
-            reason = "Last shot was sour (24s)",
-            recommendedDose = 18.5,
-            basedOnTaste = true,
-            confidence = "HIGH"
-        )
         val validJson = """
             {
                 "beanId": "bean123",
@@ -154,15 +145,6 @@ class GrindRecommendationPreferencesTest {
     fun `markRecommendationFollowed updates wasFollowed flag when recommendation exists`() = runTest {
         // Given
         val beanId = "bean123"
-        val existingRecommendation = SerializableGrindRecommendation.create(
-            beanId = beanId,
-            suggestedGrindSetting = "5.5",
-            adjustmentDirection = "FINER",
-            reason = "Last shot was sour (24s)",
-            recommendedDose = 18.5,
-            basedOnTaste = true,
-            confidence = "HIGH"
-        )
         val existingJson = """
             {
                 "beanId": "bean123",

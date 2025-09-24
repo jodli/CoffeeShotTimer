@@ -4,7 +4,6 @@ import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import io.mockk.every
 import io.mockk.mockk
@@ -34,7 +33,6 @@ class BeanManagementViewModelTest {
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase = mockk()
     private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
     private val beanRepository: BeanRepository = mockk(relaxed = true)
-    private val stringResourceProvider: StringResourceProvider = mockk(relaxed = true)
     private val domainErrorTranslator: DomainErrorTranslator = mockk(relaxed = true)
 
     private lateinit var viewModel: BeanManagementViewModel
@@ -54,7 +52,6 @@ class BeanManagementViewModelTest {
             getBeanHistoryUseCase,
             updateBeanUseCase,
             beanRepository,
-            stringResourceProvider,
             domainErrorTranslator
         )
     }

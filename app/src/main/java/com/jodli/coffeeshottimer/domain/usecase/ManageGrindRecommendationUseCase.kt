@@ -58,7 +58,7 @@ class ManageGrindRecommendationUseCase @Inject constructor(
                 )
             }
 
-            val bean = beanResult.getOrNull()
+            beanResult.getOrNull()
                 ?: return Result.failure(
                     DomainException(
                         DomainErrorCode.BEAN_NOT_FOUND,

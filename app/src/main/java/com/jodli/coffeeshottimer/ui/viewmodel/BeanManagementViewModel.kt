@@ -8,7 +8,6 @@ import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +29,6 @@ class BeanManagementViewModel @Inject constructor(
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase,
     private val updateBeanUseCase: UpdateBeanUseCase,
     private val beanRepository: BeanRepository,
-    private val stringResourceProvider: StringResourceProvider,
     private val domainErrorTranslator: DomainErrorTranslator
 ) : ViewModel() {
 
