@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -327,7 +326,7 @@ fun IntroductionLandscapeLayout(
     val landscapeSpacing = spacing.landscapeSpacing()
     val currentSlide = slides[currentPage]
 
-    BoxWithConstraints(
+    Box(
         modifier = Modifier.fillMaxSize()
     ) {
         // Main content with proper padding

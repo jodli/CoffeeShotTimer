@@ -4,6 +4,7 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -221,8 +222,8 @@ fun GrindAdjustmentCard(
 @Composable
 private fun getAdjustmentIcon(direction: AdjustmentDirection): ImageVector {
     return when (direction) {
-        AdjustmentDirection.FINER -> Icons.Default.KeyboardArrowLeft
-        AdjustmentDirection.COARSER -> Icons.Default.KeyboardArrowRight
+        AdjustmentDirection.FINER -> Icons.AutoMirrored.Default.KeyboardArrowLeft
+        AdjustmentDirection.COARSER -> Icons.AutoMirrored.Default.KeyboardArrowRight
         AdjustmentDirection.NO_CHANGE -> Icons.Default.CheckCircle
     }
 }

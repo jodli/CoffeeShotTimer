@@ -54,7 +54,7 @@ class PhotoCaptureManagerTest {
         
         // Assert
         assertEquals(MediaStore.ACTION_IMAGE_CAPTURE, intent.action)
-        assertNotNull(intent.getParcelableExtra<Uri>(MediaStore.EXTRA_OUTPUT))
+        assertNotNull(intent.getParcelableExtra(MediaStore.EXTRA_OUTPUT, Uri::class.java))
         assertNotNull(tempUri)
         assertTrue(intent.flags and Intent.FLAG_GRANT_WRITE_URI_PERMISSION != 0)
         assertTrue(intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
