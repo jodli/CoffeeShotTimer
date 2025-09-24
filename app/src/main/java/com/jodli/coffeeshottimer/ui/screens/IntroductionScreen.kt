@@ -147,12 +147,6 @@ fun IntroductionScreen(
         }
     }
 
-    val onPrevious = {
-        if (currentPage > 0) {
-            currentPage--
-        }
-    }
-
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
@@ -163,7 +157,6 @@ fun IntroductionScreen(
                     slides = slides,
                     currentPage = currentPage,
                     onNext = onNext,
-                    onPrevious = onPrevious,
                     onComplete = onComplete,
                     onSkip = onSkip
                 )
@@ -173,7 +166,6 @@ fun IntroductionScreen(
                     slides = slides,
                     currentPage = currentPage,
                     onNext = onNext,
-                    onPrevious = onPrevious,
                     onComplete = onComplete,
                     onSkip = onSkip
                 )
@@ -190,7 +182,6 @@ fun IntroductionPortraitLayout(
     slides: List<IntroSlide>,
     currentPage: Int,
     onNext: () -> Unit,
-    onPrevious: () -> Unit,
     onComplete: () -> Unit,
     onSkip: () -> Unit
 ) {
@@ -329,7 +320,6 @@ fun IntroductionLandscapeLayout(
     slides: List<IntroSlide>,
     currentPage: Int,
     onNext: () -> Unit,
-    onPrevious: () -> Unit,
     onComplete: () -> Unit,
     onSkip: () -> Unit
 ) {

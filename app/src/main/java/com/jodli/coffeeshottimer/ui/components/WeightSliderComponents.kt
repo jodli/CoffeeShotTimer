@@ -588,10 +588,8 @@ private fun GrinderSettingRangeIndicator(
 fun WeightSlidersSection(
     coffeeWeightIn: String,
     onCoffeeWeightInChange: (String) -> Unit,
-    coffeeWeightInError: String? = null, // Now optional since sliders clamp values
     coffeeWeightOut: String,
     onCoffeeWeightOutChange: (String) -> Unit,
-    coffeeWeightOutError: String? = null, // Now optional since sliders clamp values
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     basketCoffeeInMin: Float,

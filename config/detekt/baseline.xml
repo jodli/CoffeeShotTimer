@@ -11,7 +11,7 @@
     <ID>ComplexCondition:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$inMin != null &amp;&amp; inMax != null &amp;&amp; outMin != null &amp;&amp; outMax != null</ID>
     <ID>ComplexCondition:ShotRecordingViewModel.kt$ShotRecordingViewModel$bean == null || weightIn == null || weightOut == null || grinder.isBlank()</ID>
     <ID>ComplexInterface:ShotDao.kt$ShotDao</ID>
-    <ID>CyclomaticComplexMethod:AddEditBeanScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AddEditBeanScreen( beanId: String? = null, onNavigateBack: () -&gt; Unit = {}, viewModel: AddEditBeanViewModel = hiltViewModel(), isOnboardingMode: Boolean = false, onboardingTitle: String? = null, onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -&gt; Unit)? = null )</ID>
+    <ID>CyclomaticComplexMethod:AddEditBeanScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AddEditBeanScreen( beanId: String? = null, onNavigateBack: () -&gt; Unit = {}, viewModel: AddEditBeanViewModel = hiltViewModel(), isOnboardingMode: Boolean = false, onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -&gt; Unit)? = null )</ID>
     <ID>CyclomaticComplexMethod:BasketSetup.kt$@Composable fun BasketSetup( coffeeInMin: String, coffeeInMax: String, coffeeOutMin: String, coffeeOutMax: String, onCoffeeInMinChange: (String) -&gt; Unit, onCoffeeInMaxChange: (String) -&gt; Unit, onCoffeeOutMinChange: (String) -&gt; Unit, onCoffeeOutMaxChange: (String) -&gt; Unit, onPresetSelected: (BasketPreset) -&gt; Unit, coffeeInMinError: String? = null, coffeeInMaxError: String? = null, coffeeOutMinError: String? = null, coffeeOutMaxError: String? = null, generalError: String? = null, validationSuggestion: String? = null, modifier: Modifier = Modifier, showDescription: Boolean = true, showPresets: Boolean = true )</ID>
     <ID>CyclomaticComplexMethod:DomainErrorTranslator.kt$DomainErrorTranslator$fun translate(errorCode: DomainErrorCode, details: String? = null): String</ID>
     <ID>CyclomaticComplexMethod:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$override suspend fun compressImage(imageUri: Uri): Result&lt;Uri&gt;</ID>
@@ -21,7 +21,7 @@
     <ID>FunctionParameterNaming:TimerComponents.kt$timer_seconds_suffix: String = "s"</ID>
     <ID>LargeClass:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>LongMethod:AboutScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AboutScreen( onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier, debugViewModel: DebugViewModel = hiltViewModel() )</ID>
-    <ID>LongMethod:AddEditBeanScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AddEditBeanScreen( beanId: String? = null, onNavigateBack: () -&gt; Unit = {}, viewModel: AddEditBeanViewModel = hiltViewModel(), isOnboardingMode: Boolean = false, onboardingTitle: String? = null, onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -&gt; Unit)? = null )</ID>
+    <ID>LongMethod:AddEditBeanScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AddEditBeanScreen( beanId: String? = null, onNavigateBack: () -&gt; Unit = {}, viewModel: AddEditBeanViewModel = hiltViewModel(), isOnboardingMode: Boolean = false, onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -&gt; Unit)? = null )</ID>
     <ID>LongMethod:AppNavigation.kt$@Composable fun AppNavigation( navController: NavHostController, modifier: Modifier = Modifier, startDestination: String = NavigationDestinations.RecordShot.route )</ID>
     <ID>LongMethod:BasketSetup.kt$@Composable fun BasketSetup( coffeeInMin: String, coffeeInMax: String, coffeeOutMin: String, coffeeOutMax: String, onCoffeeInMinChange: (String) -&gt; Unit, onCoffeeInMaxChange: (String) -&gt; Unit, onCoffeeOutMinChange: (String) -&gt; Unit, onCoffeeOutMaxChange: (String) -&gt; Unit, onPresetSelected: (BasketPreset) -&gt; Unit, coffeeInMinError: String? = null, coffeeInMaxError: String? = null, coffeeOutMinError: String? = null, coffeeOutMaxError: String? = null, generalError: String? = null, validationSuggestion: String? = null, modifier: Modifier = Modifier, showDescription: Boolean = true, showPresets: Boolean = true )</ID>
     <ID>LongMethod:BeanManagementScreen.kt$@Composable private fun BeanListItem( bean: Bean, onEdit: () -&gt; Unit, onDelete: () -&gt; Unit, onUseForShot: () -&gt; Unit, onReactivate: (() -&gt; Unit)? = null, onPhotoClick: ((String) -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
@@ -485,27 +485,6 @@
     <ID>TooManyFunctions:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ShotRepository.kt$ShotRepository</ID>
     <ID>TooManyFunctions:ValidationStringProvider.kt$ValidationStringProvider</ID>
-    <ID>UnusedParameter:AddEditBeanScreen.kt$onboardingTitle: String? = null</ID>
-    <ID>UnusedParameter:AddEditBeanViewModel.kt$AddEditBeanViewModel$context: Context</ID>
-    <ID>UnusedParameter:AddEditBeanViewModel.kt$AddEditBeanViewModel$setting: String</ID>
-    <ID>UnusedParameter:CalculateGrindAdjustmentUseCase.kt$CalculateGrindAdjustmentUseCase$extractionTimeSeconds: Int</ID>
-    <ID>UnusedParameter:EquipmentSetupFlowScreen.kt$onSkip: () -&gt; Unit</ID>
-    <ID>UnusedParameter:GuidedBeanCreationScreen.kt$availableWidth: androidx.compose.ui.unit.Dp</ID>
-    <ID>UnusedParameter:IntroductionScreen.kt$onPrevious: () -&gt; Unit</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$bringIntoViewRequester: BringIntoViewRequester</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$coffeeWeightInError: String?</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$coffeeWeightOutError: String?</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$coroutineScope: kotlinx.coroutines.CoroutineScope</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$notes: String</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$onNotesChange: (String) -&gt; Unit</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$showBeanSelector: Boolean</ID>
-    <ID>UnusedParameter:RecordShotScreen.kt$showTimerValidation: Boolean</ID>
-    <ID>UnusedParameter:TasteUtils.kt$taste: TastePrimary</ID>
-    <ID>UnusedParameter:TasteUtils.kt$taste: TasteSecondary</ID>
-    <ID>UnusedParameter:TimerComponents.kt$isValidForSave: Boolean</ID>
-    <ID>UnusedParameter:TimerComponents.kt$showValidationState: Boolean</ID>
-    <ID>UnusedParameter:WeightSliderComponents.kt$coffeeWeightInError: String? = null</ID>
-    <ID>UnusedParameter:WeightSliderComponents.kt$coffeeWeightOutError: String? = null</ID>
     <ID>UnusedPrivateMember:EnhancedValidationIntegration.kt$EnhancedShotRecordingViewModel$private fun validateFormAndUpdateBrewRatio()</ID>
     <ID>UnusedPrivateMember:GrindAdjustmentCard.kt$@Preview(name = "Coarser Adjustment", showBackground = true) @Composable private fun GrindAdjustmentCardCoarserPreview()</ID>
     <ID>UnusedPrivateMember:GrindAdjustmentCard.kt$@Preview(name = "Compact Mode", showBackground = true) @Composable private fun GrindAdjustmentCardCompactPreview()</ID>

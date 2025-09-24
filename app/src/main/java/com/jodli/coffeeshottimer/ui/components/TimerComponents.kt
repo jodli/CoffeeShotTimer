@@ -785,8 +785,6 @@ fun ClickableTimerControls(
     modifier: Modifier = Modifier,
     showReset: Boolean = true,
     showColorCoding: Boolean = true,
-    showValidationState: Boolean = false,
-    isValidForSave: Boolean = true,
     useLandscapeTimer: Boolean = false
 ) {
     val spacing = LocalSpacing.current
@@ -810,8 +808,6 @@ fun ClickableTimerControls(
                 timerSize = adaptiveTimerSize,
                 showReset = showReset,
                 showColorCoding = showColorCoding,
-                showValidationState = showValidationState,
-                isValidForSave = isValidForSave,
                 context = context,
                 spacing = spacing,
                 modifier = modifier,
@@ -829,8 +825,6 @@ fun ClickableTimerControls(
             timerSize = spacing.timerSize,
             showReset = showReset,
             showColorCoding = showColorCoding,
-            showValidationState = showValidationState,
-            isValidForSave = isValidForSave,
             context = context,
             spacing = spacing,
             modifier = modifier,
@@ -849,8 +843,6 @@ private fun ClickableTimerControlsInternal(
     timerSize: Dp,
     showReset: Boolean,
     showColorCoding: Boolean,
-    showValidationState: Boolean,
-    isValidForSave: Boolean,
     context: Context,
     spacing: Spacing,
     modifier: Modifier = Modifier,
