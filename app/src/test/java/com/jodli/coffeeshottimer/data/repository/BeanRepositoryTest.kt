@@ -9,7 +9,6 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

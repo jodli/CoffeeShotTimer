@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingProgress
-import com.jodli.coffeeshottimer.data.onboarding.OnboardingStep
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.ui.navigation.NavigationDestinations
 import io.mockk.coEvery
