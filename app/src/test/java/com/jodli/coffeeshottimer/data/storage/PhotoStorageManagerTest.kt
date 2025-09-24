@@ -3,7 +3,6 @@ package com.jodli.coffeeshottimer.data.storage
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
@@ -17,7 +16,6 @@ import org.robolectric.annotation.Config
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import kotlin.io.path.createTempDirectory

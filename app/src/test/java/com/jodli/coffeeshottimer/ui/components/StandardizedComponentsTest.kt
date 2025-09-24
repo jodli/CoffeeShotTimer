@@ -1,10 +1,5 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Coffee
-import androidx.compose.material3.CardDefaults
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import org.junit.Test

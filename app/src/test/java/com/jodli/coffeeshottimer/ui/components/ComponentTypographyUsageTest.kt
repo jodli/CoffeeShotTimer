@@ -1,7 +1,5 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import org.junit.Test

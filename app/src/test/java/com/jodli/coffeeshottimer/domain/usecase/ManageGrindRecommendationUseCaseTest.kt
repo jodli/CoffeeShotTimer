@@ -14,7 +14,6 @@ import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.slot

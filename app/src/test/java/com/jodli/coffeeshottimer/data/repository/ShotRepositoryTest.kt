@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.data.repository
 
-import android.content.SharedPreferences
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.jodli.coffeeshottimer.data.database.AppDatabase
