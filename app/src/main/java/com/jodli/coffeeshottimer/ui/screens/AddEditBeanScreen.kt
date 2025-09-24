@@ -69,7 +69,6 @@ fun AddEditBeanScreen(
     onNavigateBack: () -> Unit = {},
     viewModel: AddEditBeanViewModel = hiltViewModel(),
     isOnboardingMode: Boolean = false,
-    onboardingTitle: String? = null,
     onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -111,7 +110,7 @@ fun AddEditBeanScreen(
         if (isGranted) {
             // Permission granted, launch camera directly
             try {
-                val cameraResult = viewModel.createCameraIntent(context)
+                val cameraResult = viewModel.createCameraIntent()
                 if (cameraResult != null) {
                     val (intent, uri) = cameraResult
                     tempCameraUri = uri
@@ -146,7 +145,7 @@ fun AddEditBeanScreen(
     val launchCamera = remember {
         {
             try {
-                val cameraResult = viewModel.createCameraIntent(context)
+                val cameraResult = viewModel.createCameraIntent()
                 if (cameraResult != null) {
                     val (intent, uri) = cameraResult
                     tempCameraUri = uri

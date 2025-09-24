@@ -128,7 +128,6 @@ fun GuidedBeanCreationPortraitLayout(
                     beanId = null, // Always creating a new bean in onboarding
                     onNavigateBack = viewModel::returnToEducation,
                     isOnboardingMode = true,
-                    onboardingTitle = stringResource(R.string.bean_form_title),
                     onSubmit = { createdBean ->
                         // Update the guided bean creation state with the created bean
                         viewModel.onBeanCreated(createdBean)
@@ -175,7 +174,6 @@ fun GuidedBeanCreationLandscapeLayout(
                     isLoading = uiState.isLoading,
                     error = uiState.error,
                     onClearError = viewModel::clearError,
-                    availableWidth = maxWidth,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -186,7 +184,6 @@ fun GuidedBeanCreationLandscapeLayout(
                     beanId = null, // Always creating a new bean in onboarding
                     onNavigateBack = viewModel::returnToEducation,
                     isOnboardingMode = true,
-                    onboardingTitle = stringResource(R.string.bean_form_title),
                     onSubmit = { createdBean ->
                         // Update the guided bean creation state with the created bean
                         viewModel.onBeanCreated(createdBean)
@@ -200,7 +197,6 @@ fun GuidedBeanCreationLandscapeLayout(
                     freshnessMessage = viewModel.getFreshnessMessage(uiState.createdBean!!),
                     onContinue = { onComplete(uiState.createdBean!!) },
                     isLoading = uiState.isLoading,
-                    availableWidth = maxWidth,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -338,7 +334,6 @@ fun BeanEducationContentLandscape(
     isLoading: Boolean,
     error: String?,
     onClearError: () -> Unit,
-    availableWidth: androidx.compose.ui.unit.Dp,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -748,7 +743,6 @@ fun BeanCreationSuccessLandscape(
     freshnessMessage: String,
     onContinue: () -> Unit,
     isLoading: Boolean,
-    availableWidth: androidx.compose.ui.unit.Dp,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current

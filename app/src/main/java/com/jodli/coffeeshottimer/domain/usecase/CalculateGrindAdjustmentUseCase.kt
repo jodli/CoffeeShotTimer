@@ -107,7 +107,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                         grinderConfig,
                         currentValue,
                         timeDeviation,
-                        extractionTimeSeconds,
                         tasteFeedback
                     )
                 }
@@ -116,7 +115,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                         grinderConfig,
                         currentValue,
                         timeDeviation,
-                        extractionTimeSeconds,
                         tasteFeedback
                     )
                 }
@@ -126,7 +124,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                         grinderConfig,
                         currentValue,
                         timeDeviation,
-                        extractionTimeSeconds,
                         tasteFeedback
                     )
                 }
@@ -135,7 +132,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
                         grinderConfig,
                         currentValue,
                         timeDeviation,
-                        extractionTimeSeconds,
                         tasteFeedback
                     )
                 }
@@ -176,7 +172,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         config: GrinderConfiguration,
         currentValue: Double,
         timeDeviation: Int,
-        extractionTimeSeconds: Int,
         tasteFeedback: TastePrimary?
     ): GrindAdjustmentRecommendation {
         val adjustmentSteps = calculateAdjustmentSteps(abs(timeDeviation))
@@ -207,7 +202,6 @@ class CalculateGrindAdjustmentUseCase @Inject constructor(
         config: GrinderConfiguration,
         currentValue: Double,
         timeDeviation: Int,
-        extractionTimeSeconds: Int,
         tasteFeedback: TastePrimary?
     ): GrindAdjustmentRecommendation {
         val adjustmentSteps = calculateAdjustmentSteps(abs(timeDeviation))

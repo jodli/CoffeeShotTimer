@@ -31,7 +31,6 @@ import com.jodli.coffeeshottimer.ui.viewmodel.EquipmentSetupFlowViewModel
 @Composable
 fun EquipmentSetupFlowScreen(
     onComplete: () -> Unit,
-    onSkip: () -> Unit,
     viewModel: EquipmentSetupFlowViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()

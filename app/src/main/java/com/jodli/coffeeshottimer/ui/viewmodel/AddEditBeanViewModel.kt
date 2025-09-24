@@ -128,10 +128,6 @@ class AddEditBeanViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(isActive = isActive)
     }
 
-    fun updateLastGrinderSetting(setting: String) {
-        _uiState.value = _uiState.value.copy()
-    }
-
     private fun validateName(name: String) {
         viewModelScope.launch {
             // Get existing bean names for uniqueness check
@@ -506,7 +502,7 @@ class AddEditBeanViewModel @Inject constructor(
     /**
      * Creates a camera capture intent with a temporary file URI.
      */
-    fun createCameraIntent(context: Context): Pair<Intent, Uri>? {
+    fun createCameraIntent(): Pair<Intent, Uri>? {
         return try {
             photoCaptureManager.createImageCaptureIntent()
         } catch (e: Exception) {

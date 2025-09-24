@@ -141,14 +141,12 @@ fun RecordShotScreen(
                 verticalArrangement = Arrangement.spacedBy(spacing.large)
             ) {
                 RecordShotPortraitContent(
-                    showBeanSelector = showBeanSelector,
                     selectedBean = selectedBean,
                     onShowBeanSelector = { showBeanSelector = true },
                     onNavigateToBeanManagement = onNavigateToBeanManagement,
                     currentTime = currentTime,
                     targetTime = targetTime,
                     uiTimerState = uiTimerState,
-                    showTimerValidation = showTimerValidation,
                     onStartPause = {
                         if (timerState.isRunning) {
                             viewModel.pauseTimer()
@@ -177,10 +175,6 @@ fun RecordShotScreen(
                     basketCoffeeInMax = basketCoffeeInMax,
                     basketCoffeeOutMin = basketCoffeeOutMin,
                     basketCoffeeOutMax = basketCoffeeOutMax,
-                    notes = notes,
-                    onNotesChange = viewModel::updateNotes,
-                    bringIntoViewRequester = bringIntoViewRequester,
-                    coroutineScope = coroutineScope,
                     isFormValid = isFormValid,
                     isLoading = isLoading,
                     onRecordShot = { viewModel.recordShot() },
@@ -213,7 +207,6 @@ fun RecordShotScreen(
                             currentTime = currentTime,
                             targetTime = targetTime,
                             timerState = uiTimerState,
-                            showTimerValidation = showTimerValidation,
                             onStartPause = {
                                 if (timerState.isRunning) {
                                     viewModel.pauseTimer()
@@ -235,10 +228,8 @@ fun RecordShotScreen(
                         onNavigateToBeanManagement = onNavigateToBeanManagement,
                         coffeeWeightIn = coffeeWeightIn,
                         onCoffeeWeightInChange = viewModel::updateCoffeeWeightIn,
-                        coffeeWeightInError = null, // Not needed with clamped sliders
                         coffeeWeightOut = coffeeWeightOut,
                         onCoffeeWeightOutChange = viewModel::updateCoffeeWeightOut,
-                        coffeeWeightOutError = null, // Not needed with clamped sliders
                         brewRatio = brewRatio,
                         formattedBrewRatio = formattedBrewRatio,
                         isOptimalBrewRatio = isOptimalBrewRatio,
@@ -255,10 +246,6 @@ fun RecordShotScreen(
                         basketCoffeeInMax = basketCoffeeInMax,
                         basketCoffeeOutMin = basketCoffeeOutMin,
                         basketCoffeeOutMax = basketCoffeeOutMax,
-                        notes = notes,
-                        onNotesChange = viewModel::updateNotes,
-                        bringIntoViewRequester = bringIntoViewRequester,
-                        coroutineScope = coroutineScope,
                         isFormValid = isFormValid,
                         isLoading = isLoading,
                         onRecordShot = { viewModel.recordShot() },
@@ -405,7 +392,6 @@ private fun TimerSection(
     currentTime: Long,
     targetTime: Long?,
     timerState: TimerState,
-    showTimerValidation: Boolean,
     onStartPause: () -> Unit,
     onReset: () -> Unit,
     modifier: Modifier = Modifier,
@@ -703,14 +689,12 @@ enum class TimerState {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun RecordShotPortraitContent(
-    showBeanSelector: Boolean,
     selectedBean: Bean?,
     onShowBeanSelector: () -> Unit,
     onNavigateToBeanManagement: () -> Unit,
     currentTime: Long,
     targetTime: Long?,
     uiTimerState: TimerState,
-    showTimerValidation: Boolean,
     onStartPause: () -> Unit,
     onReset: () -> Unit,
     coffeeWeightIn: String,
@@ -733,10 +717,6 @@ private fun RecordShotPortraitContent(
     basketCoffeeInMax: Float,
     basketCoffeeOutMin: Float,
     basketCoffeeOutMax: Float,
-    notes: String,
-    onNotesChange: (String) -> Unit,
-    bringIntoViewRequester: BringIntoViewRequester,
-    coroutineScope: kotlinx.coroutines.CoroutineScope,
     isFormValid: Boolean,
     isLoading: Boolean,
     onRecordShot: () -> Unit,
@@ -775,7 +755,6 @@ private fun RecordShotPortraitContent(
         currentTime = currentTime,
         targetTime = targetTime,
         timerState = uiTimerState,
-        showTimerValidation = showTimerValidation,
         onStartPause = onStartPause,
         onReset = onReset,
         modifier = Modifier.fillMaxWidth(),
@@ -884,10 +863,8 @@ private fun RecordShotFormContent(
     onNavigateToBeanManagement: () -> Unit,
     coffeeWeightIn: String,
     onCoffeeWeightInChange: (String) -> Unit,
-    coffeeWeightInError: String?,
     coffeeWeightOut: String,
     onCoffeeWeightOutChange: (String) -> Unit,
-    coffeeWeightOutError: String?,
     brewRatio: Double?,
     formattedBrewRatio: String?,
     isOptimalBrewRatio: Boolean,
@@ -904,10 +881,6 @@ private fun RecordShotFormContent(
     basketCoffeeInMax: Float,
     basketCoffeeOutMin: Float,
     basketCoffeeOutMax: Float,
-    notes: String,
-    onNotesChange: (String) -> Unit,
-    bringIntoViewRequester: BringIntoViewRequester,
-    coroutineScope: kotlinx.coroutines.CoroutineScope,
     isFormValid: Boolean,
     isLoading: Boolean,
     onRecordShot: () -> Unit,

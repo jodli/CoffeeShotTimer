@@ -48,7 +48,6 @@ object TasteUtils {
  */
 @Composable
 fun TastePrimaryButton(
-    taste: TastePrimary,
     emoji: String,
     label: String,
     isSelected: Boolean,
@@ -127,7 +126,6 @@ fun TastePrimaryButton(
  */
 @Composable
 fun TasteSecondaryChip(
-    taste: TasteSecondary,
     emoji: String,
     label: String,
     isSelected: Boolean,
@@ -176,7 +174,6 @@ fun TastePrimaryButtonRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TastePrimaryButton(
-            taste = TastePrimary.SOUR,
             emoji = "😖",
             label = stringResource(R.string.taste_sour),
             isSelected = selectedTaste == TastePrimary.SOUR,
@@ -193,7 +190,6 @@ fun TastePrimaryButtonRow(
         )
 
         TastePrimaryButton(
-            taste = TastePrimary.PERFECT,
             emoji = "😊",
             label = stringResource(R.string.taste_perfect),
             isSelected = selectedTaste == TastePrimary.PERFECT,
@@ -210,7 +206,6 @@ fun TastePrimaryButtonRow(
         )
 
         TastePrimaryButton(
-            taste = TastePrimary.BITTER,
             emoji = "😣",
             label = stringResource(R.string.taste_bitter),
             isSelected = selectedTaste == TastePrimary.BITTER,
@@ -242,7 +237,6 @@ fun TasteSecondaryChipRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TasteSecondaryChip(
-            taste = TasteSecondary.WEAK,
             emoji = "💧",
             label = stringResource(R.string.taste_weak),
             isSelected = selectedSecondary == TasteSecondary.WEAK,
@@ -254,7 +248,6 @@ fun TasteSecondaryChipRow(
         )
 
         TasteSecondaryChip(
-            taste = TasteSecondary.STRONG,
             emoji = "💪",
             label = stringResource(R.string.taste_strong),
             isSelected = selectedSecondary == TasteSecondary.STRONG,
