@@ -6,6 +6,14 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Added
+
+- Detekt static analysis tool for improved code quality and consistency.
+
+### Changed
+
+- [*] Removed unused code throughout the codebase to reduce app size.
+
 ## [1.5.0]
 
 ### Added
