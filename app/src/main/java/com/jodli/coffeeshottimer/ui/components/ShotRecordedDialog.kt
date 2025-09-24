@@ -98,10 +98,8 @@ fun ShotRecordedDialog(
                             if (taste == null) {
                                 selectedSecondary = null
                             }
-                            // Always recalculate grind adjustment (even when null for timing-based)
-                            if (onTasteSelected != null) {
-                                onTasteSelected(taste, selectedSecondary)
-                            }
+                            // Recalculate grind adjustment when taste selection handler is provided
+                            onTasteSelected?.invoke(taste, selectedSecondary)
                         },
                         allowDeselection = true
                     )
@@ -127,9 +125,7 @@ fun ShotRecordedDialog(
                                 onSecondarySelected = { newValue ->
                                     selectedSecondary = newValue
                                     // Update grind adjustment with new secondary taste
-                                    if (onTasteSelected != null) {
-                                        onTasteSelected(selectedPrimary, newValue)
-                                    }
+                                    onTasteSelected?.invoke(selectedPrimary, newValue)
                                 }
                             )
                         }

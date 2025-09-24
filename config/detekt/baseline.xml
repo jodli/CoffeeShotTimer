@@ -353,6 +353,7 @@
     <ID>NoWildcardImports:CalculateGrindAdjustmentUseCase.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.animation.core.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material.icons.filled.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.runtime.*</ID>
@@ -497,6 +498,7 @@
     <ID>WildcardImport:CalculateGrindAdjustmentUseCase.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
     <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.animation.core.*</ID>
     <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.foundation.layout.*</ID>
+    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
     <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.material.icons.filled.*</ID>
     <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.runtime.*</ID>

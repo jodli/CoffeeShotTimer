@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,12 +16,12 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -160,7 +159,7 @@ fun GuidedBeanCreationLandscapeLayout(
     val spacing = LocalSpacing.current
     val landscapeSpacing = spacing.landscapeSpacing()
 
-    BoxWithConstraints(
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .navigationBarsPadding()
@@ -268,7 +267,7 @@ fun BeanEducationContent(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         BeanEducationCard(
-            icon = Icons.Default.TrendingUp,
+            icon = Icons.AutoMirrored.Default.TrendingUp,
             title = stringResource(R.string.bean_education_history_title),
             description = stringResource(R.string.bean_education_history_description)
         )
@@ -397,7 +396,7 @@ fun BeanEducationContentLandscape(
             )
 
             BeanEducationCardLandscape(
-                icon = Icons.Default.TrendingUp,
+                icon = Icons.AutoMirrored.Default.TrendingUp,
                 title = stringResource(R.string.bean_education_history_title),
                 description = stringResource(R.string.bean_education_history_description)
             )

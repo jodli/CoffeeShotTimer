@@ -16,9 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TrendingDown
-import androidx.compose.material.icons.filled.TrendingFlat
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingFlat
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -182,9 +182,9 @@ private fun AdjustmentDirectionIcon(
     modifier: Modifier = Modifier
 ) {
     val (icon, tint) = when (direction) {
-        AdjustmentDirection.FINER -> Icons.Default.TrendingUp to MaterialTheme.colorScheme.primary
-        AdjustmentDirection.COARSER -> Icons.Default.TrendingDown to MaterialTheme.colorScheme.secondary
-        AdjustmentDirection.NO_CHANGE -> Icons.Default.TrendingFlat to MaterialTheme.colorScheme.tertiary
+        AdjustmentDirection.FINER -> Icons.AutoMirrored.Default.TrendingUp to MaterialTheme.colorScheme.primary
+        AdjustmentDirection.COARSER -> Icons.AutoMirrored.Default.TrendingDown to MaterialTheme.colorScheme.secondary
+        AdjustmentDirection.NO_CHANGE -> Icons.AutoMirrored.Default.TrendingFlat to MaterialTheme.colorScheme.tertiary
     }
 
     Icon(
