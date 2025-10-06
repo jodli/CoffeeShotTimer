@@ -120,49 +120,49 @@ fun Spacing.landscapeSpacing(): Dp {
     return if (isLandscape) landscapeContentSpacing else medium
 }
 
-// Light coffee theme - warm and creamy like the launcher icon
+// Light theme - warm cream with clementine orange accents
 private val LightColorScheme = lightColorScheme(
-    primary = WarmCaramel,
+    primary = ClementineOrange,
     onPrimary = Color.White,
-    primaryContainer = SoftBeige,
-    onPrimaryContainer = RichEspresso,
-    secondary = SoftTeal,
+    primaryContainer = SoftSand,
+    onPrimaryContainer = Espresso,
+    secondary = MochaBrown,
     onSecondary = Color.White,
-    secondaryContainer = LightCream,
-    onSecondaryContainer = MediumCoffee,
-    tertiary = TealAccent,
-    onTertiary = Color.White,
-    background = CreamyBeige, // Creamy beige background like icon
-    onBackground = RichEspresso, // Dark brown text
-    surface = LightCream, // Light cream cards
-    onSurface = RichEspresso, // Dark brown text on cards
-    surfaceVariant = SoftBeige, // Soft beige variants
-    onSurfaceVariant = MediumCoffee,
-    outline = MediumCoffee, // Brown outlines
-    error = ErrorRed,
+    secondaryContainer = SoftSand.copy(alpha = 0.6f),
+    onSecondaryContainer = Espresso,
+    tertiary = WarmGold,
+    onTertiary = Espresso,
+    background = WarmCream, // Warm cream background
+    onBackground = Espresso, // Deep brown text
+    surface = SoftSand, // Sandy beige cards
+    onSurface = Espresso, // Deep brown text on cards
+    surfaceVariant = SoftSand,
+    onSurfaceVariant = Cinnamon,
+    outline = Cinnamon.copy(alpha = 0.5f), // Medium brown outlines
+    error = ExtractionTooSlow,
     onError = Color.White
 )
 
-// Dark coffee theme - rich espresso tones with warm accents
+// Dark theme - warm charcoal with soft peach accents
 private val DarkColorScheme = darkColorScheme(
-    primary = LightCaramel, // Lighter caramel for visibility
-    onPrimary = DeepBrown,
-    primaryContainer = MediumCoffee,
-    onPrimaryContainer = DarkCream,
-    secondary = WarmTeal, // Warm teal accent
-    onSecondary = DeepBrown,
-    secondaryContainer = RichEspresso,
-    onSecondaryContainer = DarkCream,
-    tertiary = TealAccent,
-    onTertiary = DeepBrown,
-    background = DeepBrown, // Deep coffee brown background
-    onBackground = DarkCream, // Cream text on dark background
-    surface = RichEspresso, // Rich espresso cards
-    onSurface = DarkCream, // Cream text on dark cards
-    surfaceVariant = MediumCoffee, // Medium coffee variants
-    onSurfaceVariant = LightCaramel,
-    outline = WarmAmber, // Warm amber outlines
-    error = ErrorRed,
+    primary = SoftPeach, // Soft peach for visibility
+    onPrimary = WarmCharcoal,
+    primaryContainer = MochaShadow,
+    onPrimaryContainer = Cream,
+    secondary = WarmGold, // Warm gold accent
+    onSecondary = WarmCharcoal,
+    secondaryContainer = MochaShadow.copy(alpha = 0.8f),
+    onSecondaryContainer = Cream,
+    tertiary = WarmGold,
+    onTertiary = WarmCharcoal,
+    background = WarmCharcoal, // Warm charcoal background
+    onBackground = Cream, // Cream text on dark background
+    surface = MochaShadow, // Mocha shadow cards
+    onSurface = Cream, // Cream text on dark cards
+    surfaceVariant = MochaShadow,
+    onSurfaceVariant = LightLatte,
+    outline = LightLatte.copy(alpha = 0.5f), // Light latte outlines
+    error = ExtractionTooSlow,
     onError = Color.White
 )
 
