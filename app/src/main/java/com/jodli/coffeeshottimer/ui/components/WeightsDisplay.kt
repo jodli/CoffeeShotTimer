@@ -2,7 +2,12 @@ package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,14 +30,14 @@ import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 
 /**
  * Ultra-compact single-line weights display component.
- * 
+ *
  * Format: "18g → 36g (1:2.0)"
- * 
+ *
  * Features:
  * - Coffee In: Tap to edit (opens dialog)
  * - Coffee Out: +/- buttons for quick 1g adjustments
  * - Brew ratio: Auto-calculated and color-coded (green when 1:1.5-2.5)
- * 
+ *
  * @param coffeeIn Coffee weight in (grams)
  * @param coffeeOut Coffee weight out (grams)
  * @param onCoffeeInClick Callback when coffee in is clicked (opens dialog)
@@ -52,7 +57,7 @@ fun WeightsDisplay(
     // Calculate brew ratio
     val ratio = if (coffeeIn > 0) coffeeOut / coffeeIn else 0.0
     val isOptimalRatio = ratio in 1.5..2.5
-    
+
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant,
@@ -85,14 +90,14 @@ fun WeightsDisplay(
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
-                
+
                 // Arrow
                 Text(
                     text = "→",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 // Coffee Out
                 Text(
                     text = stringResource(R.string.format_weight_grams, coffeeOut.toInt()),
@@ -100,7 +105,7 @@ fun WeightsDisplay(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 // Ratio (calculated)
                 Text(
                     text = stringResource(R.string.format_ratio, ratio),
@@ -113,7 +118,7 @@ fun WeightsDisplay(
                     fontWeight = if (isOptimalRatio) FontWeight.Bold else FontWeight.Normal
                 )
             }
-            
+
             // Right: Quick adjust buttons for Coffee Out
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -129,7 +134,7 @@ fun WeightsDisplay(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 IconButton(
                     onClick = onCoffeeOutIncrease,
                     modifier = Modifier.size(40.dp)
@@ -149,6 +154,7 @@ fun WeightsDisplay(
 // PREVIEW COMPOSABLES
 // ============================================================================
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Weights - Optimal Ratio (1:2.0)", showBackground = true)
 @Composable
 private fun WeightsDisplayPreview_Optimal() {
@@ -166,6 +172,7 @@ private fun WeightsDisplayPreview_Optimal() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Weights - Low Ratio (1:1.2)", showBackground = true)
 @Composable
 private fun WeightsDisplayPreview_Low() {
@@ -183,6 +190,7 @@ private fun WeightsDisplayPreview_Low() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Weights - High Ratio (1:3.0)", showBackground = true)
 @Composable
 private fun WeightsDisplayPreview_High() {
@@ -200,6 +208,7 @@ private fun WeightsDisplayPreview_High() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Weights - Dark Mode", showBackground = true)
 @Composable
 private fun WeightsDisplayPreview_Dark() {

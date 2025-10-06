@@ -1,16 +1,48 @@
 package com.jodli.coffeeshottimer.ui.screens
 
 import android.view.HapticFeedbackConstants
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Engineering
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalView
@@ -22,8 +54,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
-import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
 import com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation
+import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.WeightsDisplay
@@ -33,9 +65,9 @@ import java.time.temporal.ChronoUnit
 
 /**
  * RecordShotScreen - Production Implementation
- * 
+ *
  * Intelligence-first design with massive timer and compact controls.
- * 
+ *
  * Features:
  * - Color-coded timer (gray/orange/green/red based on extraction time)
  * - Automatic timer persistence across configuration changes
@@ -43,9 +75,10 @@ import java.time.temporal.ChronoUnit
  * - Bean-specific settings and recommendations
  * - Grinder adjustment with user configuration
  * - Coffee weight validation based on basket configuration
- * 
- * TODO: Manual timer mode (future feature) - toggle button currently disabled
- * TODO: Separate landscape layout
+ *
+ * Future enhancements:
+ * - Manual timer mode (toggle button currently disabled)
+ * - Separate landscape layout
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,113 +98,42 @@ fun RecordShotScreen(
     val recordedShotData by viewModel.recordedShotData.collectAsState()
     val grindAdjustment by viewModel.grindAdjustmentRecommendation.collectAsState()
     val persistentRecommendation by viewModel.persistentRecommendation.collectAsState()
-    
+
     // Grinder configuration
     val grinderMin by viewModel.grinderScaleMin.collectAsState()
     val grinderMax by viewModel.grinderScaleMax.collectAsState()
     val grinderStep by viewModel.grinderStepSize.collectAsState()
-    
+
     // Basket configuration
     val basketCoffeeInMin by viewModel.basketCoffeeInMin.collectAsState()
     val basketCoffeeInMax by viewModel.basketCoffeeInMax.collectAsState()
     val basketCoffeeOutMin by viewModel.basketCoffeeOutMin.collectAsState()
     val basketCoffeeOutMax by viewModel.basketCoffeeOutMax.collectAsState()
-    
+
     // UI state
     var showGrinderSheet by remember { mutableStateOf(false) }
     var showCoffeeInDialog by remember { mutableStateOf(false) }
-    
-    // Haptic feedback
-    val view = LocalView.current
-    
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .padding(bottom = 80.dp) // Padding for bottom navigation bar
-        ) {
-            // Header: Bean + Grinder (70dp)
-            HeaderSection(
-                bean = selectedBean,
-                grinderSetting = grinderSetting,
-                hasPersistentRecommendation = persistentRecommendation != null,
-                onBeanClick = onNavigateToBeanManagement,
-                onGrinderClick = { showGrinderSheet = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Timer Section - Expandable with .weight(1f)
-            TimerSection(
-                isRunning = timerState.isRunning,
-                elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
-                onTimerToggle = {
-                    if (timerState.isRunning) {
-                        // Pause - medium haptic feedback
-                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                        viewModel.pauseTimer()
-                    } else {
-                        // Start - strong haptic feedback (reject for maximum intensity)
-                        view.performHapticFeedback(HapticFeedbackConstants.REJECT)
-                        viewModel.startTimer()
-                    }
-                },
-                onTimerReset = {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    viewModel.resetTimer()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f) // Takes all remaining space
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Weights Section (50dp)
-            WeightsDisplay(
-                coffeeIn = coffeeWeightIn.toDoubleOrNull() ?: 0.0,
-                coffeeOut = coffeeWeightOut.toDoubleOrNull() ?: 0.0,
-                onCoffeeInClick = { showCoffeeInDialog = true },
-                onCoffeeOutDecrease = {
-                    val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
-                    val newValue = (current - 1).coerceAtLeast(basketCoffeeOutMin.toDouble())
-                    viewModel.updateCoffeeWeightOut(newValue.toInt().toString())
-                },
-                onCoffeeOutIncrease = {
-                    val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
-                    val newValue = (current + 1).coerceAtMost(basketCoffeeOutMax.toDouble())
-                    viewModel.updateCoffeeWeightOut(newValue.toInt().toString())
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Save Shot Button (56dp)
-            SaveShotButton(
-                enabled = isFormValid,
-                onClick = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                    viewModel.recordShot()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            )
-        }
-    }
-    
+
+    RecordShotScreenContent(
+        selectedBean = selectedBean,
+        grinderSetting = grinderSetting,
+        persistentRecommendation = persistentRecommendation,
+        timerState = timerState,
+        coffeeWeightIn = coffeeWeightIn,
+        coffeeWeightOut = coffeeWeightOut,
+        basketCoffeeOutMin = basketCoffeeOutMin,
+        basketCoffeeOutMax = basketCoffeeOutMax,
+        isFormValid = isFormValid,
+        onNavigateToBeanManagement = onNavigateToBeanManagement,
+        onShowGrinderSheet = { showGrinderSheet = true },
+        onShowCoffeeInDialog = { showCoffeeInDialog = true },
+        onPauseTimer = { viewModel.pauseTimer() },
+        onStartTimer = { viewModel.startTimer() },
+        onResetTimer = { viewModel.resetTimer() },
+        onUpdateCoffeeWeightOut = { value -> viewModel.updateCoffeeWeightOut(value) },
+        onRecordShot = { viewModel.recordShot() }
+    )
+
     // Grinder adjustment bottom sheet
     if (showGrinderSheet) {
         GrinderAdjustmentBottomSheet(
@@ -192,7 +154,7 @@ fun RecordShotScreen(
             onDismiss = { showGrinderSheet = false }
         )
     }
-    
+
     // Coffee In adjustment dialog
     if (showCoffeeInDialog) {
         CoffeeInDialog(
@@ -205,14 +167,13 @@ fun RecordShotScreen(
             onDismiss = { showCoffeeInDialog = false }
         )
     }
-    
+
     // Shot recorded success dialog
     if (showShotRecordedDialog && recordedShotData != null) {
         val data = recordedShotData!!
         ShotRecordedDialog(
             brewRatio = data.brewRatio,
             extractionTime = data.extractionTime,
-            recommendations = data.recommendations,
             suggestedTaste = data.suggestedTaste,
             grindAdjustment = grindAdjustment,
             onTasteSelected = { primary, secondary ->
@@ -225,12 +186,6 @@ fun RecordShotScreen(
                     viewModel.recordTasteFeedback(data.shotId, primary, secondary)
                 }
             },
-            onGrindAdjustmentApply = {
-                viewModel.applyGrindAdjustment()
-            },
-            onGrindAdjustmentDismiss = {
-                viewModel.dismissGrindAdjustment()
-            },
             onDismiss = {
                 viewModel.hideShotRecordedDialog()
             },
@@ -238,6 +193,113 @@ fun RecordShotScreen(
                 onNavigateToShotDetails(data.shotId)
             }
         )
+    }
+}
+
+/**
+ * Main screen content for RecordShotScreen.
+ */
+@Composable
+private fun RecordShotScreenContent(
+    selectedBean: Bean?,
+    grinderSetting: String,
+    persistentRecommendation: PersistentGrindRecommendation?,
+    timerState: TimerState,
+    coffeeWeightIn: String,
+    coffeeWeightOut: String,
+    basketCoffeeOutMin: Float,
+    basketCoffeeOutMax: Float,
+    isFormValid: Boolean,
+    onNavigateToBeanManagement: () -> Unit,
+    onShowGrinderSheet: () -> Unit,
+    onShowCoffeeInDialog: () -> Unit,
+    onPauseTimer: () -> Unit,
+    onStartTimer: () -> Unit,
+    onResetTimer: () -> Unit,
+    onUpdateCoffeeWeightOut: (String) -> Unit,
+    onRecordShot: () -> Unit
+) {
+    val view = LocalView.current
+
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+                .padding(bottom = 80.dp)
+        ) {
+            HeaderSection(
+                bean = selectedBean,
+                grinderSetting = grinderSetting,
+                hasPersistentRecommendation = persistentRecommendation?.hasAdjustment() == true,
+                onBeanClick = onNavigateToBeanManagement,
+                onGrinderClick = onShowGrinderSheet,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(70.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TimerSection(
+                isRunning = timerState.isRunning,
+                elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
+                onPauseTimer = {
+                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    onPauseTimer()
+                },
+                onStartTimer = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    onStartTimer()
+                },
+                onTimerReset = {
+                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    onResetTimer()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            WeightsDisplay(
+                coffeeIn = coffeeWeightIn.toDoubleOrNull() ?: 0.0,
+                coffeeOut = coffeeWeightOut.toDoubleOrNull() ?: 0.0,
+                onCoffeeInClick = onShowCoffeeInDialog,
+                onCoffeeOutDecrease = {
+                    val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
+                    val newValue = (current - 1).coerceAtLeast(basketCoffeeOutMin.toDouble())
+                    onUpdateCoffeeWeightOut(newValue.toInt().toString())
+                },
+                onCoffeeOutIncrease = {
+                    val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
+                    val newValue = (current + 1).coerceAtMost(basketCoffeeOutMax.toDouble())
+                    onUpdateCoffeeWeightOut(newValue.toInt().toString())
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            SaveShotButton(
+                enabled = isFormValid,
+                onClick = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                    onRecordShot()
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+            )
+        }
     }
 }
 
@@ -291,9 +353,9 @@ private fun HeaderSection(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(4.dp))
-                
+
                 // Days since roast
                 if (bean != null) {
                     val daysSinceRoast = ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now()).toInt()
@@ -304,7 +366,7 @@ private fun HeaderSection(
                     )
                 }
             }
-            
+
             // Right: Grinder setting with recommendation indicator
             Box {
                 Surface(
@@ -318,26 +380,26 @@ private fun HeaderSection(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Settings,
+                            imageVector = Icons.Filled.Engineering,
                             contentDescription = stringResource(R.string.cd_adjust_grinder),
                             modifier = Modifier.size(18.dp),
                             tint = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                         Text(
-                            text = grinderSetting.ifBlank { "--" },
+                            text = grinderSetting.ifBlank { stringResource(R.string.display_grinder_setting_empty) },
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     }
                 }
-                
+
                 // Recommendation indicator badge
                 if (hasPersistentRecommendation) {
                     Badge(
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
-                        Text("!")
+                        Text(stringResource(R.string.badge_recommendation_alert))
                     }
                 }
             }
@@ -352,7 +414,8 @@ private fun HeaderSection(
 private fun TimerSection(
     isRunning: Boolean,
     elapsedTimeMs: Long,
-    onTimerToggle: () -> Unit,
+    onPauseTimer: () -> Unit,
+    onStartTimer: () -> Unit,
     onTimerReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -371,7 +434,7 @@ private fun TimerSection(
             val availableSize = minOf(maxWidth, maxHeight)
             val timerSize = (availableSize * 0.7f).coerceIn(200.dp, 400.dp)
             val fontSize = (timerSize.value * 0.22f).coerceIn(48f, 96f).sp
-            
+
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -382,14 +445,20 @@ private fun TimerSection(
                     fontSize = fontSize,
                     isRunning = isRunning,
                     elapsedTimeMs = elapsedTimeMs,
-                    onToggle = onTimerToggle,
+                    onToggle = {
+                        if (isRunning) {
+                            onPauseTimer()
+                        } else {
+                            onStartTimer()
+                        }
+                    },
                     onReset = onTimerReset
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Mode toggle button (disabled for now - future feature)
-                // TODO: Implement manual timer mode in future update
+                // Note: Manual timer mode will be implemented in a future update
                 FilledIconButton(
                     onClick = { /* Disabled */ },
                     enabled = false,
@@ -404,9 +473,9 @@ private fun TimerSection(
                         tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.38f)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 // Mode description
                 Text(
                     text = stringResource(R.string.text_auto_timer),
@@ -444,11 +513,67 @@ private fun SaveShotButton(
                 text = stringResource(R.string.button_save_shot),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (enabled) 
-                    MaterialTheme.colorScheme.onPrimary 
-                else 
+                color = if (enabled) {
+                    MaterialTheme.colorScheme.onPrimary
+                } else {
                     MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                }
             )
+        }
+    }
+}
+
+/**
+ * Recommendation card for grinder adjustment.
+ */
+@Composable
+private fun GrinderRecommendationCard(
+    recommendation: PersistentGrindRecommendation,
+    onApply: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.primaryContainer,
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = recommendation.reason,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+                Text(
+                    text = stringResource(
+                        R.string.text_suggested_grinder_setting,
+                        recommendation.suggestedGrindSetting
+                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
+
+            FilledTonalButton(
+                onClick = onApply,
+                shape = RoundedCornerShape(8.dp),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(stringResource(R.string.button_apply))
+            }
         }
     }
 }
@@ -470,7 +595,7 @@ private fun GrinderAdjustmentBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState()
     var tempSetting by remember { mutableFloatStateOf(currentSetting) }
-    
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
@@ -499,59 +624,23 @@ private fun GrinderAdjustmentBottomSheet(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
-            // Recommendation suggestion (if available)
-            if (persistentRecommendation != null) {
-                Surface(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = persistentRecommendation.reason,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                            Text(
-                                text = "Suggested: ${persistentRecommendation.suggestedGrindSetting}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
-                            )
-                        }
-                        
-                        FilledTonalButton(
-                            onClick = {
-                                onApplyRecommendation()
-                                onDismiss()
-                            },
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.filledTonalButtonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = MaterialTheme.colorScheme.onPrimary
-                            )
-                        ) {
-                            Text("Apply")
-                        }
-                    }
-                }
-                
+
+            // Recommendation suggestion (if available and has adjustment)
+            if (persistentRecommendation?.hasAdjustment() == true) {
+                GrinderRecommendationCard(
+                    recommendation = persistentRecommendation,
+                    onApply = {
+                        onApplyRecommendation()
+                        onDismiss()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            
+
             // Current value display
             Text(
                 text = String.format("%.1f", tempSetting),
@@ -560,19 +649,22 @@ private fun GrinderAdjustmentBottomSheet(
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
-            
+
             Spacer(modifier = Modifier.height(32.dp))
-            
+
             // Slider
             val steps = ((maxValue - minValue) / stepSize).toInt() - 1
             Slider(
                 value = tempSetting,
-                onValueChange = { tempSetting = it },
+                onValueChange = { newValue ->
+                    // Round to 1 decimal place to avoid floating point errors
+                    tempSetting = (newValue * 10).toInt() / 10f
+                },
                 valueRange = minValue..maxValue,
                 steps = steps.coerceAtLeast(0),
                 modifier = Modifier.fillMaxWidth()
             )
-            
+
             // Min/Max labels
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -589,9 +681,9 @@ private fun GrinderAdjustmentBottomSheet(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
-            
+
             // Apply button
             Button(
                 onClick = {
@@ -626,7 +718,7 @@ private fun CoffeeInDialog(
 ) {
     var textValue by remember { mutableStateOf(currentValue.toInt().toString()) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
-    
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
@@ -643,12 +735,12 @@ private fun CoffeeInDialog(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 OutlinedTextField(
                     value = textValue,
-                    onValueChange = { 
+                    onValueChange = {
                         textValue = it
                         // Validate input (error messages set in supporting text)
                         val value = it.toDoubleOrNull()
@@ -669,7 +761,10 @@ private fun CoffeeInDialog(
                                 when (it) {
                                     "invalid" -> stringResource(R.string.validation_invalid_number)
                                     "too_low" -> stringResource(R.string.validation_coffee_in_too_low, minValue.toInt())
-                                    "too_high" -> stringResource(R.string.validation_coffee_in_too_high, maxValue.toInt())
+                                    "too_high" -> stringResource(
+                                        R.string.validation_coffee_in_too_high,
+                                        maxValue.toInt()
+                                    )
                                     else -> it
                                 }
                             )

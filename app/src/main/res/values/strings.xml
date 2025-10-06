@@ -589,6 +589,19 @@
     <string name="recommendation_action_coarser">Try grinding coarser</string>
     <string name="recommendation_action_no_change">Keep current setting</string>
     <string name="recommendation_explanation_format">%1$s - %2$s. %3$s.</string>
+    
+    <!-- Shot Recorded Dialog - Grind Adjustment Feedback -->
+    <string name="feedback_shot_ran_fast">Shot ran fast – consider adjusting grinder setting</string>
+    <string name="feedback_shot_ran_slow">Shot ran slow – consider adjusting grinder setting</string>
+    <string name="feedback_sour_taste">Sour taste suggests under-extraction</string>
+    <string name="feedback_bitter_taste">Bitter taste suggests over-extraction</string>
+    
+    <!-- Grinder Recommendation Card -->
+    <string name="text_suggested_grinder_setting">Suggested: %1$s</string>
+    
+    <!-- Badge and Display Values -->
+    <string name="badge_recommendation_alert">!</string>
+    <string name="display_grinder_setting_empty">--</string>
 
     <!-- Equipment Setup Screen -->
     <string name="title_equipment_setup">Equipment Setup</string>

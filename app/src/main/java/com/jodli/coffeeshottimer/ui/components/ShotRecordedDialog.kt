@@ -27,13 +27,10 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 fun ShotRecordedDialog(
     brewRatio: String,
     extractionTime: String,
-    recommendations: List<ShotRecommendation> = emptyList(),
     suggestedTaste: TastePrimary? = null,
     grindAdjustment: GrindAdjustmentRecommendation? = null,
     onTasteSelected: ((TastePrimary?, TasteSecondary?) -> Unit)? = null, // Reactive UI updates
     onSubmit: ((TastePrimary?, TasteSecondary?) -> Unit)? = null, // Save to database
-    onGrindAdjustmentApply: (() -> Unit)? = null,
-    onGrindAdjustmentDismiss: (() -> Unit)? = null,
     onDismiss: () -> Unit,
     onViewDetails: (() -> Unit)? = null,
     modifier: Modifier = Modifier
@@ -132,52 +129,52 @@ fun ShotRecordedDialog(
                     }
                 }
 
-                // Grind adjustment recommendation (always show when available)
-                if (grindAdjustment != null) {
+                // Simple contextual explanation (if grind adjustment exists)
+                if (grindAdjustment != null && grindAdjustment.hasAdjustment()) {
                     HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
 
-                    GrindAdjustmentCard(
-                        recommendation = grindAdjustment,
-                        onApply = onGrindAdjustmentApply,
-                        onDismiss = onGrindAdjustmentDismiss,
-                        isCompact = true,
+                    Surface(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = MaterialTheme.shapes.medium,
                         modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                // Next steps based on this shot
-                if (recommendations.isNotEmpty()) {
-                    HorizontalDivider()
-
-                    Text(
-                        text = stringResource(R.string.text_next_steps_based_on_shot),
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    CompactRecommendationList(
-                        recommendations = recommendations,
-                        maxItems = 2,
-                        showAsNextSteps = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    if (recommendations.size > 2) {
+                    ) {
                         Text(
-                            text = stringResource(R.string.dialog_view_details_for_more_recommendations),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            textAlign = TextAlign.Center
+                            text = when {
+                                grindAdjustment.extractionTimeDeviation < -3 ->
+                                    stringResource(R.string.feedback_shot_ran_fast)
+                                grindAdjustment.extractionTimeDeviation > 3 ->
+                                    stringResource(R.string.feedback_shot_ran_slow)
+                                grindAdjustment.tasteIssue == TastePrimary.SOUR ->
+                                    stringResource(R.string.feedback_sour_taste)
+                                grindAdjustment.tasteIssue == TastePrimary.BITTER ->
+                                    stringResource(R.string.feedback_bitter_taste)
+                                else -> "" // Don't show for perfect shots
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(spacing.medium)
                         )
                     }
                 }
             }
         },
         confirmButton = {
+            CoffeePrimaryButton(
+                text = stringResource(R.string.text_dialog_ok), // "Done"
+                onClick = {
+                    // Save taste feedback to database
+                    if (onSubmit != null) {
+                        onSubmit(selectedPrimary, selectedSecondary)
+                    }
+                    onDismiss()
+                },
+                modifier = Modifier.widthIn(min = 120.dp)
+            )
+        },
+        dismissButton = {
             if (onViewDetails != null) {
-                CoffeePrimaryButton(
-                    text = stringResource(R.string.button_view_details),
+                TextButton(
                     onClick = {
                         // Save taste feedback to database before navigating
                         if (onSubmit != null) {
@@ -185,30 +182,10 @@ fun ShotRecordedDialog(
                         }
                         onViewDetails()
                         onDismiss()
-                    },
-                    modifier = Modifier.widthIn(min = 120.dp)
-                )
-            }
-        },
-        dismissButton = {
-            if (onViewDetails != null) {
-                CoffeeSecondaryButton(
-                    text = if (selectedPrimary != null) {
-                        // When taste is selected: "Save" (save and close)
-                        stringResource(R.string.button_save)
-                    } else {
-                        // When no taste selected: "Skip" (close without saving)
-                        stringResource(R.string.button_skip_taste)
-                    },
-                    onClick = {
-                        // Save taste feedback to database
-                        if (onSubmit != null) {
-                            onSubmit(selectedPrimary, selectedSecondary)
-                        }
-                        onDismiss()
-                    },
-                    modifier = Modifier.widthIn(min = 120.dp)
-                )
+                    }
+                ) {
+                    Text(stringResource(R.string.button_view_details))
+                }
             }
         }
     )
