@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
+import com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation
 import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.WeightsDisplay
@@ -62,6 +64,7 @@ fun RecordShotScreen(
     val showShotRecordedDialog by viewModel.showShotRecordedDialog.collectAsState()
     val recordedShotData by viewModel.recordedShotData.collectAsState()
     val grindAdjustment by viewModel.grindAdjustmentRecommendation.collectAsState()
+    val persistentRecommendation by viewModel.persistentRecommendation.collectAsState()
     
     // Grinder configuration
     val grinderMin by viewModel.grinderScaleMin.collectAsState()
@@ -97,6 +100,7 @@ fun RecordShotScreen(
             HeaderSection(
                 bean = selectedBean,
                 grinderSetting = grinderSetting,
+                hasPersistentRecommendation = persistentRecommendation != null,
                 onBeanClick = onNavigateToBeanManagement,
                 onGrinderClick = { showGrinderSheet = true },
                 modifier = Modifier
@@ -111,17 +115,13 @@ fun RecordShotScreen(
                 isRunning = timerState.isRunning,
                 elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
                 onTimerToggle = {
-                    // Haptic feedback on timer toggle
-                    view.performHapticFeedback(
-                        if (timerState.isRunning) 
-                            HapticFeedbackConstants.CLOCK_TICK 
-                        else 
-                            HapticFeedbackConstants.CONTEXT_CLICK
-                    )
-                    
                     if (timerState.isRunning) {
+                        // Pause - medium haptic feedback
+                        view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
                         viewModel.pauseTimer()
                     } else {
+                        // Start - strong haptic feedback (reject for maximum intensity)
+                        view.performHapticFeedback(HapticFeedbackConstants.REJECT)
                         viewModel.startTimer()
                     }
                 },
@@ -179,8 +179,15 @@ fun RecordShotScreen(
             minValue = grinderMin,
             maxValue = grinderMax,
             stepSize = grinderStep,
+            persistentRecommendation = persistentRecommendation,
             onSettingChange = { newValue ->
                 viewModel.updateGrinderSetting(newValue.toString())
+            },
+            onApplyRecommendation = {
+                persistentRecommendation?.let {
+                    viewModel.updateGrinderSetting(it.suggestedGrindSetting)
+                    viewModel.dismissPersistentRecommendation()
+                }
             },
             onDismiss = { showGrinderSheet = false }
         )
@@ -241,6 +248,7 @@ fun RecordShotScreen(
 private fun HeaderSection(
     bean: Bean?,
     grinderSetting: String,
+    hasPersistentRecommendation: Boolean,
     onBeanClick: () -> Unit,
     onGrinderClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -297,30 +305,40 @@ private fun HeaderSection(
                 }
             }
             
-            // Right: Grinder setting
-						// TODO: we need a way to display grind suggestions from a previous shot.
-            Surface(
-                color = MaterialTheme.colorScheme.secondaryContainer,
-                shape = RoundedCornerShape(8.dp),
-                onClick = onGrinderClick
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            // Right: Grinder setting with recommendation indicator
+            Box {
+                Surface(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(8.dp),
+                    onClick = onGrinderClick
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Settings,
-                        contentDescription = stringResource(R.string.cd_adjust_grinder),
-                        modifier = Modifier.size(18.dp),
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                    Text(
-                        text = grinderSetting.ifBlank { "--" },
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = stringResource(R.string.cd_adjust_grinder),
+                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Text(
+                            text = grinderSetting.ifBlank { "--" },
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
+                
+                // Recommendation indicator badge
+                if (hasPersistentRecommendation) {
+                    Badge(
+                        modifier = Modifier.align(Alignment.TopEnd)
+                    ) {
+                        Text("!")
+                    }
                 }
             }
         }
@@ -445,13 +463,14 @@ private fun GrinderAdjustmentBottomSheet(
     minValue: Float,
     maxValue: Float,
     stepSize: Float,
+    persistentRecommendation: PersistentGrindRecommendation?,
     onSettingChange: (Float) -> Unit,
+    onApplyRecommendation: () -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     var tempSetting by remember { mutableFloatStateOf(currentSetting) }
     
-		// TODO: We can also add the grind suggestion here as a quick picker. But we have to make the grind setting point out that there is something to apply here.
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState
@@ -481,7 +500,57 @@ private fun GrinderAdjustmentBottomSheet(
                 }
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Recommendation suggestion (if available)
+            if (persistentRecommendation != null) {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Text(
+                                text = persistentRecommendation.reason,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                            Text(
+                                text = "Suggested: ${persistentRecommendation.suggestedGrindSetting}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                        
+                        FilledTonalButton(
+                            onClick = {
+                                onApplyRecommendation()
+                                onDismiss()
+                            },
+                            shape = RoundedCornerShape(8.dp),
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            Text("Apply")
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             
             // Current value display
             Text(

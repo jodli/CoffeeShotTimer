@@ -110,18 +110,30 @@ The UI changes based on what the user is doing:
 
 ### Color & Meaning
 
-**Primary palette (coffee-inspired):**
+**Primary palette (warm redesign 2024):**
 
-- **Caramel brown:** Primary actions, branding
-- **Soft teal:** Secondary actions, accents
-- **Cream:** Backgrounds, surfaces
-- **Warm red:** Errors, destructive actions
+**Light mode:**
+- **Clementine Orange (#FF8C42):** Primary actions, branding, accents
+- **Mocha Brown (#8B6F5C):** Secondary actions, supporting elements
+- **Warm Cream (#FFF8F0):** Primary background, spacious feel
+- **Soft Sand (#F5EDE4):** Card backgrounds, surfaces
+- **Espresso (#2C2418):** Primary text, high contrast
+- **Cinnamon (#6B5446):** Secondary text, subdued information
 
-**Semantic colors (extraction feedback):**
+**Dark mode:**
+- **Soft Peach (#FFB380):** Primary actions, visibility on dark
+- **Warm Gold (#D4A574):** Secondary actions, accents
+- **Warm Charcoal (#2A2520):** Primary background, warm darkness
+- **Mocha Shadow (#3A322C):** Card backgrounds, surfaces
+- **Cream (#F5EDE4):** Primary text, readable contrast
+- **Light Latte (#C8B8A8):** Secondary text, subdued information
 
-- **Green (20-30s):** Optimal extraction time
-- **Yellow (<20s):** Too fast, likely sour
-- **Red (>30s):** Too slow, likely bitter
+**Semantic colors (extraction feedback - both modes):**
+
+- **Gray (#9E9E9E) (0s):** Idle state, ready to start
+- **Orange (#FF9800) (<20s):** Too fast extraction, likely under-extracted/sour
+- **Green (#4CAF50) (20-30s):** Optimal extraction time range
+- **Red (#FF5722) (>30s):** Too slow extraction, likely over-extracted/bitter
 
 **Freshness indicators (bean age):**
 
@@ -192,13 +204,36 @@ The UI changes based on what the user is doing:
 - Integrated error text
 - Small spacing between field and error
 
-**Timer (custom):**
+**Timer (`AutomaticTimerCircle`):**
 
-- Circular progress indicator
-- Large time display (48sp)
-- Color-coded by extraction quality
-- Full circle is tappable
-- Haptic feedback on state change
+- Circular progress indicator with gradient sweep
+- Large time display (dynamically sized, 48-96sp based on available space)
+- Color-coded by extraction quality:
+  - Gray: Idle (0s)
+  - Orange: Too fast (<20s)
+  - Green: Optimal (20-30s)
+  - Red: Too slow (>30s)
+- Full circle is tappable to start/pause
+- Reset button appears when paused with elapsed time
+- Haptic feedback on state change (different for start/pause)
+- Size calculated with BoxWithConstraints (70% of available space, 200-400dp range)
+- Progress arc animates smoothly with 60-second wrapping visualization
+
+**Weights (`WeightsDisplay`):**
+
+- Ultra-compact single-line format: "18g → 36g (1:2.0)"
+- Coffee In value: Tappable to open edit dialog
+  - Dialog validates against basket configuration (5-25g typical)
+  - Number input with error feedback
+- Coffee Out value: Displayed with +/- adjustment buttons
+  - Increments of 1g per button press
+  - Range constrained by basket configuration (20-50g typical)
+  - Buttons always visible for quick adjustments
+- Brew ratio: Auto-calculated and displayed inline
+  - Color-coded: Green when in optimal range (1:1.5-2.5)
+  - Format: "(1:X.X)" with one decimal place
+- Height: Fixed 50dp
+- Full-width with 16dp horizontal padding
 
 **Bottom sheets:**
 
@@ -213,31 +248,42 @@ The UI changes based on what the user is doing:
 
 ### Recording Screen (Intelligence-First)
 
-**Structure (496dp total):**
+**Structure (flexible with weight-based layout):**
 
 ```
-Header (70dp)
-  ├─ Bean selector dropdown
-  ├─ Days since roast
-  └─ Current grinder setting (tap to adjust)
+Header (70dp fixed)
+  ├─ Bean selector dropdown with coffee emoji
+  ├─ Days since roast (dynamic, color-coded)
+  └─ Current grinder setting badge (tap to adjust via bottom sheet)
 
-Timer (320dp)
-  └─ Massive circular display with time
+Timer (.weight(1f) - expandable)
+  ├─ AutomaticTimerCircle (dynamically sized, 70% of available space)
+  ├─ Color-coded border (gray/orange/green/red)
+  ├─ Circular progress arc with gradient animation
+  ├─ Mode toggle button (disabled - placeholder for manual mode)
+  └─ "Auto timer" label
 
-Weights (50dp)
-  ├─ Coffee in → Coffee out (ratio)
-  └─ [-] [+] buttons for quick adjustment
+Weights (50dp fixed)
+  ├─ Ultra-compact single line: "18g → 36g (1:2.0)"
+  ├─ Tap coffee in to edit (dialog with basket range validation)
+  ├─ [-] [+] buttons for coffee out (1g increments)
+  └─ Ratio color-coded (green when 1:1.5-2.5)
 
-Action (56dp)
-  └─ Full-width "Save Shot" button
+Action (56dp fixed)
+  └─ Full-width "Save Shot" button (enabled when form valid)
+
+Bottom padding (80dp for navigation bar)
 ```
 
 **Key principles:**
 
-- No scrolling
-- Timer visible 100% of time
-- Settings displayed, not demanding attention
-- One clear primary action
+- No scrolling required - layout fits on screen
+- Timer fills available space dynamically with `.weight(1f)`
+- Timer visible 100% of time at maximum possible size
+- Settings displayed compactly, not demanding attention
+- One clear primary action (Save Shot)
+- Manual mode toggle present but disabled (future feature)
+- Haptic feedback on all timer interactions
 
 ### Feedback & Suggestion Flow
 

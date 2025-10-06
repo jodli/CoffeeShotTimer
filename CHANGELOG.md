@@ -12,7 +12,12 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Changed
 
-- [*] Removed unused code throughout the codebase to reduce app size.
+- [*] Redesigned RecordShotScreen with intelligence-first layout focusing on the timer.
+- [*] Implemented new warm color palette for light and dark modes (clementine orange, warm cream, mocha brown).
+- Compact single-line weights display ("18g → 36g (1:2.0)") with quick +/- adjustments.
+- RecordShotScreen layout optimized for no scrolling with flexible timer size.
+- Manual timer mode toggle disabled (placeholder for future feature).
+- Removed unused code throughout the codebase to reduce app size.
 
 ## [1.5.0]
 
