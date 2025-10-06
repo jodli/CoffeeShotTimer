@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.screens
 
+import android.content.res.Configuration
 import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -46,6 +48,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -76,10 +79,8 @@ import java.time.temporal.ChronoUnit
  * - Bean-specific settings and recommendations
  * - Grinder adjustment with user configuration
  * - Coffee weight validation based on basket configuration
- *
- * Future enhancements:
- * - Manual timer mode (toggle button currently disabled)
- * - Separate landscape layout
+ * - Haptic feedback for timer controls
+ * - Landscape orientation support with optimized layout
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -199,6 +200,7 @@ fun RecordShotScreen(
 
 /**
  * Main screen content for RecordShotScreen.
+ * Adapts layout based on orientation (portrait/landscape).
  */
 @Composable
 private fun RecordShotScreenContent(
@@ -221,7 +223,78 @@ private fun RecordShotScreenContent(
     onRecordShot: () -> Unit
 ) {
     val view = LocalView.current
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
+    if (isLandscape) {
+        RecordShotScreenLandscape(
+            selectedBean = selectedBean,
+            grinderSetting = grinderSetting,
+            persistentRecommendation = persistentRecommendation,
+            timerState = timerState,
+            coffeeWeightIn = coffeeWeightIn,
+            coffeeWeightOut = coffeeWeightOut,
+            basketCoffeeOutMin = basketCoffeeOutMin,
+            basketCoffeeOutMax = basketCoffeeOutMax,
+            isFormValid = isFormValid,
+            onNavigateToBeanManagement = onNavigateToBeanManagement,
+            onShowGrinderSheet = onShowGrinderSheet,
+            onShowCoffeeInDialog = onShowCoffeeInDialog,
+            onPauseTimer = onPauseTimer,
+            onStartTimer = onStartTimer,
+            onResetTimer = onResetTimer,
+            onUpdateCoffeeWeightOut = onUpdateCoffeeWeightOut,
+            onRecordShot = onRecordShot,
+            view = view
+        )
+    } else {
+        RecordShotScreenPortrait(
+            selectedBean = selectedBean,
+            grinderSetting = grinderSetting,
+            persistentRecommendation = persistentRecommendation,
+            timerState = timerState,
+            coffeeWeightIn = coffeeWeightIn,
+            coffeeWeightOut = coffeeWeightOut,
+            basketCoffeeOutMin = basketCoffeeOutMin,
+            basketCoffeeOutMax = basketCoffeeOutMax,
+            isFormValid = isFormValid,
+            onNavigateToBeanManagement = onNavigateToBeanManagement,
+            onShowGrinderSheet = onShowGrinderSheet,
+            onShowCoffeeInDialog = onShowCoffeeInDialog,
+            onPauseTimer = onPauseTimer,
+            onStartTimer = onStartTimer,
+            onResetTimer = onResetTimer,
+            onUpdateCoffeeWeightOut = onUpdateCoffeeWeightOut,
+            onRecordShot = onRecordShot,
+            view = view
+        )
+    }
+}
+
+/**
+ * Portrait layout for RecordShotScreen.
+ */
+@Composable
+private fun RecordShotScreenPortrait(
+    selectedBean: Bean?,
+    grinderSetting: String,
+    persistentRecommendation: PersistentGrindRecommendation?,
+    timerState: TimerState,
+    coffeeWeightIn: String,
+    coffeeWeightOut: String,
+    basketCoffeeOutMin: Float,
+    basketCoffeeOutMax: Float,
+    isFormValid: Boolean,
+    onNavigateToBeanManagement: () -> Unit,
+    onShowGrinderSheet: () -> Unit,
+    onShowCoffeeInDialog: () -> Unit,
+    onPauseTimer: () -> Unit,
+    onStartTimer: () -> Unit,
+    onResetTimer: () -> Unit,
+    onUpdateCoffeeWeightOut: (String) -> Unit,
+    onRecordShot: () -> Unit,
+    view: android.view.View
+) {
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -306,7 +379,10 @@ private fun RecordShotScreenContent(
 
 /**
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 3ac2b45 (feat: add landscape mode to new shot screen)
  * Landscape layout for RecordShotScreen.
  * Horizontal layout with timer on the left and controls on the right.
  */
@@ -441,7 +517,10 @@ private fun RecordShotScreenLandscape(
 }
 
 /**
+<<<<<<< HEAD
 >>>>>>> c03d903 (fixup! chore: fix detekt issues)
+=======
+>>>>>>> 3ac2b45 (feat: add landscape mode to new shot screen)
  * Header section with bean selector and grinder setting.
  */
 @Composable
@@ -546,7 +625,7 @@ private fun HeaderSection(
 }
 
 /**
- * Timer section with automatic timer and disabled manual mode toggle.
+ * Timer section with automatic timer.
  */
 @Composable
 private fun TimerSection(
@@ -573,55 +652,21 @@ private fun TimerSection(
             val timerSize = (availableSize * 0.7f).coerceIn(200.dp, 400.dp)
             val fontSize = (timerSize.value * 0.22f).coerceIn(48f, 96f).sp
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // Automatic timer circle
-                AutomaticTimerCircle(
-                    size = timerSize,
-                    fontSize = fontSize,
-                    isRunning = isRunning,
-                    elapsedTimeMs = elapsedTimeMs,
-                    onToggle = {
-                        if (isRunning) {
-                            onPauseTimer()
-                        } else {
-                            onStartTimer()
-                        }
-                    },
-                    onReset = onTimerReset
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Mode toggle button (disabled for now - future feature)
-                // Note: Manual timer mode will be implemented in a future update
-                FilledIconButton(
-                    onClick = { /* Disabled */ },
-                    enabled = false,
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.38f)
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = stringResource(R.string.cd_mode_toggle_disabled),
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.38f)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                // Mode description
-                Text(
-                    text = stringResource(R.string.text_auto_timer),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            // Automatic timer circle
+            AutomaticTimerCircle(
+                size = timerSize,
+                fontSize = fontSize,
+                isRunning = isRunning,
+                elapsedTimeMs = elapsedTimeMs,
+                onToggle = {
+                    if (isRunning) {
+                        onPauseTimer()
+                    } else {
+                        onStartTimer()
+                    }
+                },
+                onReset = onTimerReset
+            )
         }
     }
 }
