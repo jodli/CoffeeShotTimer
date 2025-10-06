@@ -29,10 +29,9 @@
     <ID>LongMethod:DebugDialog.kt$@Composable fun DebugDialog( isVisible: Boolean, onDismiss: () -&gt; Unit, onFillDatabase: () -&gt; Unit, onClearDatabase: () -&gt; Unit, onResetToNewUser: () -&gt; Unit, onResetToExistingUserNoBeans: () -&gt; Unit, onForceEquipmentSetup: () -&gt; Unit, isLoading: Boolean, operationResult: String?, showConfirmation: Boolean, onShowConfirmation: () -&gt; Unit, onHideConfirmation: () -&gt; Unit )</ID>
     <ID>LongMethod:GrindAdjustmentCard.kt$@Composable fun GrindAdjustmentCard( recommendation: GrindAdjustmentRecommendation, onApply: (() -&gt; Unit)? = null, onDismiss: (() -&gt; Unit)? = null, modifier: Modifier = Modifier, isCompact: Boolean = false )</ID>
     <ID>LongMethod:MoreScreen.kt$@Composable private fun MoreScreenContent( onNavigateToGrinderSettings: () -&gt; Unit, onNavigateToBasketSettings: () -&gt; Unit, onNavigateToAbout: () -&gt; Unit, spacing: com.jodli.coffeeshottimer.ui.theme.Spacing, context: android.content.Context )</ID>
-    <ID>LongMethod:RecordShotScreen.kt$@OptIn(ExperimentalFoundationApi::class) @Composable fun RecordShotScreen( onNavigateToBeanManagement: () -&gt; Unit = {}, onNavigateToShotDetails: (String) -&gt; Unit = {}, viewModel: ShotRecordingViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:ShotDetailsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ShotDetailsScreen( shotId: String, onNavigateBack: () -&gt; Unit = {}, onNavigateToShot: (String) -&gt; Unit = {}, viewModel: ShotDetailsViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:ShotHistoryFilterDialog.kt$@Composable fun ShotHistoryFilterDialog( currentFilter: ShotHistoryFilter, availableBeans: List&lt;Bean&gt;, onApplyFilter: (ShotHistoryFilter) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
-    <ID>LongMethod:ShotRecordedDialog.kt$@Composable fun ShotRecordedDialog( brewRatio: String, extractionTime: String, recommendations: List&lt;ShotRecommendation&gt; = emptyList(), suggestedTaste: TastePrimary? = null, grindAdjustment: GrindAdjustmentRecommendation? = null, onTasteSelected: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Reactive UI updates onSubmit: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Save to database onGrindAdjustmentApply: (() -&gt; Unit)? = null, onGrindAdjustmentDismiss: (() -&gt; Unit)? = null, onDismiss: () -&gt; Unit, onViewDetails: (() -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:ShotRecordedDialog.kt$@Composable fun ShotRecordedDialog( brewRatio: String, extractionTime: String, suggestedTaste: TastePrimary? = null, grindAdjustment: GrindAdjustmentRecommendation? = null, onTasteSelected: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Reactive UI updates onSubmit: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Save to database onDismiss: () -&gt; Unit, onViewDetails: (() -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
     <ID>LongMethod:WeightSliderComponents.kt$@Composable fun GrinderSettingSlider( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, errorMessage: String? = null, enabled: Boolean = true, suggestedSetting: String? = null, previousSuccessfulSettings: List&lt;String&gt; = emptyList(), minSetting: Float, maxSetting: Float, stepSize: Float = 0.5f )</ID>
     <ID>LongParameterList:AddEditBeanViewModel.kt$AddEditBeanViewModel$( private val addBeanUseCase: AddBeanUseCase, private val updateBeanUseCase: UpdateBeanUseCase, private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase, private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase, private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase, private val photoCaptureManager: PhotoCaptureManager, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val domainErrorTranslator: DomainErrorTranslator )</ID>
@@ -63,20 +62,23 @@
     <ID>MagicNumber:CoffeeShotTimerApplication.kt$CoffeeShotTimerApplication$0.25</ID>
     <ID>MagicNumber:CoffeeShotTimerApplication.kt$CoffeeShotTimerApplication$1024</ID>
     <ID>MagicNumber:CoffeeShotTimerApplication.kt$CoffeeShotTimerApplication$50</ID>
-    <ID>MagicNumber:Color.kt$0xFF1A0F08</ID>
-    <ID>MagicNumber:Color.kt$0xFF2D1B0F</ID>
-    <ID>MagicNumber:Color.kt$0xFF5D3A1A</ID>
-    <ID>MagicNumber:Color.kt$0xFF6B9B99</ID>
-    <ID>MagicNumber:Color.kt$0xFF7BA5A3</ID>
-    <ID>MagicNumber:Color.kt$0xFF9BC5C3</ID>
-    <ID>MagicNumber:Color.kt$0xFFB8763D</ID>
-    <ID>MagicNumber:Color.kt$0xFFD32F2F</ID>
-    <ID>MagicNumber:Color.kt$0xFFD4935A</ID>
-    <ID>MagicNumber:Color.kt$0xFFD4C4B0</ID>
-    <ID>MagicNumber:Color.kt$0xFFE6B577</ID>
-    <ID>MagicNumber:Color.kt$0xFFE8DDD0</ID>
-    <ID>MagicNumber:Color.kt$0xFFF2E6D3</ID>
-    <ID>MagicNumber:Color.kt$0xFFFAF5F0</ID>
+    <ID>MagicNumber:Color.kt$0xFF2A2520</ID>
+    <ID>MagicNumber:Color.kt$0xFF2C2418</ID>
+    <ID>MagicNumber:Color.kt$0xFF3A322C</ID>
+    <ID>MagicNumber:Color.kt$0xFF4CAF50</ID>
+    <ID>MagicNumber:Color.kt$0xFF6B5446</ID>
+    <ID>MagicNumber:Color.kt$0xFF8B6F5C</ID>
+    <ID>MagicNumber:Color.kt$0xFF9E9E9E</ID>
+    <ID>MagicNumber:Color.kt$0xFFC8B8A8</ID>
+    <ID>MagicNumber:Color.kt$0xFFD4A574</ID>
+    <ID>MagicNumber:Color.kt$0xFFF5EDE4</ID>
+    <ID>MagicNumber:Color.kt$0xFFFF5722</ID>
+    <ID>MagicNumber:Color.kt$0xFFFF8C42</ID>
+    <ID>MagicNumber:Color.kt$0xFFFF9800</ID>
+    <ID>MagicNumber:Color.kt$0xFFFFA055</ID>
+    <ID>MagicNumber:Color.kt$0xFFFFA726</ID>
+    <ID>MagicNumber:Color.kt$0xFFFFB380</ID>
+    <ID>MagicNumber:Color.kt$0xFFFFF8F0</ID>
     <ID>MagicNumber:DatabasePopulator.kt$DatabasePopulator$0.7f</ID>
     <ID>MagicNumber:DatabasePopulator.kt$DatabasePopulator$10</ID>
     <ID>MagicNumber:DatabasePopulator.kt$DatabasePopulator$12</ID>
@@ -189,9 +191,10 @@
     <ID>MagicNumber:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$180f</ID>
     <ID>MagicNumber:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$270f</ID>
     <ID>MagicNumber:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$90f</ID>
-    <ID>MagicNumber:RecordShotScreen.kt$1.5</ID>
-    <ID>MagicNumber:RecordShotScreen.kt$1000</ID>
-    <ID>MagicNumber:RecordShotScreen.kt$3.0</ID>
+    <ID>MagicNumber:RecordShotScreen.kt$0.22f</ID>
+    <ID>MagicNumber:RecordShotScreen.kt$0.7f</ID>
+    <ID>MagicNumber:RecordShotScreen.kt$48f</ID>
+    <ID>MagicNumber:RecordShotScreen.kt$96f</ID>
     <ID>MagicNumber:RecordShotUseCase.kt$RecordShotUseCase$1.5</ID>
     <ID>MagicNumber:RecordShotUseCase.kt$RecordShotUseCase$100</ID>
     <ID>MagicNumber:RecordShotUseCase.kt$RecordShotUseCase$1000</ID>
@@ -256,6 +259,12 @@
     <ID>MagicNumber:ShotRecordingViewModel.kt$ShotRecordingViewModel$60</ID>
     <ID>MagicNumber:TasteUtils.kt$TasteUtils$25</ID>
     <ID>MagicNumber:TasteUtils.kt$TasteUtils$30</ID>
+    <ID>MagicNumber:TimerCircle.kt$0.5f</ID>
+    <ID>MagicNumber:TimerCircle.kt$1000f</ID>
+    <ID>MagicNumber:TimerCircle.kt$24f</ID>
+    <ID>MagicNumber:TimerCircle.kt$360f</ID>
+    <ID>MagicNumber:TimerCircle.kt$60</ID>
+    <ID>MagicNumber:TimerCircle.kt$60f</ID>
     <ID>MagicNumber:TimerComponents.kt$0.98f</ID>
     <ID>MagicNumber:TimerComponents.kt$0xFF4CAF50</ID>
     <ID>MagicNumber:TimerComponents.kt$0xFFF44336</ID>
@@ -285,6 +294,8 @@
     <ID>MagicNumber:WeightSliderComponents.kt$0.5f</ID>
     <ID>MagicNumber:WeightSliderComponents.kt$10f</ID>
     <ID>MagicNumber:WeightSliderComponents.kt$3</ID>
+    <ID>MagicNumber:WeightsDisplay.kt$1.5</ID>
+    <ID>MagicNumber:WeightsDisplay.kt$2.5</ID>
     <ID>MatchingDeclarationName:ValidationComponents.kt$ValidationUtils</ID>
     <ID>MaximumLineLength:AddEditBeanViewModel.kt$AddEditBeanViewModel$ </ID>
     <ID>MaximumLineLength:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$ </ID>

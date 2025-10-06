@@ -1,7 +1,13 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -11,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
@@ -25,17 +30,23 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.R
-import com.jodli.coffeeshottimer.ui.theme.*
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils.Companion.OPTIMAL_EXTRACTION_TIME_MAX
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils.Companion.OPTIMAL_EXTRACTION_TIME_MIN
+import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
+import com.jodli.coffeeshottimer.ui.theme.ExtractionIdle
+import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
+import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
+import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
 
 /**
  * Automatic timer circle with color-coded extraction feedback.
- * 
+ *
  * Color coding based on extraction time:
  * - Gray (idle): 0 seconds - ready to start
- * - Orange (too fast): < 20 seconds - under-extracted
- * - Green (optimal): 20-30 seconds - perfect extraction
+ * - Orange (too fast): < 25 seconds - under-extracted
+ * - Green (optimal): 25-30 seconds - perfect extraction
  * - Red (too slow): > 30 seconds - over-extracted
- * 
+ *
  * @param size Size of the timer circle
  * @param fontSize Font size for the time display
  * @param isRunning Whether the timer is currently running
@@ -55,10 +66,10 @@ fun AutomaticTimerCircle(
     modifier: Modifier = Modifier
 ) {
     val elapsedSeconds = (elapsedTimeMs / 1000f)
-    
+
     // Color-coded based on extraction time
     val borderColor = getExtractionColor(elapsedSeconds)
-    
+
     Box(
         modifier = modifier.size(size),
         contentAlignment = Alignment.Center
@@ -66,7 +77,7 @@ fun AutomaticTimerCircle(
         Surface(
             modifier = Modifier
                 .size(size)
-                .pointerInput(Unit) {
+                .pointerInput(isRunning, onToggle) {
                     detectTapGestures(
                         onTap = { onToggle() }
                     )
@@ -81,18 +92,18 @@ fun AutomaticTimerCircle(
                     .drawBehind {
                         val strokeWidth = 24f
                         val radius = size.toPx() / 2f
-                        
+
                         // Draw background circle
                         drawCircle(
                             color = borderColor.copy(alpha = 0.2f),
                             radius = radius - strokeWidth / 2,
                             style = Stroke(width = strokeWidth)
                         )
-                        
+
                         // Draw progress arc if running or has time
                         if (elapsedTimeMs > 0) {
                             val sweepAngle = ((elapsedSeconds % 60) / 60f) * 360f
-                            
+
                             drawArc(
                                 brush = Brush.sweepGradient(
                                     0f to borderColor.copy(alpha = 0.7f),
@@ -119,7 +130,7 @@ fun AutomaticTimerCircle(
                         fontWeight = FontWeight.Bold,
                         color = if (elapsedTimeMs > 0) borderColor else MaterialTheme.colorScheme.onSurface
                     )
-                    
+
                     // Reset button (only show when paused and has time)
                     if (!isRunning && elapsedTimeMs > 0) {
                         Spacer(modifier = Modifier.height(8.dp))
@@ -139,19 +150,19 @@ fun AutomaticTimerCircle(
 
 /**
  * Get the color for the timer based on extraction time.
- * 
+ *
  * Color logic:
  * - 0 seconds: Gray (idle)
- * - < 20 seconds: Orange (too fast)
- * - 20-30 seconds: Green (optimal)
+ * - < 25 seconds: Orange (too fast)
+ * - 25-30 seconds: Green (optimal)
  * - > 30 seconds: Red (too slow)
  */
 @Composable
 private fun getExtractionColor(elapsedSeconds: Float): Color {
     return when {
         elapsedSeconds == 0f -> ExtractionIdle // Gray - idle
-        elapsedSeconds < 20f -> ExtractionTooFast // Orange - too fast
-        elapsedSeconds <= 30f -> ExtractionOptimal // Green - optimal
+        elapsedSeconds < OPTIMAL_EXTRACTION_TIME_MIN -> ExtractionTooFast // Orange - too fast
+        elapsedSeconds <= OPTIMAL_EXTRACTION_TIME_MAX -> ExtractionOptimal // Green - optimal
         else -> ExtractionTooSlow // Red - too slow
     }
 }
@@ -160,6 +171,7 @@ private fun getExtractionColor(elapsedSeconds: Float): Color {
 // PREVIEW COMPOSABLES
 // ============================================================================
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Timer - Idle (0s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_Idle() {
@@ -175,6 +187,7 @@ private fun AutomaticTimerCirclePreview_Idle() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Timer - Too Fast (15s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_TooFast() {
@@ -190,6 +203,7 @@ private fun AutomaticTimerCirclePreview_TooFast() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Timer - Optimal (25s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_Optimal() {
@@ -205,6 +219,7 @@ private fun AutomaticTimerCirclePreview_Optimal() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Timer - Too Slow (35s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_TooSlow() {
@@ -220,6 +235,7 @@ private fun AutomaticTimerCirclePreview_TooSlow() {
     }
 }
 
+@Suppress("UnusedPrivateMember")
 @Preview(name = "Timer - Dark Mode", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_Dark() {

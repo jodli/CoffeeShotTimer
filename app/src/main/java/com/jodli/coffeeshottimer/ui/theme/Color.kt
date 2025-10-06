@@ -31,4 +31,3 @@ val ExtractionOptimal = Color(0xFF4CAF50) // Green - optimal extraction (20-30s)
 val ExtractionTooFast = Color(0xFFFF9800) // Orange - too fast (<20s)
 val ExtractionTooSlow = Color(0xFFFF5722) // Red - too slow (>30s)
 val ExtractionIdle = Color(0xFF9E9E9E) // Gray - idle state (0s)
-

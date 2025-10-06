@@ -758,4 +758,17 @@
     <string name="validation_coffee_in_too_low">Kaffeemenge muss mindestens %1$dg betragen</string>
     <string name="validation_coffee_in_too_high">Kaffeemenge kann nicht mehr als %1$dg betragen</string>
 
+    <!-- Shot Recorded Dialog - Grind Adjustment Feedback -->
+    <string name="feedback_shot_ran_fast">Shot lief zu schnell – Mahlgrad anpassen</string>
+    <string name="feedback_shot_ran_slow">Shot lief zu langsam – Mahlgrad anpassen</string>
+    <string name="feedback_sour_taste">Saurer Geschmack deutet auf Unterextraktion hin</string>
+    <string name="feedback_bitter_taste">Bitterer Geschmack deutet auf Überextraktion hin</string>
+    
+    <!-- Grinder Recommendation Card -->
+    <string name="text_suggested_grinder_setting">Vorschlag: %1$s</string>
+    
+    <!-- Badge and Display Values -->
+    <string name="badge_recommendation_alert">!</string>
+    <string name="display_grinder_setting_empty">--</string>
+
 </resources>
