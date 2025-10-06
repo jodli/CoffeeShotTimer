@@ -13,13 +13,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Engineering
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -304,6 +305,143 @@ private fun RecordShotScreenContent(
 }
 
 /**
+<<<<<<< HEAD
+=======
+ * Landscape layout for RecordShotScreen.
+ * Horizontal layout with timer on the left and controls on the right.
+ */
+@Composable
+private fun RecordShotScreenLandscape(
+    selectedBean: Bean?,
+    grinderSetting: String,
+    persistentRecommendation: PersistentGrindRecommendation?,
+    timerState: TimerState,
+    coffeeWeightIn: String,
+    coffeeWeightOut: String,
+    basketCoffeeOutMin: Float,
+    basketCoffeeOutMax: Float,
+    isFormValid: Boolean,
+    onNavigateToBeanManagement: () -> Unit,
+    onShowGrinderSheet: () -> Unit,
+    onShowCoffeeInDialog: () -> Unit,
+    onPauseTimer: () -> Unit,
+    onStartTimer: () -> Unit,
+    onResetTimer: () -> Unit,
+    onUpdateCoffeeWeightOut: (String) -> Unit,
+    onRecordShot: () -> Unit,
+    view: android.view.View
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .navigationBarsPadding(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Left side: Timer section (takes up ~45% of width)
+            Surface(
+                modifier = Modifier
+                    .weight(0.45f)
+                    .fillMaxHeight(),
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                // Use BoxWithConstraints to calculate optimal timer size
+                BoxWithConstraints(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    // Calculate timer size: 70% of the smaller dimension
+                    // with a minimum of 180dp and maximum of 280dp for landscape
+                    val availableSize = minOf(maxWidth, maxHeight)
+                    val timerSize = (availableSize * 0.7f).coerceIn(180.dp, 280.dp)
+                    val fontSize = (timerSize.value * 0.22f).coerceIn(44f, 70f).sp
+
+                    AutomaticTimerCircle(
+                        size = timerSize,
+                        fontSize = fontSize,
+                        isRunning = timerState.isRunning,
+                        elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
+                        onToggle = {
+                            if (timerState.isRunning) {
+                                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                                onPauseTimer()
+                            } else {
+                                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                                onStartTimer()
+                            }
+                        },
+                        onReset = {
+                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                            onResetTimer()
+                        }
+                    )
+                }
+            }
+
+            // Right side: Scrollable form controls (takes up ~55% of width)
+            Column(
+                modifier = Modifier
+                    .weight(0.55f)
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Header with bean and grinder
+                HeaderSection(
+                    bean = selectedBean,
+                    grinderSetting = grinderSetting,
+                    hasPersistentRecommendation = persistentRecommendation?.hasAdjustment() == true,
+                    onBeanClick = onNavigateToBeanManagement,
+                    onGrinderClick = onShowGrinderSheet,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(70.dp)
+                )
+
+                // Weights display
+                WeightsDisplay(
+                    coffeeIn = coffeeWeightIn.toDoubleOrNull() ?: 0.0,
+                    coffeeOut = coffeeWeightOut.toDoubleOrNull() ?: 0.0,
+                    onCoffeeInClick = onShowCoffeeInDialog,
+                    onCoffeeOutDecrease = {
+                        val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
+                        val newValue = (current - 1).coerceAtLeast(basketCoffeeOutMin.toDouble())
+                        onUpdateCoffeeWeightOut(newValue.toInt().toString())
+                    },
+                    onCoffeeOutIncrease = {
+                        val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
+                        val newValue = (current + 1).coerceAtMost(basketCoffeeOutMax.toDouble())
+                        onUpdateCoffeeWeightOut(newValue.toInt().toString())
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                )
+
+                // Save button
+                SaveShotButton(
+                    enabled = isFormValid,
+                    onClick = {
+                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+                        onRecordShot()
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                )
+            }
+        }
+    }
+}
+
+/**
+>>>>>>> c03d903 (fixup! chore: fix detekt issues)
  * Header section with bean selector and grinder setting.
  */
 @Composable
