@@ -513,6 +513,15 @@
 
     <!-- Timer display suffixes -->
     <string name="timer_seconds_suffix">s</string>
+    <string name="format_timer_seconds">%1$ds</string>
+    
+    <!-- Weight and ratio format strings -->
+    <string name="format_weight_grams">%1$dg</string>
+    <string name="format_ratio">(1:%.1f)</string>
+    
+    <!-- Content descriptions for weights display -->
+    <string name="cd_decrease_coffee_out">Decrease coffee out by 1 gram</string>
+    <string name="cd_increase_coffee_out">Increase coffee out by 1 gram</string>
 
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unknown error occurred</string>
