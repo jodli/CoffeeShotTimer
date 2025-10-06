@@ -522,6 +522,21 @@
     <!-- Content descriptions for weights display -->
     <string name="cd_decrease_coffee_out">Decrease coffee out by 1 gram</string>
     <string name="cd_increase_coffee_out">Increase coffee out by 1 gram</string>
+    <string name="cd_adjust_grinder">Adjust grinder setting</string>
+    <string name="cd_mode_toggle_disabled">Mode toggle (disabled)</string>
+    
+    <!-- RecordShotScreen strings -->
+    <string name="text_auto_timer">Auto timer</string>
+    <string name="button_save_shot">Save Shot</string>
+    <string name="dialog_adjust_grinder_setting">Adjust Grinder Setting</string>
+    <string name="button_apply_setting">Apply Setting</string>
+    <string name="dialog_adjust_coffee_in">Adjust Coffee In</string>
+    <string name="text_enter_coffee_in_amount">Enter the amount of coffee grounds (in grams)</string>
+    
+    <!-- Validation messages -->
+    <string name="validation_invalid_number">Please enter a valid number</string>
+    <string name="validation_coffee_in_too_low">Coffee in must be at least %1$dg</string>
+    <string name="validation_coffee_in_too_high">Coffee in cannot exceed %1$dg</string>
 
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unknown error occurred</string>
