@@ -264,11 +264,14 @@
     <ID>MagicNumber:TasteUtils.kt$TasteUtils$25</ID>
     <ID>MagicNumber:TasteUtils.kt$TasteUtils$30</ID>
     <ID>MagicNumber:TimerCircle.kt$0.5f</ID>
+    <ID>MagicNumber:TimerCircle.kt$0.9f</ID>
     <ID>MagicNumber:TimerCircle.kt$1000f</ID>
+    <ID>MagicNumber:TimerCircle.kt$16</ID>
+    <ID>MagicNumber:TimerCircle.kt$2000</ID>
     <ID>MagicNumber:TimerCircle.kt$24f</ID>
     <ID>MagicNumber:TimerCircle.kt$360f</ID>
-    <ID>MagicNumber:TimerCircle.kt$60</ID>
-    <ID>MagicNumber:TimerCircle.kt$60f</ID>
+    <ID>MagicNumber:TimerCircle.kt$60000</ID>
+    <ID>MagicNumber:TimerCircle.kt$60000f</ID>
     <ID>MagicNumber:TimerComponents.kt$0.98f</ID>
     <ID>MagicNumber:TimerComponents.kt$0xFF4CAF50</ID>
     <ID>MagicNumber:TimerComponents.kt$0xFFF44336</ID>
