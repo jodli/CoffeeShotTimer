@@ -734,4 +734,41 @@
     <string name="grind_coarser">Gröber mahlen</string>
     <string name="no_change_needed">Keine Änderung nötig</string>
 
+    <!-- Timer and Weight Format Strings -->
+    <string name="format_timer_seconds">%1$ds</string>
+    <string name="format_weight_grams">%1$dg</string>
+    <string name="format_ratio">(1:%.1f)</string>
+    
+    <!-- Content Descriptions for RecordShotScreen -->
+    <string name="cd_decrease_coffee_out">Ausgabe um 1 Gramm verringern</string>
+    <string name="cd_increase_coffee_out">Ausgabe um 1 Gramm erhöhen</string>
+    <string name="cd_adjust_grinder">Mahlgrad anpassen</string>
+    <string name="cd_mode_toggle_disabled">Modus-Umschalter (deaktiviert)</string>
+    
+    <!-- RecordShotScreen Strings -->
+    <string name="text_auto_timer">Automatischer Timer</string>
+    <string name="button_save_shot">Shot speichern</string>
+    <string name="dialog_adjust_grinder_setting">Mahlgrad anpassen</string>
+    <string name="button_apply_setting">Einstellung anwenden</string>
+    <string name="dialog_adjust_coffee_in">Kaffeemenge anpassen</string>
+    <string name="text_enter_coffee_in_amount">Geben Sie die Menge an Kaffeepulver ein (in Gramm)</string>
+    
+    <!-- Validation Messages -->
+    <string name="validation_invalid_number">Bitte geben Sie eine gültige Zahl ein</string>
+    <string name="validation_coffee_in_too_low">Kaffeemenge muss mindestens %1$dg betragen</string>
+    <string name="validation_coffee_in_too_high">Kaffeemenge kann nicht mehr als %1$dg betragen</string>
+
+    <!-- Shot Recorded Dialog - Grind Adjustment Feedback -->
+    <string name="feedback_shot_ran_fast">Shot lief zu schnell – Mahlgrad anpassen</string>
+    <string name="feedback_shot_ran_slow">Shot lief zu langsam – Mahlgrad anpassen</string>
+    <string name="feedback_sour_taste">Saurer Geschmack deutet auf Unterextraktion hin</string>
+    <string name="feedback_bitter_taste">Bitterer Geschmack deutet auf Überextraktion hin</string>
+    
+    <!-- Grinder Recommendation Card -->
+    <string name="text_suggested_grinder_setting">Vorschlag: %1$s</string>
+    
+    <!-- Badge and Display Values -->
+    <string name="badge_recommendation_alert">!</string>
+    <string name="display_grinder_setting_empty">--</string>
+
 </resources>
