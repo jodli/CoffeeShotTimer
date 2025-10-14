@@ -315,6 +315,14 @@ class RecordShotUseCase @Inject constructor(
 }
 
 /**
+ * Enum representing timer mode (automatic vs manual).
+ */
+enum class TimerMode {
+    AUTOMATIC,
+    MANUAL
+}
+
+/**
  * Data class representing the timer state.
  */
 data class TimerState(

@@ -20,6 +20,7 @@ import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
+import com.jodli.coffeeshottimer.domain.usecase.TimerMode
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
@@ -202,6 +203,13 @@ class ShotRecordingViewModel @Inject constructor(
     // Persistent grind recommendation state (Epic 4)
     private val _persistentRecommendation = MutableStateFlow<PersistentGrindRecommendation?>(null)
     val persistentRecommendation: StateFlow<PersistentGrindRecommendation?> = _persistentRecommendation.asStateFlow()
+
+    // Timer mode state (automatic vs manual)
+    private val _timerMode = MutableStateFlow(TimerMode.AUTOMATIC)
+    val timerMode: StateFlow<TimerMode> = _timerMode.asStateFlow()
+
+    private val _manualTimeSeconds = MutableStateFlow(ValidationUtils.MANUAL_TIMER_DEFAULT_SECONDS)
+    val manualTimeSeconds: StateFlow<Int> = _manualTimeSeconds.asStateFlow()
 
     // Timer update job
     private var timerUpdateJob: Job? = null
@@ -645,7 +653,10 @@ class ShotRecordingViewModel @Inject constructor(
             _coffeeWeightOutError.value == null
         val hasValidGrinder = _grinderSetting.value.isNotBlank() &&
             _grinderSettingError.value == null
-        val hasValidTimer = timerState.value.elapsedTimeSeconds >= ValidationUtils.MIN_EXTRACTION_TIME
+
+        // Use effective extraction time based on current mode
+        val effectiveTime = getEffectiveExtractionTime()
+        val hasValidTimer = effectiveTime >= ValidationUtils.MIN_EXTRACTION_TIME
 
         val isValid = hasValidBean && hasValidWeights && hasValidGrinder && hasValidTimer
 
@@ -653,7 +664,7 @@ class ShotRecordingViewModel @Inject constructor(
 
         // Show timer validation feedback if everything else is valid but timer is insufficient
         val shouldShowTimerValidation = hasValidBean && hasValidWeights && hasValidGrinder &&
-            !hasValidTimer && timerState.value.elapsedTimeSeconds > 0
+            !hasValidTimer && effectiveTime > 0
 
         if (shouldShowTimerValidation && !_showTimerValidation.value) {
             _showTimerValidation.value = true
@@ -693,6 +704,52 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
+     * Toggle between automatic and manual timer modes.
+     * Only works when timer is stopped to prevent mid-extraction mode changes.
+     */
+    fun toggleTimerMode() {
+        // Only allow toggle when timer is not running
+        if (!timerState.value.isRunning) {
+            _timerMode.value = when (_timerMode.value) {
+                TimerMode.AUTOMATIC -> {
+                    // Transfer current elapsed time to manual mode
+                    val currentSeconds = timerState.value.elapsedTimeSeconds
+                    if (currentSeconds > 0) {
+                        setManualTime(currentSeconds)
+                    }
+                    TimerMode.MANUAL
+                }
+                TimerMode.MANUAL -> TimerMode.AUTOMATIC
+            }
+            validateForm() // Revalidate form after mode change
+        }
+    }
+
+    /**
+     * Set manual time with validation.
+     * Clamps value to valid range (5-60 seconds).
+     */
+    fun setManualTime(timeSeconds: Int) {
+        val clampedTime = timeSeconds.coerceIn(
+            ValidationUtils.MANUAL_TIMER_MIN_SECONDS,
+            ValidationUtils.MANUAL_TIMER_MAX_SECONDS
+        )
+        _manualTimeSeconds.value = clampedTime
+        validateForm() // Revalidate form after manual time change
+    }
+
+    /**
+     * Get the effective extraction time based on current mode.
+     * Returns automatic timer value in automatic mode, manual time in manual mode.
+     */
+    fun getEffectiveExtractionTime(): Int {
+        return when (_timerMode.value) {
+            TimerMode.AUTOMATIC -> timerState.value.elapsedTimeSeconds
+            TimerMode.MANUAL -> _manualTimeSeconds.value
+        }
+    }
+
+    /**
      * Record the current shot with validation.
      * Epic 4: Enhanced with recommendation tracking to learn user behavior.
      */
@@ -708,8 +765,11 @@ class ShotRecordingViewModel @Inject constructor(
             return
         }
 
+        // Use effective extraction time based on current mode
+        val effectiveExtractionTime = getEffectiveExtractionTime()
+
         // Check minimum extraction time and show visual feedback
-        if (timerState.value.elapsedTimeSeconds < ValidationUtils.MIN_EXTRACTION_TIME) {
+        if (effectiveExtractionTime < ValidationUtils.MIN_EXTRACTION_TIME) {
             _showTimerValidation.value = true
             _errorMessage.value = context.getString(R.string.error_extraction_time_minimum, ValidationUtils.MIN_EXTRACTION_TIME)
 
@@ -726,8 +786,8 @@ class ShotRecordingViewModel @Inject constructor(
             val currentRecommendation = _persistentRecommendation.value
             val followedRecommendation = checkIfRecommendationFollowed(grinder, currentRecommendation)
 
-            // Capture extraction time BEFORE recording (it might be reset after recording)
-            val extractionTimeSeconds = timerState.value.elapsedTimeSeconds
+            // Capture extraction time BEFORE recording (use effective time based on mode)
+            val extractionTimeSeconds = effectiveExtractionTime
 
             // Validate parameters first
             val validationResult = recordShotUseCase.validateShotParameters(
@@ -744,11 +804,12 @@ class ShotRecordingViewModel @Inject constructor(
                 return@launch
             }
 
-            // Record the shot using current timer
-            val result = recordShotUseCase.recordShotWithCurrentTimer(
+            // Record the shot with effective extraction time (automatic or manual)
+            val result = recordShotUseCase.recordShot(
                 beanId = bean.id,
                 coffeeWeightIn = weightIn,
                 coffeeWeightOut = weightOut,
+                extractionTimeSeconds = extractionTimeSeconds,
                 grinderSetting = grinder,
                 notes = shotNotes
             )

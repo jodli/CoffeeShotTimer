@@ -524,14 +524,22 @@
     <string name="cd_increase_coffee_out">Increase coffee out by 1 gram</string>
     <string name="cd_adjust_grinder">Adjust grinder setting</string>
     <string name="cd_mode_toggle_disabled">Mode toggle (disabled)</string>
+    <string name="cd_toggle_timer_mode">Toggle between automatic and manual timer</string>
+    <string name="cd_manual_timer_slider">Adjust extraction time manually</string>
+    <string name="cd_tap_to_edit_time">Tap to edit time</string>
     
     <!-- RecordShotScreen strings -->
     <string name="text_auto_timer">Auto timer</string>
+    <string name="text_manual_timer">Manual timer</string>
     <string name="button_save_shot">Save Shot</string>
     <string name="dialog_adjust_grinder_setting">Adjust Grinder Setting</string>
     <string name="button_apply_setting">Apply Setting</string>
     <string name="dialog_adjust_coffee_in">Adjust Coffee In</string>
     <string name="text_enter_coffee_in_amount">Enter the amount of coffee grounds (in grams)</string>
+    <string name="dialog_adjust_extraction_time">Set Extraction Time</string>
+    <string name="text_enter_extraction_time">Enter the extraction time in seconds</string>
+    <string name="validation_time_too_low">Time must be at least %1$d seconds</string>
+    <string name="validation_time_too_high">Time cannot exceed %1$d seconds</string>
     
     <!-- Validation messages -->
     <string name="validation_invalid_number">Please enter a valid number</string>

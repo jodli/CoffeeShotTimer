@@ -195,9 +195,7 @@
     <ID>MagicNumber:RecordShotScreen.kt$0.45f</ID>
     <ID>MagicNumber:RecordShotScreen.kt$0.55f</ID>
     <ID>MagicNumber:RecordShotScreen.kt$0.7f</ID>
-    <ID>MagicNumber:RecordShotScreen.kt$44f</ID>
     <ID>MagicNumber:RecordShotScreen.kt$48f</ID>
-    <ID>MagicNumber:RecordShotScreen.kt$70f</ID>
     <ID>MagicNumber:RecordShotScreen.kt$96f</ID>
     <ID>MagicNumber:RecordShotUseCase.kt$RecordShotUseCase$1.5</ID>
     <ID>MagicNumber:RecordShotUseCase.kt$RecordShotUseCase$100</ID>
@@ -265,13 +263,16 @@
     <ID>MagicNumber:TasteUtils.kt$TasteUtils$30</ID>
     <ID>MagicNumber:TimerCircle.kt$0.5f</ID>
     <ID>MagicNumber:TimerCircle.kt$0.9f</ID>
+    <ID>MagicNumber:TimerCircle.kt$100</ID>
     <ID>MagicNumber:TimerCircle.kt$1000f</ID>
     <ID>MagicNumber:TimerCircle.kt$16</ID>
+    <ID>MagicNumber:TimerCircle.kt$180f</ID>
     <ID>MagicNumber:TimerCircle.kt$2000</ID>
     <ID>MagicNumber:TimerCircle.kt$24f</ID>
     <ID>MagicNumber:TimerCircle.kt$360f</ID>
     <ID>MagicNumber:TimerCircle.kt$60000</ID>
     <ID>MagicNumber:TimerCircle.kt$60000f</ID>
+    <ID>MagicNumber:TimerCircle.kt$90f</ID>
     <ID>MagicNumber:TimerComponents.kt$0.98f</ID>
     <ID>MagicNumber:TimerComponents.kt$0xFF4CAF50</ID>
     <ID>MagicNumber:TimerComponents.kt$0xFFF44336</ID>
@@ -291,6 +292,10 @@
     <ID>MagicNumber:TimerComponents.kt$300L</ID>
     <ID>MagicNumber:TimerComponents.kt$35</ID>
     <ID>MagicNumber:TimerComponents.kt$60</ID>
+    <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$180f</ID>
+    <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$270f</ID>
+    <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$360f</ID>
+    <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$90f</ID>
     <ID>MagicNumber:ValidationComponents.kt$ValidationUtils$100</ID>
     <ID>MagicNumber:ValidationComponents.kt$ValidationUtils$365</ID>
     <ID>MagicNumber:ValidationExtensions.kt$0.8</ID>
@@ -317,6 +322,7 @@
     <ID>MaximumLineLength:GrinderSettingsScreen.kt$ </ID>
     <ID>MaximumLineLength:OnboardingManager.kt$OnboardingProgress$ </ID>
     <ID>MaximumLineLength:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$ </ID>
+    <ID>MaximumLineLength:RecordShotScreen.kt$ </ID>
     <ID>MaximumLineLength:ShotDetailsViewModel.kt$ShotDetailsViewModel$ </ID>
     <ID>MaximumLineLength:ShotHistoryViewModel.kt$ShotHistoryViewModel$ </ID>
     <ID>MaximumLineLength:ShotRecordingViewModel.kt$ShotRecordingViewModel$ </ID>
