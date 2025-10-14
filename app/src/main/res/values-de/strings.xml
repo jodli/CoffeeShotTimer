@@ -744,14 +744,22 @@
     <string name="cd_increase_coffee_out">Ausgabe um 1 Gramm erhöhen</string>
     <string name="cd_adjust_grinder">Mahlgrad anpassen</string>
     <string name="cd_mode_toggle_disabled">Modus-Umschalter (deaktiviert)</string>
+    <string name="cd_toggle_timer_mode">Zwischen automatischem und manuellem Timer wechseln</string>
+    <string name="cd_manual_timer_slider">Extraktionszeit manuell anpassen</string>
+    <string name="cd_tap_to_edit_time">Tippen zum Bearbeiten der Zeit</string>
     
     <!-- RecordShotScreen Strings -->
     <string name="text_auto_timer">Automatischer Timer</string>
+    <string name="text_manual_timer">Manueller Timer</string>
     <string name="button_save_shot">Shot speichern</string>
     <string name="dialog_adjust_grinder_setting">Mahlgrad anpassen</string>
     <string name="button_apply_setting">Einstellung anwenden</string>
     <string name="dialog_adjust_coffee_in">Kaffeemenge anpassen</string>
     <string name="text_enter_coffee_in_amount">Geben Sie die Menge an Kaffeepulver ein (in Gramm)</string>
+    <string name="dialog_adjust_extraction_time">Extraktionszeit einstellen</string>
+    <string name="text_enter_extraction_time">Geben Sie die Extraktionszeit in Sekunden ein</string>
+    <string name="validation_time_too_low">Zeit muss mindestens %1$d Sekunden betragen</string>
+    <string name="validation_time_too_high">Zeit kann nicht mehr als %1$d Sekunden betragen</string>
     
     <!-- Validation Messages -->
     <string name="validation_invalid_number">Bitte geben Sie eine gültige Zahl ein</string>

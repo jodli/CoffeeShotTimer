@@ -15,14 +15,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
@@ -59,9 +62,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation
+import com.jodli.coffeeshottimer.domain.usecase.TimerMode
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
+import com.jodli.coffeeshottimer.ui.components.ManualTimerCircle
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
+import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.components.WeightsDisplay
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 import java.time.LocalDate
@@ -112,15 +118,22 @@ fun RecordShotScreen(
     val basketCoffeeOutMin by viewModel.basketCoffeeOutMin.collectAsState()
     val basketCoffeeOutMax by viewModel.basketCoffeeOutMax.collectAsState()
 
+    // Timer mode state
+    val timerMode by viewModel.timerMode.collectAsState()
+    val manualTimeSeconds by viewModel.manualTimeSeconds.collectAsState()
+
     // UI state
     var showGrinderSheet by remember { mutableStateOf(false) }
     var showCoffeeInDialog by remember { mutableStateOf(false) }
+    var showManualTimeDialog by remember { mutableStateOf(false) }
 
     RecordShotScreenContent(
         selectedBean = selectedBean,
         grinderSetting = grinderSetting,
         persistentRecommendation = persistentRecommendation,
+        timerMode = timerMode,
         timerState = timerState,
+        manualTimeSeconds = manualTimeSeconds,
         coffeeWeightIn = coffeeWeightIn,
         coffeeWeightOut = coffeeWeightOut,
         basketCoffeeOutMin = basketCoffeeOutMin,
@@ -129,6 +142,9 @@ fun RecordShotScreen(
         onNavigateToBeanManagement = onNavigateToBeanManagement,
         onShowGrinderSheet = { showGrinderSheet = true },
         onShowCoffeeInDialog = { showCoffeeInDialog = true },
+        onToggleTimerMode = { viewModel.toggleTimerMode() },
+        onManualTimeChange = { newTime -> viewModel.setManualTime(newTime) },
+        onShowManualTimeDialog = { showManualTimeDialog = true },
         onPauseTimer = { viewModel.pauseTimer() },
         onStartTimer = { viewModel.startTimer() },
         onResetTimer = { viewModel.resetTimer() },
@@ -170,6 +186,17 @@ fun RecordShotScreen(
         )
     }
 
+    // Manual time adjustment dialog
+    if (showManualTimeDialog) {
+        ManualTimeDialog(
+            currentValue = manualTimeSeconds,
+            onValueChange = { newValue ->
+                viewModel.setManualTime(newValue)
+            },
+            onDismiss = { showManualTimeDialog = false }
+        )
+    }
+
     // Shot recorded success dialog
     if (showShotRecordedDialog && recordedShotData != null) {
         val data = recordedShotData!!
@@ -207,7 +234,9 @@ private fun RecordShotScreenContent(
     selectedBean: Bean?,
     grinderSetting: String,
     persistentRecommendation: PersistentGrindRecommendation?,
+    timerMode: TimerMode,
     timerState: TimerState,
+    manualTimeSeconds: Int,
     coffeeWeightIn: String,
     coffeeWeightOut: String,
     basketCoffeeOutMin: Float,
@@ -216,6 +245,9 @@ private fun RecordShotScreenContent(
     onNavigateToBeanManagement: () -> Unit,
     onShowGrinderSheet: () -> Unit,
     onShowCoffeeInDialog: () -> Unit,
+    onToggleTimerMode: () -> Unit,
+    onManualTimeChange: (Int) -> Unit,
+    onShowManualTimeDialog: () -> Unit,
     onPauseTimer: () -> Unit,
     onStartTimer: () -> Unit,
     onResetTimer: () -> Unit,
@@ -231,7 +263,9 @@ private fun RecordShotScreenContent(
             selectedBean = selectedBean,
             grinderSetting = grinderSetting,
             persistentRecommendation = persistentRecommendation,
+            timerMode = timerMode,
             timerState = timerState,
+            manualTimeSeconds = manualTimeSeconds,
             coffeeWeightIn = coffeeWeightIn,
             coffeeWeightOut = coffeeWeightOut,
             basketCoffeeOutMin = basketCoffeeOutMin,
@@ -240,6 +274,9 @@ private fun RecordShotScreenContent(
             onNavigateToBeanManagement = onNavigateToBeanManagement,
             onShowGrinderSheet = onShowGrinderSheet,
             onShowCoffeeInDialog = onShowCoffeeInDialog,
+            onToggleTimerMode = onToggleTimerMode,
+            onManualTimeChange = onManualTimeChange,
+            onShowManualTimeDialog = onShowManualTimeDialog,
             onPauseTimer = onPauseTimer,
             onStartTimer = onStartTimer,
             onResetTimer = onResetTimer,
@@ -252,7 +289,9 @@ private fun RecordShotScreenContent(
             selectedBean = selectedBean,
             grinderSetting = grinderSetting,
             persistentRecommendation = persistentRecommendation,
+            timerMode = timerMode,
             timerState = timerState,
+            manualTimeSeconds = manualTimeSeconds,
             coffeeWeightIn = coffeeWeightIn,
             coffeeWeightOut = coffeeWeightOut,
             basketCoffeeOutMin = basketCoffeeOutMin,
@@ -261,6 +300,9 @@ private fun RecordShotScreenContent(
             onNavigateToBeanManagement = onNavigateToBeanManagement,
             onShowGrinderSheet = onShowGrinderSheet,
             onShowCoffeeInDialog = onShowCoffeeInDialog,
+            onToggleTimerMode = onToggleTimerMode,
+            onManualTimeChange = onManualTimeChange,
+            onShowManualTimeDialog = onShowManualTimeDialog,
             onPauseTimer = onPauseTimer,
             onStartTimer = onStartTimer,
             onResetTimer = onResetTimer,
@@ -279,7 +321,9 @@ private fun RecordShotScreenPortrait(
     selectedBean: Bean?,
     grinderSetting: String,
     persistentRecommendation: PersistentGrindRecommendation?,
+    timerMode: TimerMode,
     timerState: TimerState,
+    manualTimeSeconds: Int,
     coffeeWeightIn: String,
     coffeeWeightOut: String,
     basketCoffeeOutMin: Float,
@@ -288,6 +332,9 @@ private fun RecordShotScreenPortrait(
     onNavigateToBeanManagement: () -> Unit,
     onShowGrinderSheet: () -> Unit,
     onShowCoffeeInDialog: () -> Unit,
+    onToggleTimerMode: () -> Unit,
+    onManualTimeChange: (Int) -> Unit,
+    onShowManualTimeDialog: () -> Unit,
     onPauseTimer: () -> Unit,
     onStartTimer: () -> Unit,
     onResetTimer: () -> Unit,
@@ -321,8 +368,13 @@ private fun RecordShotScreenPortrait(
             Spacer(modifier = Modifier.height(16.dp))
 
             TimerSection(
+                timerMode = timerMode,
                 isRunning = timerState.isRunning,
                 elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
+                manualTimeSeconds = manualTimeSeconds,
+                onToggleTimerMode = onToggleTimerMode,
+                onManualTimeChange = onManualTimeChange,
+                onShowManualTimeDialog = onShowManualTimeDialog,
                 onPauseTimer = {
                     view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
                     onPauseTimer()
@@ -391,7 +443,9 @@ private fun RecordShotScreenLandscape(
     selectedBean: Bean?,
     grinderSetting: String,
     persistentRecommendation: PersistentGrindRecommendation?,
+    timerMode: TimerMode,
     timerState: TimerState,
+    manualTimeSeconds: Int,
     coffeeWeightIn: String,
     coffeeWeightOut: String,
     basketCoffeeOutMin: Float,
@@ -400,6 +454,9 @@ private fun RecordShotScreenLandscape(
     onNavigateToBeanManagement: () -> Unit,
     onShowGrinderSheet: () -> Unit,
     onShowCoffeeInDialog: () -> Unit,
+    onToggleTimerMode: () -> Unit,
+    onManualTimeChange: (Int) -> Unit,
+    onShowManualTimeDialog: () -> Unit,
     onPauseTimer: () -> Unit,
     onStartTimer: () -> Unit,
     onResetTimer: () -> Unit,
@@ -420,45 +477,30 @@ private fun RecordShotScreenLandscape(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Left side: Timer section (takes up ~45% of width)
-            Surface(
+            TimerSection(
+                timerMode = timerMode,
+                isRunning = timerState.isRunning,
+                elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
+                manualTimeSeconds = manualTimeSeconds,
+                onToggleTimerMode = onToggleTimerMode,
+                onManualTimeChange = onManualTimeChange,
+                onShowManualTimeDialog = onShowManualTimeDialog,
+                onPauseTimer = {
+                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    onPauseTimer()
+                },
+                onStartTimer = {
+                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
+                    onStartTimer()
+                },
+                onTimerReset = {
+                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+                    onResetTimer()
+                },
                 modifier = Modifier
                     .weight(0.45f)
-                    .fillMaxHeight(),
-                color = MaterialTheme.colorScheme.surfaceVariant,
-                shape = RoundedCornerShape(16.dp)
-            ) {
-                // Use BoxWithConstraints to calculate optimal timer size
-                BoxWithConstraints(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Calculate timer size: 70% of the smaller dimension
-                    // with a minimum of 180dp and maximum of 280dp for landscape
-                    val availableSize = minOf(maxWidth, maxHeight)
-                    val timerSize = (availableSize * 0.7f).coerceIn(180.dp, 280.dp)
-                    val fontSize = (timerSize.value * 0.22f).coerceIn(44f, 70f).sp
-
-                    AutomaticTimerCircle(
-                        size = timerSize,
-                        fontSize = fontSize,
-                        isRunning = timerState.isRunning,
-                        elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
-                        onToggle = {
-                            if (timerState.isRunning) {
-                                view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                                onPauseTimer()
-                            } else {
-                                view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                                onStartTimer()
-                            }
-                        },
-                        onReset = {
-                            view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                            onResetTimer()
-                        }
-                    )
-                }
-            }
+                    .fillMaxHeight()
+            )
 
             // Right side: Scrollable form controls (takes up ~55% of width)
             Column(
@@ -625,12 +667,18 @@ private fun HeaderSection(
 }
 
 /**
- * Timer section with automatic timer.
+ * Timer section with mode toggle and conditional rendering.
+ * Supports both automatic timer and manual time input modes.
  */
 @Composable
 private fun TimerSection(
+    timerMode: TimerMode,
     isRunning: Boolean,
     elapsedTimeMs: Long,
+    manualTimeSeconds: Int,
+    onToggleTimerMode: () -> Unit,
+    onManualTimeChange: (Int) -> Unit,
+    onShowManualTimeDialog: () -> Unit,
     onPauseTimer: () -> Unit,
     onStartTimer: () -> Unit,
     onTimerReset: () -> Unit,
@@ -641,32 +689,79 @@ private fun TimerSection(
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(16.dp)
     ) {
-        // Use BoxWithConstraints to calculate maximum timer size
-        BoxWithConstraints(
+        Column(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Calculate timer size: 70% of the smaller dimension
-            // with a minimum of 200dp and maximum of 400dp
-            val availableSize = minOf(maxWidth, maxHeight)
-            val timerSize = (availableSize * 0.7f).coerceIn(200.dp, 400.dp)
-            val fontSize = (timerSize.value * 0.22f).coerceIn(48f, 96f).sp
-
-            // Automatic timer circle
-            AutomaticTimerCircle(
-                size = timerSize,
-                fontSize = fontSize,
-                isRunning = isRunning,
-                elapsedTimeMs = elapsedTimeMs,
-                onToggle = {
-                    if (isRunning) {
-                        onPauseTimer()
-                    } else {
-                        onStartTimer()
+            // Mode toggle button - always reserve space to prevent layout shift
+            Box(
+                modifier = Modifier.height(56.dp), // Reserve space for button + spacers (8dp + 40dp + 8dp)
+                contentAlignment = Alignment.Center
+            ) {
+                if (!isRunning) {
+                    FilledTonalButton(
+                        onClick = onToggleTimerMode,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (timerMode == TimerMode.AUTOMATIC) {
+                                Icons.Default.PlayArrow
+                            } else {
+                                Icons.Default.Edit
+                            },
+                            contentDescription = stringResource(R.string.cd_toggle_timer_mode),
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = when (timerMode) {
+                                TimerMode.AUTOMATIC -> stringResource(R.string.text_auto_timer)
+                                TimerMode.MANUAL -> stringResource(R.string.text_manual_timer)
+                            }
+                        )
                     }
-                },
-                onReset = onTimerReset
-            )
+                }
+            }
+
+            // Timer display (conditional based on mode)
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f),
+                contentAlignment = Alignment.Center
+            ) {
+                val availableSize = minOf(maxWidth, maxHeight)
+                val timerSize = (availableSize * 0.7f).coerceIn(200.dp, 400.dp)
+                val fontSize = (timerSize.value * 0.22f).coerceIn(48f, 96f).sp
+
+                when (timerMode) {
+                    TimerMode.AUTOMATIC -> {
+                        AutomaticTimerCircle(
+                            size = timerSize,
+                            fontSize = fontSize,
+                            isRunning = isRunning,
+                            elapsedTimeMs = elapsedTimeMs,
+                            onToggle = {
+                                if (isRunning) {
+                                    onPauseTimer()
+                                } else {
+                                    onStartTimer()
+                                }
+                            },
+                            onReset = onTimerReset
+                        )
+                    }
+                    TimerMode.MANUAL -> {
+                        ManualTimerCircle(
+                            size = timerSize,
+                            fontSize = fontSize,
+                            manualTimeSeconds = manualTimeSeconds,
+                            onTimeChange = onManualTimeChange,
+                            onTapToEdit = onShowManualTimeDialog
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -968,6 +1063,98 @@ private fun CoffeeInDialog(
                     }
                 },
                 enabled = errorMessage == null && textValue.toDoubleOrNull() != null
+            ) {
+                Text(stringResource(R.string.button_apply_setting))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.text_dialog_cancel))
+            }
+        }
+    )
+}
+
+/**
+ * Manual time input dialog for precise time entry.
+ */
+@Composable
+private fun ManualTimeDialog(
+    currentValue: Int,
+    onValueChange: (Int) -> Unit,
+    onDismiss: () -> Unit
+) {
+    var textValue by remember { mutableStateOf(currentValue.toString()) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.dialog_adjust_extraction_time),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(R.string.text_enter_extraction_time),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = textValue,
+                    onValueChange = {
+                        textValue = it
+                        val value = it.toIntOrNull()
+                        errorMessage = when {
+                            value == null -> "invalid"
+                            value < ValidationUtils.MANUAL_TIMER_MIN_SECONDS -> "too_low"
+                            value > ValidationUtils.MANUAL_TIMER_MAX_SECONDS -> "too_high"
+                            else -> null
+                        }
+                    },
+                    label = { Text(stringResource(R.string.label_extraction_time)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    isError = errorMessage != null,
+                    supportingText = errorMessage?.let {
+                        @Composable {
+                            Text(
+                                when (it) {
+                                    "invalid" -> stringResource(R.string.validation_invalid_number)
+                                    "too_low" -> stringResource(
+                                        R.string.validation_time_too_low,
+                                        ValidationUtils.MANUAL_TIMER_MIN_SECONDS
+                                    )
+                                    "too_high" -> stringResource(
+                                        R.string.validation_time_too_high,
+                                        ValidationUtils.MANUAL_TIMER_MAX_SECONDS
+                                    )
+                                    else -> it
+                                }
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    textValue.toIntOrNull()?.let { value ->
+                        if (value in ValidationUtils.MANUAL_TIMER_MIN_SECONDS..ValidationUtils.MANUAL_TIMER_MAX_SECONDS) {
+                            onValueChange(value)
+                            onDismiss()
+                        }
+                    }
+                },
+                enabled = errorMessage == null && textValue.toIntOrNull() != null
             ) {
                 Text(stringResource(R.string.button_apply_setting))
             }

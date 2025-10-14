@@ -1,11 +1,13 @@
 package com.jodli.coffeeshottimer.ui.components
 
+import android.view.HapticFeedbackConstants
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -48,6 +52,8 @@ import com.jodli.coffeeshottimer.ui.theme.ExtractionIdle
 import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
 import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
 import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
+import kotlin.math.PI
+import kotlin.math.atan2
 
 /**
  * Automatic timer circle with color-coded extraction feedback and smooth animation.
@@ -201,6 +207,151 @@ fun AutomaticTimerCircle(
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Manual timer circle with circular slider for time input.
+ *
+ * Features:
+ * - Circular slider with drag gesture handling
+ * - Non-linear scale (20-40s range gets more arc space)
+ * - Color coding based on extraction quality
+ * - Haptic feedback on value changes
+ * - Center tap to open precise text input dialog
+ *
+ * @param size Size of the timer circle
+ * @param fontSize Font size for the time display
+ * @param manualTimeSeconds Current manually set time in seconds
+ * @param onTimeChange Callback when time is changed via slider
+ * @param onTapToEdit Callback when user taps center to edit time
+ * @param modifier Modifier for the composable
+ */
+@Composable
+fun ManualTimerCircle(
+    size: Dp,
+    fontSize: TextUnit,
+    manualTimeSeconds: Int,
+    onTimeChange: (Int) -> Unit,
+    onTapToEdit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val view = LocalView.current
+    var currentAngle by remember { mutableFloatStateOf(TimerScaleMapper.timeToAngle(manualTimeSeconds)) }
+
+    // Track if user has performed haptic feedback recently (debounce)
+    var lastHapticTime by remember { mutableLongStateOf(0L) }
+
+    // Update angle when manualTimeSeconds changes externally (e.g., from dialog)
+    LaunchedEffect(manualTimeSeconds) {
+        currentAngle = TimerScaleMapper.timeToAngle(manualTimeSeconds)
+    }
+
+    // Color coding based on extraction quality (manual mode is always "running" for display)
+    val borderColor = getExtractionColor(manualTimeSeconds.toFloat(), isRunning = true)
+
+    Box(
+        modifier = modifier.size(size),
+        contentAlignment = Alignment.Center
+    ) {
+        Surface(
+            modifier = Modifier
+                .size(size)
+                .pointerInput(Unit) {
+                    detectDragGestures { change, _ ->
+                        change.consume()
+
+                        // Calculate angle from center
+                        val centerX = size.toPx() / 2
+                        val centerY = size.toPx() / 2
+                        val touchX = change.position.x - centerX
+                        val touchY = change.position.y - centerY
+
+                        // Calculate angle in degrees (0° at top, clockwise)
+                        val angle = (atan2(touchY, touchX) * 180f / PI.toFloat() + 90f + 360f) % 360f
+                        currentAngle = angle
+
+                        // Convert angle to time
+                        val newTime = TimerScaleMapper.angleToTime(angle)
+
+                        // Only trigger callback and haptics if time actually changed
+                        if (newTime != manualTimeSeconds) {
+                            onTimeChange(newTime)
+
+                            // Debounced haptic feedback
+                            val now = System.currentTimeMillis()
+                            if (now - lastHapticTime > 100) {
+                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                lastHapticTime = now
+                            }
+                        }
+                    }
+                }
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onTap = { onTapToEdit() }
+                    )
+                },
+            color = MaterialTheme.colorScheme.surface,
+            shape = CircleShape,
+            shadowElevation = 6.dp
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .drawBehind {
+                        val strokeWidth = 24f
+                        val radius = size.toPx() / 2f
+
+                        // Draw background circle
+                        drawCircle(
+                            color = borderColor.copy(alpha = 0.2f),
+                            radius = radius - strokeWidth / 2,
+                            style = Stroke(width = strokeWidth)
+                        )
+
+                        // Draw progress arc from top (-90°) to current angle
+                        val sweepAngle = currentAngle
+                        if (sweepAngle > 0) {
+                            drawArc(
+                                brush = Brush.sweepGradient(
+                                    0f to borderColor.copy(alpha = 0.6f),
+                                    0.5f to borderColor.copy(alpha = 0.9f),
+                                    1f to borderColor.copy(alpha = 0.6f)
+                                ),
+                                startAngle = -90f,
+                                sweepAngle = sweepAngle,
+                                useCenter = false,
+                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+                            )
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Time display - centered
+                    Text(
+                        text = stringResource(R.string.format_timer_seconds, manualTimeSeconds),
+                        fontSize = fontSize,
+                        fontWeight = FontWeight.Bold,
+                        color = borderColor
+                    )
+
+                    // Hint text with consistent spacing (matches Reset button in AutomaticTimerCircle)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextButton(onClick = onTapToEdit) {
+                        Text(
+                            text = stringResource(R.string.cd_tap_to_edit_time),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
                     }
                 }
             }

@@ -48,6 +48,13 @@ class ValidationUtils(
         const val OPTIMAL_EXTRACTION_TIME_MIN = 25
         const val OPTIMAL_EXTRACTION_TIME_MAX = 30
 
+        // Manual timer constants
+        const val MANUAL_TIMER_MIN_SECONDS = 5
+        const val MANUAL_TIMER_MAX_SECONDS = 60
+        const val MANUAL_TIMER_PRECISION_RANGE_START = 20
+        const val MANUAL_TIMER_PRECISION_RANGE_END = 40
+        const val MANUAL_TIMER_DEFAULT_SECONDS = 25 // Default to optimal extraction time
+
         // Text validation constants
         private const val MIN_BEAN_NAME_LENGTH = 2
         private const val MAX_BEAN_NAME_LENGTH = 100
