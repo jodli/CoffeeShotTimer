@@ -32,6 +32,7 @@
     <ID>LongMethod:ShotDetailsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ShotDetailsScreen( shotId: String, onNavigateBack: () -&gt; Unit = {}, onNavigateToShot: (String) -&gt; Unit = {}, viewModel: ShotDetailsViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:ShotHistoryFilterDialog.kt$@Composable fun ShotHistoryFilterDialog( currentFilter: ShotHistoryFilter, availableBeans: List&lt;Bean&gt;, onApplyFilter: (ShotHistoryFilter) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
     <ID>LongMethod:ShotRecordedDialog.kt$@Composable fun ShotRecordedDialog( brewRatio: String, extractionTime: String, suggestedTaste: TastePrimary? = null, grindAdjustment: GrindAdjustmentRecommendation? = null, onTasteSelected: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Reactive UI updates onSubmit: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Save to database onDismiss: () -&gt; Unit, onViewDetails: (() -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
+    <ID>LongMethod:TimerCircle.kt$@Composable fun ManualTimerCircle( size: Dp, fontSize: TextUnit, manualTimeSeconds: Int, onTimeChange: (Int) -&gt; Unit, onTapToEdit: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
     <ID>LongMethod:WeightSliderComponents.kt$@Composable fun GrinderSettingSlider( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, errorMessage: String? = null, enabled: Boolean = true, suggestedSetting: String? = null, previousSuccessfulSettings: List&lt;String&gt; = emptyList(), minSetting: Float, maxSetting: Float, stepSize: Float = 0.5f )</ID>
     <ID>LongParameterList:AddEditBeanViewModel.kt$AddEditBeanViewModel$( private val addBeanUseCase: AddBeanUseCase, private val updateBeanUseCase: UpdateBeanUseCase, private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase, private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase, private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase, private val photoCaptureManager: PhotoCaptureManager, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val domainErrorTranslator: DomainErrorTranslator )</ID>
@@ -263,13 +264,13 @@
     <ID>MagicNumber:TasteUtils.kt$TasteUtils$30</ID>
     <ID>MagicNumber:TimerCircle.kt$0.5f</ID>
     <ID>MagicNumber:TimerCircle.kt$0.9f</ID>
-    <ID>MagicNumber:TimerCircle.kt$100</ID>
     <ID>MagicNumber:TimerCircle.kt$1000f</ID>
     <ID>MagicNumber:TimerCircle.kt$16</ID>
     <ID>MagicNumber:TimerCircle.kt$180f</ID>
     <ID>MagicNumber:TimerCircle.kt$2000</ID>
     <ID>MagicNumber:TimerCircle.kt$24f</ID>
     <ID>MagicNumber:TimerCircle.kt$360f</ID>
+    <ID>MagicNumber:TimerCircle.kt$40f</ID>
     <ID>MagicNumber:TimerCircle.kt$60000</ID>
     <ID>MagicNumber:TimerCircle.kt$60000f</ID>
     <ID>MagicNumber:TimerCircle.kt$90f</ID>
@@ -313,68 +314,57 @@
     <ID>MaximumLineLength:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$ </ID>
     <ID>MaximumLineLength:BasketSettingsScreen.kt$ </ID>
     <ID>MaximumLineLength:BasketSettingsViewModel.kt$BasketSettingsViewModel$ </ID>
+    <ID>MaximumLineLength:BeanManagementViewModelTest.kt$BeanManagementViewModelTest$ </ID>
+    <ID>MaximumLineLength:BeanRepositoryTest.kt$BeanRepositoryTest$ </ID>
     <ID>MaximumLineLength:CommonComponents.kt$ </ID>
+    <ID>MaximumLineLength:ConditionalCompilationTest.kt$ConditionalCompilationTest$ </ID>
     <ID>MaximumLineLength:DebugViewModel.kt$DebugViewModel$ </ID>
+    <ID>MaximumLineLength:DesignSystemValidationTest.kt$DesignSystemValidationTest$ </ID>
     <ID>MaximumLineLength:EquipmentSettingsViewModel.kt$EquipmentSettingsViewModel$ </ID>
     <ID>MaximumLineLength:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$ </ID>
     <ID>MaximumLineLength:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$ </ID>
+    <ID>MaximumLineLength:GetShotHistoryUseCaseTest.kt$GetShotHistoryUseCaseTest$ </ID>
+    <ID>MaximumLineLength:GrindAdjustmentFormatterTest.kt$GrindAdjustmentFormatterTest$ </ID>
     <ID>MaximumLineLength:GrinderConfigRepository.kt$GrinderConfigRepository$ </ID>
     <ID>MaximumLineLength:GrinderSettingsScreen.kt$ </ID>
+    <ID>MaximumLineLength:ManageGrindRecommendationUseCaseTest.kt$ManageGrindRecommendationUseCaseTest$ </ID>
     <ID>MaximumLineLength:OnboardingManager.kt$OnboardingProgress$ </ID>
+    <ID>MaximumLineLength:OnboardingRoutingIntegrationTest.kt$OnboardingRoutingIntegrationTest$ </ID>
     <ID>MaximumLineLength:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$ </ID>
     <ID>MaximumLineLength:RecordShotScreen.kt$ </ID>
+    <ID>MaximumLineLength:RecordTasteFeedbackUseCaseTest.kt$RecordTasteFeedbackUseCaseTest$ </ID>
     <ID>MaximumLineLength:ShotDetailsViewModel.kt$ShotDetailsViewModel$ </ID>
     <ID>MaximumLineLength:ShotHistoryViewModel.kt$ShotHistoryViewModel$ </ID>
+    <ID>MaximumLineLength:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest$ </ID>
     <ID>MaximumLineLength:ShotRecordingViewModel.kt$ShotRecordingViewModel$ </ID>
     <ID>MaximumLineLength:TimerComponents.kt$ </ID>
+    <ID>MaximumLineLength:TypographyAndSpacingTest.kt$TypographyAndSpacingTest$ </ID>
     <ID>MaximumLineLength:ValidationComponents.kt$ </ID>
+    <ID>MaximumLineLength:ValidationHelpersTest.kt$ValidationHelpersTest$ </ID>
     <ID>MaximumLineLength:WeightSliderComponents.kt$ </ID>
     <ID>NestedBlockDepth:UpdateBeanUseCase.kt$UpdateBeanUseCase$suspend fun getBeanForEditing(beanId: String): Result&lt;Bean&gt;</ID>
-    <ID>NewLineAtEndOfFile:AddPhotoToBeanUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:AppDatabaseTest.kt$com.jodli.coffeeshottimer.data.database.AppDatabaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:BeanDaoTest.kt$com.jodli.coffeeshottimer.data.dao.BeanDaoTest.kt</ID>
-    <ID>NewLineAtEndOfFile:BeanManagementViewModelTest.kt$com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModelTest.kt</ID>
-    <ID>NewLineAtEndOfFile:BeanRepositoryTest.kt$com.jodli.coffeeshottimer.data.repository.BeanRepositoryTest.kt</ID>
-    <ID>NewLineAtEndOfFile:BeanTest.kt$com.jodli.coffeeshottimer.data.model.BeanTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ComponentTypographyUsageTest.kt$com.jodli.coffeeshottimer.ui.components.ComponentTypographyUsageTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ConditionalCompilationTest.kt$com.jodli.coffeeshottimer.debug.ConditionalCompilationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:DatabasePopulatorTest.kt$com.jodli.coffeeshottimer.data.util.DatabasePopulatorTest.kt</ID>
-    <ID>NewLineAtEndOfFile:DebugViewModelTest.kt$com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModelTest.kt</ID>
-    <ID>NewLineAtEndOfFile:DesignSystemValidationTest.kt$com.jodli.coffeeshottimer.ui.components.DesignSystemValidationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ExampleUnitTest.kt$com.jodli.coffeeshottimer.ExampleUnitTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GetActiveBeansUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GetBeanHistoryUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GetBeanPhotoUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.GetBeanPhotoUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GetShotDetailsUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GetShotHistoryUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.GetShotHistoryUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GetShotStatisticsUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.GetShotStatisticsUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GrinderConfigDaoTest.kt$com.jodli.coffeeshottimer.data.dao.GrinderConfigDaoTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GrinderConfigRepositoryTest.kt$com.jodli.coffeeshottimer.data.repository.GrinderConfigRepositoryTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GrinderConfigurationTest.kt$com.jodli.coffeeshottimer.data.model.GrinderConfigurationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:GrinderSettingSliderTest.kt$com.jodli.coffeeshottimer.ui.components.GrinderSettingSliderTest.kt</ID>
-    <ID>NewLineAtEndOfFile:HiltModuleTest.kt$com.jodli.coffeeshottimer.di.HiltModuleTest.kt</ID>
-    <ID>NewLineAtEndOfFile:IntroductionScreenTest.kt$com.jodli.coffeeshottimer.ui.screens.IntroductionScreenTest.kt</ID>
-    <ID>NewLineAtEndOfFile:LandscapeConfigurationTest.kt$com.jodli.coffeeshottimer.ui.theme.LandscapeConfigurationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:LoadingAndErrorStateTest.kt$com.jodli.coffeeshottimer.ui.components.LoadingAndErrorStateTest.kt</ID>
-    <ID>NewLineAtEndOfFile:NavigationTest.kt$com.jodli.coffeeshottimer.ui.navigation.NavigationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:OnboardingNavigationIntegrationTest.kt$com.jodli.coffeeshottimer.ui.navigation.OnboardingNavigationIntegrationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:PhotoCaptureManagerTest.kt$com.jodli.coffeeshottimer.data.storage.PhotoCaptureManagerTest.kt</ID>
-    <ID>NewLineAtEndOfFile:PhotoStorageManagerTest.kt$com.jodli.coffeeshottimer.data.storage.PhotoStorageManagerTest.kt</ID>
-    <ID>NewLineAtEndOfFile:RecordShotUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:RemovePhotoFromBeanUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ShotDaoTest.kt$com.jodli.coffeeshottimer.data.dao.ShotDaoTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ShotRecordingIntegrationTest.kt$com.jodli.coffeeshottimer.integration.ShotRecordingIntegrationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ShotRecordingViewModelTest.kt$com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModelTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ShotRepositoryTest.kt$com.jodli.coffeeshottimer.data.repository.ShotRepositoryTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ShotTest.kt$com.jodli.coffeeshottimer.data.model.ShotTest.kt</ID>
-    <ID>NewLineAtEndOfFile:StandardizedComponentsTest.kt$com.jodli.coffeeshottimer.ui.components.StandardizedComponentsTest.kt</ID>
-    <ID>NewLineAtEndOfFile:TimerComponentsTest.kt$com.jodli.coffeeshottimer.ui.components.TimerComponentsTest.kt</ID>
-    <ID>NewLineAtEndOfFile:TimerStatePreservationTest.kt$com.jodli.coffeeshottimer.ui.viewmodel.TimerStatePreservationTest.kt</ID>
-    <ID>NewLineAtEndOfFile:TypographyAndSpacingTest.kt$com.jodli.coffeeshottimer.ui.components.TypographyAndSpacingTest.kt</ID>
-    <ID>NewLineAtEndOfFile:UpdateBeanUseCaseTest.kt$com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCaseTest.kt</ID>
-    <ID>NewLineAtEndOfFile:ValidationHelpersTest.kt$com.jodli.coffeeshottimer.ui.validation.ValidationHelpersTest.kt</ID>
-    <ID>NewLineAtEndOfFile:WeightSliderComponentsTest.kt$com.jodli.coffeeshottimer.ui.components.WeightSliderComponentsTest.kt</ID>
+    <ID>NoWildcardImports:AddBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:AddPhotoToBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:AppDatabaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:BasketConfigDaoTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:BasketConfigurationTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:BeanDaoTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:BeanRepositoryTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:BeanTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:CalculateGrindAdjustmentUseCase.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
+    <ID>NoWildcardImports:CalculateGrindAdjustmentUseCaseTest.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
+    <ID>NoWildcardImports:CalculateGrindAdjustmentUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ComponentTypographyUsageTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:DesignSystemValidationTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:EnhancedTimerButtonTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetActiveBeansUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetBeanHistoryUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetBeanPhotoUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetShotDetailsUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetShotHistoryUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetShotStatisticsUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GetTastePreselectionUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.animation.core.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
@@ -382,11 +372,38 @@
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.runtime.*</ID>
     <ID>NoWildcardImports:GrindAdjustmentCard.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
+    <ID>NoWildcardImports:GrindRecommendationPreferencesTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GrinderConfigDaoTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GrinderConfigRepositoryTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GrinderConfigurationTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:GrinderSettingSliderTest.kt$import androidx.compose.ui.test.*</ID>
+    <ID>NoWildcardImports:GuidedBeanCreationViewModelTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:LoadingAndErrorStateTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ManageGrindRecommendationUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:NavigationTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:OnboardingPreferencesTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:PersistentGrindRecommendationTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:PhotoCaptureManagerTest.kt$import io.mockk.*</ID>
+    <ID>NoWildcardImports:PhotoCaptureManagerTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:PhotoStorageManagerTest.kt$import io.mockk.*</ID>
+    <ID>NoWildcardImports:PhotoStorageManagerTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:RecommendationCard.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:RecommendationCard.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:RecordShotUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:RecordTasteFeedbackUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:RemovePhotoFromBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ShotDaoTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ShotHistoryViewModelTest.kt$import kotlinx.coroutines.test.*</ID>
+    <ID>NoWildcardImports:ShotHistoryViewModelTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ShotRecordedDialog.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:ShotRecordedDialog.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:ShotRecordedDialog.kt$import androidx.compose.runtime.*</ID>
+    <ID>NoWildcardImports:ShotRecordingIntegrationTest.kt$import io.mockk.*</ID>
+    <ID>NoWildcardImports:ShotRecordingIntegrationTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ShotRepositoryTasteTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ShotRepositoryTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ShotTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:StandardizedComponentsTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:TasteFeedbackDisplay.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:TasteFeedbackDisplay.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.foundation.layout.*</ID>
@@ -394,6 +411,12 @@
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.runtime.*</ID>
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.material3.*</ID>
+    <ID>NoWildcardImports:TimerComponentsTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:TypographyAndSpacingTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:UpdateBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ValidationExtensionsTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:ValidationHelpersTest.kt$import org.junit.Assert.*</ID>
+    <ID>NoWildcardImports:WeightSliderComponentsTest.kt$import org.junit.Assert.*</ID>
     <ID>ReturnCount:AddPhotoToBeanUseCase.kt$AddPhotoToBeanUseCase$suspend fun execute(beanId: String, imageUri: Uri): Result&lt;String&gt;</ID>
     <ID>ReturnCount:BasketConfigRepository.kt$BasketConfigRepository$suspend fun saveConfig(config: BasketConfiguration): Result&lt;Unit&gt;</ID>
     <ID>ReturnCount:BasketConfigRepository.kt$BasketConfigRepository$suspend fun setActiveConfig(configId: String): Result&lt;Unit&gt;</ID>
@@ -500,7 +523,6 @@
     <ID>TooGenericExceptionThrown:DatabasePopulator.kt$DatabasePopulator$throw Exception("Failed to add more shots: ${e.message}", e)</ID>
     <ID>TooGenericExceptionThrown:DatabasePopulator.kt$DatabasePopulator$throw Exception("Failed to clear database: ${e.message}", e)</ID>
     <ID>TooGenericExceptionThrown:DatabasePopulator.kt$DatabasePopulator$throw Exception("Failed to populate database: ${e.message}", e)</ID>
-    <ID>TooGenericExceptionThrown:IntroductionScreenTest.kt$IntroductionScreenTest$throw RuntimeException("Test error")</ID>
     <ID>TooManyFunctions:AddEditBeanViewModel.kt$AddEditBeanViewModel : ViewModel</ID>
     <ID>TooManyFunctions:BeanRepository.kt$BeanRepository</ID>
     <ID>TooManyFunctions:ShotDao.kt$ShotDao</ID>

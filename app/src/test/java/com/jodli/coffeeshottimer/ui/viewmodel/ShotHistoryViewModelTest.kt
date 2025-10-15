@@ -2,16 +2,16 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
+import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
+import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotStatisticsUseCase
-import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
+import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
-import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
-import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -21,9 +21,9 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -37,13 +37,13 @@ class ShotHistoryViewModelTest {
     private val memoryOptimizer = mockk<MemoryOptimizer>(relaxed = true)
     private val stringResourceProvider = mockk<StringResourceProvider>(relaxed = true)
     private val domainErrorTranslator = mockk<DomainErrorTranslator>(relaxed = true)
-    
+
     private val testDispatcher = UnconfinedTestDispatcher()
 
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        
+
         // Setup default mock responses
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(emptyList()))
         coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
@@ -61,16 +61,24 @@ class ShotHistoryViewModelTest {
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(OverallStatistics.empty())
         coEvery { getShotStatisticsUseCase.getShotTrends(any(), any()) } returns Result.success(ShotTrends.empty())
         coEvery { getShotStatisticsUseCase.getBrewRatioAnalysis(any()) } returns Result.success(BrewRatioAnalysis.empty())
-        coEvery { getShotStatisticsUseCase.getExtractionTimeAnalysis(any()) } returns Result.success(ExtractionTimeAnalysis.empty())
+        coEvery {
+            getShotStatisticsUseCase.getExtractionTimeAnalysis(any())
+        } returns Result.success(ExtractionTimeAnalysis.empty())
         coEvery { getShotStatisticsUseCase.getGrinderSettingAnalysis(any()) } returns Result.success(
             com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis.empty()
         )
-        
+
         // Setup string resource provider mocks
-        every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_unknown_error) } returns "Unknown error occurred"
-        every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.error_failed_to_load_analysis, any()) } returns "Failed to load analysis: Unknown error occurred"
-        every { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_inactive_bean) } returns "Inactive Bean"
-        
+        every {
+            stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_unknown_error)
+        } returns "Unknown error occurred"
+        every {
+            stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.error_failed_to_load_analysis, any())
+        } returns "Failed to load analysis: Unknown error occurred"
+        every {
+            stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_inactive_bean)
+        } returns "Inactive Bean"
+
         viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
     }
 
@@ -82,7 +90,7 @@ class ShotHistoryViewModelTest {
     @Test
     fun `initial state is correct`() {
         val uiState = viewModel.uiState.value
-        
+
         assertFalse(uiState.isLoading)
         assertTrue(uiState.shots.isEmpty())
         assertTrue(uiState.availableBeans.isEmpty())
@@ -92,7 +100,7 @@ class ShotHistoryViewModelTest {
     @Test
     fun `filter has no filters initially`() {
         val filter = viewModel.currentFilter.value
-        
+
         assertFalse(filter.hasFilters())
     }
 
@@ -103,12 +111,12 @@ class ShotHistoryViewModelTest {
             minBrewRatio = 1.5,
             maxBrewRatio = 3.0
         )
-        
-        every { getShotHistoryUseCase.getFilteredShots(testFilter) } returns 
+
+        every { getShotHistoryUseCase.getFilteredShots(testFilter) } returns
             flowOf(Result.success(emptyList()))
-        
+
         viewModel.applyFilter(testFilter)
-        
+
         val currentFilter = viewModel.currentFilter.value
         assertEquals("test-bean-id", currentFilter.beanId)
         assertEquals(1.5, currentFilter.minBrewRatio)
@@ -120,13 +128,13 @@ class ShotHistoryViewModelTest {
     fun `clearFilters resets filter to empty`() = runTest {
         // First apply a filter
         val testFilter = ShotHistoryFilter(beanId = "test-bean-id")
-        every { getShotHistoryUseCase.getFilteredShots(testFilter) } returns 
+        every { getShotHistoryUseCase.getFilteredShots(testFilter) } returns
             flowOf(Result.success(emptyList()))
         viewModel.applyFilter(testFilter)
-        
+
         // Then clear filters
         viewModel.clearFilters()
-        
+
         val currentFilter = viewModel.currentFilter.value
         assertFalse(currentFilter.hasFilters())
         assertEquals(null, currentFilter.beanId)
@@ -135,9 +143,9 @@ class ShotHistoryViewModelTest {
     @Test
     fun `setBeanFilter updates bean filter`() = runTest {
         val beanId = "test-bean-id"
-        
+
         viewModel.setBeanFilter(beanId)
-        
+
         val currentFilter = viewModel.currentFilter.value
         assertEquals(beanId, currentFilter.beanId)
         assertTrue(currentFilter.hasFilters())
@@ -147,9 +155,9 @@ class ShotHistoryViewModelTest {
     fun `setDateRangeFilter updates date range`() = runTest {
         val startDate = LocalDate.of(2024, 1, 1)
         val endDate = LocalDate.of(2024, 1, 31)
-        
+
         viewModel.setDateRangeFilter(startDate, endDate)
-        
+
         val currentFilter = viewModel.currentFilter.value
         assertEquals(startDate.atStartOfDay(), currentFilter.startDate)
         assertEquals(endDate.atTime(23, 59, 59, 999999999), currentFilter.endDate)
@@ -162,15 +170,15 @@ class ShotHistoryViewModelTest {
             Bean(id = "bean1", name = "Ethiopian Yirgacheffe", roastDate = LocalDate.now().minusDays(7)),
             Bean(id = "bean2", name = "Colombian Supremo", roastDate = LocalDate.now().minusDays(5))
         )
-        
+
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(testBeans))
-        
+
         // Recreate viewModel to pick up the new mock
         viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
-        
+
         // Wait for initial data load
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         val beanName = viewModel.getBeanName("bean1")
         assertEquals("Ethiopian Yirgacheffe", beanName)
     }
@@ -185,11 +193,11 @@ class ShotHistoryViewModelTest {
     fun `toggleOptimalExtractionTimeFilter toggles correctly`() = runTest {
         // Initially false
         assertFalse(viewModel.currentFilter.value.onlyOptimalExtractionTime == true)
-        
+
         // Toggle to true
         viewModel.toggleOptimalExtractionTimeFilter()
         assertTrue(viewModel.currentFilter.value.onlyOptimalExtractionTime == true)
-        
+
         // Toggle back to null/false
         viewModel.toggleOptimalExtractionTimeFilter()
         assertFalse(viewModel.currentFilter.value.onlyOptimalExtractionTime == true)
@@ -199,11 +207,11 @@ class ShotHistoryViewModelTest {
     fun `toggleTypicalBrewRatioFilter toggles correctly`() = runTest {
         // Initially false
         assertFalse(viewModel.currentFilter.value.onlyTypicalBrewRatio == true)
-        
+
         // Toggle to true
         viewModel.toggleTypicalBrewRatioFilter()
         assertTrue(viewModel.currentFilter.value.onlyTypicalBrewRatio == true)
-        
+
         // Toggle back to null/false
         viewModel.toggleTypicalBrewRatioFilter()
         assertFalse(viewModel.currentFilter.value.onlyTypicalBrewRatio == true)
@@ -213,11 +221,11 @@ class ShotHistoryViewModelTest {
     fun `toggleAnalysisView toggles analysis state correctly`() = runTest {
         // Initially analysis is not shown
         assertFalse(viewModel.uiState.value.showAnalysis)
-        
+
         // Toggle to show analysis
         viewModel.toggleAnalysisView()
         assertTrue(viewModel.uiState.value.showAnalysis)
-        
+
         // Toggle back to hide analysis
         viewModel.toggleAnalysisView()
         assertFalse(viewModel.uiState.value.showAnalysis)
@@ -238,7 +246,7 @@ class ShotHistoryViewModelTest {
             lastShotDate = LocalDateTime.now(),
             firstShotDate = LocalDateTime.now().minusDays(30)
         )
-        
+
         val mockTrends = ShotTrends(
             totalShots = 10,
             daysAnalyzed = 30,
@@ -251,16 +259,16 @@ class ShotHistoryViewModelTest {
             secondHalfAvgTime = 28.0,
             isImproving = true
         )
-        
+
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockOverallStats)
         coEvery { getShotStatisticsUseCase.getShotTrends(days = 30) } returns Result.success(mockTrends)
-        
+
         // Toggle analysis view
         viewModel.toggleAnalysisView()
-        
+
         // Wait for async operations
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
         assertEquals(mockOverallStats, uiState.overallStatistics)
@@ -272,22 +280,22 @@ class ShotHistoryViewModelTest {
     fun `analysis loading state is handled correctly`() = runTest {
         // Initially not loading analysis
         assertFalse(viewModel.uiState.value.analysisLoading)
-        
+
         // Mock a delayed response
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } coAnswers {
             kotlinx.coroutines.delay(100)
             Result.success(OverallStatistics.empty())
         }
-        
+
         // Toggle analysis view (this should start loading)
         viewModel.toggleAnalysisView()
-        
+
         // Should be loading initially
         assertTrue(viewModel.uiState.value.analysisLoading)
-        
+
         // Wait for completion
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         // Should not be loading anymore
         assertFalse(viewModel.uiState.value.analysisLoading)
     }
@@ -295,16 +303,16 @@ class ShotHistoryViewModelTest {
     @Test
     fun `analysis error is handled correctly`() = runTest {
         val errorMessage = "Failed to load statistics"
-        
+
         // Mock the first method to throw an exception (not just return Result.failure)
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } throws Exception(errorMessage)
-        
+
         // Toggle analysis view
         viewModel.toggleAnalysisView()
-        
+
         // Wait for async operations
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         val uiState = viewModel.uiState.value
         assertTrue(uiState.showAnalysis)
         assertFalse(uiState.analysisLoading)
@@ -325,17 +333,17 @@ class ShotHistoryViewModelTest {
             lastShotDate = LocalDateTime.now(),
             firstShotDate = LocalDateTime.now().minusDays(15)
         )
-        
+
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockStats)
-        
+
         // First show analysis
         viewModel.toggleAnalysisView()
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         // Refresh analysis
         viewModel.refreshAnalysis()
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         val uiState = viewModel.uiState.value
         assertEquals(mockStats, uiState.overallStatistics)
     }
@@ -344,11 +352,11 @@ class ShotHistoryViewModelTest {
     fun `refreshAnalysis does nothing when analysis is not shown`() = runTest {
         // Don't show analysis
         assertFalse(viewModel.uiState.value.showAnalysis)
-        
+
         // Refresh analysis (should do nothing)
         viewModel.refreshAnalysis()
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         val uiState = viewModel.uiState.value
         assertFalse(uiState.showAnalysis)
         assertEquals(null, uiState.overallStatistics)
@@ -359,10 +367,10 @@ class ShotHistoryViewModelTest {
     fun `hasAnalysisData returns true when any analysis data is present`() = runTest {
         val mockStats = OverallStatistics.empty().copy(totalShots = 1)
         coEvery { getShotStatisticsUseCase.getOverallStatistics() } returns Result.success(mockStats)
-        
+
         viewModel.toggleAnalysisView()
         testDispatcher.scheduler.advanceTimeBy(500)
-        
+
         assertTrue(viewModel.uiState.value.hasAnalysisData)
     }
 
@@ -402,7 +410,7 @@ class ShotHistoryViewModelTest {
         coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.failure(Exception("Test error"))
         every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.failure(Exception("Test error")))
         every { getShotHistoryUseCase.getFilteredShots(any()) } returns flowOf(Result.failure(Exception("Test error")))
-        
+
         // Set error state through manual refresh
         viewModel.refreshData()
         testDispatcher.scheduler.advanceTimeBy(1000)
@@ -416,7 +424,7 @@ class ShotHistoryViewModelTest {
         coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
             com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
         )
-        
+
         // Trigger a filter change which restarts reactive collection
         viewModel.setBeanFilter("test-bean-id")
         testDispatcher.scheduler.advanceTimeBy(2000)

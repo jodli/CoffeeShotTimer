@@ -230,7 +230,7 @@ class ManageGrindRecommendationUseCaseTest {
         assertTrue("Should now be based on taste", updated.basedOnTaste)
         assertEquals(ConfidenceLevel.HIGH, updated.confidence) // Updated confidence
         assertEquals("5.3", updated.suggestedGrindSetting) // Updated grind setting
-        
+
         // Verify correct serializable recommendation was saved
         val serializableSlot = slot<SerializableGrindRecommendation>()
         coVerify { mockGrindRecommendationPreferences.saveRecommendation(eq(beanId), capture(serializableSlot)) }

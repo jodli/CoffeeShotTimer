@@ -69,8 +69,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean should be invalid", result.isValid)
-        assertTrue("Should contain name length error", 
-            result.errors.contains("Bean name cannot exceed 100 characters"))
+        assertTrue(
+            "Should contain name length error",
+            result.errors.contains("Bean name cannot exceed 100 characters")
+        )
     }
 
     @Test
@@ -103,8 +105,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean should be invalid", result.isValid)
-        assertTrue("Should contain future date error", 
-            result.errors.contains("Roast date cannot be in the future"))
+        assertTrue(
+            "Should contain future date error",
+            result.errors.contains("Roast date cannot be in the future")
+        )
     }
 
     @Test
@@ -120,8 +124,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean should be invalid", result.isValid)
-        assertTrue("Should contain old date error", 
-            result.errors.contains("Roast date cannot be more than 365 days ago"))
+        assertTrue(
+            "Should contain old date error",
+            result.errors.contains("Roast date cannot be more than 365 days ago")
+        )
     }
 
     @Test
@@ -155,8 +161,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean should be invalid", result.isValid)
-        assertTrue("Should contain notes length error", 
-            result.errors.contains("Notes cannot exceed 500 characters"))
+        assertTrue(
+            "Should contain notes length error",
+            result.errors.contains("Notes cannot exceed 500 characters")
+        )
     }
 
     @Test
@@ -193,10 +201,14 @@ class BeanTest {
         assertFalse("Bean should be invalid", result.isValid)
         assertEquals("Should have 3 errors", 3, result.errors.size)
         assertTrue("Should contain name error", result.errors.contains("Bean name cannot be empty"))
-        assertTrue("Should contain future date error", 
-            result.errors.contains("Roast date cannot be in the future"))
-        assertTrue("Should contain notes length error", 
-            result.errors.contains("Notes cannot exceed 500 characters"))
+        assertTrue(
+            "Should contain future date error",
+            result.errors.contains("Roast date cannot be in the future")
+        )
+        assertTrue(
+            "Should contain notes length error",
+            result.errors.contains("Notes cannot exceed 500 characters")
+        )
     }
 
     @Test
@@ -397,8 +409,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean with empty photo path should be invalid", result.isValid)
-        assertTrue("Should contain photo path error", 
-            result.errors.contains("Photo path cannot be empty if provided"))
+        assertTrue(
+            "Should contain photo path error",
+            result.errors.contains("Photo path cannot be empty if provided")
+        )
     }
 
     @Test
@@ -415,8 +429,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean with blank photo path should be invalid", result.isValid)
-        assertTrue("Should contain photo path error", 
-            result.errors.contains("Photo path cannot be empty if provided"))
+        assertTrue(
+            "Should contain photo path error",
+            result.errors.contains("Photo path cannot be empty if provided")
+        )
     }
 
     @Test
@@ -434,8 +450,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean with long photo path should be invalid", result.isValid)
-        assertTrue("Should contain photo path length error", 
-            result.errors.contains("Photo path cannot exceed 500 characters"))
+        assertTrue(
+            "Should contain photo path length error",
+            result.errors.contains("Photo path cannot exceed 500 characters")
+        )
     }
 
     @Test
@@ -453,8 +471,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean with invalid photo path should be invalid", result.isValid)
-        assertTrue("Should contain photo path validation error", 
-            result.errors.contains("Photo path must be a valid file path"))
+        assertTrue(
+            "Should contain photo path validation error",
+            result.errors.contains("Photo path must be a valid file path")
+        )
     }
 
     @Test
@@ -472,8 +492,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean with directory traversal path should be invalid", result.isValid)
-        assertTrue("Should contain photo path validation error", 
-            result.errors.contains("Photo path must be a valid file path"))
+        assertTrue(
+            "Should contain photo path validation error",
+            result.errors.contains("Photo path must be a valid file path")
+        )
     }
 
     @Test
@@ -491,8 +513,10 @@ class BeanTest {
 
         // Then
         assertFalse("Bean with whitespace in photo path should be invalid", result.isValid)
-        assertTrue("Should contain photo path validation error", 
-            result.errors.contains("Photo path must be a valid file path"))
+        assertTrue(
+            "Should contain photo path validation error",
+            result.errors.contains("Photo path must be a valid file path")
+        )
     }
 
     @Test

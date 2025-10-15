@@ -2,14 +2,32 @@ package com.jodli.coffeeshottimer.utils
 
 import android.content.Context
 import androidx.compose.ui.semantics.SemanticsProperties
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.fetchSemanticsNodes
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.onAllNodes
+import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextClearance
+import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.test.waitUntil
 import com.jodli.coffeeshottimer.data.database.AppDatabase
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.Assert.fail
 import java.io.File
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -19,7 +37,7 @@ import java.util.*
  * Utility functions for testing the Espresso Shot Tracker app.
  */
 object TestUtils {
-    
+
     /**
      * Wait for a condition to be true with timeout.
      */
@@ -31,7 +49,7 @@ object TestUtils {
             condition()
         }
     }
-    
+
     /**
      * Wait for text to appear on screen.
      */
@@ -51,7 +69,7 @@ object TestUtils {
         performTextClearance()
         performTextInput(text)
     }
-    
+
     /**
      * Create a test bean with default values.
      */
@@ -70,7 +88,7 @@ object TestUtils {
             createdAt = LocalDateTime.now()
         )
     }
-    
+
     /**
      * Create a test shot with default values.
      */
@@ -93,7 +111,7 @@ object TestUtils {
             timestamp = LocalDateTime.now()
         )
     }
-    
+
     /**
      * Insert test data into database.
      */
@@ -105,19 +123,19 @@ object TestUtils {
         beans.forEach { bean ->
             database.beanDao().insertBean(bean)
         }
-        
+
         shots.forEach { shot ->
             database.shotDao().insertShot(shot)
         }
     }
-    
+
     /**
      * Clear all data from database.
      */
     fun clearDatabase(database: AppDatabase) = runBlocking {
         database.clearAllTables()
     }
-    
+
     /**
      * Navigate to a specific screen using bottom navigation.
      */
@@ -125,7 +143,7 @@ object TestUtils {
         onNodeWithText(screenName).performClick()
         waitForText(screenName)
     }
-    
+
     /**
      * Fill bean form with test data.
      */
@@ -136,7 +154,7 @@ object TestUtils {
         onNodeWithText("Bean Name").performTextInputWithClear(name)
         onNodeWithText("Notes").performTextInputWithClear(notes)
     }
-    
+
     /**
      * Fill shot recording form with test data.
      */
@@ -150,14 +168,14 @@ object TestUtils {
         // Select bean
         onNodeWithText("Select Bean").performClick()
         onNodeWithText(beanName).performClick()
-        
+
         // Fill form fields
         onNodeWithText("Coffee Weight In (g)").performTextInputWithClear(coffeeWeightIn)
         onNodeWithText("Coffee Weight Out (g)").performTextInputWithClear(coffeeWeightOut)
         onNodeWithText("Grinder Setting").performTextInputWithClear(grinderSetting)
         onNodeWithText("Notes (optional)").performTextInputWithClear(notes)
     }
-    
+
     /**
      * Verify shot appears in history with expected data.
      */
@@ -169,7 +187,7 @@ object TestUtils {
         onNodeWithText(beanName).assertIsDisplayed()
         onNodeWithText("${weightIn}g → ${weightOut}g").assertIsDisplayed()
     }
-    
+
     /**
      * Test accessibility of a screen by checking common accessibility requirements.
      */
@@ -179,23 +197,23 @@ object TestUtils {
             val hasContentDescription = node.config.contains(SemanticsProperties.ContentDescription)
             val hasText = node.config.contains(SemanticsProperties.Text)
             val hasRole = node.config.contains(SemanticsProperties.Role)
-            
+
             assert(hasContentDescription || hasText || hasRole) {
                 "Clickable element without proper accessibility labeling found"
             }
         }
-        
+
         // Check that form fields have proper labels
         onAllNodes(hasSetTextAction()).fetchSemanticsNodes().forEach { node ->
             val hasContentDescription = node.config.contains(SemanticsProperties.ContentDescription)
             val hasText = node.config.contains(SemanticsProperties.Text)
-            
+
             assert(hasContentDescription || hasText) {
                 "Form field without proper accessibility labeling found"
             }
         }
     }
-    
+
     /**
      * Test performance of a screen by measuring load time.
      */
@@ -204,23 +222,23 @@ object TestUtils {
         expectedMaxLoadTime: Long = 3000
     ): Long {
         val startTime = System.currentTimeMillis()
-        
+
         navigateToScreen(screenName)
-        
+
         // Wait for loading indicators to disappear
         waitForCondition {
             onAllNodesWithText("Loading...").fetchSemanticsNodes().isEmpty()
         }
-        
+
         val loadTime = System.currentTimeMillis() - startTime
-        
+
         assert(loadTime < expectedMaxLoadTime) {
             "Screen $screenName took too long to load: ${loadTime}ms (expected < ${expectedMaxLoadTime}ms)"
         }
-        
+
         return loadTime
     }
-    
+
     /**
      * Simulate memory pressure by creating and releasing objects.
      */
@@ -231,7 +249,7 @@ object TestUtils {
         }
         System.gc()
     }
-    
+
     /**
      * Get current memory usage in MB.
      */
@@ -240,30 +258,30 @@ object TestUtils {
         val usedMemory = runtime.totalMemory() - runtime.freeMemory()
         return usedMemory / (1024 * 1024)
     }
-    
+
     /**
      * Test that the app handles low memory conditions gracefully.
      */
     fun ComposeContentTestRule.testLowMemoryHandling() {
         val initialMemory = getCurrentMemoryUsageMB()
-        
+
         // Simulate memory pressure
         simulateMemoryPressure()
-        
+
         // App should still be responsive
         onNodeWithText("Record").assertIsDisplayed()
         onNodeWithText("History").assertIsDisplayed()
         onNodeWithText("Beans").assertIsDisplayed()
-        
+
         val finalMemory = getCurrentMemoryUsageMB()
         val memoryIncrease = finalMemory - initialMemory
-        
+
         // Memory increase should be reasonable
         assert(memoryIncrease < 50) {
             "Memory usage increased too much during test: ${memoryIncrease}MB"
         }
     }
-    
+
     /**
      * Test app behavior during configuration changes (rotation).
      * Note: This function is disabled as it requires activity scenario access.
@@ -276,7 +294,7 @@ object TestUtils {
             onAllNodesWithText("Loading...").fetchSemanticsNodes().isEmpty()
         }
     }
-    
+
     /**
      * Verify that all required UI elements are present on a screen.
      */
@@ -285,7 +303,7 @@ object TestUtils {
             onNodeWithText(element).assertIsDisplayed()
         }
     }
-    
+
     /**
      * Test form validation by submitting empty/invalid data.
      */
@@ -295,32 +313,32 @@ object TestUtils {
     ) {
         // Try to submit without filling required fields
         onNodeWithText(submitButtonText).performClick()
-        
+
         // Verify validation errors appear
         expectedErrors.forEach { error ->
             waitForText(error)
             onNodeWithText(error).assertIsDisplayed()
         }
     }
-    
+
     /**
      * Test that the app works offline by disabling network (simulation).
      */
     fun ComposeContentTestRule.testOfflineCapability() {
         // Since this is a local-only app, all functionality should work "offline"
         // We'll test that all main features are accessible
-        
+
         navigateToScreen("Beans")
         onNodeWithContentDescription("Add bean").assertIsDisplayed()
-        
+
         navigateToScreen("Record")
         onNodeWithText("Start Timer").assertIsDisplayed()
-        
+
         navigateToScreen("History")
         // Should show either shots or empty state
         assert(
             onAllNodesWithText("No shots recorded yet").fetchSemanticsNodes().isNotEmpty() ||
-            onAllNodesWithTag("shot_history_list").fetchSemanticsNodes().isNotEmpty()
+                onAllNodesWithTag("shot_history_list").fetchSemanticsNodes().isNotEmpty()
         )
     }
 
@@ -329,7 +347,7 @@ object TestUtils {
      */
     fun createTestImageFile(context: Context, fileName: String = "test_image_${UUID.randomUUID()}.jpg"): File {
         val testFile = File(context.cacheDir, fileName)
-        
+
         // Create a minimal valid JPEG file
         val testImageData = byteArrayOf(
             0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), 0xE0.toByte(), 0x00.toByte(), 0x10.toByte(),
@@ -362,7 +380,7 @@ object TestUtils {
             0x11.toByte(), 0x00.toByte(), 0x3F.toByte(), 0x00.toByte(), 0x00.toByte(), 0xFF.toByte(),
             0xD9.toByte()
         )
-        
+
         testFile.writeBytes(testImageData)
         return testFile
     }
@@ -373,10 +391,10 @@ object TestUtils {
     fun ComposeContentTestRule.testBeanPhotoFunctionality(beanName: String) {
         // Navigate to bean management
         navigateToScreen("Beans")
-        
+
         // Find and click on the bean
         onNodeWithText(beanName).performClick()
-        
+
         // Look for photo-related UI elements
         try {
             // Check if "Add Photo" button exists
@@ -385,7 +403,7 @@ object TestUtils {
             // Photo section might not be visible or implemented yet
             // This is acceptable for integration testing
         }
-        
+
         try {
             // Check if photo is displayed
             onNodeWithContentDescription("Bean photo").assertIsDisplayed()
@@ -400,7 +418,7 @@ object TestUtils {
     fun ComposeContentTestRule.verifyBeanHasPhoto(beanName: String) {
         navigateToScreen("Beans")
         onNodeWithText(beanName).performClick()
-        
+
         // Look for photo-related elements
         try {
             onNodeWithContentDescription("Bean photo").assertIsDisplayed()
@@ -421,22 +439,22 @@ object TestUtils {
     fun ComposeContentTestRule.testPhotoPermissions() {
         // This would typically test permission dialogs and camera availability
         // In integration tests, we mainly verify the UI doesn't crash when permissions are missing
-        
+
         navigateToScreen("Beans")
-        
+
         // Try to add a bean and access photo functionality
         onNodeWithContentDescription("Add bean").performClick()
-        
+
         // Look for photo-related buttons
         try {
             onNodeWithText("Add Photo").performClick()
-            
+
             // Should show either camera options or permission request
             // The exact behavior depends on device state and permissions
             waitForCondition(timeoutMillis = 2000) {
                 onAllNodesWithText("Camera").fetchSemanticsNodes().isNotEmpty() ||
-                onAllNodesWithText("Gallery").fetchSemanticsNodes().isNotEmpty() ||
-                onAllNodesWithText("Permission").fetchSemanticsNodes().isNotEmpty()
+                    onAllNodesWithText("Gallery").fetchSemanticsNodes().isNotEmpty() ||
+                    onAllNodesWithText("Permission").fetchSemanticsNodes().isNotEmpty()
             }
         } catch (e: Exception) {
             // Photo functionality might not be fully implemented or accessible
@@ -451,27 +469,29 @@ object TestUtils {
         // Create a bean with photo path
         val testBean = createTestBean(name = "Migration Test Bean")
         val beanWithPhoto = testBean.copy(photoPath = "test/photo/path.jpg")
-        
+
         // Insert bean with photo
         database.beanDao().insertBean(beanWithPhoto)
-        
+
         // Verify photo field is properly stored and retrieved
         val retrievedBean = database.beanDao().getBeanById(beanWithPhoto.id)
         assertNotNull("Bean should be retrieved", retrievedBean)
         assertEquals("Photo path should match", beanWithPhoto.photoPath, retrievedBean!!.photoPath)
         assertTrue("Bean should have photo", retrievedBean.hasPhoto())
-        
+
         // Test photo-specific queries
         val beansWithPhotos = database.beanDao().getBeansWithPhotos().first()
         assertTrue("Should find beans with photos", beansWithPhotos.isNotEmpty())
-        assertTrue("Test bean should be in results", 
-            beansWithPhotos.any { it.id == beanWithPhoto.id })
-        
+        assertTrue(
+            "Test bean should be in results",
+            beansWithPhotos.any { it.id == beanWithPhoto.id }
+        )
+
         // Test updating photo path
         database.beanDao().updateBeanPhoto(beanWithPhoto.id, "new/photo/path.jpg")
         val updatedBean = database.beanDao().getBeanById(beanWithPhoto.id)
         assertEquals("Photo path should be updated", "new/photo/path.jpg", updatedBean!!.photoPath)
-        
+
         // Test removing photo
         database.beanDao().removeBeanPhoto(beanWithPhoto.id)
         val beanWithoutPhoto = database.beanDao().getBeanById(beanWithPhoto.id)

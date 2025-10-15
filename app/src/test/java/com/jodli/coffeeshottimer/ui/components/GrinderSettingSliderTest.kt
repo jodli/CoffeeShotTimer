@@ -11,7 +11,7 @@ import org.robolectric.RobolectricTestRunner
 /**
  * Tests for GrinderSettingSlider component.
  * Verifies Task 15 implementation: Implement slider for grinder settings.
- * 
+ *
  * Note: These are unit tests using Robolectric for Compose testing.
  */
 @RunWith(RobolectricTestRunner::class)
@@ -23,7 +23,7 @@ class GrinderSettingSliderTest {
     @Test
     fun grinderSettingSlider_displaysCorrectValue() {
         var currentValue = "5.0"
-        
+
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 GrinderSettingSlider(
@@ -39,7 +39,7 @@ class GrinderSettingSliderTest {
 
         // Verify the current value is displayed
         composeTestRule.onNodeWithText("5").assertIsDisplayed()
-        
+
         // Verify the grinder setting label is displayed
         composeTestRule.onNodeWithText("Grinder Setting").assertIsDisplayed()
     }
@@ -47,7 +47,7 @@ class GrinderSettingSliderTest {
     @Test
     fun grinderSettingSlider_showsSuggestedSetting() {
         var currentValue = ""
-        
+
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 GrinderSettingSlider(
@@ -70,12 +70,12 @@ class GrinderSettingSliderTest {
     fun grinderSettingSlider_handlesValueChange() {
         var currentValue = "5.0"
         var valueChanged = false
-        
+
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 GrinderSettingSlider(
                     value = currentValue,
-                    onValueChange = { 
+                    onValueChange = {
                         currentValue = it
                         valueChanged = true
                     },
@@ -87,7 +87,7 @@ class GrinderSettingSliderTest {
 
         // Verify the slider component exists by checking for the label
         composeTestRule.onNodeWithText("Grinder Setting").assertExists()
-        
+
         // Verify the current value is displayed
         composeTestRule.onNodeWithText("5").assertExists()
     }

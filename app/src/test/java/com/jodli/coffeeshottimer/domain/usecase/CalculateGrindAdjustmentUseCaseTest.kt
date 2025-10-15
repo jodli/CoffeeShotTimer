@@ -56,18 +56,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 22 // 3 seconds too fast
         val tasteFeedback = TastePrimary.SOUR
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue("Result should be successful", result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals("Should recommend finer grind", AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals("Should suggest one step finer", "14.5", recommendation.suggestedGrindSetting)
         assertEquals("Should be 1 step adjustment", 1, recommendation.adjustmentSteps)
@@ -82,18 +84,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 27 // Optimal timing
         val tasteFeedback = TastePrimary.SOUR
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals("14.5", recommendation.suggestedGrindSetting)
         assertEquals(ConfidenceLevel.MEDIUM, recommendation.confidence) // Lower confidence due to good timing
@@ -108,18 +112,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 35 // 5 seconds too slow
         val tasteFeedback = TastePrimary.BITTER
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.COARSER, recommendation.adjustmentDirection)
         assertEquals("16.0", recommendation.suggestedGrindSetting) // 2 steps coarser (5s deviation)
         assertEquals(2, recommendation.adjustmentSteps)
@@ -134,18 +140,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 28 // Optimal timing
         val tasteFeedback = TastePrimary.BITTER
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.COARSER, recommendation.adjustmentDirection)
         assertEquals(ConfidenceLevel.MEDIUM, recommendation.confidence)
         assertEquals(0, recommendation.extractionTimeDeviation)
@@ -159,18 +167,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 27 // Optimal timing
         val tasteFeedback = TastePrimary.PERFECT
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.NO_CHANGE, recommendation.adjustmentDirection)
         assertEquals("15.0", recommendation.suggestedGrindSetting)
         assertEquals(0, recommendation.adjustmentSteps)
@@ -184,18 +194,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 20 // Too fast
         val tasteFeedback = TastePrimary.PERFECT
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         // Should recommend finer grind due to fast extraction, despite perfect taste
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals(ConfidenceLevel.MEDIUM, recommendation.confidence)
@@ -209,18 +221,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 27 // Optimal timing
         val tasteFeedback = null
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.NO_CHANGE, recommendation.adjustmentDirection)
         assertEquals(ConfidenceLevel.HIGH, recommendation.confidence) // No change is always high confidence
     }
@@ -231,18 +245,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 20 // Too fast
         val tasteFeedback = null
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals(ConfidenceLevel.MEDIUM, recommendation.confidence) // Medium due to no taste feedback
     }
@@ -256,23 +272,28 @@ class CalculateGrindAdjustmentUseCaseTest {
         val testCases = listOf(
             // deviation -> expected steps
             Pair(22, 1), // 3s deviation -> 1 step
-            Pair(21, 2), // 4s deviation -> 2 steps  
+            Pair(21, 2), // 4s deviation -> 2 steps
             Pair(18, 3), // 7s deviation -> 3 steps
             Pair(15, 3), // 10s deviation -> 3 steps (max)
             Pair(33, 1), // 3s deviation -> 1 step
             Pair(36, 2), // 6s deviation -> 2 steps
-            Pair(40, 3)  // 10s deviation -> 3 steps
+            Pair(40, 3) // 10s deviation -> 3 steps
         )
 
         testCases.forEach { (extractionTime, expectedSteps) ->
             val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-                "15.0", extractionTime, null
+                "15.0",
+                extractionTime,
+                null
             )
-            
+
             assertTrue("Result should be successful for $extractionTime", result.isSuccess)
             val recommendation = result.getOrNull()!!
-            assertEquals("Steps should be $expectedSteps for deviation from $extractionTime", 
-                expectedSteps, recommendation.adjustmentSteps)
+            assertEquals(
+                "Steps should be $expectedSteps for deviation from $extractionTime",
+                expectedSteps,
+                recommendation.adjustmentSteps
+            )
         }
     }
 
@@ -284,18 +305,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "5.5" // Middle of range (1-10), allows adjustment
         val extractionTime = 22 // 3s too fast
         val tasteFeedback = TastePrimary.SOUR
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(precisionGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals("5.4", recommendation.suggestedGrindSetting) // 0.1 step finer
         assertEquals(1, recommendation.adjustmentSteps)
@@ -307,20 +330,25 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "55"
         val extractionTime = 22 // 3s too fast
         val tasteFeedback = TastePrimary.SOUR
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(coarseStepGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
-        assertEquals("54", recommendation.suggestedGrindSetting) // 1.0 step finer (formatted as integer since step size >= 1.0)
+        assertEquals(
+            "54",
+            recommendation.suggestedGrindSetting
+        ) // 1.0 step finer (formatted as integer since step size >= 1.0)
         assertEquals(1, recommendation.adjustmentSteps)
     }
 
@@ -332,18 +360,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "10.0" // At minimum
         val extractionTime = 20 // Should recommend finer
         val tasteFeedback = TastePrimary.SOUR
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals("10.0", recommendation.suggestedGrindSetting) // Can't go below minimum
         assertEquals(0, recommendation.adjustmentSteps) // No actual steps possible
@@ -355,18 +385,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "20.0" // At maximum
         val extractionTime = 35 // Should recommend coarser
         val tasteFeedback = TastePrimary.BITTER
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.COARSER, recommendation.adjustmentDirection)
         assertEquals("20.0", recommendation.suggestedGrindSetting) // Can't go above maximum
         assertEquals(0, recommendation.adjustmentSteps) // No actual steps possible
@@ -378,18 +410,20 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "10.5" // Only 1 step from minimum
         val extractionTime = 15 // 10s deviation, would normally be 3 steps
         val tasteFeedback = TastePrimary.SOUR
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue(result.isSuccess)
         val recommendation = result.getOrNull()!!
-        
+
         assertEquals(AdjustmentDirection.FINER, recommendation.adjustmentDirection)
         assertEquals("10.0", recommendation.suggestedGrindSetting) // Hit minimum boundary
         assertEquals(1, recommendation.adjustmentSteps) // Only 1 step actually possible
@@ -403,19 +437,24 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "invalid"
         val extractionTime = 27
         val tasteFeedback = TastePrimary.PERFECT
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
         assertTrue("Result should be failure", result.isFailure)
         val exception = result.exceptionOrNull()
         assertNotNull("Exception should not be null", exception)
-        assertTrue("Should be domain exception", exception is com.jodli.coffeeshottimer.domain.exception.DomainException)
+        assertTrue(
+            "Should be domain exception",
+            exception is com.jodli.coffeeshottimer.domain.exception.DomainException
+        )
     }
 
     @Test
@@ -424,12 +463,14 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = -5 // Invalid negative time
         val tasteFeedback = TastePrimary.PERFECT
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(standardGrinderConfig)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
@@ -445,13 +486,15 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 27
         val tasteFeedback = TastePrimary.PERFECT
-        
+
         val repositoryError = RepositoryException.DatabaseError("Database error", Exception())
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.failure(repositoryError)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
@@ -465,12 +508,14 @@ class CalculateGrindAdjustmentUseCaseTest {
         val currentGrindSetting = "15.0"
         val extractionTime = 27
         val tasteFeedback = TastePrimary.PERFECT
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(null)
 
         // When
         val result = calculateGrindAdjustmentUseCase.calculateAdjustment(
-            currentGrindSetting, extractionTime, tasteFeedback
+            currentGrindSetting,
+            extractionTime,
+            tasteFeedback
         )
 
         // Then
@@ -497,7 +542,6 @@ class CalculateGrindAdjustmentUseCaseTest {
         assertFalse("Should not have adjustment", noChangeResult.getOrNull()!!.hasAdjustment())
     }
 
-
     // === CONFIDENCE LEVEL TESTS ===
 
     @Test
@@ -516,8 +560,11 @@ class CalculateGrindAdjustmentUseCaseTest {
         testCases.forEach { (extractionTime, taste, expectedConfidence) ->
             val result = calculateGrindAdjustmentUseCase.calculateAdjustment("15.0", extractionTime, taste)
             assertTrue("Result should be successful for $extractionTime/$taste", result.isSuccess)
-            assertEquals("Confidence should be $expectedConfidence for $extractionTime/$taste", 
-                expectedConfidence, result.getOrNull()!!.confidence)
+            assertEquals(
+                "Confidence should be $expectedConfidence for $extractionTime/$taste",
+                expectedConfidence,
+                result.getOrNull()!!.confidence
+            )
         }
     }
 }

@@ -12,9 +12,9 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * Unit tests for ShotRepository taste feedback methods.
@@ -47,7 +47,7 @@ class ShotRepositoryTasteTest {
             extractionTimeSeconds = 28,
             grinderSetting = "15"
         )
-        
+
         coEvery { shotDao.getShotById(shotId) } returns mockShot
         coEvery { shotDao.updateTasteFeedback(shotId, tastePrimary, tasteSecondary) } returns Unit
 
@@ -73,7 +73,7 @@ class ShotRepositoryTasteTest {
             extractionTimeSeconds = 22,
             grinderSetting = "15"
         )
-        
+
         coEvery { shotDao.getShotById(shotId) } returns mockShot
         coEvery { shotDao.updateTasteFeedback(shotId, tastePrimary, null) } returns Unit
 
@@ -106,7 +106,7 @@ class ShotRepositoryTasteTest {
         // Given
         val shotId = "non-existent-shot"
         val tastePrimary = TastePrimary.BITTER
-        
+
         coEvery { shotDao.getShotById(shotId) } returns null
 
         // When
@@ -125,7 +125,7 @@ class ShotRepositoryTasteTest {
         val shotId = "test-shot-id"
         val tastePrimary = TastePrimary.PERFECT
         val databaseException = RuntimeException("Database connection lost")
-        
+
         coEvery { shotDao.getShotById(shotId) } throws databaseException
 
         // When
@@ -155,7 +155,7 @@ class ShotRepositoryTasteTest {
                 tastePrimary = TastePrimary.PERFECT
             )
         )
-        
+
         every { shotDao.getShotsByTaste(tastePrimary, beanId) } returns flowOf(mockShots)
 
         // When
@@ -192,7 +192,7 @@ class ShotRepositoryTasteTest {
                 tastePrimary = TastePrimary.SOUR
             )
         )
-        
+
         every { shotDao.getShotsByTaste(null, beanId) } returns flowOf(mockShots)
 
         // When
@@ -211,7 +211,7 @@ class ShotRepositoryTasteTest {
         val tastePrimary = TastePrimary.BITTER
         val beanId = "test-bean"
         val databaseException = RuntimeException("Database error")
-        
+
         every { shotDao.getShotsByTaste(tastePrimary, beanId) } throws databaseException
 
         // When
@@ -235,7 +235,7 @@ class ShotRepositoryTasteTest {
             TasteDistribution(TastePrimary.PERFECT, 8),
             TasteDistribution(TastePrimary.BITTER, 1)
         )
-        
+
         coEvery { shotDao.getTasteDistributionForBean(beanId) } returns mockDistribution
 
         // When
@@ -266,7 +266,7 @@ class ShotRepositoryTasteTest {
         // Given
         val beanId = "test-bean"
         val databaseException = RuntimeException("Database connection failed")
-        
+
         coEvery { shotDao.getTasteDistributionForBean(beanId) } throws databaseException
 
         // When
@@ -306,7 +306,7 @@ class ShotRepositoryTasteTest {
                 extractionTimeSeconds = 28,
                 grinderSetting = "15"
             )
-            
+
             coEvery { shotDao.getShotById(shotId) } returns mockShot
             coEvery { shotDao.updateTasteFeedback(shotId, primary, secondary) } returns Unit
 
@@ -333,7 +333,7 @@ class ShotRepositoryTasteTest {
             tastePrimary = TastePrimary.PERFECT,
             tasteSecondary = TasteSecondary.STRONG
         )
-        
+
         coEvery { shotDao.getShotById(shotId) } returns mockShot
         coEvery { shotDao.updateTasteFeedback(shotId, null, null) } returns Unit
 

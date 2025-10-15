@@ -38,8 +38,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain coffee in min error", 
-            result.errors.contains("Coffee in minimum cannot be less than 5g"))
+        assertTrue(
+            "Should contain coffee in min error",
+            result.errors.contains("Coffee in minimum cannot be less than 5g")
+        )
     }
 
     @Test
@@ -57,8 +59,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain coffee in max error", 
-            result.errors.contains("Coffee in maximum cannot exceed 30g"))
+        assertTrue(
+            "Should contain coffee in max error",
+            result.errors.contains("Coffee in maximum cannot exceed 30g")
+        )
     }
 
     @Test
@@ -76,8 +80,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain min/max error", 
-            result.errors.contains("Coffee in minimum must be less than maximum"))
+        assertTrue(
+            "Should contain min/max error",
+            result.errors.contains("Coffee in minimum must be less than maximum")
+        )
     }
 
     @Test
@@ -95,8 +101,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain coffee out min error", 
-            result.errors.contains("Coffee out minimum cannot be less than 10g"))
+        assertTrue(
+            "Should contain coffee out min error",
+            result.errors.contains("Coffee out minimum cannot be less than 10g")
+        )
     }
 
     @Test
@@ -114,8 +122,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain coffee out max error", 
-            result.errors.contains("Coffee out maximum cannot exceed 80g"))
+        assertTrue(
+            "Should contain coffee out max error",
+            result.errors.contains("Coffee out maximum cannot exceed 80g")
+        )
     }
 
     @Test
@@ -133,8 +143,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain min/max error", 
-            result.errors.contains("Coffee out minimum must be less than maximum"))
+        assertTrue(
+            "Should contain min/max error",
+            result.errors.contains("Coffee out minimum must be less than maximum")
+        )
     }
 
     @Test
@@ -142,7 +154,7 @@ class BasketConfigurationTest {
         // Given
         val invalidConfig = BasketConfiguration(
             coffeeInMin = 10f,
-            coffeeInMax = 12f,  // Range = 2g
+            coffeeInMax = 12f, // Range = 2g
             coffeeOutMin = 20f,
             coffeeOutMax = 50f
         )
@@ -152,8 +164,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain range size error", 
-            result.errors.contains("Coffee in range must be at least 3g"))
+        assertTrue(
+            "Should contain range size error",
+            result.errors.contains("Coffee in range must be at least 3g")
+        )
     }
 
     @Test
@@ -163,7 +177,7 @@ class BasketConfigurationTest {
             coffeeInMin = 10f,
             coffeeInMax = 20f,
             coffeeOutMin = 20f,
-            coffeeOutMax = 29f  // Range = 9g
+            coffeeOutMax = 29f // Range = 9g
         )
 
         // When
@@ -171,8 +185,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain range size error", 
-            result.errors.contains("Coffee out range must be at least 10g"))
+        assertTrue(
+            "Should contain range size error",
+            result.errors.contains("Coffee out range must be at least 10g")
+        )
     }
 
     @Test
@@ -181,7 +197,7 @@ class BasketConfigurationTest {
         val invalidConfig = BasketConfiguration(
             coffeeInMin = 10f,
             coffeeInMax = 20f,
-            coffeeOutMin = 10f,  // 10g out / 20g in = 0.5 ratio < 0.8
+            coffeeOutMin = 10f, // 10g out / 20g in = 0.5 ratio < 0.8
             coffeeOutMax = 30f
         )
 
@@ -190,8 +206,10 @@ class BasketConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain ratio error", 
-            result.errors.contains("Weight ranges don't allow reasonable brew ratios"))
+        assertTrue(
+            "Should contain ratio error",
+            result.errors.contains("Weight ranges don't allow reasonable brew ratios")
+        )
     }
 
     @Test
@@ -200,7 +218,7 @@ class BasketConfigurationTest {
         val validConfig = BasketConfiguration(
             coffeeInMin = 10f,
             coffeeInMax = 20f,
-            coffeeOutMin = 16f,  // 16g out / 20g in = 0.8 ratio (exactly)
+            coffeeOutMin = 16f, // 16g out / 20g in = 0.8 ratio (exactly)
             coffeeOutMax = 50f
         )
 
@@ -216,10 +234,10 @@ class BasketConfigurationTest {
     fun `validate returns multiple errors for multiple invalid fields`() {
         // Given
         val invalidConfig = BasketConfiguration(
-            coffeeInMin = 3f,   // Too low
-            coffeeInMax = 35f,  // Too high
-            coffeeOutMin = 5f,  // Too low
-            coffeeOutMax = 90f  // Too high
+            coffeeInMin = 3f, // Too low
+            coffeeInMax = 35f, // Too high
+            coffeeOutMin = 5f, // Too low
+            coffeeOutMax = 90f // Too high
         )
 
         // When
@@ -470,14 +488,30 @@ class BasketConfigurationTest {
         val doubleShot = BasketConfiguration.DOUBLE_SHOT
 
         // Then
-        assertEquals("Default should match double shot in coffee in min", 
-            doubleShot.coffeeInMin, default.coffeeInMin, 0.01f)
-        assertEquals("Default should match double shot in coffee in max", 
-            doubleShot.coffeeInMax, default.coffeeInMax, 0.01f)
-        assertEquals("Default should match double shot in coffee out min", 
-            doubleShot.coffeeOutMin, default.coffeeOutMin, 0.01f)
-        assertEquals("Default should match double shot in coffee out max", 
-            doubleShot.coffeeOutMax, default.coffeeOutMax, 0.01f)
+        assertEquals(
+            "Default should match double shot in coffee in min",
+            doubleShot.coffeeInMin,
+            default.coffeeInMin,
+            0.01f
+        )
+        assertEquals(
+            "Default should match double shot in coffee in max",
+            doubleShot.coffeeInMax,
+            default.coffeeInMax,
+            0.01f
+        )
+        assertEquals(
+            "Default should match double shot in coffee out min",
+            doubleShot.coffeeOutMin,
+            default.coffeeOutMin,
+            0.01f
+        )
+        assertEquals(
+            "Default should match double shot in coffee out max",
+            doubleShot.coffeeOutMax,
+            default.coffeeOutMax,
+            0.01f
+        )
     }
 
     @Test
@@ -499,18 +533,26 @@ class BasketConfigurationTest {
 
         // When & Then for single shot
         // 1:2 ratio (ristretto): 10g in -> 20g out (both in range)
-        assertTrue("Single shot should allow 1:2 ratio", 
-            singleShot.isCoffeeInValueInRange(10f) && singleShot.isCoffeeOutValueInRange(20f))
+        assertTrue(
+            "Single shot should allow 1:2 ratio",
+            singleShot.isCoffeeInValueInRange(10f) && singleShot.isCoffeeOutValueInRange(20f)
+        )
         // 1:3 ratio (normale): 10g in -> 30g out (both in range)
-        assertTrue("Single shot should allow 1:3 ratio", 
-            singleShot.isCoffeeInValueInRange(10f) && singleShot.isCoffeeOutValueInRange(30f))
+        assertTrue(
+            "Single shot should allow 1:3 ratio",
+            singleShot.isCoffeeInValueInRange(10f) && singleShot.isCoffeeOutValueInRange(30f)
+        )
 
         // When & Then for double shot
         // 1:2 ratio (ristretto): 18g in -> 36g out (both in range)
-        assertTrue("Double shot should allow 1:2 ratio", 
-            doubleShot.isCoffeeInValueInRange(18f) && doubleShot.isCoffeeOutValueInRange(36f))
+        assertTrue(
+            "Double shot should allow 1:2 ratio",
+            doubleShot.isCoffeeInValueInRange(18f) && doubleShot.isCoffeeOutValueInRange(36f)
+        )
         // 1:2.5 ratio (normale): 18g in -> 45g out (both in range)
-        assertTrue("Double shot should allow 1:2.5 ratio", 
-            doubleShot.isCoffeeInValueInRange(18f) && doubleShot.isCoffeeOutValueInRange(45f))
+        assertTrue(
+            "Double shot should allow 1:2.5 ratio",
+            doubleShot.isCoffeeInValueInRange(18f) && doubleShot.isCoffeeOutValueInRange(45f)
+        )
     }
 }

@@ -90,7 +90,7 @@ class OnboardingNavigationIntegrationTest {
 
         // Verify routes are different (back navigation is meaningful)
         assert(introRoute != equipmentRoute) { "Introduction and equipment setup should have different routes" }
-        
+
         // Verify routes follow expected naming convention
         assert(introRoute.startsWith("onboarding_")) { "Introduction route should start with 'onboarding_'" }
         assert(equipmentRoute.startsWith("onboarding_")) { "Equipment setup route should start with 'onboarding_'" }
@@ -179,19 +179,19 @@ class OnboardingNavigationIntegrationTest {
 
         // Test navigation through all slides
         composeTestRule.onNodeWithText("Welcome to Coffee Shot Timer").assertExists()
-        
+
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Main Features").assertExists()
-        
+
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Flexible Workflow").assertExists()
-        
+
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Smart Timer").assertExists()
-        
+
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Ready to Begin").assertExists()
@@ -212,14 +212,14 @@ class OnboardingNavigationIntegrationTest {
 
         // Verify the screen loads without errors
         composeTestRule.onNodeWithText("Welcome to Coffee Shot Timer").assertExists()
-        
+
         // Test that navigation operations don't crash
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
-        
+
         composeTestRule.onNodeWithText("Previous").performClick()
         composeTestRule.waitForIdle()
-        
+
         composeTestRule.onNodeWithText("Welcome to Coffee Shot Timer").assertExists()
     }
 }

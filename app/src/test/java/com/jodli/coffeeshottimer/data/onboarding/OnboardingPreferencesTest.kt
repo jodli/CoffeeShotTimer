@@ -389,7 +389,7 @@ class OnboardingProgressTest {
         // Then
         assertNull(nextStep)
     }
-    
+
     @Test
     fun `isComplete returns false when equipment setup version is outdated`() {
         // Given
@@ -404,7 +404,7 @@ class OnboardingProgressTest {
         // When & Then
         assertFalse(progress.isComplete())
     }
-    
+
     @Test
     fun `getNextStep returns EQUIPMENT_SETUP when version is outdated`() {
         // Given
@@ -422,7 +422,7 @@ class OnboardingProgressTest {
         // Then
         assertEquals(OnboardingStep.EQUIPMENT_SETUP, nextStep)
     }
-    
+
     @Test
     fun `needsEquipmentSetup returns true when equipment setup not completed`() {
         // Given
@@ -435,7 +435,7 @@ class OnboardingProgressTest {
         // When & Then
         assertTrue(progress.needsEquipmentSetup())
     }
-    
+
     @Test
     fun `needsEquipmentSetup returns true when equipment setup version is outdated`() {
         // Given
@@ -448,7 +448,7 @@ class OnboardingProgressTest {
         // When & Then
         assertTrue(progress.needsEquipmentSetup())
     }
-    
+
     @Test
     fun `needsEquipmentSetup returns false when equipment setup is complete and current version`() {
         // Given

@@ -1,8 +1,8 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.ui.graphics.Color
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Test
 
 class TimerComponentsTest {
 
