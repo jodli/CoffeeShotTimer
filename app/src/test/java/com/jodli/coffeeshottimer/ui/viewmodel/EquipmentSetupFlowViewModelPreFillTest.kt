@@ -55,7 +55,7 @@ class EquipmentSetupFlowViewModelPreFillTest {
             scaleMax = 10,
             stepSize = 0.5
         )
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(existingGrinderConfig)
         coEvery { basketConfigRepository.getActiveConfig() } returns Result.success(null)
 
@@ -81,7 +81,7 @@ class EquipmentSetupFlowViewModelPreFillTest {
             coffeeOutMax = 55f,
             isActive = true
         )
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(null)
         coEvery { basketConfigRepository.getActiveConfig() } returns Result.success(existingBasketConfig)
 
@@ -113,7 +113,7 @@ class EquipmentSetupFlowViewModelPreFillTest {
             coffeeOutMax = 40f,
             isActive = true
         )
-        
+
         coEvery { grinderConfigRepository.getCurrentConfig() } returns Result.success(existingGrinderConfig)
         coEvery { basketConfigRepository.getActiveConfig() } returns Result.success(existingBasketConfig)
 
@@ -123,13 +123,13 @@ class EquipmentSetupFlowViewModelPreFillTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        
+
         // Grinder fields
         assertEquals("30", uiState.grinderScaleMin)
         assertEquals("80", uiState.grinderScaleMax)
         assertEquals("1.0", uiState.grinderStepSize)
         assertTrue("Grinder should be valid after pre-filling", uiState.isGrinderValid)
-        
+
         // Basket fields
         assertEquals("7", uiState.coffeeInMin)
         assertEquals("12", uiState.coffeeInMax)
@@ -150,7 +150,7 @@ class EquipmentSetupFlowViewModelPreFillTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        
+
         // Should use defaults from EquipmentSetupFlowUiState
         assertEquals("", uiState.grinderScaleMin)
         assertEquals("", uiState.grinderScaleMax)
@@ -173,7 +173,7 @@ class EquipmentSetupFlowViewModelPreFillTest {
 
         // Then
         val uiState = viewModel.uiState.first()
-        
+
         // Should gracefully handle errors and use defaults
         assertEquals("", uiState.grinderScaleMin)
         assertEquals("", uiState.grinderScaleMax)

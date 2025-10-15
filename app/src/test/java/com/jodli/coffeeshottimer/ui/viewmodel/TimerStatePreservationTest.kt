@@ -5,12 +5,12 @@ import android.os.SystemClock
 import androidx.lifecycle.SavedStateHandle
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
+import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
+import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
-import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
-import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -56,9 +56,9 @@ class TimerStatePreservationTest {
     private lateinit var basketConfigRepository: com.jodli.coffeeshottimer.data.repository.BasketConfigRepository
     private lateinit var context: Context
     private lateinit var savedStateHandle: SavedStateHandle
-    
+
     private lateinit var viewModel: ShotRecordingViewModel
-    
+
     private val testDispatcher = StandardTestDispatcher()
     private val testScope = TestScope(testDispatcher)
 
@@ -66,7 +66,7 @@ class TimerStatePreservationTest {
     fun setup() {
         // Mock SystemClock for consistent testing
         mockkStatic(SystemClock::class)
-        
+
         // Mock dependencies
         shotRepository = mockk(relaxed = true)
         recordShotUseCase = RecordShotUseCase(shotRepository)
@@ -83,7 +83,7 @@ class TimerStatePreservationTest {
         basketConfigRepository = mockk(relaxed = true)
         context = mockk(relaxed = true)
         savedStateHandle = SavedStateHandle()
-        
+
         // Mock repository responses
         every { beanRepository.getActiveBeans() } returns kotlinx.coroutines.flow.flowOf(Result.success(emptyList()))
         io.mockk.coEvery { beanRepository.getCurrentBean() } returns Result.success(null)
@@ -182,11 +182,11 @@ class TimerStatePreservationTest {
 
         // Start timer
         viewModel.startTimer()
-        
+
         // Advance time by 3 seconds
         mockTime += 3000L
         advanceTimeBy(3000L)
-        
+
         // Pause timer
         viewModel.pauseTimer()
         assertFalse("Timer should be paused", viewModel.timerState.value.isRunning)
@@ -242,7 +242,7 @@ class TimerStatePreservationTest {
         mockTime += 2000L
         advanceTimeBy(2000L)
         viewModel.resetTimer()
-        
+
         // Verify reset state
         assertFalse("Timer should be stopped after reset", viewModel.timerState.value.isRunning)
         assertEquals("Timer should show 0 seconds after reset", 0, viewModel.timerState.value.elapsedTimeSeconds)
@@ -267,7 +267,11 @@ class TimerStatePreservationTest {
 
         // Verify reset state is preserved
         assertFalse("Timer should remain reset after restoration", newViewModel.timerState.value.isRunning)
-        assertEquals("Elapsed time should remain 0 after restoration", 0, newViewModel.timerState.value.elapsedTimeSeconds)
+        assertEquals(
+            "Elapsed time should remain 0 after restoration",
+            0,
+            newViewModel.timerState.value.elapsedTimeSeconds
+        )
     }
 
     @Test
@@ -299,7 +303,7 @@ class TimerStatePreservationTest {
         // First configuration change after 2 seconds
         mockTime += 2000L
         advanceTimeBy(2000L)
-        
+
         var newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
@@ -324,7 +328,7 @@ class TimerStatePreservationTest {
         // Second configuration change after another 3 seconds
         mockTime += 3000L
         advanceTimeBy(3000L)
-        
+
         newViewModel = ShotRecordingViewModel(
             recordShotUseCase = RecordShotUseCase(shotRepository),
             getShotDetailsUseCase = getShotDetailsUseCase,
@@ -371,7 +375,7 @@ class TimerStatePreservationTest {
 
         // Start timer
         viewModel.startTimer()
-        
+
         // Advance time by 4 seconds
         mockTime += 4000L
         advanceTimeBy(4000L)
@@ -401,10 +405,10 @@ class TimerStatePreservationTest {
         // Advance time by another 2 seconds and verify accuracy
         mockTime += 2000L
         advanceTimeBy(2000L)
-        
+
         // The timer should automatically update through the ViewModel's periodic updates
         // We can verify the elapsed time through the timerState
-        
+
         assertEquals("Total elapsed time should be 6 seconds", 6, newViewModel.timerState.value.elapsedTimeSeconds)
     }
 }

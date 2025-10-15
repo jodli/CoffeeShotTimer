@@ -1,9 +1,9 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
-import com.jodli.coffeeshottimer.data.util.DatabasePopulator
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.data.util.DatabasePopulator
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -40,24 +40,31 @@ class DebugViewModelTest {
     @Before
     fun setup() {
         // Skip all tests in this class if not in debug build
-        org.junit.Assume.assumeTrue("DebugViewModel tests only run in debug builds", com.jodli.coffeeshottimer.BuildConfig.DEBUG)
-        
+        org.junit.Assume.assumeTrue(
+            "DebugViewModel tests only run in debug builds",
+            com.jodli.coffeeshottimer.BuildConfig.DEBUG
+        )
+
         Dispatchers.setMain(testDispatcher)
         databasePopulator = mockk(relaxed = true)
         onboardingManager = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
         domainErrorTranslator = mockk(relaxed = true)
-        
+
         // Setup mock responses for string resources
         coEvery { stringResourceProvider.getString(any()) } returns "Mock string"
-        coEvery { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_database_filled) } returns "Database filled with test data successfully!"
-        coEvery { stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_database_cleared) } returns "Database cleared successfully!"
-        
+        coEvery {
+            stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_database_filled)
+        } returns "Database filled with test data successfully!"
+        coEvery {
+            stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_database_cleared)
+        } returns "Database cleared successfully!"
+
         // Setup mock responses for error translator
         coEvery { domainErrorTranslator.getLoadingError(any()) } returns "Failed to fill database"
         coEvery { domainErrorTranslator.getDeleteError() } returns "Failed to clear database"
         coEvery { domainErrorTranslator.translateError(any()) } returns "Unknown error occurred"
-        
+
         viewModel = DebugViewModel(databasePopulator, onboardingManager, stringResourceProvider, domainErrorTranslator)
     }
 
@@ -94,7 +101,7 @@ class DebugViewModelTest {
     fun `hideDialog should reset state correctly`() {
         // Given
         viewModel.showDialog()
-        
+
         // When
         viewModel.hideDialog()
 
@@ -120,7 +127,7 @@ class DebugViewModelTest {
     fun `hideConfirmation should update state correctly`() {
         // Given
         viewModel.showConfirmation()
-        
+
         // When
         viewModel.hideConfirmation()
 
@@ -134,7 +141,8 @@ class DebugViewModelTest {
     @Test
     fun `fillDatabase should not execute when databasePopulator is null`() = runTest {
         // Given
-        val viewModelWithNullPopulator = DebugViewModel(null, onboardingManager, stringResourceProvider, domainErrorTranslator)
+        val viewModelWithNullPopulator =
+            DebugViewModel(null, onboardingManager, stringResourceProvider, domainErrorTranslator)
 
         // When
         viewModelWithNullPopulator.fillDatabase()
@@ -157,7 +165,7 @@ class DebugViewModelTest {
 
         // Then
         coVerify(exactly = 1) { databasePopulator.populateForScreenshots() }
-        
+
         val state = viewModel.uiState.value
         assertFalse("Should not be loading after completion", state.isLoading)
         assertEquals(
@@ -198,7 +206,7 @@ class DebugViewModelTest {
 
         // Then
         coVerify(exactly = 1) { databasePopulator.clearAllData() }
-        
+
         val state = viewModel.uiState.value
         assertFalse("Should not be loading after completion", state.isLoading)
         assertFalse("Confirmation should be hidden after operation", state.showConfirmation)
@@ -287,7 +295,7 @@ class DebugViewModelTest {
         // Then
         coVerify(exactly = 1) { databasePopulator.populateForScreenshots() }
         coVerify(exactly = 1) { databasePopulator.clearAllData() }
-        
+
         val state = viewModel.uiState.value
         assertEquals(
             "Database cleared successfully!",

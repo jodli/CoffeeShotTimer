@@ -12,10 +12,12 @@ import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.junit.Assert.*
 import java.time.LocalDate
 
 /**
@@ -195,7 +197,7 @@ class ShotDaoTasteTest {
                 // No taste feedback
             )
         )
-        
+
         shots.forEach { shotDao.insertShot(it) }
 
         // When - filter by PERFECT taste
@@ -230,7 +232,7 @@ class ShotDaoTasteTest {
                 // No taste feedback
             )
         )
-        
+
         shots.forEach { shotDao.insertShot(it) }
 
         // When - filter with null taste (should return all)
@@ -282,7 +284,7 @@ class ShotDaoTasteTest {
             )
             // Note: Shots without taste feedback should not be included in distribution
         )
-        
+
         shots.forEach { shotDao.insertShot(it) }
 
         // When
@@ -290,11 +292,11 @@ class ShotDaoTasteTest {
 
         // Then
         assertEquals(3, distribution.size) // 3 different taste types
-        
+
         val sourCount = distribution.find { it.tastePrimary == TastePrimary.SOUR }?.count ?: 0
         val perfectCount = distribution.find { it.tastePrimary == TastePrimary.PERFECT }?.count ?: 0
         val bitterCount = distribution.find { it.tastePrimary == TastePrimary.BITTER }?.count ?: 0
-        
+
         assertEquals(1, sourCount)
         assertEquals(2, perfectCount)
         assertEquals(1, bitterCount)

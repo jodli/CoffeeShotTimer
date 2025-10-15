@@ -1,10 +1,10 @@
 package com.jodli.coffeeshottimer.debug
 
-import com.jodli.coffeeshottimer.data.util.DatabasePopulator
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
-import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.data.util.DatabasePopulator
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,8 +35,11 @@ class ConditionalCompilationTest {
     @Before
     fun setup() {
         // Skip all tests in this class if not in debug build
-        org.junit.Assume.assumeTrue("ConditionalCompilation tests only run in debug builds", com.jodli.coffeeshottimer.BuildConfig.DEBUG)
-        
+        org.junit.Assume.assumeTrue(
+            "ConditionalCompilation tests only run in debug builds",
+            com.jodli.coffeeshottimer.BuildConfig.DEBUG
+        )
+
         Dispatchers.setMain(testDispatcher)
         databasePopulator = mockk(relaxed = true)
         onboardingManager = mockk(relaxed = true)
@@ -115,7 +118,6 @@ class ConditionalCompilationTest {
         // In debug build, the operation should start (loading state may vary based on timing)
         // The key is that it doesn't immediately return without doing anything
     }
-
 
     @Test
     fun `DebugViewModel clearDatabase should execute in debug build`() = runTest {

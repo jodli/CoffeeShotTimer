@@ -59,7 +59,10 @@ class GrindRecommendationPreferencesTest {
         assertEquals("grind_recommendation_bean123", keySlot.captured)
         assertTrue("JSON should contain bean ID", jsonSlot.captured.contains("\"beanId\":\"bean123\""))
         assertTrue("JSON should contain grind setting", jsonSlot.captured.contains("\"suggestedGrindSetting\":\"5.5\""))
-        assertTrue("JSON should contain adjustment direction", jsonSlot.captured.contains("\"adjustmentDirection\":\"FINER\""))
+        assertTrue(
+            "JSON should contain adjustment direction",
+            jsonSlot.captured.contains("\"adjustmentDirection\":\"FINER\"")
+        )
         assertTrue("JSON should contain based on taste", jsonSlot.captured.contains("\"basedOnTaste\":true"))
     }
 
@@ -269,7 +272,7 @@ class GrindRecommendationPreferencesTest {
         assertEquals(false, result.wasFollowed)
         assertEquals(true, result.basedOnTaste)
         assertEquals("HIGH", result.confidence)
-        
+
         // Timestamp should be recent (within 1 minute)
         val timestamp = result.getTimestamp()
         assertTrue("Timestamp should be recent", timestamp.isAfter(now.minusMinutes(1)))

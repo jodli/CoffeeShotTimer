@@ -15,10 +15,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class GetShotHistoryUseCaseTest {
-    
+
     private lateinit var shotRepository: ShotRepository
     private lateinit var getShotHistoryUseCase: GetShotHistoryUseCase
-    
+
     private val testBeanId = "test-bean-id"
     private val testShot1 = Shot(
         id = UUID.randomUUID().toString(),
@@ -30,7 +30,7 @@ class GetShotHistoryUseCaseTest {
         notes = "Perfect shot",
         timestamp = LocalDateTime.now().minusHours(1)
     )
-    
+
     private val testShot2 = Shot(
         id = UUID.randomUUID().toString(),
         beanId = testBeanId,
@@ -41,7 +41,7 @@ class GetShotHistoryUseCaseTest {
         notes = "Good extraction",
         timestamp = LocalDateTime.now().minusHours(2)
     )
-    
+
     private val testShot3 = Shot(
         id = UUID.randomUUID().toString(),
         beanId = "different-bean-id",
@@ -52,73 +52,73 @@ class GetShotHistoryUseCaseTest {
         notes = "Fast extraction",
         timestamp = LocalDateTime.now().minusHours(3)
     )
-    
+
     @Before
     fun setup() {
         shotRepository = mockk()
         getShotHistoryUseCase = GetShotHistoryUseCase(shotRepository)
     }
-    
+
     @Test
     fun `getAllShots returns all shots from repository`() = runTest {
         // Given
         val expectedShots = listOf(testShot1, testShot2, testShot3)
         every { shotRepository.getAllShots() } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getAllShots().toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getShotsByBean returns filtered shots for specific bean`() = runTest {
         // Given
         val expectedShots = listOf(testShot1, testShot2)
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getShotsByBean(testBeanId).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getRecentShots returns limited number of shots`() = runTest {
         // Given
         val expectedShots = listOf(testShot1, testShot2)
         every { shotRepository.getRecentShots(2) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getRecentShots(2).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getRecentShots uses default limit of 10`() = runTest {
         // Given
         val expectedShots = listOf(testShot1, testShot2, testShot3)
         every { shotRepository.getRecentShots(10) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getRecentShots().toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getShotsByDateRange returns shots in date range`() = runTest {
         // Given
@@ -126,16 +126,16 @@ class GetShotHistoryUseCaseTest {
         val endDate = LocalDateTime.now()
         val expectedShots = listOf(testShot1, testShot2)
         every { shotRepository.getShotsByDateRange(startDate, endDate) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getShotsByDateRange(startDate, endDate).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getFilteredShots applies basic filters through repository`() = runTest {
         // Given
@@ -145,31 +145,31 @@ class GetShotHistoryUseCaseTest {
             endDate = LocalDateTime.now()
         )
         val expectedShots = listOf(testShot1, testShot2)
-        every { 
-            shotRepository.getFilteredShots(filter.beanId, filter.startDate, filter.endDate) 
+        every {
+            shotRepository.getFilteredShots(filter.beanId, filter.startDate, filter.endDate)
         } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getFilteredShots(filter).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getFilteredShots applies grinder setting filter`() = runTest {
         // Given
         val filter = ShotHistoryFilter(grinderSetting = "15")
         val allShots = listOf(testShot1, testShot2, testShot3)
-        every { 
-            shotRepository.getFilteredShots(null, null, null) 
+        every {
+            shotRepository.getFilteredShots(null, null, null)
         } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getFilteredShots(filter).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
@@ -177,19 +177,19 @@ class GetShotHistoryUseCaseTest {
         assertEquals(1, filteredShots.size)
         assertEquals(testShot1, filteredShots[0])
     }
-    
+
     @Test
     fun `getFilteredShots applies brew ratio range filter`() = runTest {
         // Given
         val filter = ShotHistoryFilter(minBrewRatio = 1.9, maxBrewRatio = 2.1)
         val allShots = listOf(testShot1, testShot2, testShot3)
-        every { 
-            shotRepository.getFilteredShots(null, null, null) 
+        every {
+            shotRepository.getFilteredShots(null, null, null)
         } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getFilteredShots(filter).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
@@ -198,19 +198,19 @@ class GetShotHistoryUseCaseTest {
         // All should be included
         assertEquals(3, filteredShots.size)
     }
-    
+
     @Test
     fun `getFilteredShots applies extraction time range filter`() = runTest {
         // Given
         val filter = ShotHistoryFilter(minExtractionTime = 25, maxExtractionTime = 28)
         val allShots = listOf(testShot1, testShot2, testShot3)
-        every { 
-            shotRepository.getFilteredShots(null, null, null) 
+        every {
+            shotRepository.getFilteredShots(null, null, null)
         } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getFilteredShots(filter).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
@@ -219,19 +219,19 @@ class GetShotHistoryUseCaseTest {
         assertTrue(filteredShots.contains(testShot1))
         assertTrue(filteredShots.contains(testShot3))
     }
-    
+
     @Test
     fun `getFilteredShots applies optimal extraction time filter`() = runTest {
         // Given
         val filter = ShotHistoryFilter(onlyOptimalExtractionTime = true)
         val allShots = listOf(testShot1, testShot2, testShot3)
-        every { 
-            shotRepository.getFilteredShots(null, null, null) 
+        every {
+            shotRepository.getFilteredShots(null, null, null)
         } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getFilteredShots(filter).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
@@ -239,42 +239,42 @@ class GetShotHistoryUseCaseTest {
         // Only shots with 25-30 seconds should be included
         assertEquals(3, filteredShots.size) // All test shots are in optimal range
     }
-    
+
     @Test
     fun `getFilteredShots applies limit filter`() = runTest {
         // Given
         val filter = ShotHistoryFilter(limit = 2)
         val allShots = listOf(testShot1, testShot2, testShot3)
-        every { 
-            shotRepository.getFilteredShots(null, null, null) 
+        every {
+            shotRepository.getFilteredShots(null, null, null)
         } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getFilteredShots(filter).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         val filteredShots = result[0].getOrNull()!!
         assertEquals(2, filteredShots.size)
     }
-    
+
     @Test
     fun `getShotsByGrinderSetting returns shots with specific grinder setting`() = runTest {
         // Given
         val grinderSetting = "15"
         val expectedShots = listOf(testShot1)
         every { shotRepository.getShotsByGrinderSetting(grinderSetting) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getShotsByGrinderSetting(grinderSetting).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getShotsByBrewRatioRange returns shots in ratio range`() = runTest {
         // Given
@@ -282,73 +282,75 @@ class GetShotHistoryUseCaseTest {
         val maxRatio = 2.2
         val expectedShots = listOf(testShot1, testShot2)
         every { shotRepository.getShotsByBrewRatioRange(minRatio, maxRatio) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getShotsByBrewRatioRange(minRatio, maxRatio).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getShotsByExtractionTimeRange returns shots in time range`() = runTest {
         // Given
         val minSeconds = 25
         val maxSeconds = 30
         val expectedShots = listOf(testShot1, testShot2, testShot3)
-        every { shotRepository.getShotsByExtractionTimeRange(minSeconds, maxSeconds) } returns flowOf(Result.success(expectedShots))
-        
+        every {
+            shotRepository.getShotsByExtractionTimeRange(minSeconds, maxSeconds)
+        } returns flowOf(Result.success(expectedShots))
+
         // When
         val result = getShotHistoryUseCase.getShotsByExtractionTimeRange(minSeconds, maxSeconds).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getOptimalExtractionTimeShots returns shots with 25-30 second extraction`() = runTest {
         // Given
         val expectedShots = listOf(testShot1, testShot2, testShot3)
         every { shotRepository.getShotsByExtractionTimeRange(25, 30) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getOptimalExtractionTimeShots().toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `getTypicalBrewRatioShots returns shots with 1_5-3_0 ratio`() = runTest {
         // Given
         val expectedShots = listOf(testShot1, testShot2)
         every { shotRepository.getShotsByBrewRatioRange(1.5, 3.0) } returns flowOf(Result.success(expectedShots))
-        
+
         // When
         val result = getShotHistoryUseCase.getTypicalBrewRatioShots().toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
         assertEquals(expectedShots, result[0].getOrNull())
     }
-    
+
     @Test
     fun `searchShotsByNotes returns shots with matching notes`() = runTest {
         // Given
         val searchTerm = "perfect"
         val allShots = listOf(testShot1, testShot2, testShot3)
         every { shotRepository.getAllShots() } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotHistoryUseCase.searchShotsByNotes(searchTerm).toList()
-        
+
         // Then
         assertEquals(1, result.size)
         assertTrue(result[0].isSuccess)
@@ -356,21 +358,21 @@ class GetShotHistoryUseCaseTest {
         assertEquals(1, filteredShots.size)
         assertEquals(testShot1, filteredShots[0])
     }
-    
+
     @Test
     fun `getTotalShotCount returns count from repository`() = runTest {
         // Given
         val expectedCount = 42
         coEvery { shotRepository.getTotalShotCount() } returns Result.success(expectedCount)
-        
+
         // When
         val result = getShotHistoryUseCase.getTotalShotCount()
-        
+
         // Then
         assertTrue(result.isSuccess)
         assertEquals(expectedCount, result.getOrNull())
     }
-    
+
     @Test
     fun `ShotHistoryFilter hasFilters returns true when filters are set`() {
         // Given
@@ -381,7 +383,7 @@ class GetShotHistoryUseCaseTest {
         val filterWithTime = ShotHistoryFilter(minExtractionTime = 25)
         val filterWithOptimal = ShotHistoryFilter(onlyOptimalExtractionTime = true)
         val emptyFilter = ShotHistoryFilter()
-        
+
         // Then
         assertTrue(filterWithBean.hasFilters())
         assertTrue(filterWithDate.hasFilters())
@@ -391,7 +393,7 @@ class GetShotHistoryUseCaseTest {
         assertTrue(filterWithOptimal.hasFilters())
         assertFalse(emptyFilter.hasFilters())
     }
-    
+
     @Test
     fun `ShotHistoryFilter dateRangeOnly returns filter with only date filters`() {
         // Given
@@ -402,10 +404,10 @@ class GetShotHistoryUseCaseTest {
             grinderSetting = "15",
             minBrewRatio = 2.0
         )
-        
+
         // When
         val dateOnlyFilter = originalFilter.dateRangeOnly()
-        
+
         // Then
         assertNull(dateOnlyFilter.beanId)
         assertNotNull(dateOnlyFilter.startDate)
@@ -413,7 +415,7 @@ class GetShotHistoryUseCaseTest {
         assertNull(dateOnlyFilter.grinderSetting)
         assertNull(dateOnlyFilter.minBrewRatio)
     }
-    
+
     @Test
     fun `ShotHistoryFilter beanOnly returns filter with only bean filter`() {
         // Given
@@ -424,10 +426,10 @@ class GetShotHistoryUseCaseTest {
             grinderSetting = "15",
             minBrewRatio = 2.0
         )
-        
+
         // When
         val beanOnlyFilter = originalFilter.beanOnly()
-        
+
         // Then
         assertNotNull(beanOnlyFilter.beanId)
         assertNull(beanOnlyFilter.startDate)

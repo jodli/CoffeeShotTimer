@@ -25,18 +25,22 @@ class GrindAdjustmentFormatterTest {
     fun setup() {
         context = mockk()
         formatter = GrindAdjustmentFormatter(context)
-        
+
         // Mock string resources
         every { context.getString(R.string.grind_adjustment_finer_single) } returns "Grind 1 step finer"
         every { context.getString(R.string.grind_adjustment_finer_multiple, any()) } returns "Grind %d steps finer"
         every { context.getString(R.string.grind_adjustment_coarser_single) } returns "Grind 1 step coarser"
         every { context.getString(R.string.grind_adjustment_coarser_multiple, any()) } returns "Grind %d steps coarser"
         every { context.getString(R.string.grind_adjustment_no_change) } returns "No adjustment needed"
-        
+
         every { context.getString(R.string.grind_adjustment_summary_finer_single, any()) } returns "1 step finer → %s"
-        every { context.getString(R.string.grind_adjustment_summary_finer_multiple, any(), any()) } returns "%d steps finer → %s"
+        every {
+            context.getString(R.string.grind_adjustment_summary_finer_multiple, any(), any())
+        } returns "%d steps finer → %s"
         every { context.getString(R.string.grind_adjustment_summary_coarser_single, any()) } returns "1 step coarser → %s"
-        every { context.getString(R.string.grind_adjustment_summary_coarser_multiple, any(), any()) } returns "%d steps coarser → %s"
+        every {
+            context.getString(R.string.grind_adjustment_summary_coarser_multiple, any(), any())
+        } returns "%d steps coarser → %s"
         every { context.getString(R.string.grind_adjustment_summary_no_change) } returns "Keep current setting"
     }
 

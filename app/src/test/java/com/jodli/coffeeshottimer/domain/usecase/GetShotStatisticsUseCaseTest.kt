@@ -15,12 +15,12 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class GetShotStatisticsUseCaseTest {
-    
+
     private lateinit var shotRepository: ShotRepository
     private lateinit var getShotStatisticsUseCase: GetShotStatisticsUseCase
-    
+
     private val testBeanId = "test-bean-id"
-    
+
     private val testShot1 = Shot(
         id = UUID.randomUUID().toString(),
         beanId = testBeanId,
@@ -31,7 +31,7 @@ class GetShotStatisticsUseCaseTest {
         notes = "Perfect shot",
         timestamp = LocalDateTime.now().minusHours(1)
     )
-    
+
     private val testShot2 = Shot(
         id = UUID.randomUUID().toString(),
         beanId = testBeanId,
@@ -42,7 +42,7 @@ class GetShotStatisticsUseCaseTest {
         notes = "Good extraction",
         timestamp = LocalDateTime.now().minusHours(2)
     )
-    
+
     private val testShot3 = Shot(
         id = UUID.randomUUID().toString(),
         beanId = testBeanId,
@@ -53,7 +53,7 @@ class GetShotStatisticsUseCaseTest {
         notes = "Fast extraction",
         timestamp = LocalDateTime.now().minusHours(3)
     )
-    
+
     private val testShotStatistics = ShotStatistics(
         totalShots = 3,
         avgWeightIn = 18.0,
@@ -61,53 +61,53 @@ class GetShotStatisticsUseCaseTest {
         avgExtractionTime = 28.0,
         avgBrewRatio = 2.0
     )
-    
+
     @Before
     fun setup() {
         shotRepository = mockk()
         getShotStatisticsUseCase = GetShotStatisticsUseCase(shotRepository)
     }
-    
+
     @Test
     fun `getBeanStatistics returns statistics from repository`() = runTest {
         // Given
         coEvery { shotRepository.getShotStatistics(testBeanId) } returns Result.success(testShotStatistics)
-        
+
         // When
         val result = getShotStatisticsUseCase.getBeanStatistics(testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         assertEquals(testShotStatistics, result.getOrNull())
     }
-    
+
     @Test
     fun `getBeanStatistics returns error when repository fails`() = runTest {
         // Given
         val exception = Exception("Database error")
         coEvery { shotRepository.getShotStatistics(testBeanId) } returns Result.failure(exception)
-        
+
         // When
         val result = getShotStatisticsUseCase.getBeanStatistics(testBeanId)
-        
+
         // Then
         assertTrue(result.isFailure)
         assertEquals(exception, result.exceptionOrNull())
     }
-    
+
     @Test
     fun `getBeanAnalytics calculates comprehensive analytics`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2, testShot3)
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getBeanAnalytics(testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analytics = result.getOrNull()!!
-        
+
         assertEquals(3, analytics.totalShots)
         assertEquals(2.0, analytics.avgBrewRatio, 0.1) // Average of 2.0, 2.0, 2.0
         assertEquals(28.0, analytics.avgExtractionTime, 0.1) // Average of 28, 30, 26
@@ -120,19 +120,19 @@ class GetShotStatisticsUseCaseTest {
         assertNotNull(analytics.lastShotDate)
         assertNotNull(analytics.firstShotDate)
     }
-    
+
     @Test
     fun `getBeanAnalytics returns empty analytics for no shots`() = runTest {
         // Given
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(emptyList()))
-        
+
         // When
         val result = getShotStatisticsUseCase.getBeanAnalytics(testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analytics = result.getOrNull()!!
-        
+
         assertEquals(0, analytics.totalShots)
         assertEquals(0.0, analytics.avgBrewRatio, 0.01)
         assertEquals(0.0, analytics.avgExtractionTime, 0.01)
@@ -140,35 +140,35 @@ class GetShotStatisticsUseCaseTest {
         assertNull(analytics.lastShotDate)
         assertNull(analytics.firstShotDate)
     }
-    
+
     @Test
     fun `getBeanAnalytics handles repository error`() = runTest {
         // Given
         val exception = Exception("Repository error")
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.failure(exception))
-        
+
         // When
         val result = getShotStatisticsUseCase.getBeanAnalytics(testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess) // The use case catches the exception and returns empty analytics
         val analytics = result.getOrNull()!!
         assertEquals(0, analytics.totalShots) // Should return empty analytics when flow fails
     }
-    
+
     @Test
     fun `getOverallStatistics calculates statistics across all shots`() = runTest {
         // Given
         val allShots = listOf(testShot1, testShot2, testShot3)
         every { shotRepository.getAllShots() } returns flowOf(Result.success(allShots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getOverallStatistics()
-        
+
         // Then
         assertTrue(result.isSuccess)
         val statistics = result.getOrNull()!!
-        
+
         assertEquals(3, statistics.totalShots)
         assertEquals(1, statistics.uniqueBeans) // All shots use same bean
         assertEquals(2.0, statistics.avgBrewRatio, 0.1)
@@ -180,19 +180,19 @@ class GetShotStatisticsUseCaseTest {
         assertNotNull(statistics.lastShotDate)
         assertNotNull(statistics.firstShotDate)
     }
-    
+
     @Test
     fun `getOverallStatistics returns empty statistics for no shots`() = runTest {
         // Given
         every { shotRepository.getAllShots() } returns flowOf(Result.success(emptyList()))
-        
+
         // When
         val result = getShotStatisticsUseCase.getOverallStatistics()
-        
+
         // Then
         assertTrue(result.isSuccess)
         val statistics = result.getOrNull()!!
-        
+
         assertEquals(0, statistics.totalShots)
         assertEquals(0, statistics.uniqueBeans)
         assertEquals(0.0, statistics.avgBrewRatio, 0.01)
@@ -201,22 +201,22 @@ class GetShotStatisticsUseCaseTest {
         assertNull(statistics.lastShotDate)
         assertNull(statistics.firstShotDate)
     }
-    
+
     @Test
     fun `getShotTrends calculates trends over time`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2, testShot3)
-        every { 
-            shotRepository.getShotsByDateRange(any(), any()) 
+        every {
+            shotRepository.getShotsByDateRange(any(), any())
         } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getShotTrends(days = 30)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val trends = result.getOrNull()!!
-        
+
         assertEquals(3, trends.totalShots)
         assertEquals(30, trends.daysAnalyzed)
         assertEquals(0.1, trends.shotsPerDay, 0.01) // 3 shots / 30 days
@@ -225,97 +225,97 @@ class GetShotStatisticsUseCaseTest {
         assertTrue(trends.firstHalfAvgTime > 0)
         assertTrue(trends.secondHalfAvgTime > 0)
     }
-    
+
     @Test
     fun `getShotTrends with bean filter uses filtered shots`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2)
-        every { 
-            shotRepository.getFilteredShots(testBeanId, any(), any()) 
+        every {
+            shotRepository.getFilteredShots(testBeanId, any(), any())
         } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getShotTrends(beanId = testBeanId, days = 7)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val trends = result.getOrNull()!!
-        
+
         assertEquals(2, trends.totalShots)
         assertEquals(7, trends.daysAnalyzed)
     }
-    
+
     @Test
     fun `getShotTrends returns empty trends for no shots`() = runTest {
         // Given
-        every { 
-            shotRepository.getShotsByDateRange(any(), any()) 
+        every {
+            shotRepository.getShotsByDateRange(any(), any())
         } returns flowOf(Result.success(emptyList()))
-        
+
         // When
         val result = getShotStatisticsUseCase.getShotTrends(days = 30)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val trends = result.getOrNull()!!
-        
+
         assertEquals(0, trends.totalShots)
         assertEquals(30, trends.daysAnalyzed)
         assertEquals(0.0, trends.shotsPerDay, 0.01)
         assertFalse(trends.isImproving)
     }
-    
+
     @Test
     fun `getGrinderSettingAnalysis calculates setting statistics`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2, testShot3) // Two "15" settings, one "16"
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getGrinderSettingAnalysis(testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analysis = result.getOrNull()!!
-        
+
         assertEquals(2, analysis.totalSettings) // "15" and "16"
         assertEquals(2, analysis.settingStats.size)
         assertNotNull(analysis.mostUsedSetting)
         assertEquals("15", analysis.mostUsedSetting?.setting) // Used twice
         assertNotNull(analysis.bestPerformingSetting)
     }
-    
+
     @Test
     fun `getGrinderSettingAnalysis returns empty analysis for no shots`() = runTest {
         // Given
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(emptyList()))
-        
+
         // When
         val result = getShotStatisticsUseCase.getGrinderSettingAnalysis(testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analysis = result.getOrNull()!!
-        
+
         assertEquals(0, analysis.totalSettings)
         assertTrue(analysis.settingStats.isEmpty())
         assertNull(analysis.mostUsedSetting)
         assertNull(analysis.bestPerformingSetting)
     }
-    
+
     @Test
     fun `getBrewRatioAnalysis calculates ratio distribution`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2, testShot3) // All have 2.0 ratio
         every { shotRepository.getAllShots() } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getBrewRatioAnalysis()
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analysis = result.getOrNull()!!
-        
+
         assertEquals(3, analysis.totalShots)
         assertEquals(2.0, analysis.avgRatio, 0.01)
         assertEquals(2.0, analysis.minRatio, 0.01)
@@ -327,36 +327,36 @@ class GetShotStatisticsUseCaseTest {
         assertTrue(analysis.distribution.containsKey("2.0-2.5"))
         assertEquals(3, analysis.distribution["2.0-2.5"]) // All shots in this bucket
     }
-    
+
     @Test
     fun `getBrewRatioAnalysis with bean filter uses bean shots`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2)
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getBrewRatioAnalysis(beanId = testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analysis = result.getOrNull()!!
-        
+
         assertEquals(2, analysis.totalShots)
     }
-    
+
     @Test
     fun `getExtractionTimeAnalysis calculates time distribution`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2, testShot3) // 28s, 30s, 26s
         every { shotRepository.getAllShots() } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getExtractionTimeAnalysis()
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analysis = result.getOrNull()!!
-        
+
         assertEquals(3, analysis.totalShots)
         assertEquals(28.0, analysis.avgTime, 0.1) // (28+30+26)/3
         assertEquals(26, analysis.minTime)
@@ -368,28 +368,28 @@ class GetShotStatisticsUseCaseTest {
         assertTrue(analysis.distribution.containsKey("25-30s"))
         assertEquals(3, analysis.distribution["25-30s"]) // All shots in optimal range
     }
-    
+
     @Test
     fun `getExtractionTimeAnalysis with bean filter uses bean shots`() = runTest {
         // Given
         val shots = listOf(testShot1, testShot2)
         every { shotRepository.getShotsByBean(testBeanId) } returns flowOf(Result.success(shots))
-        
+
         // When
         val result = getShotStatisticsUseCase.getExtractionTimeAnalysis(beanId = testBeanId)
-        
+
         // Then
         assertTrue(result.isSuccess)
         val analysis = result.getOrNull()!!
-        
+
         assertEquals(2, analysis.totalShots)
     }
-    
+
     @Test
     fun `BeanAnalytics empty returns correct empty instance`() {
         // When
         val empty = BeanAnalytics.empty()
-        
+
         // Then
         assertEquals(0, empty.totalShots)
         assertEquals(0.0, empty.avgBrewRatio, 0.01)
@@ -404,12 +404,12 @@ class GetShotStatisticsUseCaseTest {
         assertNull(empty.lastShotDate)
         assertNull(empty.firstShotDate)
     }
-    
+
     @Test
     fun `OverallStatistics empty returns correct empty instance`() {
         // When
         val empty = OverallStatistics.empty()
-        
+
         // Then
         assertEquals(0, empty.totalShots)
         assertEquals(0, empty.uniqueBeans)
@@ -422,12 +422,12 @@ class GetShotStatisticsUseCaseTest {
         assertNull(empty.lastShotDate)
         assertNull(empty.firstShotDate)
     }
-    
+
     @Test
     fun `ShotTrends empty returns correct empty instance`() {
         // When
         val empty = ShotTrends.empty()
-        
+
         // Then
         assertEquals(0, empty.totalShots)
         assertEquals(0, empty.daysAnalyzed)
@@ -440,24 +440,24 @@ class GetShotStatisticsUseCaseTest {
         assertEquals(0.0, empty.secondHalfAvgTime, 0.01)
         assertFalse(empty.isImproving)
     }
-    
+
     @Test
     fun `GrinderSettingAnalysis empty returns correct empty instance`() {
         // When
         val empty = GrinderSettingAnalysis.empty()
-        
+
         // Then
         assertEquals(0, empty.totalSettings)
         assertTrue(empty.settingStats.isEmpty())
         assertNull(empty.mostUsedSetting)
         assertNull(empty.bestPerformingSetting)
     }
-    
+
     @Test
     fun `BrewRatioAnalysis empty returns correct empty instance`() {
         // When
         val empty = BrewRatioAnalysis.empty()
-        
+
         // Then
         assertEquals(0, empty.totalShots)
         assertEquals(0.0, empty.avgRatio, 0.01)
@@ -469,12 +469,12 @@ class GetShotStatisticsUseCaseTest {
         assertEquals(0.0, empty.overExtractedPercentage, 0.01)
         assertTrue(empty.distribution.isEmpty())
     }
-    
+
     @Test
     fun `ExtractionTimeAnalysis empty returns correct empty instance`() {
         // When
         val empty = ExtractionTimeAnalysis.empty()
-        
+
         // Then
         assertEquals(0, empty.totalShots)
         assertEquals(0.0, empty.avgTime, 0.01)

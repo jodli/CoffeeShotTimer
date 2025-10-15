@@ -71,7 +71,11 @@ class EnhancedTimerButtonTest {
         assertNotEquals("States should be different", stoppedState.isRunning, runningState.isRunning)
         assertNotEquals("Button colors should be different", stoppedState.buttonColor, runningState.buttonColor)
         assertNotEquals("Icons should be different", stoppedState.icon, runningState.icon)
-        assertNotEquals("Content descriptions should be different", stoppedState.contentDescription, runningState.contentDescription)
+        assertNotEquals(
+            "Content descriptions should be different",
+            stoppedState.contentDescription,
+            runningState.contentDescription
+        )
     }
 
     @Test

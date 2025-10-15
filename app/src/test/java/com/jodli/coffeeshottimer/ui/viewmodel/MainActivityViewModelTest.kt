@@ -35,7 +35,7 @@ class MainActivityViewModelTest {
         Dispatchers.setMain(testDispatcher)
         onboardingManager = mockk()
         beanRepository = mockk()
-        
+
         // Default mock behavior for BeanRepository
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(0)
     }
@@ -150,7 +150,7 @@ class MainActivityViewModelTest {
         assertEquals(NavigationDestinations.RecordShot.route, (state as RoutingState.Success).route)
         assertFalse(state.isFirstTimeUser)
     }
-    
+
     @Test
     fun `when existing user has outdated equipment setup, routes to equipment setup`() = runTest {
         // Given
@@ -173,7 +173,7 @@ class MainActivityViewModelTest {
         assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (state as RoutingState.Success).route)
         assertFalse(state.isFirstTimeUser) // Should be marked as existing user
     }
-    
+
     @Test
     fun `when existing user never completed equipment setup, routes to equipment setup`() = runTest {
         // Given
@@ -352,7 +352,7 @@ class MainActivityViewModelTest {
         assertEquals(NavigationDestinations.RecordShot.route, errorState.fallbackRoute)
         assertEquals(exception, errorState.exception)
     }
-    
+
     @Test
     fun `handleEquipmentSetupComplete for user without beans returns false`() = runTest {
         // Given
@@ -363,27 +363,29 @@ class MainActivityViewModelTest {
         )
         coEvery { onboardingManager.updateOnboardingProgress(any()) } returns Unit
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(0) // No beans
-        
+
         viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         var resultShouldSkipBeanCreation: Boolean? = null
-        
+
         // When
         viewModel.handleEquipmentSetupComplete { shouldSkip ->
             resultShouldSkipBeanCreation = shouldSkip
         }
         advanceUntilIdle()
-        
+
         // Then
         assertEquals(false, resultShouldSkipBeanCreation) // Should not skip bean creation
-        coVerify { 
-            onboardingManager.updateOnboardingProgress(match { progress ->
-                progress.hasCompletedEquipmentSetup && 
-                !progress.hasCreatedFirstBean && // Should NOT mark bean creation complete
-                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
-            })
+        coVerify {
+            onboardingManager.updateOnboardingProgress(
+                match { progress ->
+                    progress.hasCompletedEquipmentSetup &&
+                        !progress.hasCreatedFirstBean && // Should NOT mark bean creation complete
+                        progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                }
+            )
         }
     }
-    
+
     @Test
     fun `handleEquipmentSetupComplete for user with beans returns true and skips bean creation`() = runTest {
         // Given
@@ -395,27 +397,29 @@ class MainActivityViewModelTest {
         )
         coEvery { onboardingManager.updateOnboardingProgress(any()) } returns Unit
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(3) // Has beans
-        
+
         viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         var resultShouldSkipBeanCreation: Boolean? = null
-        
+
         // When
         viewModel.handleEquipmentSetupComplete { shouldSkip ->
             resultShouldSkipBeanCreation = shouldSkip
         }
         advanceUntilIdle()
-        
+
         // Then
         assertEquals(true, resultShouldSkipBeanCreation) // Should skip bean creation
-        coVerify { 
-            onboardingManager.updateOnboardingProgress(match { progress ->
-                progress.hasCompletedEquipmentSetup && 
-                progress.hasCreatedFirstBean && // Should also mark bean creation complete
-                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
-            })
+        coVerify {
+            onboardingManager.updateOnboardingProgress(
+                match { progress ->
+                    progress.hasCompletedEquipmentSetup &&
+                        progress.hasCreatedFirstBean && // Should also mark bean creation complete
+                        progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                }
+            )
         }
     }
-    
+
     @Test
     fun `handleEquipmentSetupSkip for user with beans returns true and skips bean creation`() = runTest {
         // Given
@@ -427,25 +431,26 @@ class MainActivityViewModelTest {
         )
         coEvery { onboardingManager.updateOnboardingProgress(any()) } returns Unit
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(5) // Has beans
-        
+
         viewModel = MainActivityViewModel(onboardingManager, beanRepository)
         var resultShouldSkipBeanCreation: Boolean? = null
-        
+
         // When
         viewModel.handleEquipmentSetupSkip { shouldSkip ->
             resultShouldSkipBeanCreation = shouldSkip
         }
         advanceUntilIdle()
-        
+
         // Then
         assertEquals(true, resultShouldSkipBeanCreation) // Should skip bean creation
-        coVerify { 
-            onboardingManager.updateOnboardingProgress(match { progress ->
-                progress.hasCompletedEquipmentSetup && 
-                progress.hasCreatedFirstBean && // Should mark bean creation complete since they have beans
-                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
-            })
+        coVerify {
+            onboardingManager.updateOnboardingProgress(
+                match { progress ->
+                    progress.hasCompletedEquipmentSetup &&
+                        progress.hasCreatedFirstBean && // Should mark bean creation complete since they have beans
+                        progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                }
+            )
         }
     }
-    
 }

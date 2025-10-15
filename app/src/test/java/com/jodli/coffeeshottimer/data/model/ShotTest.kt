@@ -38,8 +38,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain weight in error", 
-            result.errors.contains("Coffee input weight must be at least 0.1g"))
+        assertTrue(
+            "Should contain weight in error",
+            result.errors.contains("Coffee input weight must be at least 0.1g")
+        )
     }
 
     @Test
@@ -65,8 +67,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain weight in error", 
-            result.errors.contains("Coffee input weight cannot exceed 50.0g"))
+        assertTrue(
+            "Should contain weight in error",
+            result.errors.contains("Coffee input weight cannot exceed 50.0g")
+        )
     }
 
     @Test
@@ -92,8 +96,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain weight out error", 
-            result.errors.contains("Coffee output weight must be at least 0.1g"))
+        assertTrue(
+            "Should contain weight out error",
+            result.errors.contains("Coffee output weight must be at least 0.1g")
+        )
     }
 
     @Test
@@ -119,8 +125,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain weight out error", 
-            result.errors.contains("Coffee output weight cannot exceed 100.0g"))
+        assertTrue(
+            "Should contain weight out error",
+            result.errors.contains("Coffee output weight cannot exceed 100.0g")
+        )
     }
 
     @Test
@@ -146,8 +154,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain extraction time error", 
-            result.errors.contains("Extraction time must be at least 5 seconds"))
+        assertTrue(
+            "Should contain extraction time error",
+            result.errors.contains("Extraction time must be at least 5 seconds")
+        )
     }
 
     @Test
@@ -173,8 +183,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain extraction time error", 
-            result.errors.contains("Extraction time cannot exceed 120 seconds"))
+        assertTrue(
+            "Should contain extraction time error",
+            result.errors.contains("Extraction time cannot exceed 120 seconds")
+        )
     }
 
     @Test
@@ -200,8 +212,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain grinder setting error", 
-            result.errors.contains("Grinder setting cannot be empty"))
+        assertTrue(
+            "Should contain grinder setting error",
+            result.errors.contains("Grinder setting cannot be empty")
+        )
     }
 
     @Test
@@ -214,8 +228,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain grinder setting error", 
-            result.errors.contains("Grinder setting cannot be empty"))
+        assertTrue(
+            "Should contain grinder setting error",
+            result.errors.contains("Grinder setting cannot be empty")
+        )
     }
 
     @Test
@@ -229,8 +245,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain grinder setting length error", 
-            result.errors.contains("Grinder setting cannot exceed 50 characters"))
+        assertTrue(
+            "Should contain grinder setting length error",
+            result.errors.contains("Grinder setting cannot exceed 50 characters")
+        )
     }
 
     @Test
@@ -257,8 +275,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain bean ID error", 
-            result.errors.contains("Bean ID cannot be empty"))
+        assertTrue(
+            "Should contain bean ID error",
+            result.errors.contains("Bean ID cannot be empty")
+        )
     }
 
     @Test
@@ -271,8 +291,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain bean ID error", 
-            result.errors.contains("Bean ID cannot be empty"))
+        assertTrue(
+            "Should contain bean ID error",
+            result.errors.contains("Bean ID cannot be empty")
+        )
     }
 
     @Test
@@ -286,8 +308,10 @@ class ShotTest {
 
         // Then
         assertFalse("Shot should be invalid", result.isValid)
-        assertTrue("Should contain notes length error", 
-            result.errors.contains("Notes cannot exceed 500 characters"))
+        assertTrue(
+            "Should contain notes length error",
+            result.errors.contains("Notes cannot exceed 500 characters")
+        )
     }
 
     @Test
@@ -323,16 +347,26 @@ class ShotTest {
         assertFalse("Shot should be invalid", result.isValid)
         assertEquals("Should have 6 errors", 6, result.errors.size)
         assertTrue("Should contain bean ID error", result.errors.contains("Bean ID cannot be empty"))
-        assertTrue("Should contain weight in error", 
-            result.errors.contains("Coffee input weight must be at least 0.1g"))
-        assertTrue("Should contain weight out error", 
-            result.errors.contains("Coffee output weight cannot exceed 100.0g"))
-        assertTrue("Should contain extraction time error", 
-            result.errors.contains("Extraction time must be at least 5 seconds"))
-        assertTrue("Should contain grinder setting error", 
-            result.errors.contains("Grinder setting cannot be empty"))
-        assertTrue("Should contain notes length error", 
-            result.errors.contains("Notes cannot exceed 500 characters"))
+        assertTrue(
+            "Should contain weight in error",
+            result.errors.contains("Coffee input weight must be at least 0.1g")
+        )
+        assertTrue(
+            "Should contain weight out error",
+            result.errors.contains("Coffee output weight cannot exceed 100.0g")
+        )
+        assertTrue(
+            "Should contain extraction time error",
+            result.errors.contains("Extraction time must be at least 5 seconds")
+        )
+        assertTrue(
+            "Should contain grinder setting error",
+            result.errors.contains("Grinder setting cannot be empty")
+        )
+        assertTrue(
+            "Should contain notes length error",
+            result.errors.contains("Notes cannot exceed 500 characters")
+        )
     }
 
     @Test

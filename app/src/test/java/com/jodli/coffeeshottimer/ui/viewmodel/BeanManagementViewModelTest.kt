@@ -16,11 +16,11 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Before
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 
 /**
  * Test class for BeanManagementViewModel.
@@ -41,12 +41,12 @@ class BeanManagementViewModelTest {
     @Before
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        
+
         // Setup default mock responses
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(emptyList()))
         every { getActiveBeansUseCase.getActiveBeansWithSearch(any()) } returns flowOf(Result.success(emptyList()))
         every { getBeanHistoryUseCase.getBeanHistoryWithSearch(any(), any()) } returns flowOf(Result.success(emptyList()))
-        
+
         viewModel = BeanManagementViewModel(
             getActiveBeansUseCase,
             getBeanHistoryUseCase,
@@ -64,7 +64,7 @@ class BeanManagementViewModelTest {
     @Test
     fun `initial state should be correct`() = runTest(testDispatcher) {
         val initialState = viewModel.uiState.value
-        
+
         assertTrue(initialState.beans.isEmpty())
         assertFalse(initialState.isLoading)
         assertEquals(null, initialState.error)
@@ -74,22 +74,22 @@ class BeanManagementViewModelTest {
     @Test
     fun `search query should update correctly`() = runTest(testDispatcher) {
         val searchQuery = "test query"
-        
+
         viewModel.updateSearchQuery(searchQuery)
-        
+
         assertEquals(searchQuery, viewModel.searchQuery.value)
     }
 
     @Test
     fun `show inactive toggle should work correctly`() = runTest(testDispatcher) {
         assertFalse(viewModel.showInactive.value)
-        
+
         viewModel.toggleShowInactive()
-        
+
         assertTrue(viewModel.showInactive.value)
-        
+
         viewModel.toggleShowInactive()
-        
+
         assertFalse(viewModel.showInactive.value)
     }
 
@@ -97,7 +97,7 @@ class BeanManagementViewModelTest {
     fun `clear error should reset error state`() = runTest(testDispatcher) {
         // This is a simple test since we can't easily mock the error state
         viewModel.clearError()
-        
+
         assertEquals(null, viewModel.uiState.value.error)
     }
 }

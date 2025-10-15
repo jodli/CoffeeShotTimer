@@ -44,7 +44,8 @@ android {
             // Check for CI/CD environment variables first
             val signingKeyBase64 = System.getenv("SIGNING_KEY_BASE64")
             val keyAlias = System.getenv("KEY_ALIAS") ?: keystoreProperties["keyAlias"]?.toString()
-            val keyStorePassword = System.getenv("KEY_STORE_PASSWORD") ?: keystoreProperties["storePassword"]?.toString()
+            val keyStorePassword = System.getenv("KEY_STORE_PASSWORD")
+                ?: keystoreProperties["storePassword"]?.toString()
             val keyPassword = System.getenv("KEY_PASSWORD") ?: keystoreProperties["keyPassword"]?.toString()
 
             if (signingKeyBase64 != null && keyAlias != null && keyStorePassword != null && keyPassword != null) {

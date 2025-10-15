@@ -57,7 +57,7 @@ class DatabasePopulatorTest {
         // Then
         // Verify that grinder config was inserted (only if none exists)
         coVerify(exactly = 1) { grinderConfigDao.insertConfig(any()) }
-        
+
         // Verify that beans were inserted (should be 5 beans based on implementation)
         coVerify(exactly = 5) { beanDao.insertBean(any()) }
 
@@ -81,8 +81,6 @@ class DatabasePopulatorTest {
             assertTrue("Should contain original error", e.message?.contains("Database error") == true)
         }
     }
-
-
 
     @Test
     fun `addMoreShots should add shots to existing beans`() = runTest {

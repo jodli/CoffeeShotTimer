@@ -34,8 +34,10 @@ class GrinderConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain min/max error", 
-            result.errors.contains("Minimum scale value must be less than maximum scale value"))
+        assertTrue(
+            "Should contain min/max error",
+            result.errors.contains("Minimum scale value must be less than maximum scale value")
+        )
     }
 
     @Test
@@ -51,8 +53,10 @@ class GrinderConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain min/max error", 
-            result.errors.contains("Minimum scale value must be less than maximum scale value"))
+        assertTrue(
+            "Should contain min/max error",
+            result.errors.contains("Minimum scale value must be less than maximum scale value")
+        )
     }
 
     @Test
@@ -68,8 +72,10 @@ class GrinderConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain negative min error", 
-            result.errors.contains("Minimum scale value cannot be negative"))
+        assertTrue(
+            "Should contain negative min error",
+            result.errors.contains("Minimum scale value cannot be negative")
+        )
     }
 
     @Test
@@ -101,15 +107,17 @@ class GrinderConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain max value error", 
-            result.errors.contains("Maximum scale value cannot exceed 1000"))
+        assertTrue(
+            "Should contain max value error",
+            result.errors.contains("Maximum scale value cannot exceed 1000")
+        )
     }
 
     @Test
     fun `validate accepts maximum value of exactly 1000`() {
         // Given
         val validConfig = GrinderConfiguration(
-            scaleMin = 900,  // Range size = 100, which is exactly the limit
+            scaleMin = 900, // Range size = 100, which is exactly the limit
             scaleMax = 1000
         )
 
@@ -126,7 +134,7 @@ class GrinderConfigurationTest {
         // Given
         val invalidConfig = GrinderConfiguration(
             scaleMin = 5,
-            scaleMax = 7  // Range size = 2
+            scaleMax = 7 // Range size = 2
         )
 
         // When
@@ -134,8 +142,10 @@ class GrinderConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain range size error", 
-            result.errors.any { it.contains("Scale range must have at least 3 steps") })
+        assertTrue(
+            "Should contain range size error",
+            result.errors.any { it.contains("Scale range must have at least 3 steps") }
+        )
     }
 
     @Test
@@ -143,7 +153,7 @@ class GrinderConfigurationTest {
         // Given
         val validConfig = GrinderConfiguration(
             scaleMin = 5,
-            scaleMax = 8  // Range size = 3
+            scaleMax = 8 // Range size = 3
         )
 
         // When
@@ -159,7 +169,7 @@ class GrinderConfigurationTest {
         // Given
         val invalidConfig = GrinderConfiguration(
             scaleMin = 1,
-            scaleMax = 102  // Range size = 101
+            scaleMax = 102 // Range size = 101
         )
 
         // When
@@ -167,8 +177,10 @@ class GrinderConfigurationTest {
 
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
-        assertTrue("Should contain range size error", 
-            result.errors.any { it.contains("Scale range cannot exceed 100 steps") })
+        assertTrue(
+            "Should contain range size error",
+            result.errors.any { it.contains("Scale range cannot exceed 100 steps") }
+        )
     }
 
     @Test
@@ -176,7 +188,7 @@ class GrinderConfigurationTest {
         // Given
         val validConfig = GrinderConfiguration(
             scaleMin = 1,
-            scaleMax = 101  // Range size = 100
+            scaleMax = 101 // Range size = 100
         )
 
         // When
@@ -201,10 +213,14 @@ class GrinderConfigurationTest {
         // Then
         assertFalse("Configuration should be invalid", result.isValid)
         assertTrue("Should have multiple errors", result.errors.size >= 2)
-        assertTrue("Should contain negative min error", 
-            result.errors.contains("Minimum scale value cannot be negative"))
-        assertTrue("Should contain max value error", 
-            result.errors.contains("Maximum scale value cannot exceed 1000"))
+        assertTrue(
+            "Should contain negative min error",
+            result.errors.contains("Minimum scale value cannot be negative")
+        )
+        assertTrue(
+            "Should contain max value error",
+            result.errors.contains("Maximum scale value cannot exceed 1000")
+        )
     }
 
     @Test
@@ -393,14 +409,22 @@ class GrinderConfigurationTest {
         val presets = GrinderConfiguration.COMMON_PRESETS
 
         // Then
-        assertTrue("Should contain 1-10 preset", 
-            presets.any { it.scaleMin == 1 && it.scaleMax == 10 })
-        assertTrue("Should contain 30-80 preset", 
-            presets.any { it.scaleMin == 30 && it.scaleMax == 80 })
-        assertTrue("Should contain 50-60 preset", 
-            presets.any { it.scaleMin == 50 && it.scaleMax == 60 })
-        assertTrue("Should contain 0-100 preset", 
-            presets.any { it.scaleMin == 0 && it.scaleMax == 100 })
+        assertTrue(
+            "Should contain 1-10 preset",
+            presets.any { it.scaleMin == 1 && it.scaleMax == 10 }
+        )
+        assertTrue(
+            "Should contain 30-80 preset",
+            presets.any { it.scaleMin == 30 && it.scaleMax == 80 }
+        )
+        assertTrue(
+            "Should contain 50-60 preset",
+            presets.any { it.scaleMin == 50 && it.scaleMax == 60 }
+        )
+        assertTrue(
+            "Should contain 0-100 preset",
+            presets.any { it.scaleMin == 0 && it.scaleMax == 100 }
+        )
     }
 
     @Test

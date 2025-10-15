@@ -8,9 +8,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * Unit tests for RecordTasteFeedbackUseCase.
@@ -205,7 +205,7 @@ class RecordTasteFeedbackUseCaseTest {
         results.forEach { result ->
             assertTrue("All concurrent calls should succeed", result.isSuccess)
         }
-        
+
         // Verify all repository calls were made
         shotIds.forEach { shotId ->
             coVerify { shotRepository.updateTasteFeedback(shotId, TastePrimary.PERFECT, TasteSecondary.STRONG) }

@@ -42,7 +42,7 @@ class IntroductionScreenTest {
     fun introductionScreen_skipButtonCallsCallback() {
         // Arrange
         var skipCalled = false
-        
+
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 IntroductionScreen(
@@ -105,7 +105,7 @@ class IntroductionScreenTest {
     fun introductionScreen_getStartedButtonCallsOnComplete() {
         // Arrange
         var completeCalled = false
-        
+
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
                 IntroductionScreen(
@@ -140,22 +140,22 @@ class IntroductionScreenTest {
 
         // Test slide 1
         composeTestRule.onNodeWithText("Welcome to Coffee Shot Timer").assertIsDisplayed()
-        
+
         // Navigate to slide 2
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Main Features").assertIsDisplayed()
-        
+
         // Navigate to slide 3
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Flexible Workflow").assertIsDisplayed()
-        
+
         // Navigate to slide 4
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithText("Smart Timer").assertIsDisplayed()
-        
+
         // Navigate to slide 5
         composeTestRule.onNodeWithText("Next").performClick()
         composeTestRule.waitForIdle()

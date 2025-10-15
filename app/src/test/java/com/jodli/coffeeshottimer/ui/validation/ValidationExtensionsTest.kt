@@ -3,9 +3,9 @@ package com.jodli.coffeeshottimer.ui.validation
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import io.mockk.every
 import io.mockk.mockk
-import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Test
 import java.time.LocalDate
 
 /**
@@ -50,7 +50,6 @@ class ValidationExtensionsTest {
 
     // Weight validation tests removed - sliders now handle all weight validation by constraining values to basket configuration ranges
 
-
     @Test
     fun `validateBeanNameEnhanced should pass for valid names`() {
         val result = "Ethiopian Yirgacheffe".validateBeanNameEnhanced(validationUtils)
@@ -62,13 +61,17 @@ class ValidationExtensionsTest {
     fun `validateBeanNameEnhanced should provide helpful tips for problematic names`() {
         val shortResult = "A".validateBeanNameEnhanced(validationUtils)
         assertFalse("Single character name should fail", shortResult.isValid)
-        assertTrue("Should suggest more descriptive name",
-            shortResult.errors.any { it.contains("descriptive", ignoreCase = true) })
+        assertTrue(
+            "Should suggest more descriptive name",
+            shortResult.errors.any { it.contains("descriptive", ignoreCase = true) }
+        )
 
         val duplicateResult = "Existing Bean".validateBeanNameEnhanced(validationUtils, listOf("Existing Bean"))
         assertFalse("Duplicate name should fail", duplicateResult.isValid)
-        assertTrue("Should suggest making name unique",
-            duplicateResult.errors.any { it.contains("unique", ignoreCase = true) })
+        assertTrue(
+            "Should suggest making name unique",
+            duplicateResult.errors.any { it.contains("unique", ignoreCase = true) }
+        )
     }
 
     @Test
@@ -82,13 +85,17 @@ class ValidationExtensionsTest {
     fun `validateRoastDateEnhanced should provide helpful tips for problematic dates`() {
         val futureResult = LocalDate.now().plusDays(1).validateRoastDateEnhanced(validationUtils)
         assertFalse("Future date should fail", futureResult.isValid)
-        assertTrue("Should suggest using today's date",
-            futureResult.errors.any { it.contains("today", ignoreCase = true) })
+        assertTrue(
+            "Should suggest using today's date",
+            futureResult.errors.any { it.contains("today", ignoreCase = true) }
+        )
 
         val oldResult = LocalDate.now().minusDays(450).validateRoastDateEnhanced(validationUtils)
         assertFalse("Very old date should fail", oldResult.isValid)
-        assertTrue("Should warn about flavor loss",
-            oldResult.errors.any { it.contains("flavor", ignoreCase = true) })
+        assertTrue(
+            "Should warn about flavor loss",
+            oldResult.errors.any { it.contains("flavor", ignoreCase = true) }
+        )
     }
 
     @Test
@@ -101,49 +108,65 @@ class ValidationExtensionsTest {
     fun `validateExtractionTimeEnhanced should provide contextual feedback`() {
         val shortResult = 3.validateExtractionTimeEnhanced(validationUtils)
         assertFalse("Very short time should fail", shortResult.isValid)
-        assertTrue("Should warn about sour taste",
-            shortResult.errors.any { it.contains("sour", ignoreCase = true) })
+        assertTrue(
+            "Should warn about sour taste",
+            shortResult.errors.any { it.contains("sour", ignoreCase = true) }
+        )
 
         val longResult = 150.validateExtractionTimeEnhanced(validationUtils)
         assertFalse("Very long time should fail", longResult.isValid)
-        assertTrue("Should warn about bitter taste",
-            longResult.errors.any { it.contains("bitter", ignoreCase = true) })
+        assertTrue(
+            "Should warn about bitter taste",
+            longResult.errors.any { it.contains("bitter", ignoreCase = true) }
+        )
     }
 
     @Test
     fun `getBrewRatioWarnings should provide appropriate feedback`() {
         val lowRatio = 1.2.getBrewRatioWarnings(validationUtils)
         assertTrue("Low ratio should have warning", lowRatio.isNotEmpty())
-        assertTrue("Should warn about concentration",
-            lowRatio.any { it.contains("concentrated", ignoreCase = true) })
+        assertTrue(
+            "Should warn about concentration",
+            lowRatio.any { it.contains("concentrated", ignoreCase = true) }
+        )
 
         val highRatio = 3.5.getBrewRatioWarnings(validationUtils)
         assertTrue("High ratio should have warning", highRatio.isNotEmpty())
-        assertTrue("Should warn about dilution",
-            highRatio.any { it.contains("diluted", ignoreCase = true) })
+        assertTrue(
+            "Should warn about dilution",
+            highRatio.any { it.contains("diluted", ignoreCase = true) }
+        )
 
         val optimalRatio = 2.2.getBrewRatioWarnings(validationUtils)
         // Optimal ratio might still have suggestions, but shouldn't have strong warnings
-        assertTrue("Optimal ratio warnings should be mild or empty",
-            optimalRatio.isEmpty() || optimalRatio.all { !it.contains("very", ignoreCase = true) })
+        assertTrue(
+            "Optimal ratio warnings should be mild or empty",
+            optimalRatio.isEmpty() || optimalRatio.all { !it.contains("very", ignoreCase = true) }
+        )
     }
 
     @Test
     fun `getExtractionTimeWarnings should provide appropriate feedback`() {
         val shortTime = 20.getExtractionTimeWarnings(validationUtils)
         assertTrue("Short time should have warning", shortTime.isNotEmpty())
-        assertTrue("Should suggest grinding finer",
-            shortTime.any { it.contains("finer", ignoreCase = true) })
+        assertTrue(
+            "Should suggest grinding finer",
+            shortTime.any { it.contains("finer", ignoreCase = true) }
+        )
 
         val longTime = 35.getExtractionTimeWarnings(validationUtils)
         assertTrue("Long time should have warning", longTime.isNotEmpty())
-        assertTrue("Should suggest grinding coarser",
-            longTime.any { it.contains("coarser", ignoreCase = true) })
+        assertTrue(
+            "Should suggest grinding coarser",
+            longTime.any { it.contains("coarser", ignoreCase = true) }
+        )
 
         val optimalTime = 27.getExtractionTimeWarnings(validationUtils)
         assertTrue("Optimal time should have positive feedback", optimalTime.isNotEmpty())
-        assertTrue("Should mention optimal range",
-            optimalTime.any { it.contains("optimal", ignoreCase = true) })
+        assertTrue(
+            "Should mention optimal range",
+            optimalTime.any { it.contains("optimal", ignoreCase = true) }
+        )
     }
 
     @Test
@@ -224,33 +247,55 @@ class ValidationExtensionsTest {
     fun `BasketConfiguration defaults should be reasonable for espresso`() {
         // Test that our basket configuration defaults make sense for espresso
         val defaultBasket = com.jodli.coffeeshottimer.data.model.BasketConfiguration.DEFAULT
-        
-        assertTrue("Coffee in min weight should be reasonable",
-            defaultBasket.coffeeInMin >= 5.0f)
-        assertTrue("Coffee in max weight should be reasonable",
-            defaultBasket.coffeeInMax <= 25.0f)
-        assertTrue("Coffee out min weight should be reasonable",
-            defaultBasket.coffeeOutMin >= 10.0f)
-        assertTrue("Coffee out max weight should be reasonable",
-            defaultBasket.coffeeOutMax <= 60.0f)
-        assertTrue("Coffee in range should be valid",
-            defaultBasket.coffeeInMin < defaultBasket.coffeeInMax)
-        assertTrue("Coffee out range should be valid",
-            defaultBasket.coffeeOutMin < defaultBasket.coffeeOutMax)
-        assertTrue("Default configuration should pass validation",
-            defaultBasket.validate().isValid)
+
+        assertTrue(
+            "Coffee in min weight should be reasonable",
+            defaultBasket.coffeeInMin >= 5.0f
+        )
+        assertTrue(
+            "Coffee in max weight should be reasonable",
+            defaultBasket.coffeeInMax <= 25.0f
+        )
+        assertTrue(
+            "Coffee out min weight should be reasonable",
+            defaultBasket.coffeeOutMin >= 10.0f
+        )
+        assertTrue(
+            "Coffee out max weight should be reasonable",
+            defaultBasket.coffeeOutMax <= 60.0f
+        )
+        assertTrue(
+            "Coffee in range should be valid",
+            defaultBasket.coffeeInMin < defaultBasket.coffeeInMax
+        )
+        assertTrue(
+            "Coffee out range should be valid",
+            defaultBasket.coffeeOutMin < defaultBasket.coffeeOutMax
+        )
+        assertTrue(
+            "Default configuration should pass validation",
+            defaultBasket.validate().isValid
+        )
     }
 
     @Test
     fun `ValidationUtils constants should be reasonable for espresso`() {
         // Test that our validation constants make sense for espresso
-        assertTrue("Min extraction time should be reasonable",
-            ValidationUtils.MIN_EXTRACTION_TIME >= 5)
-        assertTrue("Max extraction time should be reasonable",
-            ValidationUtils.MAX_EXTRACTION_TIME <= 120)
-        assertTrue("Optimal extraction time range should be reasonable",
-            ValidationUtils.OPTIMAL_EXTRACTION_TIME_MIN < ValidationUtils.OPTIMAL_EXTRACTION_TIME_MAX)
-        assertTrue("Brew ratio range should be reasonable",
-            ValidationUtils.MIN_TYPICAL_BREW_RATIO < ValidationUtils.MAX_TYPICAL_BREW_RATIO)
+        assertTrue(
+            "Min extraction time should be reasonable",
+            ValidationUtils.MIN_EXTRACTION_TIME >= 5
+        )
+        assertTrue(
+            "Max extraction time should be reasonable",
+            ValidationUtils.MAX_EXTRACTION_TIME <= 120
+        )
+        assertTrue(
+            "Optimal extraction time range should be reasonable",
+            ValidationUtils.OPTIMAL_EXTRACTION_TIME_MIN < ValidationUtils.OPTIMAL_EXTRACTION_TIME_MAX
+        )
+        assertTrue(
+            "Brew ratio range should be reasonable",
+            ValidationUtils.MIN_TYPICAL_BREW_RATIO < ValidationUtils.MAX_TYPICAL_BREW_RATIO
+        )
     }
 }

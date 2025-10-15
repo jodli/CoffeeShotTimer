@@ -1,11 +1,23 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.ui.test.*
+import androidx.compose.ui.test.assertDoesNotExist
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNode
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.or
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.waitForIdle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.jodli.coffeeshottimer.domain.model.*
-import com.jodli.coffeeshottimer.domain.usecase.RecommendationType
+import com.jodli.coffeeshottimer.domain.model.AdjustmentDirection
+import com.jodli.coffeeshottimer.domain.model.ConfidenceLevel
+import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.RecommendationPriority
+import com.jodli.coffeeshottimer.domain.usecase.RecommendationType
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import org.junit.Rule
@@ -14,7 +26,7 @@ import org.junit.runner.RunWith
 
 /**
  * Comprehensive instrumented tests for ShotRecordedDialog component.
- * 
+ *
  * This test runs on device/emulator and tests the actual UI interactions,
  * including:
  * - Dialog displays shot information correctly
@@ -22,7 +34,7 @@ import org.junit.runner.RunWith
  * - Button actions save taste feedback to database
  * - Grind adjustment card appears/disappears correctly
  * - User interaction flows work as expected
- * 
+ *
  * These tests verify the complete dialog functionality including:
  * 1. Basic information display (brew ratio, extraction time)
  * 2. Taste feedback UI (primary/secondary taste selection)
@@ -230,9 +242,9 @@ class ShotRecordedDialogTest {
 
         // Then
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("15.0")  // Current setting (exact value)
+        composeTestRule.onNodeWithText("15.0") // Current setting (exact value)
             .assertIsDisplayed()
-        composeTestRule.onNodeWithText("14.5")  // Suggested setting
+        composeTestRule.onNodeWithText("14.5") // Suggested setting
             .assertIsDisplayed()
         composeTestRule.onNodeWithText("Under-extracted (Sour) - Shot ran 3s too fast. Try grinding finer.")
             .assertIsDisplayed()
@@ -294,9 +306,9 @@ class ShotRecordedDialogTest {
         }
 
         // When
-        composeTestRule.onNodeWithText("Perfect").performClick()  // Select taste
+        composeTestRule.onNodeWithText("Perfect").performClick() // Select taste
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("View Details").performClick()  // Submit
+        composeTestRule.onNodeWithText("View Details").performClick() // Submit
 
         // Then
         composeTestRule.waitForIdle()
@@ -327,11 +339,11 @@ class ShotRecordedDialogTest {
         }
 
         // When
-        composeTestRule.onNodeWithText("Bitter").performClick()  // Select taste
+        composeTestRule.onNodeWithText("Bitter").performClick() // Select taste
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Strong").performClick()  // Select secondary
+        composeTestRule.onNodeWithText("Strong").performClick() // Select secondary
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithText("Save").performClick()    // Submit
+        composeTestRule.onNodeWithText("Save").performClick() // Submit
 
         // Then
         composeTestRule.waitForIdle()
@@ -371,9 +383,9 @@ class ShotRecordedDialogTest {
         }
 
         // When
-        composeTestRule.onNodeWithText("Sour").performClick()  // Show grind adjustment
+        composeTestRule.onNodeWithText("Sour").performClick() // Show grind adjustment
         composeTestRule.waitForIdle()
-        
+
         // Find and click the Apply button (this might have different text)
         composeTestRule.onNode(
             hasText("Apply") or hasText("Apply Adjustment")
@@ -431,7 +443,7 @@ class ShotRecordedDialogTest {
             CoffeeShotTimerTheme {
                 ShotRecordedDialog(
                     brewRatio = "1:2.0",
-                    extractionTime = "00:18",  // Fast extraction
+                    extractionTime = "00:18", // Fast extraction
                     suggestedTaste = TastePrimary.SOUR,
                     onTasteSelected = { _, _ -> },
                     onDismiss = {}
@@ -441,9 +453,9 @@ class ShotRecordedDialogTest {
 
         // Then - check for suggested taste indication (might be via content description)
         composeTestRule.onNode(
-            hasContentDescription("Sour (recommended)") or 
-            hasContentDescription("Sour (suggested)") or
-            hasText("Sour")
+            hasContentDescription("Sour (recommended)") or
+                hasContentDescription("Sour (suggested)") or
+                hasText("Sour")
         ).assertExists()
     }
 
@@ -534,7 +546,7 @@ class ShotRecordedDialogTest {
         composeTestRule.onNode(
             hasText("00:25", substring = true)
         ).assertIsDisplayed()
-        
+
         // And taste feedback section should not be visible
         composeTestRule.onNodeWithText("How did it taste?").assertDoesNotExist()
     }
@@ -557,11 +569,11 @@ class ShotRecordedDialogTest {
         // Check for proper content descriptions
         composeTestRule.onNode(hasContentDescription("Shot recorded successfully"))
             .assertExists()
-            
+
         // Taste buttons should have proper accessibility
         composeTestRule.onNode(hasContentDescription("Sour"))
             .assertExists()
-        composeTestRule.onNode(hasContentDescription("Perfect")) 
+        composeTestRule.onNode(hasContentDescription("Perfect"))
             .assertExists()
         composeTestRule.onNode(hasContentDescription("Bitter"))
             .assertExists()
@@ -591,16 +603,16 @@ class ShotRecordedDialogTest {
         composeTestRule.onNodeWithText("Sour").performClick()
         composeTestRule.waitForIdle()
         assert(selectedTaste == TastePrimary.SOUR)
-        
+
         // Select secondary taste
         composeTestRule.onNodeWithText("Weak").performClick()
         composeTestRule.waitForIdle()
         assert(selectedSecondary == TasteSecondary.WEAK)
-        
+
         // If deselection is supported by clicking the same taste again
         composeTestRule.onNodeWithText("Sour").performClick()
         composeTestRule.waitForIdle()
-        
+
         // Then - verify state is properly managed
         // (The exact behavior depends on the implementation)
         // At minimum, the callback should have been called again

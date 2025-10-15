@@ -1,22 +1,22 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import android.net.Uri
-import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
+import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
-import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
-import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
-import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
-import com.jodli.coffeeshottimer.data.model.Bean
-import io.mockk.mockk
+import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
+import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
+import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
+import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestDispatcher
@@ -25,13 +25,13 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
-import org.junit.Before
-import org.junit.Test
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Test
 import java.time.LocalDate
 
 /**

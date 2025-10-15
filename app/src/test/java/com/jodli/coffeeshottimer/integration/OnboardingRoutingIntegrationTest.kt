@@ -2,10 +2,10 @@ package com.jodli.coffeeshottimer.integration
 
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingManager
 import com.jodli.coffeeshottimer.data.onboarding.OnboardingProgress
+import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.ui.navigation.NavigationDestinations
 import com.jodli.coffeeshottimer.ui.viewmodel.MainActivityViewModel
 import com.jodli.coffeeshottimer.ui.viewmodel.RoutingState
-import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -41,7 +41,7 @@ class OnboardingRoutingIntegrationTest {
         Dispatchers.setMain(testDispatcher)
         onboardingManager = mockk()
         beanRepository = mockk()
-        
+
         // Default mock behavior for BeanRepository
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(0)
     }
@@ -92,7 +92,10 @@ class OnboardingRoutingIntegrationTest {
 
         val step3State = viewModel.routingState.first()
         assertTrue(step3State is RoutingState.Success)
-        assertEquals(NavigationDestinations.OnboardingGuidedBeanCreation.route, (step3State as RoutingState.Success).route)
+        assertEquals(
+            NavigationDestinations.OnboardingGuidedBeanCreation.route,
+            (step3State as RoutingState.Success).route
+        )
         assertTrue(step3State.isFirstTimeUser)
 
         // Step 4: After guided bean creation - should route to first shot (RecordShot)
@@ -260,7 +263,10 @@ class OnboardingRoutingIntegrationTest {
 
         val equipmentState = viewModel.routingState.first()
         assertTrue(equipmentState is RoutingState.Success)
-        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (equipmentState as RoutingState.Success).route)
+        assertEquals(
+            NavigationDestinations.OnboardingEquipmentSetup.route,
+            (equipmentState as RoutingState.Success).route
+        )
 
         // Step 3: User goes back to introduction (should be allowed)
         coEvery { onboardingManager.getOnboardingProgress() } returns OnboardingProgress()
@@ -270,7 +276,10 @@ class OnboardingRoutingIntegrationTest {
 
         val backToIntroState = viewModel.routingState.first()
         assertTrue(backToIntroState is RoutingState.Success)
-        assertEquals(NavigationDestinations.OnboardingIntroduction.route, (backToIntroState as RoutingState.Success).route)
+        assertEquals(
+            NavigationDestinations.OnboardingIntroduction.route,
+            (backToIntroState as RoutingState.Success).route
+        )
     }
 
     @Test
@@ -339,7 +348,7 @@ class OnboardingRoutingIntegrationTest {
         assertEquals(NavigationDestinations.RecordShot.route, (completedState as RoutingState.Success).route)
         assertTrue(!completedState.isFirstTimeUser)
     }
-    
+
     @Test
     fun `existing user with outdated equipment setup is forced through equipment setup flow`() = runTest {
         // Given: Existing user with outdated equipment setup version
@@ -351,7 +360,7 @@ class OnboardingRoutingIntegrationTest {
             hasRecordedFirstShot = true,
             equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION - 1 // Outdated
         )
-        
+
         // Mock that they have existing beans
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(3)
 
@@ -365,7 +374,7 @@ class OnboardingRoutingIntegrationTest {
         assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (state as RoutingState.Success).route)
         assertFalse(state.isFirstTimeUser) // Should be marked as existing user
     }
-    
+
     @Test
     fun `existing user who completes equipment setup with beans goes directly to main app`() = runTest {
         // Given: Existing user with outdated equipment setup
@@ -385,28 +394,33 @@ class OnboardingRoutingIntegrationTest {
 
         // Verify they're routed to equipment setup
         val initialState = viewModel.routingState.first()
-        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (initialState as RoutingState.Success).route)
+        assertEquals(
+            NavigationDestinations.OnboardingEquipmentSetup.route,
+            (initialState as RoutingState.Success).route
+        )
         assertFalse(initialState.isFirstTimeUser)
-        
+
         var resultCallback: Boolean? = null
-        
+
         // When: They complete equipment setup
         viewModel.handleEquipmentSetupComplete { shouldSkipBeanCreation ->
             resultCallback = shouldSkipBeanCreation
         }
         advanceUntilIdle()
-        
+
         // Then: Should indicate user should skip bean creation and update progress
         assertEquals(true, resultCallback)
-        coVerify { 
-            onboardingManager.updateOnboardingProgress(match { progress ->
-                progress.hasCompletedEquipmentSetup &&
-                progress.hasCreatedFirstBean && // Should mark bean creation complete since they have beans
-                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
-            })
+        coVerify {
+            onboardingManager.updateOnboardingProgress(
+                match { progress ->
+                    progress.hasCompletedEquipmentSetup &&
+                        progress.hasCreatedFirstBean && // Should mark bean creation complete since they have beans
+                        progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                }
+            )
         }
     }
-    
+
     @Test
     fun `existing user who completes equipment setup without beans should continue to bean creation`() = runTest {
         // Given: Existing user with no beans
@@ -426,25 +440,30 @@ class OnboardingRoutingIntegrationTest {
 
         // Verify they're routed to equipment setup
         val initialState = viewModel.routingState.first()
-        assertEquals(NavigationDestinations.OnboardingEquipmentSetup.route, (initialState as RoutingState.Success).route)
+        assertEquals(
+            NavigationDestinations.OnboardingEquipmentSetup.route,
+            (initialState as RoutingState.Success).route
+        )
         assertFalse(initialState.isFirstTimeUser)
-        
+
         var resultCallback: Boolean? = null
-        
+
         // When: They complete equipment setup
         viewModel.handleEquipmentSetupComplete { shouldSkipBeanCreation ->
             resultCallback = shouldSkipBeanCreation
         }
         advanceUntilIdle()
-        
+
         // Then: Should not skip bean creation since they have no beans
         assertEquals(false, resultCallback)
-        coVerify { 
-            onboardingManager.updateOnboardingProgress(match { progress ->
-                progress.hasCompletedEquipmentSetup &&
-                !progress.hasCreatedFirstBean && // Should NOT mark bean creation complete since they have no beans
-                progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
-            })
+        coVerify {
+            onboardingManager.updateOnboardingProgress(
+                match { progress ->
+                    progress.hasCompletedEquipmentSetup &&
+                        !progress.hasCreatedFirstBean && // Should NOT mark bean creation complete since they have no beans
+                        progress.equipmentSetupVersion == OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION
+                }
+            )
         }
     }
 }

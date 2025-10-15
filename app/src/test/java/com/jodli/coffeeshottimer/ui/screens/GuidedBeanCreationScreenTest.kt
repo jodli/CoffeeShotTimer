@@ -174,7 +174,9 @@ class GuidedBeanCreationScreenTest {
             createdBean = testBean
         )
         every { mockViewModel.uiState } returns MutableStateFlow(uiState)
-        every { mockViewModel.getFreshnessMessage(testBean) } returns "Perfect timing – these beans are in their optimal freshness window!"
+        every {
+            mockViewModel.getFreshnessMessage(testBean)
+        } returns "Perfect timing – these beans are in their optimal freshness window!"
 
         composeTestRule.setContent {
             CoffeeShotTimerTheme {
@@ -190,7 +192,9 @@ class GuidedBeanCreationScreenTest {
         composeTestRule.onNodeWithText("Great! Your First Bean is Ready").assertIsDisplayed()
         composeTestRule.onNode(hasText("Ethiopian Yirgacheffe", substring = true)).assertIsDisplayed()
         composeTestRule.onNodeWithText("Continue to First Shot").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Perfect timing – these beans are in their optimal freshness window!").assertIsDisplayed()
+        composeTestRule.onNodeWithText(
+            "Perfect timing – these beans are in their optimal freshness window!"
+        ).assertIsDisplayed()
     }
 
     @Test

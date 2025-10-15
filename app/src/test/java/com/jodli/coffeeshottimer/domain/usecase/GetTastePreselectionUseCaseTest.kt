@@ -1,15 +1,15 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import org.junit.Assert.*
 
 /**
  * Unit tests for GetTastePreselectionUseCase.
  * Tests the extraction time to taste mapping logic according to the specification:
  * - < 25s → SOUR (under-extracted)
- * - 25-30s → PERFECT (optimal range) 
+ * - 25-30s → PERFECT (optimal range)
  * - > 30s → BITTER (over-extracted)
  */
 class GetTastePreselectionUseCaseTest {
@@ -61,7 +61,7 @@ class GetTastePreselectionUseCaseTest {
     fun `invoke with extraction time under 25 seconds returns SOUR`() {
         // Test boundary and typical under-extracted times
         val underExtractedTimes = listOf(5.0, 15.0, 20.0, 24.0, 24.9)
-        
+
         underExtractedTimes.forEach { time ->
             // When
             val result = useCase(time)
@@ -87,7 +87,7 @@ class GetTastePreselectionUseCaseTest {
     fun `invoke with extraction time between 25 and 30 seconds returns PERFECT`() {
         // Test optimal extraction times
         val optimalTimes = listOf(25.0, 25.5, 27.0, 28.5, 30.0)
-        
+
         optimalTimes.forEach { time ->
             // When
             val result = useCase(time)
@@ -113,7 +113,7 @@ class GetTastePreselectionUseCaseTest {
     fun `invoke with extraction time over 30 seconds returns BITTER`() {
         // Test over-extracted times
         val overExtractedTimes = listOf(30.1, 35.0, 40.0, 45.0, 60.0)
-        
+
         overExtractedTimes.forEach { time ->
             // When
             val result = useCase(time)
@@ -158,7 +158,7 @@ class GetTastePreselectionUseCaseTest {
             30.0 to TastePrimary.PERFECT,
             30.001 to TastePrimary.BITTER
         )
-        
+
         testCases.forEach { (time, expected) ->
             // When
             val result = useCase(time)
@@ -177,7 +177,7 @@ class GetTastePreselectionUseCaseTest {
             100.0 to TastePrimary.BITTER,
             300.0 to TastePrimary.BITTER
         )
-        
+
         extremeCases.forEach { (time, expected) ->
             // When
             val result = useCase(time)

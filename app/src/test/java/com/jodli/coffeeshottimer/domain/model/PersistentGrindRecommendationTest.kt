@@ -256,7 +256,7 @@ class PersistentGrindRecommendationTest {
         assertFalse(result.wasFollowed)
         assertEquals(basedOnTaste, result.basedOnTaste)
         assertEquals(ConfidenceLevel.HIGH, result.confidence)
-        
+
         // Timestamp should be recent
         assertTrue("Timestamp should be recent", result.timestamp.isAfter(LocalDateTime.now().minusMinutes(1)))
     }

@@ -1,9 +1,13 @@
 # Detekt configuration for CoffeeShotTimer Android app
 # Optimized for AI-generated code patterns and Android development
 
+config:
+  validation: true
+  warningsAsErrors: false
+
 build:
-  maxIssues: 0  # Fail build on any new issues (baseline mode)
-  excludeCorrectable: true  # Do not fail the build on auto-correctable issues (formatting, simple style)
+  maxIssues: 0 # Fail build on any new issues (baseline mode)
+  excludeCorrectable: true # Do not fail the build on auto-correctable issues (formatting, simple style)
   weights:
     # Prioritize critical issues for Android apps
     complexity: 2
@@ -14,11 +18,11 @@ build:
 console-reports:
   active: true
   exclude:
-    - 'ProjectStatisticsReport'
-    - 'ComplexityReport'
-    - 'NotificationReport'
-    - 'FindingsReport'
-    - 'FileBasedFindingsReport'
+    - "ProjectStatisticsReport"
+    - "ComplexityReport"
+    - "NotificationReport"
+    - "FindingsReport"
+    - "FileBasedFindingsReport"
 
 output-reports:
   active: true
@@ -45,6 +49,7 @@ comments:
 # Complexity - High priority for maintainable code
 complexity:
   active: true
+  excludes: ["**/build.gradle.kts"]
   ComplexCondition:
     active: true
     threshold: 4
@@ -55,7 +60,7 @@ complexity:
     includePrivateDeclarations: false
   CyclomaticComplexMethod:
     active: true
-    threshold: 20  # Higher to accommodate complex UI/Compose logic; revisit in baseline reductions
+    threshold: 20 # Higher to accommodate complex UI/Compose logic; revisit in baseline reductions
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
@@ -63,17 +68,17 @@ complexity:
     active: false
   LargeClass:
     active: true
-    threshold: 500  # Slightly permissive for Android; tighten over time
+    threshold: 500 # Slightly permissive for Android; tighten over time
   LongMethod:
     active: true
-    threshold: 120  # Allow larger @Composable and UI methods; revisit over time
+    threshold: 120 # Allow larger @Composable and UI methods; revisit over time
   LongParameterList:
     active: true
     functionThreshold: 10
-    constructorThreshold: 9  # Slightly higher for Android constructors
+    constructorThreshold: 9 # Slightly higher for Android constructors
     ignoreDefaultParameters: false
     ignoreDataClasses: true
-    ignoreAnnotated: ['Composable']
+    ignoreAnnotated: ["Composable"]
   MethodOverloading:
     active: false
   NestedBlockDepth:
@@ -98,9 +103,9 @@ coroutines:
   InjectDispatcher:
     active: true
     dispatcherNames:
-      - 'IO'
-      - 'Default'
-      - 'Unconfined'
+      - "IO"
+      - "Default"
+      - "Unconfined"
   RedundantSuspendModifier:
     active: true
   SleepInsteadOfDelay:
@@ -147,6 +152,7 @@ empty-blocks:
 # Exceptions - Critical for Android app stability
 exceptions:
   active: true
+  excludes: ["**/test/**", "**/androidTest/**"]
   ExceptionRaisedInUnexpectedLocation:
     active: false
   InstanceOfCheckForException:
@@ -194,15 +200,15 @@ naming:
   active: true
   ClassNaming:
     active: true
-    classPattern: '[A-Z][a-zA-Z0-9]*'
+    classPattern: "[A-Z][a-zA-Z0-9]*"
   ConstructorParameterNaming:
     active: true
-    parameterPattern: '[a-z][A-Za-z0-9]*'
-    privateParameterPattern: '[a-z][A-Za-z0-9]*'
-    excludeClassPattern: '$^'
+    parameterPattern: "[a-z][A-Za-z0-9]*"
+    privateParameterPattern: "[a-z][A-Za-z0-9]*"
+    excludeClassPattern: "$^"
   EnumNaming:
     active: true
-    enumEntryPattern: '[A-Z][_a-zA-Z0-9]*'
+    enumEntryPattern: "[A-Z][_a-zA-Z0-9]*"
   ForbiddenClassName:
     active: false
   FunctionMaxLength:
@@ -211,13 +217,13 @@ naming:
     active: false
   FunctionNaming:
     active: true
-    functionPattern: '([a-z][a-zA-Z0-9]*)|(`.*`)'
-    excludeClassPattern: '$^'
-    ignoreAnnotated: ['Composable']  # Allow different naming for Compose functions
+    functionPattern: "([a-z][a-zA-Z0-9]*)|(`.*`)"
+    excludeClassPattern: "$^"
+    ignoreAnnotated: ["Composable"] # Allow different naming for Compose functions
   FunctionParameterNaming:
     active: true
-    parameterPattern: '[a-z][A-Za-z0-9]*'
-    excludeClassPattern: '$^'
+    parameterPattern: "[a-z][A-Za-z0-9]*"
+    excludeClassPattern: "$^"
   InvalidPackageDeclaration:
     active: false
   MatchingDeclarationName:
@@ -228,26 +234,26 @@ naming:
     ignoreOverridden: true
   ObjectPropertyNaming:
     active: true
-    constantPattern: '[A-Za-z][_A-Za-z0-9]*'
-    propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
-    privatePropertyPattern: '(_)?[A-Za-z][_A-Za-z0-9]*'
+    constantPattern: "[A-Za-z][_A-Za-z0-9]*"
+    propertyPattern: "[A-Za-z][_A-Za-z0-9]*"
+    privatePropertyPattern: "(_)?[A-Za-z][_A-Za-z0-9]*"
   PackageNaming:
     active: true
     packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'
   TopLevelPropertyNaming:
     active: true
-    constantPattern: '[A-Z][_A-Z0-9]*'
-    propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
-    privatePropertyPattern: '_?[A-Za-z][_A-Za-z0-9]*'
+    constantPattern: "[A-Z][_A-Z0-9]*"
+    propertyPattern: "[A-Za-z][_A-Za-z0-9]*"
+    privatePropertyPattern: "_?[A-Za-z][_A-Za-z0-9]*"
   VariableMaxLength:
     active: false
   VariableMinLength:
     active: false
   VariableNaming:
     active: true
-    variablePattern: '[a-z][A-Za-z0-9]*'
-    privateVariablePattern: '(_)?[a-z][A-Za-z0-9]*'
-    excludeClassPattern: '$^'
+    variablePattern: "[a-z][A-Za-z0-9]*"
+    privateVariablePattern: "(_)?[a-z][A-Za-z0-9]*"
+    excludeClassPattern: "$^"
 
 # Performance - Critical for mobile apps
 performance:
@@ -256,16 +262,17 @@ performance:
     active: false
   ForEachOnRange:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**']
+    excludes: ["**/test/**", "**/androidTest/**"]
   SpreadOperator:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**']
+    excludes: ["**/test/**", "**/androidTest/**"]
   UnnecessaryTemporaryInstantiation:
     active: true
 
 # Potential bugs - Highest priority
 potential-bugs:
   active: true
+  excludes: ["**/test/**", "**/androidTest/**"]
   Deprecation:
     active: false
   EqualsAlwaysReturnsTrueOrFalse:
@@ -313,6 +320,7 @@ potential-bugs:
 
 # Style - Medium priority, focused on consistency
 style:
+  excludes: ["**/build.gradle.kts"]
   active: true
   CollapsibleIfStatements:
     active: false
@@ -330,7 +338,7 @@ style:
     active: false
   ForbiddenComment:
     active: true
-    comments: ['TODO:', 'FIXME:', 'STOPSHIP:', 'HACK:', 'XXX:']
+    comments: ["TODO:", "FIXME:", "STOPSHIP:", "HACK:", "XXX:"]
     allowedPatterns: ""
   ForbiddenImport:
     active: false
@@ -344,8 +352,8 @@ style:
     active: false
   MagicNumber:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**']
-    ignoreNumbers: ['-1', '0', '1', '2']
+    excludes: ["**/test/**", "**/androidTest/**"]
+    ignoreNumbers: ["-1", "0", "1", "2"]
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: false
     ignoreLocalVariableDeclaration: false
@@ -357,8 +365,8 @@ style:
     ignoreRanges: false
   MaxLineLength:
     active: false
-    maxLineLength: 120  # Enforced by formatting.MaximumLineLength
-    excludes: ['**/test/**', '**/androidTest/**']
+    maxLineLength: 120 # Enforced by formatting.MaximumLineLength
+    excludes: ["**/build.gradle.kts", "**/test/**", "**/androidTest/**"]
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false
@@ -422,6 +430,8 @@ style:
     active: true
   UnusedPrivateClass:
     active: false
+  UnusedPrivateProperty:
+    active: false
   UnusedPrivateMember:
     active: true
   UseArrayLiteralsInAnnotations:
@@ -452,16 +462,14 @@ style:
     active: false
   WildcardImport:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**']
-    excludeImports: ['java.util.*', 'kotlinx.android.synthetic.*']
+    excludes: ["**/test/**", "**/androidTest/**"]
+    excludeImports: ["java.util.*", "kotlinx.android.synthetic.*"]
 
 formatting:
   active: true
   android: true
   AutoCorrect: true
-  excludes: ['**/test/**', '**/androidTest/**']
   MaximumLineLength:
     active: true
     maxLineLength: 120
-
 # Custom rule sets can be added here for specific espresso timer patterns

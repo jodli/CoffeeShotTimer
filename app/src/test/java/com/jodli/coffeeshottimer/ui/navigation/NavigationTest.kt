@@ -1,7 +1,7 @@
 package com.jodli.coffeeshottimer.ui.navigation
 
-import org.junit.Test
 import org.junit.Assert.*
+import org.junit.Test
 
 /**
  * Unit tests for navigation destinations and configuration
@@ -15,7 +15,7 @@ class NavigationTest {
         assertEquals("bean_management", NavigationDestinations.BeanManagement.route)
         assertEquals("shot_details/{shotId}", NavigationDestinations.ShotDetails.route)
         assertEquals("add_edit_bean?beanId={beanId}", NavigationDestinations.AddEditBean.route)
-        
+
         // Onboarding destinations
         assertEquals("onboarding_introduction", NavigationDestinations.OnboardingIntroduction.route)
         assertEquals("onboarding_equipment_setup", NavigationDestinations.OnboardingEquipmentSetup.route)
@@ -32,7 +32,7 @@ class NavigationTest {
     fun `add edit bean creates correct routes`() {
         // Test add new bean (no ID)
         assertEquals("add_edit_bean", NavigationDestinations.AddEditBean.createRoute())
-        
+
         // Test edit existing bean (with ID)
         val beanId = "test-bean-456"
         val expectedRoute = "add_edit_bean?beanId=$beanId"
