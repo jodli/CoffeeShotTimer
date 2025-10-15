@@ -26,14 +26,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
@@ -54,6 +57,8 @@ import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
 import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
 import kotlin.math.PI
 import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Automatic timer circle with color-coded extraction feedback and smooth animation.
@@ -242,13 +247,17 @@ fun ManualTimerCircle(
 ) {
     val view = LocalView.current
     var currentAngle by remember { mutableFloatStateOf(TimerScaleMapper.timeToAngle(manualTimeSeconds)) }
+    var isDragging by remember { mutableStateOf(false) }
 
     // Track if user has performed haptic feedback recently (debounce)
     var lastHapticTime by remember { mutableLongStateOf(0L) }
 
     // Update angle when manualTimeSeconds changes externally (e.g., from dialog)
+    // But don't update while dragging to prevent jumps
     LaunchedEffect(manualTimeSeconds) {
-        currentAngle = TimerScaleMapper.timeToAngle(manualTimeSeconds)
+        if (!isDragging) {
+            currentAngle = TimerScaleMapper.timeToAngle(manualTimeSeconds)
+        }
     }
 
     // Color coding based on extraction quality (manual mode is always "running" for display)
@@ -258,38 +267,50 @@ fun ManualTimerCircle(
         modifier = modifier.size(size),
         contentAlignment = Alignment.Center
     ) {
+        // Timer circle with background and progress arc
         Surface(
             modifier = Modifier
                 .size(size)
                 .pointerInput(Unit) {
-                    detectDragGestures { change, _ ->
-                        change.consume()
+                    detectDragGestures(
+                        onDragStart = {
+                            isDragging = true
+                        },
+                        onDragEnd = {
+                            isDragging = false
+                        },
+                        onDragCancel = {
+                            isDragging = false
+                        },
+                        onDrag = { change, _ ->
+                            change.consume()
 
-                        // Calculate angle from center
-                        val centerX = size.toPx() / 2
-                        val centerY = size.toPx() / 2
-                        val touchX = change.position.x - centerX
-                        val touchY = change.position.y - centerY
+                            // Calculate angle from center
+                            val centerX = size.toPx() / 2
+                            val centerY = size.toPx() / 2
+                            val touchX = change.position.x - centerX
+                            val touchY = change.position.y - centerY
 
-                        // Calculate angle in degrees (0° at top, clockwise)
-                        val angle = (atan2(touchY, touchX) * 180f / PI.toFloat() + 90f + 360f) % 360f
-                        currentAngle = angle
+                            // Calculate angle in degrees (0° at top, clockwise)
+                            val angle = (atan2(touchY, touchX) * 180f / PI.toFloat() + 90f + 360f) % 360f
+                            currentAngle = angle
 
-                        // Convert angle to time
-                        val newTime = TimerScaleMapper.angleToTime(angle)
+                            // Convert angle to time
+                            val newTime = TimerScaleMapper.angleToTime(angle)
 
-                        // Only trigger callback and haptics if time actually changed
-                        if (newTime != manualTimeSeconds) {
-                            onTimeChange(newTime)
+                            // Only trigger callback and haptics if time actually changed
+                            if (newTime != manualTimeSeconds) {
+                                onTimeChange(newTime)
 
-                            // Debounced haptic feedback
-                            val now = System.currentTimeMillis()
-                            if (now - lastHapticTime > 100) {
-                                view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                lastHapticTime = now
+                                // Debounced haptic feedback
+                                val now = System.currentTimeMillis()
+                                if (now - lastHapticTime > 100) {
+                                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+                                    lastHapticTime = now
+                                }
                             }
                         }
-                    }
+                    )
                 }
                 .pointerInput(Unit) {
                     detectTapGestures(
@@ -356,6 +377,47 @@ fun ManualTimerCircle(
                 }
             }
         }
+
+        // Grabber handle - drawn outside Surface to prevent clipping
+        Box(
+            modifier = Modifier
+                .size(size)
+                .drawBehind {
+                    val strokeWidth = 24f
+                    val radius = size.toPx() / 2f
+
+                    // Calculate grabber position
+                    val grabberAngle = (currentAngle - 90f) * PI.toFloat() / 180f
+                    val grabberRadius = radius - strokeWidth / 2
+                    val grabberCenterX = center.x + grabberRadius * cos(grabberAngle)
+                    val grabberCenterY = center.y + grabberRadius * sin(grabberAngle)
+                    val grabberSize = 40f
+
+                    // Draw shadow
+                    drawCircle(
+                        color = Color.Black.copy(alpha = 0.2f),
+                        radius = grabberSize / 2 + 2f,
+                        center = Offset(grabberCenterX + 1f, grabberCenterY + 2f),
+                        style = Fill
+                    )
+
+                    // Draw outer white circle for contrast
+                    drawCircle(
+                        color = Color.White,
+                        radius = grabberSize / 2,
+                        center = Offset(grabberCenterX, grabberCenterY),
+                        style = Fill
+                    )
+
+                    // Draw inner colored circle
+                    drawCircle(
+                        color = borderColor,
+                        radius = (grabberSize / 2) - 5f,
+                        center = Offset(grabberCenterX, grabberCenterY),
+                        style = Fill
+                    )
+                }
+        )
     }
 }
 

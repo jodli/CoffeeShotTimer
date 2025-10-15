@@ -131,8 +131,8 @@ The UI changes based on what the user is doing:
 **Semantic colors (extraction feedback - both modes):**
 
 - **Gray (#9E9E9E) (0s):** Idle state, ready to start
-- **Orange (#FF9800) (<20s):** Too fast extraction, likely under-extracted/sour
-- **Green (#4CAF50) (20-30s):** Optimal extraction time range
+- **Orange (#FF9800) (<25s):** Too fast extraction, likely under-extracted/sour
+- **Green (#4CAF50) (25-30s):** Optimal extraction time range
 - **Red (#FF5722) (>30s):** Too slow extraction, likely over-extracted/bitter
 
 **Freshness indicators (bean age):**
@@ -210,8 +210,8 @@ The UI changes based on what the user is doing:
 - Large time display (dynamically sized, 48-96sp based on available space)
 - Color-coded by extraction quality:
   - Gray: Idle (0s)
-  - Orange: Too fast (<20s)
-  - Green: Optimal (20-30s)
+  - Orange: Too fast (<25s)
+  - Green: Optimal (25-30s)
   - Red: Too slow (>30s)
 - Full circle is tappable to start/pause
 - Reset button appears when paused with elapsed time
