@@ -8,15 +8,15 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Added
 
+- [*] Manually adjust extraction time for accurate shot records.
 - Detekt static analysis tool for improved code quality and consistency.
 
 ### Changed
 
 - [*] Redesigned RecordShotScreen with intelligence-first layout focusing on the timer.
-- [*] Implemented new warm color palette for light and dark modes (clementine orange, warm cream, mocha brown).
+- [*] Implemented new warm color palette for light and dark modes.
 - Compact single-line weights display ("18g → 36g (1:2.0)") with quick +/- adjustments.
 - RecordShotScreen layout optimized for no scrolling with flexible timer size.
-- Manual timer mode toggle disabled (placeholder for future feature).
 - Removed unused code throughout the codebase to reduce app size.
 
 ## [1.5.0]
