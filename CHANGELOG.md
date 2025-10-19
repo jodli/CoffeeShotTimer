@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [2.0.0]
+
 ### Added
 
 - [*] Manually adjust extraction time for accurate shot records.
