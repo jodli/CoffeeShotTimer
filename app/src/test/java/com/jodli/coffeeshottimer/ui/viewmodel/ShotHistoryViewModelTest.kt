@@ -34,6 +34,8 @@ class ShotHistoryViewModelTest {
     private val getShotHistoryUseCase = mockk<GetShotHistoryUseCase>()
     private val getActiveBeansUseCase = mockk<GetActiveBeansUseCase>()
     private val getShotStatisticsUseCase = mockk<GetShotStatisticsUseCase>()
+    private val getShotQualityAnalysisUseCase =
+        mockk<com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase>(relaxed = true)
     private val memoryOptimizer = mockk<MemoryOptimizer>(relaxed = true)
     private val stringResourceProvider = mockk<StringResourceProvider>(relaxed = true)
     private val domainErrorTranslator = mockk<DomainErrorTranslator>(relaxed = true)
@@ -79,7 +81,7 @@ class ShotHistoryViewModelTest {
             stringResourceProvider.getString(com.jodli.coffeeshottimer.R.string.text_inactive_bean)
         } returns "Inactive Bean"
 
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, getShotQualityAnalysisUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
     }
 
     @After
@@ -174,7 +176,7 @@ class ShotHistoryViewModelTest {
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(testBeans))
 
         // Recreate viewModel to pick up the new mock
-        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
+        viewModel = ShotHistoryViewModel(getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase, getShotQualityAnalysisUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator)
 
         // Wait for initial data load
         testDispatcher.scheduler.advanceTimeBy(500)

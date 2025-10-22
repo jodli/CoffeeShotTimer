@@ -21,7 +21,8 @@ import javax.inject.Singleton
 @Singleton
 class GetShotDetailsUseCase @Inject constructor(
     private val shotRepository: ShotRepository,
-    private val beanRepository: BeanRepository
+    private val beanRepository: BeanRepository,
+    private val getShotQualityAnalysisUseCase: GetShotQualityAnalysisUseCase
 ) {
 
     companion object {
@@ -283,17 +284,15 @@ class GetShotDetailsUseCase @Inject constructor(
         val isConsistentWithHistory = kotlin.math.abs(brewRatioDeviation) < 0.3 &&
             kotlin.math.abs(extractionTimeDeviation) < 5
 
-        // Calculate quality score with transparent breakdown (0-100)
+        // Delegate quality score calculation to centralized use case
+        val qualityScore = getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, relatedShots)
+
+        // Calculate individual point components for transparency in shot details UI
         val extractionTimePoints = calculateExtractionTimePoints(shot, isOptimalExtraction)
         val brewRatioPoints = calculateBrewRatioPoints(shot, isTypicalRatio)
         val tastePoints = calculateTastePoints(shot)
         val consistencyPoints = if (isConsistentWithHistory) MAX_CONSISTENCY_POINTS else MIN_CONSISTENCY_POINTS
         val deviationBonusPoints = calculateDeviationBonus(brewRatioDeviation, extractionTimeDeviation)
-
-        val qualityScore = (
-            extractionTimePoints + brewRatioPoints + tastePoints +
-                consistencyPoints + deviationBonusPoints
-            ).coerceIn(0, 100)
 
         // Generate improvement path
         val improvementPath = generateImprovementPath(
