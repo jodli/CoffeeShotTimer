@@ -844,4 +844,9 @@
     <string name="coaching_insights_section_coaching">Coaching Impact</string>
     <string name="cd_collapse_insights">Collapse insights</string>
     <string name="cd_expand_insights">Expand insights</string>
+    
+    <!-- Achievement Badges -->
+    <string name="achievement_first_perfect">First perfect with %1$s!</string>
+    <string name="achievement_dialed_in">Dialed in %1$s</string>
+    <string name="achievement_consistency_streak">%1$d streak with %2$s</string>
 </resources>

@@ -60,6 +60,8 @@ import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
+import com.jodli.coffeeshottimer.ui.viewmodel.Achievement
+import com.jodli.coffeeshottimer.ui.viewmodel.AchievementType
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryViewModel
 import java.time.format.DateTimeFormatter
@@ -500,7 +502,8 @@ private fun ShotHistoryLandscapeListContent(
             ShotHistoryLandscapeItem(
                 shot = shot,
                 beanName = getBeanName(shot.beanId),
-                onClick = { onShotClick(shot.id) }
+                onClick = { onShotClick(shot.id) },
+                viewModel = hiltViewModel()
             )
         }
 
@@ -526,6 +529,7 @@ private fun ShotHistoryLandscapeItem(
     shot: Shot,
     beanName: String,
     onClick: () -> Unit,
+    viewModel: ShotHistoryViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -583,6 +587,11 @@ private fun ShotHistoryLandscapeItem(
                         value = shot.grinderSetting,
                         isNeutral = true
                     )
+                }
+
+                // Achievement badge
+                viewModel.getAchievementForShot(shot)?.let { achievement ->
+                    AchievementBadge(achievement = achievement)
                 }
             }
 
@@ -842,7 +851,8 @@ private fun ShotHistoryList(
             ShotHistoryItem(
                 shot = shot,
                 beanName = getBeanName(shot.beanId),
-                onClick = { onShotClick(shot.id) }
+                onClick = { onShotClick(shot.id) },
+                viewModel = hiltViewModel()
             )
         }
 
@@ -864,6 +874,7 @@ private fun ShotHistoryItem(
     shot: Shot,
     beanName: String,
     onClick: () -> Unit,
+    viewModel: ShotHistoryViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -927,6 +938,11 @@ private fun ShotHistoryItem(
                         tastePrimary = shot.tastePrimary,
                         tasteSecondary = shot.tasteSecondary
                     )
+
+                    // Achievement badge
+                    viewModel.getAchievementForShot(shot)?.let { achievement ->
+                        AchievementBadge(achievement = achievement)
+                    }
                 }
             }
 
@@ -955,6 +971,61 @@ private fun ShotHistoryItem(
                     modifier = Modifier.padding(top = spacing.extraSmall)
                 )
             }
+        }
+    }
+}
+
+/**
+ * Achievement badge component showing bean-specific milestones.
+ */
+@Composable
+private fun AchievementBadge(
+    achievement: Achievement,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    // Color based on achievement type
+    val backgroundColor = when (achievement.type) {
+        AchievementType.FIRST_PERFECT -> MaterialTheme.colorScheme.primaryContainer
+        AchievementType.DIALED_IN -> MaterialTheme.colorScheme.tertiaryContainer
+        AchievementType.CONSISTENCY -> MaterialTheme.colorScheme.secondaryContainer
+    }
+
+    val contentColor = when (achievement.type) {
+        AchievementType.FIRST_PERFECT -> MaterialTheme.colorScheme.onPrimaryContainer
+        AchievementType.DIALED_IN -> MaterialTheme.colorScheme.onTertiaryContainer
+        AchievementType.CONSISTENCY -> MaterialTheme.colorScheme.onSecondaryContainer
+    }
+
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(spacing.cornerLarge),
+        color = backgroundColor
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = spacing.small,
+                vertical = spacing.extraSmall
+            ),
+            horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Emoji
+            Text(
+                text = achievement.emoji,
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            // Label
+            Text(
+                text = achievement.label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
