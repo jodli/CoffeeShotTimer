@@ -6,6 +6,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Added
+
+- [*] Shot History now shows bean-specific coaching insights and celebrates achievements like your first perfect shot, dial-in milestones, and consistency streaks.
+
 ### Changed
 
 - [*] Redesigned Shot Details screen with conversational insights, quality score breakdown, and shot ranking.
