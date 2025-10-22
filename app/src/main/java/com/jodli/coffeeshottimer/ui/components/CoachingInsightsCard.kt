@@ -33,7 +33,7 @@ import com.jodli.coffeeshottimer.ui.viewmodel.CoachingInsights
 /**
  * Card component that displays retrospective coaching insights about the user's brewing journey.
  * Shows bean-specific trends, dial-in status, and grind coaching effectiveness.
- * 
+ *
  * Expandable/collapsible for space efficiency while providing rich insights.
  */
 @Composable
@@ -76,7 +76,7 @@ fun CoachingInsightsCard(
                 } else {
                     stringResource(R.string.coaching_insights_title)
                 }
-                
+
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
@@ -103,7 +103,7 @@ fun CoachingInsightsCard(
         // Always show the most important insight when collapsed
         if (!isExpanded) {
             Spacer(modifier = Modifier.height(spacing.small))
-            
+
             // Show first available insight
             val summaryText = when {
                 insights.recentTrend != null -> insights.recentTrend.consistencyMessage

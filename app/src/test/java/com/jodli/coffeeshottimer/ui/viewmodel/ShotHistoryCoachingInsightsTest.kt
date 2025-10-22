@@ -3,8 +3,9 @@ package com.jodli.coffeeshottimer.ui.viewmodel
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
-import io.mockk.mockk
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import java.time.LocalDateTime
@@ -12,7 +13,7 @@ import java.util.UUID
 
 /**
  * Unit tests for coaching insights and achievement detection logic in ShotHistoryViewModel.
- * 
+ *
  * Tests focus on:
  * - Recent trend analysis (3-5 shots per bean)
  * - Dial-in status calculation (bean-specific)
@@ -22,14 +23,14 @@ import java.util.UUID
 class ShotHistoryCoachingInsightsTest {
 
     private lateinit var viewModel: ShotHistoryViewModel
-    
+
     // Test beans
     private val beanA = Bean(
         id = "bean-a",
         name = "Ethiopian Yirgacheffe",
         roastDate = LocalDateTime.now().minusDays(7).toLocalDate()
     )
-    
+
     private val beanB = Bean(
         id = "bean-b",
         name = "Colombian Supremo",
@@ -48,18 +49,29 @@ class ShotHistoryCoachingInsightsTest {
     fun `achievement detected for first perfect shot with bean`() {
         // Given: 3 shots with bean A, one is perfect (score >= 80)
         val shots = listOf(
-            createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 40, ratio = 2.0), // Good but not perfect (score ~60)
-            createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 38, ratio = 2.1), // Good but not perfect (score ~68)
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Perfect!
+            createShot(
+                beanId = beanA.id,
+                timestamp = now().minusHours(3),
+                time = 40,
+                ratio = 2.0
+            ), // Good but not perfect (score ~60)
+            createShot(
+                beanId = beanA.id,
+                timestamp = now().minusHours(2),
+                time = 38,
+                ratio = 2.1
+            ), // Good but not perfect (score ~68)
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Perfect!
         )
 
         // When: Check if last shot has first perfect achievement
         val lastShot = shots.last()
-        
+
         // Then: Should be first perfect because previous shots weren't perfect
         // Quality score for last shot: time=27s (optimal) = 40pts, ratio=2.0 (typical) = 40pts, weights ok = 20pts = 100pts
         assertTrue("Last shot should be perfect", calculateQualityScore(lastShot) >= 80)
-        assertTrue("Should be first perfect for this bean", 
+        assertTrue(
+            "Should be first perfect for this bean",
             shots.filter { it.timestamp < lastShot.timestamp }
                 .none { calculateQualityScore(it) >= 80 }
         )
@@ -71,15 +83,16 @@ class ShotHistoryCoachingInsightsTest {
         val shots = listOf(
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 27, ratio = 2.0), // Perfect
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 28, ratio = 2.0), // Perfect
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Perfect
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Perfect
         )
 
         // When: Check last shot
         val lastShot = shots.last()
-        
+
         // Then: Should NOT be "first perfect" because earlier perfect shots exist
         assertTrue("Last shot should be perfect", calculateQualityScore(lastShot) >= 80)
-        assertTrue("Previous perfect shots should exist",
+        assertTrue(
+            "Previous perfect shots should exist",
             shots.filter { it.timestamp < lastShot.timestamp }
                 .any { calculateQualityScore(it) >= 80 }
         )
@@ -91,12 +104,12 @@ class ShotHistoryCoachingInsightsTest {
         val shots = listOf(
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 28, ratio = 2.0), // Good
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 29, ratio = 2.1), // Good
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Good
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Good
         )
 
         // When: Check if all 3 shots are good
         val allGood = shots.all { calculateQualityScore(it) >= 60 }
-        
+
         // Then: Should be dial-in milestone
         assertTrue("All shots should be good quality", allGood)
         assertEquals("Should have exactly 3 shots", 3, shots.size)
@@ -147,7 +160,7 @@ class ShotHistoryCoachingInsightsTest {
             createShot(beanId = beanA.id, timestamp = now().minusHours(4), time = 28, ratio = 2.0), // Good
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 45, ratio = 1.2), // Poor
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 28, ratio = 2.0), // Good
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Good
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Good
         )
 
         // When: Count consecutive good shots from end
@@ -172,7 +185,7 @@ class ShotHistoryCoachingInsightsTest {
         val shotsWithBeanA = listOf(
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 27, ratio = 2.0) // Perfect with A
         )
-        
+
         val shotsWithBeanB = listOf(
             createShot(beanId = beanB.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Perfect with B
         )
@@ -180,12 +193,14 @@ class ShotHistoryCoachingInsightsTest {
         // When: Check if each is first perfect for its bean
         val beanAShotsBeforeLast = shotsWithBeanA.dropLast(1)
         val beanBShotsBeforeLast = shotsWithBeanB.dropLast(1)
-        
+
         // Then: Both should be "first perfect" for their respective beans
-        assertTrue("Bean A shot should be first perfect for bean A", 
+        assertTrue(
+            "Bean A shot should be first perfect for bean A",
             beanAShotsBeforeLast.none { calculateQualityScore(it) >= 80 }
         )
-        assertTrue("Bean B shot should be first perfect for bean B",
+        assertTrue(
+            "Bean B shot should be first perfect for bean B",
             beanBShotsBeforeLast.none { calculateQualityScore(it) >= 80 }
         )
     }
@@ -221,7 +236,7 @@ class ShotHistoryCoachingInsightsTest {
             createShot(beanId = beanA.id, timestamp = now().minusHours(4), time = 40, ratio = 2.0), // Good (60)
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 27, ratio = 2.0), // Perfect (100)
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 38, ratio = 2.0), // Good (68)
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Perfect (100)
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Perfect (100)
         )
 
         // When: Count perfect and good shots
@@ -239,7 +254,7 @@ class ShotHistoryCoachingInsightsTest {
         val shots = listOf(
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 27, ratio = 2.0), // 100
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 40, ratio = 2.0), // 60
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // 100
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // 100
         )
 
         // When: Calculate scores and average
@@ -290,7 +305,7 @@ class ShotHistoryCoachingInsightsTest {
             createShot(beanId = beanA.id, timestamp = now().minusHours(4), time = 42, ratio = 1.3), // Poor
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 28, ratio = 2.0), // Good
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 29, ratio = 2.1), // Good
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Good
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Good
         )
 
         // When: Check last 3 shots
@@ -310,7 +325,7 @@ class ShotHistoryCoachingInsightsTest {
             createShot(beanId = beanA.id, timestamp = now().minusHours(4), time = 45, ratio = 1.2), // Poor
             createShot(beanId = beanA.id, timestamp = now().minusHours(3), time = 28, ratio = 2.0), // Good
             createShot(beanId = beanA.id, timestamp = now().minusHours(2), time = 42, ratio = 1.3), // Poor
-            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0)  // Good
+            createShot(beanId = beanA.id, timestamp = now().minusHours(1), time = 27, ratio = 2.0) // Good
         )
 
         // When: Check for any 3 consecutive good shots
@@ -375,7 +390,7 @@ class ShotHistoryCoachingInsightsTest {
     ): Shot {
         val coffeeIn = 18.0
         val coffeeOut = coffeeIn * ratio
-        
+
         return Shot(
             id = UUID.randomUUID().toString(),
             beanId = beanId,
@@ -385,8 +400,13 @@ class ShotHistoryCoachingInsightsTest {
             grinderSetting = "3.5",
             timestamp = timestamp,
             tastePrimary = if (calculateQualityScore(
-                createTempShot(time, ratio)
-            ) >= 80) TastePrimary.PERFECT else null
+                    createTempShot(time, ratio)
+                ) >= 80
+            ) {
+                TastePrimary.PERFECT
+            } else {
+                null
+            }
         )
     }
 

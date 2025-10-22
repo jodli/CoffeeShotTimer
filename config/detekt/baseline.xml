@@ -19,6 +19,7 @@
     <ID>CyclomaticComplexMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
     <ID>ExplicitGarbageCollectionCall:MemoryOptimizer.kt$MemoryOptimizer$gc()</ID>
     <ID>FunctionParameterNaming:TimerComponents.kt$timer_seconds_suffix: String = "s"</ID>
+    <ID>LargeClass:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
     <ID>LargeClass:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>LongMethod:AboutScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AboutScreen( onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier, debugViewModel: DebugViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:AddEditBeanScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AddEditBeanScreen( beanId: String? = null, onNavigateBack: () -&gt; Unit = {}, viewModel: AddEditBeanViewModel = hiltViewModel(), isOnboardingMode: Boolean = false, onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -&gt; Unit)? = null )</ID>
@@ -120,18 +121,13 @@
     <ID>MagicNumber:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$4</ID>
     <ID>MagicNumber:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$60</ID>
     <ID>MagicNumber:GetBeanHistoryUseCase.kt$GetBeanHistoryUseCase$30</ID>
-    <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$0.1</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$0.3</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$0.5</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$1.5</ID>
-    <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$10</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$100</ID>
-    <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$15</ID>
-    <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$20</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$25</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$3.0</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$5</ID>
-    <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$50</ID>
     <ID>MagicNumber:GetShotHistoryUseCase.kt$GetShotHistoryUseCase$1.5</ID>
     <ID>MagicNumber:GetShotHistoryUseCase.kt$GetShotHistoryUseCase$25</ID>
     <ID>MagicNumber:GetShotHistoryUseCase.kt$GetShotHistoryUseCase$3.0</ID>
@@ -445,6 +441,10 @@
     <ID>ReturnCount:ManageGrindRecommendationUseCase.kt$ManageGrindRecommendationUseCase$suspend fun saveRecommendation( beanId: String, recommendation: GrindAdjustmentRecommendation, lastShot: Shot ): Result&lt;PersistentGrindRecommendation&gt;</ID>
     <ID>ReturnCount:ManageGrindRecommendationUseCase.kt$ManageGrindRecommendationUseCase$suspend fun updateRecommendationWithTaste( beanId: String, updatedRecommendation: GrindAdjustmentRecommendation, updatedShot: Shot ): Result&lt;PersistentGrindRecommendation&gt;</ID>
     <ID>ReturnCount:RemovePhotoFromBeanUseCase.kt$RemovePhotoFromBeanUseCase$suspend fun execute(beanId: String): Result&lt;Unit&gt;</ID>
+    <ID>ReturnCount:ShotHistoryViewModel.kt$ShotHistoryViewModel$private fun findDialInPoint(beanShots: List&lt;Shot&gt;): Int?</ID>
+    <ID>ReturnCount:ShotHistoryViewModel.kt$ShotHistoryViewModel$private fun getDialInStatus(shots: List&lt;Shot&gt;, beanId: String?): DialInStatus?</ID>
+    <ID>ReturnCount:ShotHistoryViewModel.kt$ShotHistoryViewModel$private fun isBeanConsistencyMilestone(shot: Shot, allShots: List&lt;Shot&gt;): Int?</ID>
+    <ID>ReturnCount:ShotHistoryViewModel.kt$ShotHistoryViewModel$private fun isDialInMilestone(shot: Shot, allShots: List&lt;Shot&gt;): Boolean</ID>
     <ID>ReturnCount:ShotRecordingViewModel.kt$ShotRecordingViewModel$private fun checkIfRecommendationFollowed( currentGrinderSetting: String, recommendation: PersistentGrindRecommendation? ): Boolean</ID>
     <ID>ReturnCount:ShotRepository.kt$ShotRepository$suspend fun recordShot(shot: Shot): Result&lt;Unit&gt;</ID>
     <ID>ReturnCount:ShotRepository.kt$ShotRepository$suspend fun updateShot(shot: Shot): Result&lt;Unit&gt;</ID>
@@ -527,6 +527,7 @@
     <ID>TooManyFunctions:BeanRepository.kt$BeanRepository</ID>
     <ID>TooManyFunctions:ShotDao.kt$ShotDao</ID>
     <ID>TooManyFunctions:ShotHistoryScreen.kt$com.jodli.coffeeshottimer.ui.screens.ShotHistoryScreen.kt</ID>
+    <ID>TooManyFunctions:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>TooManyFunctions:ShotRepository.kt$ShotRepository</ID>
     <ID>TooManyFunctions:ValidationStringProvider.kt$ValidationStringProvider</ID>
