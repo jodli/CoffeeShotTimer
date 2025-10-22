@@ -778,4 +778,30 @@
     <string name="grind_coarser">Grind coarser</string>
     <string name="no_change_needed">No change needed</string>
 
+    <!-- Quality Score Breakdown -->
+    <string name="text_quality_score_breakdown">Quality Score Breakdown</string>
+    <string name="text_total_score">Total Score</string>
+    <string name="tier_excellent">Excellent</string>
+    <string name="tier_good">Good</string>
+    <string name="tier_needs_work">Needs Work</string>
+    <string name="label_taste_feedback">Taste Feedback</string>
+    <string name="label_precision">Precision</string>
+    <string name="text_to_improve">To improve:</string>
+    
+    <!-- Improvement Actions -->
+    <string name="action_grind_finer">Grind finer</string>
+    <string name="action_grind_coarser">Grind coarser</string>
+    <string name="action_adjust_brew_ratio">Adjust brew ratio</string>
+    <string name="action_dial_in_taste">Dial in based on taste</string>
+    
+    <!-- Comparison Context -->
+    <string name="text_comparison_context">How This Compares</string>
+    <string name="text_personal_best">🎉 Personal Best!</string>
+    <string name="format_ranking">%1$d out of %2$d shots</string>
+    <string name="text_with_this_bean">with this bean</string>
+    
+    <!-- What Happened Card -->
+    <string name="text_what_happened">What Happened &amp; Why</string>
+    <string name="text_your_shot">Your Shot</string>
+    <string name="text_compared_to_usual">Compared to usual:</string>
 </resources>
