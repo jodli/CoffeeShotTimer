@@ -53,7 +53,10 @@ fun TasteFeedbackDisplay(
                 )
             }
         } else {
-            // No taste recorded
+            // No taste recorded - add spacer when edit button is present
+            if (onEditClick != null) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             Text(
                 text = stringResource(R.string.text_no_taste_recorded),
                 style = MaterialTheme.typography.bodyMedium,
@@ -63,7 +66,9 @@ fun TasteFeedbackDisplay(
 
         // Edit button if callback provided
         onEditClick?.let { onClick ->
-            Spacer(modifier = Modifier.weight(1f))
+            if (tastePrimary != null) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             IconButton(
                 onClick = onClick,
                 modifier = Modifier.size(24.dp)
