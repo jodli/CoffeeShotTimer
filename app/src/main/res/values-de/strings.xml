@@ -779,4 +779,30 @@
     <string name="badge_recommendation_alert">!</string>
     <string name="display_grinder_setting_empty">--</string>
 
+    <!-- Quality Score Breakdown -->
+    <string name="text_quality_score_breakdown">Qualitätsbewertung Details</string>
+    <string name="text_total_score">Gesamtpunktzahl</string>
+    <string name="tier_excellent">Exzellent</string>
+    <string name="tier_good">Gut</string>
+    <string name="tier_needs_work">Verbesserungsbedarf</string>
+    <string name="label_taste_feedback">Geschmack</string>
+    <string name="label_precision">Präzision</string>
+    <string name="text_to_improve">Zur Verbesserung:</string>
+    
+    <!-- Improvement Actions -->
+    <string name="action_grind_finer">Feiner mahlen</string>
+    <string name="action_grind_coarser">Gröber mahlen</string>
+    <string name="action_adjust_brew_ratio">Brühverhältnis anpassen</string>
+    <string name="action_dial_in_taste">Nach Geschmack einstellen</string>
+    
+    <!-- Comparison Context -->
+    <string name="text_comparison_context">Vergleich</string>
+    <string name="text_personal_best">🎉 Persönliche Bestleistung!</string>
+    <string name="format_ranking">%1$d von %2$d Shots</string>
+    <string name="text_with_this_bean">mit dieser Bohne</string>
+    
+    <!-- What Happened Card -->
+    <string name="text_what_happened">Was ist passiert &amp; Warum</string>
+    <string name="text_your_shot">Dein Shot</string>
+    <string name="text_compared_to_usual">Im Vergleich zum Durchschnitt:</string>
 </resources>
