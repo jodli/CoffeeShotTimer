@@ -74,6 +74,23 @@ class GetShotDetailsUseCase @Inject constructor(
             // Calculate shot analysis
             val analysis = calculateShotAnalysis(shot, relatedShots, bean)
 
+            // Calculate ranking (only if enough shots exist)
+            var rankingForBean: Int? = null
+            var isPersonalBest = false
+            if (relatedShots.size > 3) {
+                // Calculate quality score for all shots
+                val shotsWithScores = relatedShots.map { relatedShot ->
+                    val relatedAnalysis = calculateShotAnalysis(relatedShot, relatedShots, bean)
+                    Pair(relatedShot.id, relatedAnalysis.qualityScore)
+                }
+
+                // Sort by score descending (highest first)
+                val sortedByScore = shotsWithScores.sortedByDescending { it.second }
+                val position = sortedByScore.indexOfFirst { it.first == shot.id } + 1
+                rankingForBean = position
+                isPersonalBest = position == 1
+            }
+
             val shotDetails = ShotDetails(
                 shot = shot,
                 bean = bean,
@@ -81,7 +98,9 @@ class GetShotDetailsUseCase @Inject constructor(
                 previousShot = previousShot,
                 nextShot = nextShot,
                 analysis = analysis,
-                relatedShotsCount = relatedShots.size
+                relatedShotsCount = relatedShots.size,
+                rankingForBean = rankingForBean,
+                isPersonalBest = isPersonalBest
             )
 
             Result.success(shotDetails)
@@ -223,18 +242,48 @@ class GetShotDetailsUseCase @Inject constructor(
         val isConsistentWithHistory = kotlin.math.abs(brewRatioDeviation) < 0.3 &&
             kotlin.math.abs(extractionTimeDeviation) < 5
 
-        // Calculate quality score (0-100)
-        var qualityScore = 50 // Base score
+        // Calculate quality score with transparent breakdown (0-100)
+        // Extraction Time: 0-25 points
+        val extractionTimePoints = when {
+            isOptimalExtraction -> 25 // Perfect range (25-30s)
+            shot.extractionTimeSeconds in 20..35 -> 15 // Close to optimal
+            else -> 5 // Needs significant adjustment
+        }
 
-        if (isOptimalExtraction) qualityScore += 20
-        if (isTypicalRatio) qualityScore += 15
-        if (isConsistentWithHistory) qualityScore += 10
+        // Brew Ratio: 0-20 points
+        val brewRatioPoints = when {
+            isTypicalRatio -> 20 // Typical range (1.5-2.5)
+            shot.brewRatio in 1.3..2.8 -> 12 // Close to typical
+            else -> 4 // Unusual ratio
+        }
 
-        // Adjust based on deviations
-        if (kotlin.math.abs(brewRatioDeviation) < 0.1) qualityScore += 5
-        if (kotlin.math.abs(extractionTimeDeviation) < 2) qualityScore += 5
+        // Taste Feedback: 0-30 points (most important - what user actually experienced)
+        val tastePoints = when (shot.tastePrimary) {
+            com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT -> 30 // User loved it
+            com.jodli.coffeeshottimer.domain.model.TastePrimary.SOUR -> 10 // Under-extracted but informative
+            com.jodli.coffeeshottimer.domain.model.TastePrimary.BITTER -> 10 // Over-extracted but informative
+            null -> 15 // No feedback yet - neutral score
+        }
 
-        qualityScore = qualityScore.coerceIn(0, 100)
+        // Consistency: 0-15 points
+        val consistencyPoints = if (isConsistentWithHistory) 15 else 5
+
+        // Deviation Bonus: 0-10 points (precision in execution)
+        var deviationBonusPoints = 0
+        if (kotlin.math.abs(brewRatioDeviation) < 0.1) deviationBonusPoints += 5
+        if (kotlin.math.abs(extractionTimeDeviation) < 2) deviationBonusPoints += 5
+
+        val qualityScore = (extractionTimePoints + brewRatioPoints + tastePoints +
+            consistencyPoints + deviationBonusPoints).coerceIn(0, 100)
+
+        // Generate improvement path
+        val improvementPath = generateImprovementPath(
+            qualityScore,
+            extractionTimePoints,
+            brewRatioPoints,
+            tastePoints,
+            shot
+        )
 
         // Generate recommendations
         val recommendations = mutableListOf<ShotRecommendation>()
@@ -315,8 +364,53 @@ class GetShotDetailsUseCase @Inject constructor(
             avgExtractionTimeForBean = avgExtractionTime,
             avgWeightInForBean = avgWeightIn,
             avgWeightOutForBean = avgWeightOut,
-            recommendations = recommendations
+            recommendations = recommendations,
+            extractionTimePoints = extractionTimePoints,
+            brewRatioPoints = brewRatioPoints,
+            tastePoints = tastePoints,
+            consistencyPoints = consistencyPoints,
+            deviationBonusPoints = deviationBonusPoints,
+            improvementPath = improvementPath
         )
+    }
+
+    /**
+     * Generate improvement path suggestion based on current score.
+     */
+    private fun generateImprovementPath(
+        currentScore: Int,
+        extractionTimePoints: Int,
+        brewRatioPoints: Int,
+        tastePoints: Int,
+        shot: Shot
+    ): String? {
+        // Already excellent
+        if (currentScore >= 85) return null
+
+        val suggestions = mutableListOf<String>()
+
+        // Check what needs the most improvement
+        if (extractionTimePoints < 20 && !shot.isOptimalExtractionTime()) {
+            val action = if (shot.extractionTimeSeconds < 25) "Grind finer" else "Grind coarser"
+            suggestions.add(action)
+        }
+
+        if (tastePoints < 20 && shot.tastePrimary != com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT) {
+            // Taste feedback suggests adjustment
+            if (suggestions.isEmpty()) {
+                suggestions.add("Dial in based on taste")
+            }
+        }
+
+        if (brewRatioPoints < 15 && !shot.isTypicalBrewRatio()) {
+            suggestions.add("Adjust brew ratio")
+        }
+
+        if (suggestions.isEmpty()) return null
+
+        val pointsNeeded = 85 - currentScore
+        val nextTier = if (currentScore >= 60) "Excellent" else "Good"
+        return "${suggestions.first()} → +$pointsNeeded points → $nextTier"
     }
 }
 
@@ -330,7 +424,9 @@ data class ShotDetails(
     val previousShot: Shot?,
     val nextShot: Shot?,
     val analysis: ShotAnalysis,
-    val relatedShotsCount: Int
+    val relatedShotsCount: Int,
+    val rankingForBean: Int? = null, // Position ranked by quality score (1 = best)
+    val isPersonalBest: Boolean = false
 )
 
 /**
@@ -349,7 +445,14 @@ data class ShotAnalysis(
     val avgExtractionTimeForBean: Double,
     val avgWeightInForBean: Double,
     val avgWeightOutForBean: Double,
-    val recommendations: List<ShotRecommendation>
+    val recommendations: List<ShotRecommendation>,
+    // Quality score breakdown for transparency
+    val extractionTimePoints: Int, // 0-25 points
+    val brewRatioPoints: Int, // 0-20 points
+    val tastePoints: Int, // 0-30 points
+    val consistencyPoints: Int, // 0-15 points
+    val deviationBonusPoints: Int, // 0-10 points
+    val improvementPath: String? = null // e.g., "Grind coarser → +5 points → Excellent"
 )
 
 /**
