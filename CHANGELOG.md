@@ -6,6 +6,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+### Changed
+
+- [*] Redesigned Shot Details screen with conversational insights, quality score breakdown, and shot ranking.
+
 ## [2.0.0]
 
 ### Added
