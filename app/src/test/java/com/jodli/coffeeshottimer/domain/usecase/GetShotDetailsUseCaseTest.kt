@@ -388,7 +388,12 @@ class GetShotDetailsUseCaseTest {
                 avgExtractionTimeForBean = 28.0,
                 avgWeightInForBean = 18.0,
                 avgWeightOutForBean = 36.0,
-                recommendations = emptyList()
+                recommendations = emptyList(),
+                extractionTimePoints = 25,
+                brewRatioPoints = 20,
+                tastePoints = 30,
+                consistencyPoints = 15,
+                deviationBonusPoints = 10
             ),
             relatedShotsCount = 1
         )
