@@ -817,4 +817,31 @@
     <string name="interpretation_concentrated">Very concentrated (%1$s).</string>
     <string name="interpretation_diluted">Very diluted (%1$s).</string>
     <string name="interpretation_consistent">Consistent with your usual shots.</string>
+    
+    <!-- Coaching Insights - Recent Trends -->
+    <string name="coaching_recent_trend_perfect_with_bean">Your last %1$d shots with %2$s: %3$d perfect! 🎯</string>
+    <string name="coaching_recent_trend_perfect">Your last %1$d shots: %2$d perfect! 🎯</string>
+    <string name="coaching_recent_trend_consistent_with_bean">Great consistency with %1$s - %2$d perfect, %3$d good!</string>
+    <string name="coaching_recent_trend_consistent">Great consistency - %1$d perfect, %2$d good!</string>
+    <string name="coaching_recent_trend_progress_with_bean">Making progress with %1$s - keep it up!</string>
+    <string name="coaching_recent_trend_progress">Making progress - keep it up!</string>
+    <string name="coaching_recent_trend_exploring_with_bean">Still exploring %1$s - each shot teaches something new.</string>
+    <string name="coaching_recent_trend_exploring">Still exploring - each shot teaches something new.</string>
+    
+    <!-- Coaching Insights - Dial-In Status -->
+    <string name="coaching_dial_in_achieved">Dialed in %1$s in %2$d shots! ☕</string>
+    <string name="coaching_dial_in_exploring">Exploring %1$s - %2$d shots so far</string>
+    
+    <!-- Coaching Insights - Grind Coaching Effectiveness -->
+    <string name="coaching_grind_effectiveness">Following grind suggestions helped achieve %1$d%% perfect shots</string>
+    <string name="coaching_grind_follow_rate">You followed %1$d%% of grind suggestions</string>
+    
+    <!-- Coaching Insights Card -->
+    <string name="coaching_insights_title">Your Brewing Journey</string>
+    <string name="coaching_insights_title_with_bean">Journey with %1$s</string>
+    <string name="coaching_insights_section_recent">Recent Pattern</string>
+    <string name="coaching_insights_section_progress">Progress</string>
+    <string name="coaching_insights_section_coaching">Coaching Impact</string>
+    <string name="cd_collapse_insights">Collapse insights</string>
+    <string name="cd_expand_insights">Expand insights</string>
 </resources>

@@ -48,6 +48,7 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.ui.components.CardHeader
+import com.jodli.coffeeshottimer.ui.components.CoachingInsightsCard
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CompactTasteDisplay
 import com.jodli.coffeeshottimer.ui.components.EmptyState
@@ -73,6 +74,7 @@ fun ShotHistoryScreen(
     val currentFilter by viewModel.currentFilter.collectAsState()
 
     var showFilterDialog by remember { mutableStateOf(false) }
+    var coachingInsightsExpanded by remember { mutableStateOf(false) }
 
     // Auto-refresh when screen becomes visible
     LaunchedEffect(Unit) {
@@ -92,6 +94,8 @@ fun ShotHistoryScreen(
                 onLoadMore = { viewModel.loadMore() },
                 onClearFilters = { viewModel.clearFilters() },
                 getBeanName = { beanId -> viewModel.getBeanName(beanId) },
+                coachingInsightsExpanded = coachingInsightsExpanded,
+                onToggleCoachingInsights = { coachingInsightsExpanded = !coachingInsightsExpanded },
                 spacing = spacing
             )
         },
@@ -106,6 +110,8 @@ fun ShotHistoryScreen(
                 onLoadMore = { viewModel.loadMore() },
                 onClearFilters = { viewModel.clearFilters() },
                 getBeanName = { beanId -> viewModel.getBeanName(beanId) },
+                coachingInsightsExpanded = coachingInsightsExpanded,
+                onToggleCoachingInsights = { coachingInsightsExpanded = !coachingInsightsExpanded },
                 spacing = spacing
             )
         }
@@ -139,6 +145,8 @@ private fun ShotHistoryPortraitContent(
     onLoadMore: () -> Unit,
     onClearFilters: () -> Unit,
     getBeanName: (String) -> String,
+    coachingInsightsExpanded: Boolean,
+    onToggleCoachingInsights: () -> Unit,
     spacing: Spacing,
     modifier: Modifier = Modifier
 ) {
@@ -156,6 +164,17 @@ private fun ShotHistoryPortraitContent(
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Coaching insights card
+        uiState.coachingInsights?.let { insights ->
+            CoachingInsightsCard(
+                insights = insights,
+                isExpanded = coachingInsightsExpanded,
+                onToggleExpanded = onToggleCoachingInsights,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(spacing.medium))
+        }
 
         // Active filters display
         if (currentFilter.hasFilters()) {
@@ -196,6 +215,8 @@ private fun ShotHistoryLandscapeContent(
     onLoadMore: () -> Unit,
     onClearFilters: () -> Unit,
     getBeanName: (String) -> String,
+    coachingInsightsExpanded: Boolean,
+    onToggleCoachingInsights: () -> Unit,
     spacing: Spacing,
     modifier: Modifier = Modifier
 ) {
@@ -215,6 +236,17 @@ private fun ShotHistoryLandscapeContent(
         )
 
         Spacer(modifier = Modifier.height(landscapeSpacing))
+
+        // Coaching insights card
+        uiState.coachingInsights?.let { insights ->
+            CoachingInsightsCard(
+                insights = insights,
+                isExpanded = coachingInsightsExpanded,
+                onToggleExpanded = onToggleCoachingInsights,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(landscapeSpacing))
+        }
 
         // Active filters display
         if (currentFilter.hasFilters()) {
