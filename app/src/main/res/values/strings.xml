@@ -804,4 +804,5 @@
     <string name="text_what_happened">What Happened &amp; Why</string>
     <string name="text_your_shot">Your Shot</string>
     <string name="text_compared_to_usual">Compared to usual:</string>
+    <string name="text_key_parameters">Key Parameters</string>
 </resources>

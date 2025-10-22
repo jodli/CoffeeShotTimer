@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
@@ -944,10 +945,12 @@ private fun ComparisonContextCard(
 
 @Composable
 private fun WhatHappenedCard(
-    @Suppress("UNUSED_PARAMETER") shotDetails: ShotDetails,
+    shotDetails: ShotDetails,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
+    val shot = shotDetails.shot
+    val analysis = shotDetails.analysis
 
     CoffeeCard(modifier = modifier) {
         CardHeader(
@@ -957,14 +960,145 @@ private fun WhatHappenedCard(
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        // TODO: full implementation in next iteration
+        // Conversational interpretation based on shot characteristics
+        val interpretation = buildInterpretation(shot, analysis)
         Text(
-            text = stringResource(R.string.text_your_shot),
-            style = MaterialTheme.typography.bodyMedium
+            text = interpretation,
+            style = MaterialTheme.typography.bodyMedium,
+            lineHeight = 20.sp
         )
 
-        // Show key parameters with context
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Key parameters with context
+        Text(
+            text = stringResource(R.string.text_key_parameters),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        // Show parameters with deviation context
+        ParameterWithContext(
+            label = stringResource(R.string.label_extraction_time),
+            value = shot.getFormattedExtractionTime(),
+            deviation = analysis.extractionTimeDeviation,
+            isOptimal = analysis.isOptimalExtraction
+        )
+        
+        ParameterWithContext(
+            label = stringResource(R.string.label_brew_ratio),
+            value = shot.getFormattedBrewRatio(),
+            deviation = analysis.brewRatioDeviation,
+            isOptimal = analysis.isTypicalRatio
+        )
+        
+        ParameterWithContext(
+            label = stringResource(R.string.label_grinder_setting),
+            value = shot.grinderSetting,
+            deviation = null,
+            isOptimal = true
+        )
     }
+}
+
+@Composable
+private fun ParameterWithContext(
+    label: String,
+    value: String,
+    deviation: Double?,
+    isOptimal: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = spacing.extraSmall),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
+                color = if (isOptimal) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.error
+                }
+            )
+            
+            // Show deviation if available and significant
+            if (deviation != null && kotlin.math.abs(deviation) > 0.5) {
+                Text(
+                    text = if (deviation > 0) "+${deviation.toInt()}" else "${deviation.toInt()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+private fun buildInterpretation(shot: com.jodli.coffeeshottimer.data.model.Shot, analysis: com.jodli.coffeeshottimer.domain.usecase.ShotAnalysis): String {
+    val parts = mutableListOf<String>()
+    
+    // Taste interpretation
+    when (shot.tastePrimary) {
+        com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT -> {
+            parts.add("Great shot! You nailed it.")
+        }
+        com.jodli.coffeeshottimer.domain.model.TastePrimary.SOUR -> {
+            parts.add("This shot tasted sour, which usually means it was under-extracted.")
+        }
+        com.jodli.coffeeshottimer.domain.model.TastePrimary.BITTER -> {
+            parts.add("This shot tasted bitter, which usually means it was over-extracted.")
+        }
+        null -> {
+            parts.add("No taste feedback recorded for this shot.")
+        }
+    }
+    
+    // Extraction time context
+    if (!analysis.isOptimalExtraction) {
+        if (shot.extractionTimeSeconds < 25) {
+            parts.add("It ran ${25 - shot.extractionTimeSeconds}s too fast (${shot.extractionTimeSeconds}s total).")
+        } else {
+            parts.add("It ran ${shot.extractionTimeSeconds - 30}s too slow (${shot.extractionTimeSeconds}s total).")
+        }
+    } else {
+        parts.add("The extraction time was right in the sweet spot (${shot.extractionTimeSeconds}s).")
+    }
+    
+    // Ratio context
+    if (!analysis.isTypicalRatio) {
+        if (shot.brewRatio < 1.5) {
+            parts.add("The ratio was quite concentrated (${shot.getFormattedBrewRatio()}).")
+        } else if (shot.brewRatio > 2.5) {
+            parts.add("The ratio was quite diluted (${shot.getFormattedBrewRatio()}).")
+        }
+    }
+    
+    // Consistency note
+    if (analysis.isConsistentWithHistory && analysis.avgExtractionTimeForBean > 0) {
+        parts.add("This was consistent with your other shots for this bean.")
+    }
+    
+    return parts.joinToString(" ")
 }
 
 @Composable

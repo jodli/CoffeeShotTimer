@@ -805,4 +805,5 @@
     <string name="text_what_happened">Was ist passiert &amp; Warum</string>
     <string name="text_your_shot">Dein Shot</string>
     <string name="text_compared_to_usual">Im Vergleich zum Durchschnitt:</string>
+    <string name="text_key_parameters">Wichtige Parameter</string>
 </resources>
