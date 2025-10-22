@@ -183,10 +183,14 @@ class ShotHistoryViewModel @Inject constructor(
                                 val paginatedShots = shots.take(currentPageSize)
                                 val hasMore = shots.size > paginatedShots.size
 
+                                // Calculate coaching insights for reactive updates
+                                val insights = calculateCoachingInsights(paginatedShots, _currentFilter.value.beanId)
+
                                 _uiState.value = _uiState.value.copy(
                                     shots = paginatedShots,
                                     hasMorePages = hasMore,
-                                    error = null
+                                    error = null,
+                                    coachingInsights = insights
                                 )
                                 hasMoreData = hasMore
                             }
@@ -281,6 +285,7 @@ class ShotHistoryViewModel @Inject constructor(
     fun refreshOnResume() {
         // Start reactive collection if not already started
         if (_uiState.value.shots.isEmpty() && _uiState.value.error == null && !_uiState.value.isLoading) {
+            loadShotHistory()
             startReactiveShotHistoryCollection()
         }
     }
@@ -717,6 +722,157 @@ class ShotHistoryViewModel @Inject constructor(
 
         return score.coerceIn(0, 100)
     }
+
+    // ACHIEVEMENT DETECTION METHODS
+
+    /**
+     * Get the achievement for a specific shot, if any.
+     * Checks for bean-specific milestones.
+     *
+     * @param shot The shot to check for achievements
+     * @return Achievement or null if no achievement
+     */
+    fun getAchievementForShot(shot: Shot): Achievement? {
+        val allShots = _uiState.value.shots
+        
+        // Check for first perfect shot with this bean
+        if (isFirstPerfectForBean(shot, allShots)) {
+            val beanName = getBeanName(shot.beanId)
+            return Achievement(
+                type = AchievementType.FIRST_PERFECT,
+                label = stringResourceProvider.getString(
+                    R.string.achievement_first_perfect,
+                    beanName
+                ),
+                emoji = "🎉",
+                beanId = shot.beanId,
+                beanName = beanName
+            )
+        }
+
+        // Check for dial-in milestone
+        if (isDialInMilestone(shot, allShots)) {
+            val beanName = getBeanName(shot.beanId)
+            return Achievement(
+                type = AchievementType.DIALED_IN,
+                label = stringResourceProvider.getString(
+                    R.string.achievement_dialed_in,
+                    beanName
+                ),
+                emoji = "🎯",
+                beanId = shot.beanId,
+                beanName = beanName
+            )
+        }
+
+        // Check for consistency milestone
+        val consistencyStreak = isBeanConsistencyMilestone(shot, allShots)
+        if (consistencyStreak != null) {
+            val beanName = getBeanName(shot.beanId)
+            return Achievement(
+                type = AchievementType.CONSISTENCY,
+                label = stringResourceProvider.getString(
+                    R.string.achievement_consistency_streak,
+                    consistencyStreak,
+                    beanName
+                ),
+                emoji = "🔥",
+                beanId = shot.beanId,
+                beanName = beanName
+            )
+        }
+
+        return null
+    }
+
+    /**
+     * Check if this is the first perfect shot with this bean.
+     */
+    private fun isFirstPerfectForBean(shot: Shot, allShots: List<Shot>): Boolean {
+        val quality = calculateShotQualityScore(shot)
+        if (quality < SCORE_PERFECT_THRESHOLD) return false
+
+        // Get all shots for this bean, sorted by timestamp
+        val beanShots = allShots
+            .filter { it.beanId == shot.beanId }
+            .sortedBy { it.timestamp }
+
+        // Find all perfect shots before this one
+        val perfectShotsBeforeThis = beanShots
+            .filter { it.timestamp < shot.timestamp }
+            .filter { calculateShotQualityScore(it) >= SCORE_PERFECT_THRESHOLD }
+
+        return perfectShotsBeforeThis.isEmpty()
+    }
+
+    /**
+     * Check if this shot represents the moment the bean was dialed in.
+     * True if this is the 3rd consecutive good shot with this bean.
+     */
+    private fun isDialInMilestone(shot: Shot, allShots: List<Shot>): Boolean {
+        // Get all shots for this bean, sorted by timestamp
+        val beanShots = allShots
+            .filter { it.beanId == shot.beanId }
+            .sortedBy { it.timestamp }
+
+        // Find the index of this shot
+        val shotIndex = beanShots.indexOfFirst { it.id == shot.id }
+        if (shotIndex < 2) return false // Need at least 3 shots total
+
+        // Check if this is the 3rd consecutive good shot
+        val lastThreeShots = beanShots.subList(maxOf(0, shotIndex - 2), shotIndex + 1)
+        if (lastThreeShots.size != MIN_SHOTS_FOR_DIAL_IN) return false
+
+        val allGood = lastThreeShots.all { calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE }
+        if (!allGood) return false
+
+        // Make sure there weren't 3 good shots in a row before this
+        if (shotIndex >= MIN_SHOTS_FOR_DIAL_IN) {
+            val previousThree = beanShots.subList(shotIndex - 3, shotIndex)
+            val previouslyDialedIn = previousThree.all { 
+                calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE 
+            }
+            if (previouslyDialedIn) return false
+        }
+
+        return true
+    }
+
+    /**
+     * Check if this shot represents a consistency milestone.
+     * Returns the streak count if this is part of a notable consistency streak (3+ good shots).
+     */
+    private fun isBeanConsistencyMilestone(shot: Shot, allShots: List<Shot>): Int? {
+        val quality = calculateShotQualityScore(shot)
+        if (quality < DIAL_IN_MIN_SCORE) return null
+
+        // Get all shots for this bean, sorted by timestamp
+        val beanShots = allShots
+            .filter { it.beanId == shot.beanId }
+            .sortedBy { it.timestamp }
+
+        // Find the index of this shot
+        val shotIndex = beanShots.indexOfFirst { it.id == shot.id }
+        if (shotIndex < 0) return null
+
+        // Count consecutive good shots ending with this one
+        var streakCount = 0
+        for (i in shotIndex downTo 0) {
+            if (calculateShotQualityScore(beanShots[i]) >= DIAL_IN_MIN_SCORE) {
+                streakCount++
+            } else {
+                break
+            }
+        }
+
+        // Only show achievement for streaks of 3, 5, or 10+
+        return when {
+            streakCount == MIN_SHOTS_FOR_DIAL_IN -> MIN_SHOTS_FOR_DIAL_IN
+            streakCount == MAX_RECENT_SHOTS -> MAX_RECENT_SHOTS
+            streakCount >= 10 && streakCount % 5 == 0 -> streakCount // Every 5 shots after 10
+            else -> null
+        }
+    }
 }
 
 /**
@@ -793,3 +949,24 @@ data class GrindCoachingEffectiveness(
     val totalSuggestionsFollowed: Int, // How many were actually followed
     val effectivenessMessage: String // E.g., "Following grind suggestions helped achieve 80% perfect shots"
 )
+
+/**
+ * Achievement for a specific shot with a specific bean.
+ * Represents a milestone or notable accomplishment in the brewing journey.
+ */
+data class Achievement(
+    val type: AchievementType,
+    val label: String, // Translatable label text
+    val emoji: String, // Visual indicator
+    val beanId: String, // Bean this achievement is tied to
+    val beanName: String // Bean name for display
+)
+
+/**
+ * Type of achievement to determine display color and significance.
+ */
+enum class AchievementType {
+    FIRST_PERFECT, // First perfect shot with this bean
+    DIALED_IN, // Successfully dialed in the bean
+    CONSISTENCY // Consistency streak with the bean
+}
