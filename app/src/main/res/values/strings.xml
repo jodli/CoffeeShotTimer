@@ -61,13 +61,13 @@
     <string name="text_active_long">Active – visible in bean lists</string>
     <string name="text_inactive">Inactive</string>
     <string name="text_bean_name_already_exists_tip">Bean name already exists\nTip: Try adding the roaster name or roast level to make it unique</string>
-    <string name="text_search_beans_hint">Try adjusting your search or filter settings</string>
+    <string name="text_search_beans_hint">No shots found for these filters. Try adjusting to see your brewing journey.</string>
     <string name="text_start_date">Start Date</string>
     <string name="text_end_date">End Date</string>
     <string name="text_date_range_format">Date: %1$s – %2$s</string>
     <string name="text_add_first_bean">Add your first coffee bean to start tracking shots</string>
     <string name="text_add_some_beans">Add some beans in Bean Management to get started</string>
-    <string name="text_record_shots_analysis">Record some shots to see analysis and insights</string>
+    <string name="text_record_shots_analysis">Ready to start your coffee journey? Record your first shot and I\'ll help you dial in your beans!</string>
     <string name="text_database_cleared">Database cleared successfully!</string>
     <string name="text_database_filled">Database filled with test data successfully!</string>
     <string name="text_bean_name_required">Bean name is required</string>
@@ -273,7 +273,7 @@
     <string name="cd_shot_list">Show shot list</string>
     <string name="cd_analysis">Show shot analysis</string>
     <string name="cd_no_shots">No shots found</string>
-    <string name="cd_no_shots_recorded">No shots recorded</string>
+    <string name="cd_no_shots_recorded">No shots yet – ready to brew?</string>
 
     <!-- Error Messages -->
     <string name="error_bean_id_cannot_be_empty">Bean ID cannot be empty</string>
