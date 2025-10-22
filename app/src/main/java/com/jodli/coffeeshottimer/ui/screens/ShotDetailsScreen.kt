@@ -23,7 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -58,7 +57,6 @@ import com.jodli.coffeeshottimer.domain.usecase.ShotDetails
 import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.ErrorState
-import com.jodli.coffeeshottimer.ui.components.GrindAdjustmentCard
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackDisplay
@@ -94,68 +92,68 @@ fun ShotDetailsScreen(
         // Top App Bar (hidden in landscape to save vertical space)
         if (!isLandscape) {
             TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.title_shot_details),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back)
+                title = {
+                    Text(
+                        text = stringResource(R.string.title_shot_details),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
                     )
-                }
-            },
-            actions = {
-                // Navigation between shots
-                uiState.shotDetails?.let { details ->
-                    if (details.previousShot != null) {
-                        IconButton(
-                            onClick = {
-                                viewModel.navigateToPreviousShot { shotId ->
-                                    onNavigateToShot(shotId)
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                                contentDescription = stringResource(R.string.cd_previous_shot)
-                            )
-                        }
-                    }
-
-                    if (details.nextShot != null) {
-                        IconButton(
-                            onClick = {
-                                viewModel.navigateToNextShot { shotId ->
-                                    onNavigateToShot(shotId)
-                                }
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                                contentDescription = stringResource(R.string.cd_next_shot)
-                            )
-                        }
-                    }
-
-                    // Delete button
-                    IconButton(
-                        onClick = { showDeleteDialog = true }
-                    ) {
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.cd_delete_shot),
-                            tint = MaterialTheme.colorScheme.error
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.cd_back)
                         )
                     }
+                },
+                actions = {
+                    // Navigation between shots
+                    uiState.shotDetails?.let { details ->
+                        if (details.previousShot != null) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.navigateToPreviousShot { shotId ->
+                                        onNavigateToShot(shotId)
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                                    contentDescription = stringResource(R.string.cd_previous_shot)
+                                )
+                            }
+                        }
+
+                        if (details.nextShot != null) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.navigateToNextShot { shotId ->
+                                        onNavigateToShot(shotId)
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                                    contentDescription = stringResource(R.string.cd_next_shot)
+                                )
+                            }
+                        }
+
+                        // Delete button
+                        IconButton(
+                            onClick = { showDeleteDialog = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = stringResource(R.string.cd_delete_shot),
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 }
-            }
-        )
-        }  // End TopAppBar conditional
+            )
+        } // End TopAppBar conditional
 
         // Content
         Box(
@@ -187,7 +185,6 @@ fun ShotDetailsScreen(
                             ShotDetailsContent(
                                 shotDetails = uiState.shotDetails!!,
                                 onEditTaste = { showTasteEditor = true },
-                                viewModel = viewModel,
                                 modifier = Modifier.fillMaxSize()
                             )
                         },
@@ -260,7 +257,6 @@ fun ShotDetailsScreen(
 private fun ShotDetailsContent(
     shotDetails: ShotDetails,
     onEditTaste: () -> Unit,
-    viewModel: ShotDetailsViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -329,130 +325,125 @@ private fun ShotOverviewCard(
 ) {
     val spacing = LocalSpacing.current
     val shot = shotDetails.shot
-    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy 'at' HH:mm")
+    val dateFormatter = DateTimeFormatter.ofPattern("MMM dd, yyyy · HH:mm")
 
     CoffeeCard(modifier = modifier) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = spacing.medium)
-                ) {
-                    Text(
-                        text = shot.timestamp.format(dateFormatter),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
+        // Date and Quality Score header
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = shot.timestamp.format(dateFormatter),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            // Quality score badge
+            Surface(
+                shape = RoundedCornerShape(spacing.cornerMedium),
+                color = when {
+                    shotDetails.analysis.qualityScore >= 80 -> MaterialTheme.colorScheme.primaryContainer
+                    shotDetails.analysis.qualityScore >= 60 -> MaterialTheme.colorScheme.tertiaryContainer
+                    else -> MaterialTheme.colorScheme.errorContainer
                 }
-
-                // Large brew ratio display
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    Text(
-                        text = shot.getFormattedBrewRatio(),
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = if (shot.isTypicalBrewRatio()) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        }
-                    )
-                    Text(
-                        text = stringResource(R.string.text_brew_ratio),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            // Taste feedback display
-            Column(
-                modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = stringResource(R.string.text_taste_feedback),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    TasteFeedbackDisplay(
-                        tastePrimary = shot.tastePrimary,
-                        tasteSecondary = shot.tasteSecondary,
-                        onEditClick = onEditTaste
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            // Quality score - moved outside columns for full width
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.text_quality_score),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = stringResource(R.string.format_quality_score, shotDetails.analysis.qualityScore),
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "${shotDetails.analysis.qualityScore}",
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    softWrap = false,
                     color = when {
-                        shotDetails.analysis.qualityScore >= 80 -> MaterialTheme.colorScheme.primary
-                        shotDetails.analysis.qualityScore >= 60 -> MaterialTheme.colorScheme.tertiary
-                        else -> MaterialTheme.colorScheme.error
+                        shotDetails.analysis.qualityScore >= 80 -> MaterialTheme.colorScheme.onPrimaryContainer
+                        shotDetails.analysis.qualityScore >= 60 -> MaterialTheme.colorScheme.onTertiaryContainer
+                        else -> MaterialTheme.colorScheme.onErrorContainer
+                    },
+                    modifier = Modifier.padding(horizontal = spacing.medium, vertical = spacing.small)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Key metrics - emphasized display
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Brew ratio (most important)
+            Column {
+                Text(
+                    text = shot.getFormattedBrewRatio(),
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = if (shot.isTypicalBrewRatio()) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.error
                     }
                 )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Key metrics row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                MetricDisplay(
-                    label = stringResource(R.string.label_input),
-                    value = stringResource(R.string.format_weight_display_g, shot.coffeeWeightIn.toInt()),
-                    modifier = Modifier.weight(1f)
-                )
-                MetricDisplay(
-                    label = stringResource(R.string.label_output),
-                    value = stringResource(R.string.format_weight_display_g, shot.coffeeWeightOut.toInt()),
-                    modifier = Modifier.weight(1f)
-                )
-                MetricDisplay(
-                    label = stringResource(R.string.label_time),
-                    value = shot.getFormattedExtractionTime(),
-                    isGood = shot.isOptimalExtractionTime(),
-                    modifier = Modifier.weight(1f)
+                Text(
+                    text = stringResource(R.string.label_ratio),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
+
+            // Dose and yield
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${shot.coffeeWeightIn.toInt()}g → ${shot.coffeeWeightOut.toInt()}g",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = stringResource(R.string.label_weight_in) + " → " + stringResource(R.string.label_weight_out),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            // Extraction time
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = shot.getFormattedExtractionTime(),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Medium,
+                    color = if (shot.isOptimalExtractionTime()) {
+                        MaterialTheme.colorScheme.onSurface
+                    } else {
+                        MaterialTheme.colorScheme.error
+                    }
+                )
+                Text(
+                    text = stringResource(R.string.label_time),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Taste feedback
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.text_taste_feedback),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            TasteFeedbackDisplay(
+                tastePrimary = shot.tastePrimary,
+                tasteSecondary = shot.tasteSecondary,
+                onEditClick = onEditTaste
+            )
         }
     }
 }
@@ -597,87 +588,6 @@ private fun ShotParametersCard(
 }
 
 @Composable
-private fun ShotAnalysisAndRecommendationsCard(
-    shotDetails: ShotDetails,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val analysis = shotDetails.analysis
-
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.Info,
-            title = stringResource(R.string.text_shot_analysis)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Quality indicators
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            QualityIndicatorChip(
-                label = stringResource(R.string.label_extraction_time),
-                isGood = analysis.isOptimalExtraction,
-                modifier = Modifier.weight(1f)
-            )
-            QualityIndicatorChip(
-                label = stringResource(R.string.label_brew_ratio),
-                isGood = analysis.isTypicalRatio,
-                modifier = Modifier.weight(1f)
-            )
-            QualityIndicatorChip(
-                label = stringResource(R.string.label_consistency),
-                isGood = analysis.isConsistentWithHistory,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Deviations from average
-        if (shotDetails.relatedShotsCount > 1) {
-            Text(
-                text = stringResource(R.string.text_compared_to_average),
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
-            )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-            ) {
-                DeviationItem(
-                    label = stringResource(R.string.label_brew_ratio),
-                    deviation = analysis.brewRatioDeviation,
-                    format = stringResource(R.string.format_decimal_two_place)
-                )
-                DeviationItem(
-                    label = stringResource(R.string.label_extraction_time),
-                    deviation = analysis.extractionTimeDeviation,
-                    format = stringResource(R.string.format_decimal_zero_place),
-                    suffix = "s"
-                )
-                DeviationItem(
-                    label = stringResource(R.string.label_weight_in),
-                    deviation = analysis.weightInDeviation,
-                    format = stringResource(R.string.format_decimal_one_place),
-                    suffix = "g"
-                )
-                DeviationItem(
-                    label = stringResource(R.string.label_weight_out),
-                    deviation = analysis.weightOutDeviation,
-                    format = stringResource(R.string.format_decimal_one_place),
-                    suffix = "g"
-                )
-            }
-        }
-    }
-}
-
-@Composable
 private fun QualityScoreBreakdownCard(
     analysis: com.jodli.coffeeshottimer.domain.usecase.ShotAnalysis,
     modifier: Modifier = Modifier
@@ -811,7 +721,7 @@ private fun ScoreBreakdownItem(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -824,23 +734,27 @@ private fun ScoreBreakdownItem(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f)
         )
-        
+
         // Fixed width container for bar+score to ensure alignment
+        val containerWidth = 130.dp
         Row(
-            modifier = Modifier.width(130.dp),  // Fixed width ensures all rows align
+            modifier = Modifier.width(containerWidth),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
-            // Progress bar - normalized to common max (30) for visual alignment
-            val commonMax = 30f
+            // Progress bar - normalized to common max for visual alignment
+            val commonMax = COMMON_MAX_SCORE
             val visualProgress = points.toFloat() / commonMax
             val scoreRatio = points.toFloat() / maxPoints
-            
+
+            val progressBarWidth = 70.dp
+            val progressBarHeight = 6.dp
+            val cornerRadius = 3.dp
             Box(
                 modifier = Modifier
-                    .width(70.dp)
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp))
+                    .width(progressBarWidth)
+                    .height(progressBarHeight)
+                    .clip(RoundedCornerShape(cornerRadius))
                     .background(MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Box(
@@ -856,15 +770,16 @@ private fun ScoreBreakdownItem(
                         )
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(spacing.small))
-            
+
+            val scoreTextWidth = 45.dp
             Text(
                 text = "$points/$maxPoints",
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.width(45.dp),  // Fixed width for score text
+                modifier = Modifier.width(scoreTextWidth),
                 textAlign = TextAlign.End
             )
         }
@@ -876,6 +791,20 @@ private const val EXCELLENT_THRESHOLD = 85
 private const val GOOD_THRESHOLD = 60
 private const val SCORE_THRESHOLD_HIGH = 0.8f
 private const val SCORE_THRESHOLD_MEDIUM = 0.5f
+
+// Constants for score breakdown visualization
+private const val COMMON_MAX_SCORE = 30f
+
+// Constants for extraction time analysis
+private const val OPTIMAL_MIN_TIME_SECONDS = 25
+private const val OPTIMAL_MAX_TIME_SECONDS = 30
+
+// Constants for brew ratio thresholds
+private const val CONCENTRATED_RATIO_THRESHOLD = 1.5
+private const val DILUTED_RATIO_THRESHOLD = 2.5
+
+// Constant for deviation display
+private const val DEVIATION_THRESHOLD = 0.5
 
 // Extension functions for enum to string resource
 private fun com.jodli.coffeeshottimer.domain.usecase.ImprovementAction.toStringRes(): Int {
@@ -961,11 +890,9 @@ private fun WhatHappenedCard(
         Spacer(modifier = Modifier.height(spacing.medium))
 
         // Conversational interpretation based on shot characteristics
-        val interpretation = buildInterpretation(shot, analysis)
-        Text(
-            text = interpretation,
-            style = MaterialTheme.typography.bodyMedium,
-            lineHeight = 20.sp
+        InterpretationText(
+            shot = shot,
+            analysis = analysis
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -987,14 +914,14 @@ private fun WhatHappenedCard(
             deviation = analysis.extractionTimeDeviation,
             isOptimal = analysis.isOptimalExtraction
         )
-        
+
         ParameterWithContext(
             label = stringResource(R.string.label_brew_ratio),
             value = shot.getFormattedBrewRatio(),
             deviation = analysis.brewRatioDeviation,
             isOptimal = analysis.isTypicalRatio
         )
-        
+
         ParameterWithContext(
             label = stringResource(R.string.label_grinder_setting),
             value = shot.grinderSetting,
@@ -1013,7 +940,7 @@ private fun ParameterWithContext(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -1026,7 +953,7 @@ private fun ParameterWithContext(
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
@@ -1041,9 +968,9 @@ private fun ParameterWithContext(
                     MaterialTheme.colorScheme.error
                 }
             )
-            
+
             // Show deviation if available and significant
-            if (deviation != null && kotlin.math.abs(deviation) > 0.5) {
+            if (deviation != null && kotlin.math.abs(deviation) > DEVIATION_THRESHOLD) {
                 Text(
                     text = if (deviation > 0) "+${deviation.toInt()}" else "${deviation.toInt()}",
                     style = MaterialTheme.typography.bodySmall,
@@ -1054,51 +981,86 @@ private fun ParameterWithContext(
     }
 }
 
-private fun buildInterpretation(shot: com.jodli.coffeeshottimer.data.model.Shot, analysis: com.jodli.coffeeshottimer.domain.usecase.ShotAnalysis): String {
-    val parts = mutableListOf<String>()
-    
-    // Taste interpretation
-    when (shot.tastePrimary) {
-        com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT -> {
-            parts.add("Great shot! You nailed it.")
+@Composable
+private fun InterpretationText(
+    shot: com.jodli.coffeeshottimer.data.model.Shot,
+    analysis: com.jodli.coffeeshottimer.domain.usecase.ShotAnalysis,
+    modifier: Modifier = Modifier
+) {
+    val parts = buildList {
+        // Taste interpretation
+        when (shot.tastePrimary) {
+            com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT -> {
+                add(stringResource(R.string.interpretation_perfect_taste))
+            }
+            com.jodli.coffeeshottimer.domain.model.TastePrimary.SOUR -> {
+                add(stringResource(R.string.interpretation_sour_taste))
+            }
+            com.jodli.coffeeshottimer.domain.model.TastePrimary.BITTER -> {
+                add(stringResource(R.string.interpretation_bitter_taste))
+            }
+            null -> {
+                add(stringResource(R.string.interpretation_no_taste))
+            }
         }
-        com.jodli.coffeeshottimer.domain.model.TastePrimary.SOUR -> {
-            parts.add("This shot tasted sour, which usually means it was under-extracted.")
-        }
-        com.jodli.coffeeshottimer.domain.model.TastePrimary.BITTER -> {
-            parts.add("This shot tasted bitter, which usually means it was over-extracted.")
-        }
-        null -> {
-            parts.add("No taste feedback recorded for this shot.")
-        }
-    }
-    
-    // Extraction time context
-    if (!analysis.isOptimalExtraction) {
-        if (shot.extractionTimeSeconds < 25) {
-            parts.add("It ran ${25 - shot.extractionTimeSeconds}s too fast (${shot.extractionTimeSeconds}s total).")
+
+        // Extraction time context
+        if (!analysis.isOptimalExtraction) {
+            if (shot.extractionTimeSeconds < OPTIMAL_MIN_TIME_SECONDS) {
+                add(
+                    stringResource(
+                        R.string.interpretation_too_fast,
+                        OPTIMAL_MIN_TIME_SECONDS - shot.extractionTimeSeconds
+                    )
+                )
+            } else {
+                add(
+                    stringResource(
+                        R.string.interpretation_too_slow,
+                        shot.extractionTimeSeconds - OPTIMAL_MAX_TIME_SECONDS
+                    )
+                )
+            }
         } else {
-            parts.add("It ran ${shot.extractionTimeSeconds - 30}s too slow (${shot.extractionTimeSeconds}s total).")
+            add(
+                stringResource(
+                    R.string.interpretation_optimal_time,
+                    shot.extractionTimeSeconds
+                )
+            )
         }
-    } else {
-        parts.add("The extraction time was right in the sweet spot (${shot.extractionTimeSeconds}s).")
-    }
-    
-    // Ratio context
-    if (!analysis.isTypicalRatio) {
-        if (shot.brewRatio < 1.5) {
-            parts.add("The ratio was quite concentrated (${shot.getFormattedBrewRatio()}).")
-        } else if (shot.brewRatio > 2.5) {
-            parts.add("The ratio was quite diluted (${shot.getFormattedBrewRatio()}).")
+
+        // Ratio context
+        if (!analysis.isTypicalRatio) {
+            if (shot.brewRatio < CONCENTRATED_RATIO_THRESHOLD) {
+                add(
+                    stringResource(
+                        R.string.interpretation_concentrated,
+                        shot.getFormattedBrewRatio()
+                    )
+                )
+            } else if (shot.brewRatio > DILUTED_RATIO_THRESHOLD) {
+                add(
+                    stringResource(
+                        R.string.interpretation_diluted,
+                        shot.getFormattedBrewRatio()
+                    )
+                )
+            }
+        }
+
+        // Consistency note
+        if (analysis.isConsistentWithHistory && analysis.avgExtractionTimeForBean > 0) {
+            add(stringResource(R.string.interpretation_consistent))
         }
     }
-    
-    // Consistency note
-    if (analysis.isConsistentWithHistory && analysis.avgExtractionTimeForBean > 0) {
-        parts.add("This was consistent with your other shots for this bean.")
-    }
-    
-    return parts.joinToString(" ")
+
+    Text(
+        text = parts.joinToString(" "),
+        style = MaterialTheme.typography.bodyMedium,
+        lineHeight = 20.sp,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -1154,66 +1116,7 @@ private fun ShotContextCard(
     }
 }
 
-/**
- * Card showing grind adjustment recommendation for the next shot based on taste feedback.
- */
-@Composable
-private fun NextShotGrindAdjustmentCard(
-    shotDetails: ShotDetails,
-    viewModel: ShotDetailsViewModel,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val shot = shotDetails.shot
-
-    // Get grind adjustment recommendation from ViewModel
-    val grindAdjustmentRecommendation by viewModel.grindAdjustmentRecommendation.collectAsState()
-
-    // Only show if we have a recommendation
-    grindAdjustmentRecommendation?.let { recommendation ->
-        CoffeeCard(modifier = modifier) {
-            CardHeader(
-                icon = Icons.Default.Lightbulb,
-                title = stringResource(R.string.text_recommendations_for_next_shot)
-            )
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            GrindAdjustmentCard(
-                recommendation = recommendation,
-                isCompact = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-    }
-}
-
 // Helper Composables
-
-@Composable
-private fun MetricDisplay(
-    label: String,
-    value: String,
-    isGood: Boolean = true,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = if (isGood) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
 
 @Composable
 private fun ParameterItem(
@@ -1251,86 +1154,6 @@ private fun ParameterItem(
 }
 
 @Composable
-private fun QualityIndicatorChip(
-    label: String,
-    isGood: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    Surface(
-        modifier = modifier.padding(horizontal = spacing.extraSmall),
-        shape = RoundedCornerShape(spacing.cornerLarge),
-        color = if (isGood) {
-            MaterialTheme.colorScheme.primaryContainer
-        } else {
-            MaterialTheme.colorScheme.errorContainer
-        }
-    ) {
-        Column(
-            modifier = Modifier.padding(spacing.small),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(spacing.qualityIndicator)
-                    .clip(CircleShape)
-                    .background(
-                        if (isGood) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.error
-                        }
-                    )
-            )
-            Spacer(modifier = Modifier.height(spacing.extraSmall))
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (isGood) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    MaterialTheme.colorScheme.onErrorContainer
-                },
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
-
-@Composable
-private fun DeviationItem(
-    label: String,
-    deviation: Double,
-    format: String,
-    suffix: String = ""
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = stringResource(
-                R.string.format_deviation_display,
-                if (deviation >= 0) "+" else "",
-                format.format(deviation) + suffix
-            ),
-            style = MaterialTheme.typography.bodySmall,
-            color = when {
-                kotlin.math.abs(deviation) < 0.1 -> MaterialTheme.colorScheme.primary
-                kotlin.math.abs(deviation) < 0.3 -> MaterialTheme.colorScheme.onSurface
-                else -> MaterialTheme.colorScheme.error
-            }
-        )
-    }
-}
-
-@Composable
 private fun ShotDetailsLandscapeContent(
     shotDetails: ShotDetails,
     onEditTaste: () -> Unit,
@@ -1344,7 +1167,7 @@ private fun ShotDetailsLandscapeContent(
             .padding(spacing.medium),
         horizontalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        // Left column - Actionable information
+        // Left column - Insight & guidance cards
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(spacing.medium),
@@ -1373,14 +1196,7 @@ private fun ShotDetailsLandscapeContent(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-        }
 
-        // Right column - Contextual information
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(spacing.medium),
-            contentPadding = PaddingValues(vertical = spacing.small)
-        ) {
             // Comparison Context
             if (shotDetails.rankingForBean != null) {
                 item {
@@ -1390,7 +1206,14 @@ private fun ShotDetailsLandscapeContent(
                     )
                 }
             }
+        }
 
+        // Right column - Contextual information
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(spacing.medium),
+            contentPadding = PaddingValues(vertical = spacing.small)
+        ) {
             // Bean Information Card
             item {
                 BeanInformationCard(shotDetails = shotDetails)

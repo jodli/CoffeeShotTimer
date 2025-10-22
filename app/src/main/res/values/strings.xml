@@ -779,30 +779,42 @@
     <string name="no_change_needed">No change needed</string>
 
     <!-- Quality Score Breakdown -->
-    <string name="text_quality_score_breakdown">Quality Score Breakdown</string>
-    <string name="text_total_score">Total Score</string>
+    <string name="text_quality_score_breakdown">Score Breakdown</string>
+    <string name="text_total_score">Total</string>
     <string name="tier_excellent">Excellent</string>
     <string name="tier_good">Good</string>
     <string name="tier_needs_work">Needs Work</string>
-    <string name="label_taste_feedback">Taste Feedback</string>
+    <string name="label_taste_feedback">Taste</string>
     <string name="label_precision">Precision</string>
     <string name="text_to_improve">To improve:</string>
     
     <!-- Improvement Actions -->
     <string name="action_grind_finer">Grind finer</string>
     <string name="action_grind_coarser">Grind coarser</string>
-    <string name="action_adjust_brew_ratio">Adjust brew ratio</string>
-    <string name="action_dial_in_taste">Dial in based on taste</string>
+    <string name="action_adjust_brew_ratio">Adjust ratio</string>
+    <string name="action_dial_in_taste">Dial in taste</string>
     
     <!-- Comparison Context -->
-    <string name="text_comparison_context">How This Compares</string>
+    <string name="text_comparison_context">Ranking</string>
     <string name="text_personal_best">🎉 Personal Best!</string>
-    <string name="format_ranking">%1$d out of %2$d shots</string>
+    <string name="format_ranking">%1$d of %2$d</string>
     <string name="text_with_this_bean">with this bean</string>
     
     <!-- What Happened Card -->
-    <string name="text_what_happened">What Happened &amp; Why</string>
+    <string name="text_what_happened">What Happened</string>
     <string name="text_your_shot">Your Shot</string>
-    <string name="text_compared_to_usual">Compared to usual:</string>
-    <string name="text_key_parameters">Key Parameters</string>
+    <string name="text_compared_to_usual">vs. usual:</string>
+    <string name="text_key_parameters">Parameters</string>
+    
+    <!-- Shot Interpretation -->
+    <string name="interpretation_perfect_taste">Perfect taste.</string>
+    <string name="interpretation_sour_taste">Tasted sour (under-extracted).</string>
+    <string name="interpretation_bitter_taste">Tasted bitter (over-extracted).</string>
+    <string name="interpretation_no_taste">No taste recorded.</string>
+    <string name="interpretation_too_fast">Ran %1$ds too fast.</string>
+    <string name="interpretation_too_slow">Ran %1$ds too slow.</string>
+    <string name="interpretation_optimal_time">Time was in the sweet spot (%1$ds).</string>
+    <string name="interpretation_concentrated">Very concentrated (%1$s).</string>
+    <string name="interpretation_diluted">Very diluted (%1$s).</string>
+    <string name="interpretation_consistent">Consistent with your usual shots.</string>
 </resources>

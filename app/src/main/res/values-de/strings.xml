@@ -780,30 +780,42 @@
     <string name="display_grinder_setting_empty">--</string>
 
     <!-- Quality Score Breakdown -->
-    <string name="text_quality_score_breakdown">Qualitätsbewertung Details</string>
-    <string name="text_total_score">Gesamtpunktzahl</string>
+    <string name="text_quality_score_breakdown">Punkteverteilung</string>
+    <string name="text_total_score">Gesamt</string>
     <string name="tier_excellent">Exzellent</string>
     <string name="tier_good">Gut</string>
     <string name="tier_needs_work">Verbesserungsbedarf</string>
     <string name="label_taste_feedback">Geschmack</string>
     <string name="label_precision">Präzision</string>
-    <string name="text_to_improve">Zur Verbesserung:</string>
+    <string name="text_to_improve">Verbessern:</string>
     
     <!-- Improvement Actions -->
     <string name="action_grind_finer">Feiner mahlen</string>
     <string name="action_grind_coarser">Gröber mahlen</string>
-    <string name="action_adjust_brew_ratio">Brühverhältnis anpassen</string>
-    <string name="action_dial_in_taste">Nach Geschmack einstellen</string>
+    <string name="action_adjust_brew_ratio">Verhältnis anpassen</string>
+    <string name="action_dial_in_taste">Geschmack einstellen</string>
     
     <!-- Comparison Context -->
-    <string name="text_comparison_context">Vergleich</string>
+    <string name="text_comparison_context">Rang</string>
     <string name="text_personal_best">🎉 Persönliche Bestleistung!</string>
-    <string name="format_ranking">%1$d von %2$d Shots</string>
+    <string name="format_ranking">%1$d von %2$d</string>
     <string name="text_with_this_bean">mit dieser Bohne</string>
     
     <!-- What Happened Card -->
-    <string name="text_what_happened">Was ist passiert &amp; Warum</string>
+    <string name="text_what_happened">Was ist passiert</string>
     <string name="text_your_shot">Dein Shot</string>
-    <string name="text_compared_to_usual">Im Vergleich zum Durchschnitt:</string>
-    <string name="text_key_parameters">Wichtige Parameter</string>
+    <string name="text_compared_to_usual">vs. üblich:</string>
+    <string name="text_key_parameters">Parameter</string>
+    
+    <!-- Shot Interpretation -->
+    <string name="interpretation_perfect_taste">Perfekter Geschmack.</string>
+    <string name="interpretation_sour_taste">Schmeckte sauer (unterextrahiert).</string>
+    <string name="interpretation_bitter_taste">Schmeckte bitter (überextrahiert).</string>
+    <string name="interpretation_no_taste">Kein Geschmack aufgezeichnet.</string>
+    <string name="interpretation_too_fast">%1$ds zu schnell.</string>
+    <string name="interpretation_too_slow">%1$ds zu langsam.</string>
+    <string name="interpretation_optimal_time">Zeit war perfekt (%1$ds).</string>
+    <string name="interpretation_concentrated">Sehr konzentriert (%1$s).</string>
+    <string name="interpretation_diluted">Sehr verdünnt (%1$s).</string>
+    <string name="interpretation_consistent">Konsistent mit deinen üblichen Shots.</string>
 </resources>
