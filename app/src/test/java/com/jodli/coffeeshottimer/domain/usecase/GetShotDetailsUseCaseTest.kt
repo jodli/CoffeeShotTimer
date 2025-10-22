@@ -22,6 +22,7 @@ class GetShotDetailsUseCaseTest {
 
     private lateinit var shotRepository: ShotRepository
     private lateinit var beanRepository: BeanRepository
+    private lateinit var getShotQualityAnalysisUseCase: GetShotQualityAnalysisUseCase
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
 
     private val testBeanId = "test-bean-id"
@@ -73,7 +74,8 @@ class GetShotDetailsUseCaseTest {
     fun setup() {
         shotRepository = mockk()
         beanRepository = mockk()
-        getShotDetailsUseCase = GetShotDetailsUseCase(shotRepository, beanRepository)
+        getShotQualityAnalysisUseCase = GetShotQualityAnalysisUseCase(shotRepository)
+        getShotDetailsUseCase = GetShotDetailsUseCase(shotRepository, beanRepository, getShotQualityAnalysisUseCase)
     }
 
     @Test

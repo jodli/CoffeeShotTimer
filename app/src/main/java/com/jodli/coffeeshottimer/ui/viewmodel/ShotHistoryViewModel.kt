@@ -37,6 +37,7 @@ class ShotHistoryViewModel @Inject constructor(
     private val getShotHistoryUseCase: GetShotHistoryUseCase,
     private val getActiveBeansUseCase: GetActiveBeansUseCase,
     private val getShotStatisticsUseCase: GetShotStatisticsUseCase,
+    private val getShotQualityAnalysisUseCase: com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase,
     private val memoryOptimizer: MemoryOptimizer,
     private val stringResourceProvider: StringResourceProvider,
     private val domainErrorTranslator: DomainErrorTranslator
@@ -534,7 +535,7 @@ class ShotHistoryViewModel @Inject constructor(
         var totalQuality = 0
 
         recentShots.forEach { shot ->
-            val quality = calculateShotQualityScore(shot)
+            val quality = getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, shots)
             totalQuality += quality
 
             when {
@@ -623,7 +624,9 @@ class ShotHistoryViewModel @Inject constructor(
 
         // Check last 3 shots for consistency
         val recentShots = beanShots.takeLast(MIN_SHOTS_FOR_DIAL_IN)
-        val recentQualityScores = recentShots.map { calculateShotQualityScore(it) }
+        val recentQualityScores = recentShots.map {
+            getShotQualityAnalysisUseCase.calculateShotQualityScore(it, beanShots)
+        }
         val avgRecentQuality = recentQualityScores.average().toInt()
 
         val isDialedIn = avgRecentQuality >= DIAL_IN_CONSISTENCY_THRESHOLD &&
@@ -669,7 +672,9 @@ class ShotHistoryViewModel @Inject constructor(
         // Look for first occurrence of 3 consecutive good shots
         for (i in 0..beanShots.size - MIN_SHOTS_FOR_DIAL_IN) {
             val threeShots = beanShots.subList(i, i + MIN_SHOTS_FOR_DIAL_IN)
-            val allGood = threeShots.all { calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE }
+            val allGood = threeShots.all {
+                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, beanShots) >= DIAL_IN_MIN_SCORE
+            }
             if (allGood) {
                 return i + MIN_SHOTS_FOR_DIAL_IN // Return the count when they achieved it
             }
@@ -693,51 +698,6 @@ class ShotHistoryViewModel @Inject constructor(
     ): GrindCoachingEffectiveness? {
         // Placeholder: Will be implemented when recommendation tracking is added to Shot model
         return null
-    }
-
-    /**
-     * Calculate a quality score for a shot (0-100).
-     * Based on extraction time optimality and brew ratio.
-     */
-    private fun calculateShotQualityScore(shot: Shot): Int {
-        var score = 0
-
-        // Optimal extraction time (25-30s) = 40 points
-        if (shot.isOptimalExtractionTime()) {
-            score += SCORE_OPTIMAL_TIME_POINTS
-        } else {
-            // Partial points for close times
-            val timeDiff = when {
-                shot.extractionTimeSeconds < MIN_OPTIMAL_EXTRACTION_TIME ->
-                    MIN_OPTIMAL_EXTRACTION_TIME - shot.extractionTimeSeconds
-                shot.extractionTimeSeconds > MAX_OPTIMAL_EXTRACTION_TIME ->
-                    shot.extractionTimeSeconds - MAX_OPTIMAL_EXTRACTION_TIME
-                else -> 0
-            }
-            score += maxOf(0, SCORE_OPTIMAL_TIME_POINTS - (timeDiff * SCORE_TIME_PENALTY_PER_SECOND))
-        }
-
-        // Typical brew ratio (1.5-3.0) = 40 points
-        if (shot.isTypicalBrewRatio()) {
-            score += SCORE_TYPICAL_RATIO_POINTS
-        } else {
-            // Partial points for close ratios
-            val ratioDiff = when {
-                shot.brewRatio < MIN_TYPICAL_BREW_RATIO -> MIN_TYPICAL_BREW_RATIO - shot.brewRatio
-                shot.brewRatio > MAX_TYPICAL_BREW_RATIO -> shot.brewRatio - MAX_TYPICAL_BREW_RATIO
-                else -> 0.0
-            }
-            score += maxOf(0, SCORE_TYPICAL_RATIO_POINTS - (ratioDiff * SCORE_RATIO_PENALTY_MULTIPLIER).toInt())
-        }
-
-        // Consistency bonus (reasonable weights) = 20 points
-        val isReasonableWeights = shot.coffeeWeightIn in MIN_REASONABLE_WEIGHT_IN..MAX_REASONABLE_WEIGHT_IN &&
-            shot.coffeeWeightOut in MIN_REASONABLE_WEIGHT_OUT..MAX_REASONABLE_WEIGHT_OUT
-        if (isReasonableWeights) {
-            score += SCORE_REASONABLE_WEIGHTS_POINTS
-        }
-
-        return score.coerceIn(0, 100)
     }
 
     // ACHIEVEMENT DETECTION METHODS
@@ -791,7 +751,7 @@ class ShotHistoryViewModel @Inject constructor(
      * Check if this is the first perfect shot with this bean.
      */
     private fun isFirstPerfectForBean(shot: Shot, allShots: List<Shot>): Boolean {
-        val quality = calculateShotQualityScore(shot)
+        val quality = getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, allShots)
         if (quality < SCORE_PERFECT_THRESHOLD) return false
 
         // Get all shots for this bean, sorted by timestamp
@@ -802,7 +762,7 @@ class ShotHistoryViewModel @Inject constructor(
         // Find all perfect shots before this one
         val perfectShotsBeforeThis = beanShots
             .filter { it.timestamp < shot.timestamp }
-            .filter { calculateShotQualityScore(it) >= SCORE_PERFECT_THRESHOLD }
+            .filter { getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= SCORE_PERFECT_THRESHOLD }
 
         return perfectShotsBeforeThis.isEmpty()
     }
@@ -825,14 +785,16 @@ class ShotHistoryViewModel @Inject constructor(
         val lastThreeShots = beanShots.subList(maxOf(0, shotIndex - 2), shotIndex + 1)
         if (lastThreeShots.size != MIN_SHOTS_FOR_DIAL_IN) return false
 
-        val allGood = lastThreeShots.all { calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE }
+        val allGood = lastThreeShots.all {
+            getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= DIAL_IN_MIN_SCORE
+        }
         if (!allGood) return false
 
         // Make sure there weren't 3 good shots in a row before this
         if (shotIndex >= MIN_SHOTS_FOR_DIAL_IN) {
             val previousThree = beanShots.subList(shotIndex - MIN_SHOTS_FOR_DIAL_IN, shotIndex)
             val previouslyDialedIn = previousThree.all {
-                calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE
+                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= DIAL_IN_MIN_SCORE
             }
             if (previouslyDialedIn) return false
         }
@@ -845,7 +807,7 @@ class ShotHistoryViewModel @Inject constructor(
      * Returns the streak count if this is part of a notable consistency streak (3+ good shots).
      */
     private fun isBeanConsistencyMilestone(shot: Shot, allShots: List<Shot>): Int? {
-        val quality = calculateShotQualityScore(shot)
+        val quality = getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, allShots)
         if (quality < DIAL_IN_MIN_SCORE) return null
 
         // Get all shots for this bean, sorted by timestamp
@@ -873,7 +835,7 @@ class ShotHistoryViewModel @Inject constructor(
     private fun countConsecutiveGoodShots(beanShots: List<Shot>, fromIndex: Int): Int {
         var count = 0
         for (i in fromIndex downTo 0) {
-            if (calculateShotQualityScore(beanShots[i]) >= DIAL_IN_MIN_SCORE) {
+            if (getShotQualityAnalysisUseCase.calculateShotQualityScore(beanShots[i], beanShots) >= DIAL_IN_MIN_SCORE) {
                 count++
             } else {
                 break
