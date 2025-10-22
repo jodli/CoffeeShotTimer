@@ -63,13 +63,13 @@
     <string name="text_active_long">Aktiv - sichtbar in Bohnenlisten</string>
     <string name="text_inactive">Inaktiv</string>
     <string name="text_bean_name_already_exists_tip">Bohnenname existiert bereits\nTipp: Versuche den Röster-Namen oder Röstgrad hinzuzufügen</string>
-    <string name="text_search_beans_hint">Versuche deine Such- oder Filtereinstellungen anzupassen</string>
+    <string name="text_search_beans_hint">Keine Shots für diese Filter. Versuche die Einstellungen anzupassen, um deine Brüh-Reise zu sehen.</string>
     <string name="text_start_date">Startdatum</string>
     <string name="text_end_date">Enddatum</string>
     <string name="text_date_range_format">Datum: %1$s – %2$s</string>
     <string name="text_add_first_bean">Füge deine erste Kaffeebohne hinzu, um Shots zu verfolgen</string>
     <string name="text_add_some_beans">Füge einige Bohnen in der Bohnenverwaltung hinzu, um zu beginnen</string>
-    <string name="text_record_shots_analysis">Nimm einige Shots auf, um Analysen und Einblicke zu sehen</string>
+    <string name="text_record_shots_analysis">Bereit, deine Kaffee-Reise zu starten? Nimm deinen ersten Shot auf und ich helfe dir, deine Bohnen einzustellen!</string>
     <string name="text_database_cleared">Datenbank erfolgreich geleert!</string>
     <string name="text_database_filled">Datenbank erfolgreich mit Testdaten gefüllt!</string>
     <string name="text_bean_name_required">Bohnenname ist erforderlich</string>
@@ -273,7 +273,7 @@
     <string name="cd_shot_list">Shot-Liste anzeigen</string>
     <string name="cd_analysis">Shot-Analyse anzeigen</string>
     <string name="cd_no_shots">Keine Shots gefunden</string>
-    <string name="cd_no_shots_recorded">Keine Shots aufgenommen</string>
+    <string name="cd_no_shots_recorded">Noch keine Shots – bereit zu brühen?</string>
     <string name="cd_shot_recorded_success">Shot erfolgreich aufgenommen</string>
 
     <!-- Error Messages -->
