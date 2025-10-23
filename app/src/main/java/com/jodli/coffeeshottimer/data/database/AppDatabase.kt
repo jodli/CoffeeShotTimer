@@ -9,10 +9,12 @@ import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
+import com.jodli.coffeeshottimer.data.dao.ShotRecommendationDao
 import com.jodli.coffeeshottimer.data.model.BasketConfiguration
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.data.model.Shot
+import com.jodli.coffeeshottimer.data.model.ShotRecommendation
 
 /**
  * Room database configuration for the Espresso Shot Tracker app.
@@ -21,8 +23,14 @@ import com.jodli.coffeeshottimer.data.model.Shot
  * relationships and performance optimizations.
  */
 @Database(
-    entities = [Bean::class, Shot::class, GrinderConfiguration::class, BasketConfiguration::class],
-    version = 8,
+    entities = [
+        Bean::class,
+        Shot::class,
+        GrinderConfiguration::class,
+        BasketConfiguration::class,
+        ShotRecommendation::class
+    ],
+    version = 9,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -32,6 +40,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun shotDao(): ShotDao
     abstract fun grinderConfigDao(): GrinderConfigDao
     abstract fun basketConfigDao(): BasketConfigDao
+    abstract fun shotRecommendationDao(): ShotRecommendationDao
 
     companion object {
         const val DATABASE_NAME = "espresso_tracker_database"
@@ -88,7 +97,8 @@ abstract class AppDatabase : RoomDatabase() {
                 MIGRATION_4_5,
                 MIGRATION_5_6,
                 MIGRATION_6_7,
-                MIGRATION_7_8
+                MIGRATION_7_8,
+                MIGRATION_8_9
             )
         }
 
@@ -296,5 +306,58 @@ abstract class AppDatabase : RoomDatabase() {
                 }
             }
         }
+
+        /**
+         * Migration from version 8 to 9: Add shot_recommendations table.
+         * Creates a separate entity for tracking grind recommendations and follow-through.
+         * This provides clean separation of concerns and extensibility for ML/analytics features.
+         */
+        val MIGRATION_8_9 = object : Migration(MIGRATION_8_VERSION, MIGRATION_9_VERSION) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                try {
+                    // Create shot_recommendations table
+                    db.execSQL(
+                        """
+                        CREATE TABLE IF NOT EXISTS shot_recommendations (
+                            id TEXT NOT NULL PRIMARY KEY,
+                            shotId TEXT NOT NULL,
+                            recommendedGrindSetting TEXT NOT NULL,
+                            adjustmentDirection TEXT NOT NULL,
+                            wasFollowed INTEGER NOT NULL,
+                            confidenceLevel TEXT NOT NULL,
+                            reasonCode TEXT NOT NULL,
+                            timestamp TEXT NOT NULL,
+                            metadata TEXT,
+                            FOREIGN KEY(shotId) REFERENCES shots(id) ON DELETE CASCADE
+                        )
+                    """
+                    )
+
+                    // Create indices for performance
+                    db.execSQL(
+                        "CREATE UNIQUE INDEX IF NOT EXISTS index_shot_recommendations_shotId ON shot_recommendations(shotId)"
+                    )
+                    db.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_shot_recommendations_timestamp ON shot_recommendations(timestamp)"
+                    )
+                    db.execSQL(
+                        "CREATE INDEX IF NOT EXISTS index_shot_recommendations_wasFollowed ON shot_recommendations(wasFollowed)"
+                    )
+                } catch (e: Exception) {
+                    throw MigrationException(
+                        "Migration 8->9 failed: ${e.message}. This migration creates shot_recommendations table.",
+                        e
+                    )
+                }
+            }
+        }
+
+        private const val MIGRATION_8_VERSION = 8
+        private const val MIGRATION_9_VERSION = 9
     }
 }
+
+/**
+ * Custom exception for database migrations to make error handling more specific.
+ */
+class MigrationException(message: String, cause: Throwable? = null) : Exception(message, cause)

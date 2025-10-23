@@ -37,6 +37,8 @@ class ShotRecordingViewModelTest {
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
     private lateinit var manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase
+    private lateinit var saveShotRecommendationUseCase:
+        com.jodli.coffeeshottimer.domain.usecase.SaveShotRecommendationUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -56,6 +58,8 @@ class ShotRecordingViewModelTest {
         recordTasteFeedbackUseCase = mockk<RecordTasteFeedbackUseCase>(relaxed = true)
         calculateGrindAdjustmentUseCase = mockk<CalculateGrindAdjustmentUseCase>(relaxed = true)
         manageGrindRecommendationUseCase = mockk<ManageGrindRecommendationUseCase>(relaxed = true)
+        saveShotRecommendationUseCase =
+            mockk<com.jodli.coffeeshottimer.domain.usecase.SaveShotRecommendationUseCase>(relaxed = true)
         beanRepository = mockk<BeanRepository>(relaxed = true)
         shotRepository = mockk<ShotRepository>(relaxed = true)
         context = mockk<Context>(relaxed = true)
@@ -74,6 +78,7 @@ class ShotRecordingViewModelTest {
             recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase,
+            saveShotRecommendationUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,

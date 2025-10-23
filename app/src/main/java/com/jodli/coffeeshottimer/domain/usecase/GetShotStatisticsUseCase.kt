@@ -5,6 +5,7 @@ import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
+import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import kotlinx.coroutines.flow.first
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -16,8 +17,13 @@ import javax.inject.Singleton
  */
 @Singleton
 class GetShotStatisticsUseCase @Inject constructor(
-    private val shotRepository: ShotRepository
+    private val shotRepository: ShotRepository,
+    private val shotRecommendationDao: com.jodli.coffeeshottimer.data.dao.ShotRecommendationDao
 ) {
+    companion object {
+        private const val MIN_SHOTS_FOR_COACHING_INSIGHTS = 5
+        private const val OPTIMAL_EXTRACTION_TIME_MID = 27.5
+    }
 
     /**
      * Get basic shot statistics for a specific bean.
@@ -197,6 +203,47 @@ class GetShotStatisticsUseCase @Inject constructor(
                     DomainException(
                         DomainErrorCode.UNKNOWN_ERROR,
                         "Unexpected error getting brew ratio analysis",
+                        exception
+                    )
+                }
+            )
+        }
+    }
+
+    /**
+     * Get coaching effectiveness analysis based on recommendation follow-through.
+     * Analyzes historical data to show how following app recommendations impacts shot quality.
+     *
+     * @param beanId Optional bean ID to filter by specific bean
+     * @return Result containing coaching effectiveness metrics or insufficient data indicator
+     */
+    suspend fun getCoachingEffectiveness(beanId: String? = null): Result<CoachingEffectiveness> {
+        return try {
+            val shotsFlow = if (beanId != null) {
+                shotRepository.getShotsByBean(beanId)
+            } else {
+                shotRepository.getAllShots()
+            }
+
+            val result = shotsFlow.first()
+
+            result.fold(
+                onSuccess = { shots ->
+                    val analysis = calculateCoachingEffectiveness(shots)
+                    Result.success(analysis)
+                },
+                onFailure = { error ->
+                    Result.failure(error)
+                }
+            )
+        } catch (exception: Exception) {
+            Result.failure(
+                if (exception is DomainException) {
+                    exception
+                } else {
+                    DomainException(
+                        DomainErrorCode.UNKNOWN_ERROR,
+                        "Unexpected error getting coaching effectiveness",
                         exception
                     )
                 }
@@ -545,6 +592,71 @@ class GetShotStatisticsUseCase @Inject constructor(
         val variance = values.map { (it - mean) * (it - mean) }.average()
         return kotlin.math.sqrt(variance)
     }
+
+    /**
+     * Calculate coaching effectiveness from shots with recommendation tracking data.
+     * Requires minimum 5 shots with recommendations for meaningful insights.
+     *
+     * This queries the separate shot_recommendations table and joins with shot data.
+     */
+    private suspend fun calculateCoachingEffectiveness(shots: List<Shot>): CoachingEffectiveness {
+        // Get all recommendations and create a map by shotId
+        val allRecommendations = shotRecommendationDao.getAllRecommendations().first()
+        val recommendationMap = allRecommendations.associateBy { it.shotId }
+
+        // Filter shots that have recommendations
+        val shotsWithRecs = shots.filter { recommendationMap.containsKey(it.id) }
+
+        // Require minimum data for meaningful insights
+        if (shotsWithRecs.size < MIN_SHOTS_FOR_COACHING_INSIGHTS) {
+            return CoachingEffectiveness.insufficient()
+        }
+
+        // Split into followed vs ignored based on recommendation data
+        val followed = shotsWithRecs.filter { recommendationMap[it.id]?.wasFollowed == true }
+        val ignored = shotsWithRecs.filter { recommendationMap[it.id]?.wasFollowed == false }
+
+        // Calculate follow rate
+        val followRate = (followed.size.toDouble() / shotsWithRecs.size) * 100
+
+        // Success metric: optimal extraction time OR perfect taste rating
+        val successWhenFollowed = if (followed.isNotEmpty()) {
+            followed.count { shot ->
+                shot.isOptimalExtractionTime() || shot.tastePrimary == TastePrimary.PERFECT
+            }.toDouble() / followed.size * 100
+        } else {
+            0.0
+        }
+
+        val successWhenIgnored = if (ignored.isNotEmpty()) {
+            ignored.count { shot ->
+                shot.isOptimalExtractionTime() || shot.tastePrimary == TastePrimary.PERFECT
+            }.toDouble() / ignored.size * 100
+        } else {
+            0.0
+        }
+
+        // Calculate average extraction time deviation from optimal mid-point
+        fun calculateDeviation(shotList: List<Shot>): Double {
+            if (shotList.isEmpty()) return 0.0
+            return shotList.map { shot ->
+                kotlin.math.abs(shot.extractionTimeSeconds - OPTIMAL_EXTRACTION_TIME_MID)
+            }.average()
+        }
+
+        val deviationFollowed = calculateDeviation(followed)
+        val deviationIgnored = calculateDeviation(ignored)
+        val improvementWhenFollowed = deviationIgnored - deviationFollowed
+
+        return CoachingEffectiveness(
+            totalShotsWithRecommendations = shotsWithRecs.size,
+            followRate = followRate,
+            successRateWhenFollowed = successWhenFollowed,
+            successRateWhenIgnored = successWhenIgnored,
+            averageImprovementWhenFollowed = improvementWhenFollowed,
+            hasEnoughData = true
+        )
+    }
 }
 
 // Data classes for statistics and analysis results
@@ -649,5 +761,18 @@ data class ExtractionTimeAnalysis(
 ) {
     companion object {
         fun empty() = ExtractionTimeAnalysis(0, 0.0, 0, 0, 0.0, 0.0, 0.0, 0.0, emptyMap())
+    }
+}
+
+data class CoachingEffectiveness(
+    val totalShotsWithRecommendations: Int,
+    val followRate: Double,
+    val successRateWhenFollowed: Double,
+    val successRateWhenIgnored: Double,
+    val averageImprovementWhenFollowed: Double,
+    val hasEnoughData: Boolean
+) {
+    companion object {
+        fun insufficient() = CoachingEffectiveness(0, 0.0, 0.0, 0.0, 0.0, false)
     }
 }

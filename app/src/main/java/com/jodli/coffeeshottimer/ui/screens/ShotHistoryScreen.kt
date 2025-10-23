@@ -66,6 +66,11 @@ import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryViewModel
 import java.time.format.DateTimeFormatter
 
+// Coaching effectiveness thresholds
+private const val COACHING_SIGNIFICANT_IMPROVEMENT_THRESHOLD = 20
+private const val COACHING_HIGH_FOLLOW_RATE_THRESHOLD = 70
+private const val COACHING_LOW_FOLLOW_RATE_THRESHOLD = 30
+
 @Composable
 fun ShotHistoryScreen(
     onShotClick: (String) -> Unit = {},
@@ -1208,6 +1213,15 @@ private fun ShotAnalysisPortraitContent(
                 GrinderSettingAnalysisCard(analysis = analysis)
             }
         }
+
+        // Coaching Effectiveness (if available)
+        uiState.coachingEffectiveness?.let { effectiveness ->
+            if (effectiveness.hasEnoughData) {
+                item {
+                    CoachingEffectivenessCard(effectiveness = effectiveness)
+                }
+            }
+        }
     }
 }
 
@@ -1249,6 +1263,15 @@ private fun ShotAnalysisLandscapeContent(
             uiState.grinderSettingAnalysis?.let { analysis ->
                 item {
                     GrinderSettingAnalysisCard(analysis = analysis)
+                }
+            }
+
+            // Coaching Effectiveness (if available)
+            uiState.coachingEffectiveness?.let { effectiveness ->
+                if (effectiveness.hasEnoughData) {
+                    item {
+                        CoachingEffectivenessCard(effectiveness = effectiveness)
+                    }
                 }
             }
         }
@@ -1698,6 +1721,96 @@ private fun GrinderSettingAnalysisCard(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun CoachingEffectivenessCard(
+    effectiveness: com.jodli.coffeeshottimer.domain.usecase.CoachingEffectiveness,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    CoffeeCard(modifier = modifier) {
+        CardHeader(
+            icon = Icons.Default.Info,
+            title = stringResource(R.string.coaching_effectiveness_title)
+        )
+
+        Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Follow rate
+        Text(
+            text = stringResource(
+                R.string.coaching_follow_rate,
+                effectiveness.followRate.toInt()
+            ),
+            style = MaterialTheme.typography.bodyMedium
+        )
+
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        // Success comparison
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.coaching_when_followed),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(spacing.extraSmall))
+                Text(
+                    text = "${effectiveness.successRateWhenFollowed.toInt()}%",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            Column(
+                modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = stringResource(R.string.coaching_when_ignored),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(spacing.extraSmall))
+                Text(
+                    text = "${effectiveness.successRateWhenIgnored.toInt()}%",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        // Encouraging message based on effectiveness
+        Spacer(modifier = Modifier.height(spacing.medium))
+        val messageRes = when {
+            effectiveness.successRateWhenFollowed >
+                effectiveness.successRateWhenIgnored + COACHING_SIGNIFICANT_IMPROVEMENT_THRESHOLD ->
+                R.string.coaching_message_highly_effective
+            effectiveness.followRate > COACHING_HIGH_FOLLOW_RATE_THRESHOLD ->
+                R.string.coaching_message_great_consistency
+            effectiveness.followRate < COACHING_LOW_FOLLOW_RATE_THRESHOLD ->
+                R.string.coaching_message_try_following_more
+            else ->
+                R.string.coaching_message_keep_going
+        }
+
+        Text(
+            text = stringResource(messageRes),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

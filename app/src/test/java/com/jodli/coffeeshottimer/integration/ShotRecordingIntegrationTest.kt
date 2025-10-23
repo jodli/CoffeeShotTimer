@@ -53,6 +53,8 @@ class ShotRecordingIntegrationTest {
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
     private lateinit var manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase
+    private lateinit var saveShotRecommendationUseCase:
+        com.jodli.coffeeshottimer.domain.usecase.SaveShotRecommendationUseCase
     private lateinit var beanRepository: BeanRepository
     private lateinit var shotRepository: ShotRepository
     private lateinit var stringResourceProvider: StringResourceProvider
@@ -76,6 +78,7 @@ class ShotRecordingIntegrationTest {
         recordTasteFeedbackUseCase = mockk(relaxed = true)
         calculateGrindAdjustmentUseCase = mockk(relaxed = true)
         manageGrindRecommendationUseCase = mockk(relaxed = true)
+        saveShotRecommendationUseCase = mockk(relaxed = true)
         beanRepository = mockk(relaxed = true)
         shotRepository = mockk(relaxed = true)
         stringResourceProvider = mockk(relaxed = true)
@@ -152,6 +155,7 @@ class ShotRecordingIntegrationTest {
             recordTasteFeedbackUseCase,
             calculateGrindAdjustmentUseCase,
             manageGrindRecommendationUseCase,
+            saveShotRecommendationUseCase,
             beanRepository,
             shotRepository,
             domainErrorTranslator,

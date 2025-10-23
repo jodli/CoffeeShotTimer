@@ -850,4 +850,17 @@
     <string name="achievement_first_perfect">Erster perfekter Shot mit %1$s!</string>
     <string name="achievement_dialed_in">%1$s eingestellt</string>
     <string name="achievement_consistency_streak">%1$d Serie mit %2$s</string>
+
+    <!-- Coaching Effectiveness -->
+    <string name="coaching_effectiveness_title">Coaching-Einblicke</string>
+    <string name="coaching_follow_rate">Du hast %d%% der Vorschläge befolgt</string>
+    <string name="coaching_when_followed">Mit Vorschlägen</string>
+    <string name="coaching_when_ignored">Eigene Anpassungen</string>
+    <string name="coaching_insufficient_data">Nimm 5+ Shots mit Empfehlungen auf, um Coaching-Einblicke zu sehen</string>
+
+    <!-- Encouraging messages -->
+    <string name="coaching_message_highly_effective">🎯 Die Befolgung der Vorschläge zahlt sich wirklich aus!</string>
+    <string name="coaching_message_great_consistency">✨ Toll, dass du konsequent den Anleitungen folgst!</string>
+    <string name="coaching_message_try_following_more">💡 Versuche, mehr Vorschläge zu befolgen, um konsistenter zu werden</string>
+    <string name="coaching_message_keep_going">☕ Experimentiere weiter und lerne deine Bohnen kennen!</string>
 </resources>

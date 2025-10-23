@@ -352,13 +352,18 @@ class ShotHistoryViewModel @Inject constructor(
                 }
                 val grinderAnalysis = grinderAnalysisResult.getOrNull()
 
+                // Load coaching effectiveness (filtered by bean if selected)
+                val coachingResult = getShotStatisticsUseCase.getCoachingEffectiveness(beanId = currentBeanId)
+                val coaching = coachingResult.getOrNull()
+
                 _uiState.value = _uiState.value.copy(
                     analysisLoading = false,
                     overallStatistics = overallStats,
                     shotTrends = trends,
                     brewRatioAnalysis = brewRatioAnalysis,
                     extractionTimeAnalysis = extractionTimeAnalysis,
-                    grinderSettingAnalysis = grinderAnalysis
+                    grinderSettingAnalysis = grinderAnalysis,
+                    coachingEffectiveness = coaching
                 )
             } catch (exception: Exception) {
                 _uiState.value = _uiState.value.copy(
@@ -461,7 +466,8 @@ class ShotHistoryViewModel @Inject constructor(
                 shotTrends = null,
                 brewRatioAnalysis = null,
                 extractionTimeAnalysis = null,
-                grinderSettingAnalysis = null
+                grinderSettingAnalysis = null,
+                coachingEffectiveness = null
             )
         }
 
@@ -898,6 +904,7 @@ data class ShotHistoryUiState(
     val brewRatioAnalysis: BrewRatioAnalysis? = null,
     val extractionTimeAnalysis: ExtractionTimeAnalysis? = null,
     val grinderSettingAnalysis: GrinderSettingAnalysis? = null,
+    val coachingEffectiveness: com.jodli.coffeeshottimer.domain.usecase.CoachingEffectiveness? = null,
     // Pagination state
     val isLoadingMore: Boolean = false,
     val hasMorePages: Boolean = true,

@@ -67,6 +67,9 @@ class ShotHistoryViewModelTest {
         coEvery { getShotStatisticsUseCase.getGrinderSettingAnalysis(any()) } returns Result.success(
             com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis.empty()
         )
+        coEvery { getShotStatisticsUseCase.getCoachingEffectiveness(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.domain.usecase.CoachingEffectiveness.insufficient()
+        )
 
         // Setup string resource provider mocks
         every {

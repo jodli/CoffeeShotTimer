@@ -17,6 +17,7 @@ import java.util.UUID
 class GetShotStatisticsUseCaseTest {
 
     private lateinit var shotRepository: ShotRepository
+    private lateinit var shotRecommendationDao: com.jodli.coffeeshottimer.data.dao.ShotRecommendationDao
     private lateinit var getShotStatisticsUseCase: GetShotStatisticsUseCase
 
     private val testBeanId = "test-bean-id"
@@ -65,7 +66,8 @@ class GetShotStatisticsUseCaseTest {
     @Before
     fun setup() {
         shotRepository = mockk()
-        getShotStatisticsUseCase = GetShotStatisticsUseCase(shotRepository)
+        shotRecommendationDao = mockk(relaxed = true)
+        getShotStatisticsUseCase = GetShotStatisticsUseCase(shotRepository, shotRecommendationDao)
     }
 
     @Test

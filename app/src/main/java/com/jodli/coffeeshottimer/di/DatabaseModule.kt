@@ -108,6 +108,17 @@ object DatabaseModule {
     }
 
     /**
+     * Provides the ShotRecommendationDao instance.
+     *
+     * @param database The AppDatabase instance
+     * @return ShotRecommendationDao instance
+     */
+    @Provides
+    fun provideShotRecommendationDao(database: AppDatabase): com.jodli.coffeeshottimer.data.dao.ShotRecommendationDao {
+        return database.shotRecommendationDao()
+    }
+
+    /**
      * Provides the DatabasePopulator instance for debug builds only.
      * This utility is used for populating the database with test data
      * and clearing database content during development and testing.

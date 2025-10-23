@@ -60,12 +60,14 @@ data class ShotDraft(
  * Integrates with RecordShotUseCase for timer functionality and shot recording.
  */
 @HiltViewModel
+@Suppress("LongParameterList")
 class ShotRecordingViewModel @Inject constructor(
     private val recordShotUseCase: RecordShotUseCase,
     private val getShotDetailsUseCase: GetShotDetailsUseCase,
     private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase,
     private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase,
     private val manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase,
+    private val saveShotRecommendationUseCase: com.jodli.coffeeshottimer.domain.usecase.SaveShotRecommendationUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
     private val domainErrorTranslator: DomainErrorTranslator,
@@ -219,6 +221,7 @@ class ShotRecordingViewModel @Inject constructor(
 
     // Timer state preservation constants
     companion object {
+        private const val RECOMMENDATION_FOLLOW_TOLERANCE = 0.1
         private const val TIMER_IS_RUNNING_KEY = "timer_is_running"
         private const val TIMER_START_TIME_KEY = "timer_start_time"
         private const val TIMER_ELAPSED_SECONDS_KEY = "timer_elapsed_seconds"
@@ -782,9 +785,26 @@ class ShotRecordingViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            // Epic 4: Track if user followed persistent recommendation before recording
+            // Track recommendation follow-through before recording
             val currentRecommendation = _persistentRecommendation.value
-            val followedRecommendation = checkIfRecommendationFollowed(grinder, currentRecommendation)
+
+            // Determine recommendation tracking fields
+            val (recommendationGiven, recommendationDirection, recommendationFollowed) =
+                if (currentRecommendation != null) {
+                    val userGrind = grinder.toDoubleOrNull() ?: 0.0
+                    val suggestedGrind = currentRecommendation.suggestedGrindSetting.toDoubleOrNull() ?: 0.0
+                    val followed = kotlin.math.abs(userGrind - suggestedGrind) <= RECOMMENDATION_FOLLOW_TOLERANCE
+
+                    Triple(
+                        currentRecommendation.suggestedGrindSetting,
+                        currentRecommendation.adjustmentDirection.name,
+                        followed
+                    )
+                } else {
+                    Triple(null, null, null)
+                }
+
+            val followedRecommendation = recommendationFollowed == true
 
             // Capture extraction time BEFORE recording (use effective time based on mode)
             val extractionTimeSeconds = effectiveExtractionTime
@@ -804,7 +824,7 @@ class ShotRecordingViewModel @Inject constructor(
                 return@launch
             }
 
-            // Record the shot with effective extraction time (automatic or manual)
+            // Record the shot (recommendation will be saved separately)
             val result = recordShotUseCase.recordShot(
                 beanId = bean.id,
                 coffeeWeightIn = weightIn,
@@ -816,6 +836,20 @@ class ShotRecordingViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = { shot ->
+                    // Save recommendation to shot_recommendations table if one was given
+                    if (recommendationGiven != null) {
+                        viewModelScope.launch {
+                            saveShotRecommendationUseCase.saveRecommendation(
+                                shotId = shot.id,
+                                recommendedGrindSetting = recommendationGiven,
+                                adjustmentDirection = recommendationDirection ?: "NO_CHANGE",
+                                wasFollowed = recommendationFollowed ?: false,
+                                confidenceLevel = "MEDIUM", // Default value; could be enhanced later
+                                reasonCode = "USER_TRACKING" // Default reason code for manual tracking
+                            )
+                        }
+                    }
+
                     // Epic 4: Handle recommendation follow-through tracking
                     if (followedRecommendation && currentRecommendation != null) {
                         // User followed the recommendation, mark it as followed
@@ -1406,27 +1440,6 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun refreshPersistentRecommendation() {
         loadPersistentRecommendation()
-    }
-
-    /**
-     * Check if the current grinder setting matches the persistent recommendation within tolerance.
-     * Epic 4: Used for tracking recommendation follow-through rates.
-     */
-    private fun checkIfRecommendationFollowed(
-        currentGrinderSetting: String,
-        recommendation: PersistentGrindRecommendation?
-    ): Boolean {
-        if (recommendation == null) return false
-
-        val currentSetting = currentGrinderSetting.toDoubleOrNull() ?: return false
-        val recommendedSetting = recommendation.suggestedGrindSetting.toDoubleOrNull() ?: return false
-
-        // Define tolerance for "following" the recommendation
-        // Allow ±0.5 step size difference to account for user adjustments
-        val tolerance = _grinderStepSize.value // Use the actual step size from configuration
-        val difference = kotlin.math.abs(currentSetting - recommendedSetting)
-
-        return difference <= tolerance
     }
 
     /**

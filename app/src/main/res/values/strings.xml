@@ -849,4 +849,17 @@
     <string name="achievement_first_perfect">First perfect with %1$s!</string>
     <string name="achievement_dialed_in">Dialed in %1$s</string>
     <string name="achievement_consistency_streak">%1$d streak with %2$s</string>
+
+    <!-- Coaching Effectiveness -->
+    <string name="coaching_effectiveness_title">Coaching Insights</string>
+    <string name="coaching_follow_rate">You followed %d%% of suggestions</string>
+    <string name="coaching_when_followed">Following suggestions</string>
+    <string name="coaching_when_ignored">Your own adjustments</string>
+    <string name="coaching_insufficient_data">Record 5+ shots with recommendations to see coaching insights</string>
+
+    <!-- Encouraging messages -->
+    <string name="coaching_message_highly_effective">🎯 Following suggestions is really paying off!</string>
+    <string name="coaching_message_great_consistency">✨ Great job staying consistent with the guidance!</string>
+    <string name="coaching_message_try_following_more">💡 Try following more suggestions to improve consistency</string>
+    <string name="coaching_message_keep_going">☕ Keep experimenting and learning your beans!</string>
 </resources>
