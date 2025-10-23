@@ -61,13 +61,13 @@
     <string name="text_active_long">Active – visible in bean lists</string>
     <string name="text_inactive">Inactive</string>
     <string name="text_bean_name_already_exists_tip">Bean name already exists\nTip: Try adding the roaster name or roast level to make it unique</string>
-    <string name="text_search_beans_hint">Try adjusting your search or filter settings</string>
+    <string name="text_search_beans_hint">No shots found for these filters. Try adjusting to see your brewing journey.</string>
     <string name="text_start_date">Start Date</string>
     <string name="text_end_date">End Date</string>
     <string name="text_date_range_format">Date: %1$s – %2$s</string>
     <string name="text_add_first_bean">Add your first coffee bean to start tracking shots</string>
     <string name="text_add_some_beans">Add some beans in Bean Management to get started</string>
-    <string name="text_record_shots_analysis">Record some shots to see analysis and insights</string>
+    <string name="text_record_shots_analysis">Ready to start your coffee journey? Record your first shot and I\'ll help you dial in your beans!</string>
     <string name="text_database_cleared">Database cleared successfully!</string>
     <string name="text_database_filled">Database filled with test data successfully!</string>
     <string name="text_bean_name_required">Bean name is required</string>
@@ -273,7 +273,7 @@
     <string name="cd_shot_list">Show shot list</string>
     <string name="cd_analysis">Show shot analysis</string>
     <string name="cd_no_shots">No shots found</string>
-    <string name="cd_no_shots_recorded">No shots recorded</string>
+    <string name="cd_no_shots_recorded">No shots yet – ready to brew?</string>
 
     <!-- Error Messages -->
     <string name="error_bean_id_cannot_be_empty">Bean ID cannot be empty</string>
@@ -817,4 +817,36 @@
     <string name="interpretation_concentrated">Very concentrated (%1$s).</string>
     <string name="interpretation_diluted">Very diluted (%1$s).</string>
     <string name="interpretation_consistent">Consistent with your usual shots.</string>
+    
+    <!-- Coaching Insights - Recent Trends -->
+    <string name="coaching_recent_trend_perfect_with_bean">Your last %1$d shots with %2$s: %3$d perfect! 🎯</string>
+    <string name="coaching_recent_trend_perfect">Your last %1$d shots: %2$d perfect! 🎯</string>
+    <string name="coaching_recent_trend_consistent_with_bean">Great consistency with %1$s - %2$d perfect, %3$d good!</string>
+    <string name="coaching_recent_trend_consistent">Great consistency - %1$d perfect, %2$d good!</string>
+    <string name="coaching_recent_trend_progress_with_bean">Making progress with %1$s - keep it up!</string>
+    <string name="coaching_recent_trend_progress">Making progress - keep it up!</string>
+    <string name="coaching_recent_trend_exploring_with_bean">Still exploring %1$s - each shot teaches something new.</string>
+    <string name="coaching_recent_trend_exploring">Still exploring - each shot teaches something new.</string>
+    
+    <!-- Coaching Insights - Dial-In Status -->
+    <string name="coaching_dial_in_achieved">Dialed in %1$s in %2$d shots! ☕</string>
+    <string name="coaching_dial_in_exploring">Exploring %1$s - %2$d shots so far</string>
+    
+    <!-- Coaching Insights - Grind Coaching Effectiveness -->
+    <string name="coaching_grind_effectiveness">Following grind suggestions helped achieve %1$d%% perfect shots</string>
+    <string name="coaching_grind_follow_rate">You followed %1$d%% of grind suggestions</string>
+    
+    <!-- Coaching Insights Card -->
+    <string name="coaching_insights_title">Your Brewing Journey</string>
+    <string name="coaching_insights_title_with_bean">Journey with %1$s</string>
+    <string name="coaching_insights_section_recent">Recent Pattern</string>
+    <string name="coaching_insights_section_progress">Progress</string>
+    <string name="coaching_insights_section_coaching">Coaching Impact</string>
+    <string name="cd_collapse_insights">Collapse insights</string>
+    <string name="cd_expand_insights">Expand insights</string>
+    
+    <!-- Achievement Badges -->
+    <string name="achievement_first_perfect">First perfect with %1$s!</string>
+    <string name="achievement_dialed_in">Dialed in %1$s</string>
+    <string name="achievement_consistency_streak">%1$d streak with %2$s</string>
 </resources>

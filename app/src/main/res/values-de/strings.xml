@@ -63,13 +63,13 @@
     <string name="text_active_long">Aktiv - sichtbar in Bohnenlisten</string>
     <string name="text_inactive">Inaktiv</string>
     <string name="text_bean_name_already_exists_tip">Bohnenname existiert bereits\nTipp: Versuche den Röster-Namen oder Röstgrad hinzuzufügen</string>
-    <string name="text_search_beans_hint">Versuche deine Such- oder Filtereinstellungen anzupassen</string>
+    <string name="text_search_beans_hint">Keine Shots für diese Filter. Versuche die Einstellungen anzupassen, um deine Brüh-Reise zu sehen.</string>
     <string name="text_start_date">Startdatum</string>
     <string name="text_end_date">Enddatum</string>
     <string name="text_date_range_format">Datum: %1$s – %2$s</string>
     <string name="text_add_first_bean">Füge deine erste Kaffeebohne hinzu, um Shots zu verfolgen</string>
     <string name="text_add_some_beans">Füge einige Bohnen in der Bohnenverwaltung hinzu, um zu beginnen</string>
-    <string name="text_record_shots_analysis">Nimm einige Shots auf, um Analysen und Einblicke zu sehen</string>
+    <string name="text_record_shots_analysis">Bereit, deine Kaffee-Reise zu starten? Nimm deinen ersten Shot auf und ich helfe dir, deine Bohnen einzustellen!</string>
     <string name="text_database_cleared">Datenbank erfolgreich geleert!</string>
     <string name="text_database_filled">Datenbank erfolgreich mit Testdaten gefüllt!</string>
     <string name="text_bean_name_required">Bohnenname ist erforderlich</string>
@@ -273,7 +273,7 @@
     <string name="cd_shot_list">Shot-Liste anzeigen</string>
     <string name="cd_analysis">Shot-Analyse anzeigen</string>
     <string name="cd_no_shots">Keine Shots gefunden</string>
-    <string name="cd_no_shots_recorded">Keine Shots aufgenommen</string>
+    <string name="cd_no_shots_recorded">Noch keine Shots – bereit zu brühen?</string>
     <string name="cd_shot_recorded_success">Shot erfolgreich aufgenommen</string>
 
     <!-- Error Messages -->
@@ -818,4 +818,36 @@
     <string name="interpretation_concentrated">Sehr konzentriert (%1$s).</string>
     <string name="interpretation_diluted">Sehr verdünnt (%1$s).</string>
     <string name="interpretation_consistent">Konsistent mit deinen üblichen Shots.</string>
+    
+    <!-- Coaching Insights - Recent Trends -->
+    <string name="coaching_recent_trend_perfect_with_bean">Deine letzten %1$d Shots mit %2$s: %3$d perfekt! 🎯</string>
+    <string name="coaching_recent_trend_perfect">Deine letzten %1$d Shots: %2$d perfekt! 🎯</string>
+    <string name="coaching_recent_trend_consistent_with_bean">Große Konstanz mit %1$s - %2$d perfekt, %3$d gut!</string>
+    <string name="coaching_recent_trend_consistent">Große Konstanz - %1$d perfekt, %2$d gut!</string>
+    <string name="coaching_recent_trend_progress_with_bean">Du machst Fortschritte mit %1$s - weiter so!</string>
+    <string name="coaching_recent_trend_progress">Du machst Fortschritte - weiter so!</string>
+    <string name="coaching_recent_trend_exploring_with_bean">Noch am Erkunden von %1$s - jeder Shot lehrt etwas Neues.</string>
+    <string name="coaching_recent_trend_exploring">Noch am Erkunden - jeder Shot lehrt etwas Neues.</string>
+    
+    <!-- Coaching Insights - Dial-In Status -->
+    <string name="coaching_dial_in_achieved">%1$s in %2$d Shots eingestellt! ☕</string>
+    <string name="coaching_dial_in_exploring">Erkunde %1$s - %2$d Shots bisher</string>
+    
+    <!-- Coaching Insights - Grind Coaching Effectiveness -->
+    <string name="coaching_grind_effectiveness">Den Mahlgradempfehlungen zu folgen half %1$d%% perfekte Shots zu erzielen</string>
+    <string name="coaching_grind_follow_rate">Du bist %1$d%% der Mahlgradempfehlungen gefolgt</string>
+    
+    <!-- Coaching Insights Card -->
+    <string name="coaching_insights_title">Deine Brüh-Reise</string>
+    <string name="coaching_insights_title_with_bean">Reise mit %1$s</string>
+    <string name="coaching_insights_section_recent">Aktuelles Muster</string>
+    <string name="coaching_insights_section_progress">Fortschritt</string>
+    <string name="coaching_insights_section_coaching">Coaching-Einfluss</string>
+    <string name="cd_collapse_insights">Erkenntnisse einklappen</string>
+    <string name="cd_expand_insights">Erkenntnisse ausklappen</string>
+    
+    <!-- Achievement Badges -->
+    <string name="achievement_first_perfect">Erster perfekter Shot mit %1$s!</string>
+    <string name="achievement_dialed_in">%1$s eingestellt</string>
+    <string name="achievement_consistency_streak">%1$d Serie mit %2$s</string>
 </resources>

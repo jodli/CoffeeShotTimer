@@ -55,6 +55,41 @@ class ShotHistoryViewModel @Inject constructor(
 
     companion object {
         private const val COMPONENT_ID = "ShotHistoryViewModel"
+
+        // Coaching insights thresholds
+        private const val MIN_SHOTS_FOR_TREND = 3
+        private const val MAX_RECENT_SHOTS = 5
+        private const val MIN_SHOTS_FOR_DIAL_IN = 3
+        private const val MIN_SHOTS_FOR_GRIND_ANALYSIS = 5
+        private const val DIAL_IN_CONSISTENCY_THRESHOLD = 70
+        private const val DIAL_IN_MIN_SCORE = 60
+
+        // Quality score constants
+        private const val SCORE_PERFECT_THRESHOLD = 80
+        private const val SCORE_GOOD_THRESHOLD = 60
+        private const val SCORE_OPTIMAL_TIME_POINTS = 40
+        private const val SCORE_TYPICAL_RATIO_POINTS = 40
+        private const val SCORE_REASONABLE_WEIGHTS_POINTS = 20
+        private const val SCORE_TIME_PENALTY_PER_SECOND = 4
+        private const val SCORE_RATIO_PENALTY_MULTIPLIER = 20.0
+
+        // Shot quality ranges
+        private const val MIN_REASONABLE_WEIGHT_IN = 15.0
+        private const val MAX_REASONABLE_WEIGHT_IN = 25.0
+        private const val MIN_REASONABLE_WEIGHT_OUT = 25.0
+        private const val MAX_REASONABLE_WEIGHT_OUT = 60.0
+
+        // Extraction time boundaries
+        private const val MIN_OPTIMAL_EXTRACTION_TIME = 25
+        private const val MAX_OPTIMAL_EXTRACTION_TIME = 30
+
+        // Brew ratio boundaries
+        private const val MIN_TYPICAL_BREW_RATIO = 1.5
+        private const val MAX_TYPICAL_BREW_RATIO = 3.0
+
+        // Consistency milestone thresholds
+        private const val CONSISTENCY_MILESTONE_TEN = 10
+        private const val CONSISTENCY_MILESTONE_INTERVAL = 5
     }
 
     init {
@@ -111,11 +146,13 @@ class ShotHistoryViewModel @Inject constructor(
 
                 result.fold(
                     onSuccess = { paginatedResult ->
+                        val insights = calculateCoachingInsights(paginatedResult.items, _currentFilter.value.beanId)
                         _uiState.value = _uiState.value.copy(
                             isLoading = false,
                             shots = paginatedResult.items,
                             error = null,
-                            hasMorePages = paginatedResult.hasNextPage
+                            hasMorePages = paginatedResult.hasNextPage,
+                            coachingInsights = insights
                         )
                         hasMoreData = paginatedResult.hasNextPage
                     },
@@ -158,10 +195,14 @@ class ShotHistoryViewModel @Inject constructor(
                                 val paginatedShots = shots.take(currentPageSize)
                                 val hasMore = shots.size > paginatedShots.size
 
+                                // Calculate coaching insights for reactive updates
+                                val insights = calculateCoachingInsights(paginatedShots, _currentFilter.value.beanId)
+
                                 _uiState.value = _uiState.value.copy(
                                     shots = paginatedShots,
                                     hasMorePages = hasMore,
-                                    error = null
+                                    error = null,
+                                    coachingInsights = insights
                                 )
                                 hasMoreData = hasMore
                             }
@@ -256,6 +297,7 @@ class ShotHistoryViewModel @Inject constructor(
     fun refreshOnResume() {
         // Start reactive collection if not already started
         if (_uiState.value.shots.isEmpty() && _uiState.value.error == null && !_uiState.value.isLoading) {
+            loadShotHistory()
             startReactiveShotHistoryCollection()
         }
     }
@@ -443,6 +485,402 @@ class ShotHistoryViewModel @Inject constructor(
         // Cancel memory cleanup when ViewModel is destroyed
         memoryOptimizer.cancelMemoryCleanup(COMPONENT_ID)
     }
+
+    // COACHING INSIGHTS CALCULATION METHODS
+
+    /**
+     * Calculate coaching insights for the current view of shots.
+     * Insights are bean-specific when a bean filter is active.
+     *
+     * @param shots List of shots to analyze
+     * @param beanId Optional bean ID for bean-specific analysis
+     * @return CoachingInsights or null if insufficient data
+     */
+    private fun calculateCoachingInsights(shots: List<Shot>, beanId: String?): CoachingInsights? {
+        if (shots.isEmpty()) return null
+
+        val beanName = beanId?.let { getBeanName(it) }
+        val recentTrend = calculateRecentTrend(shots, beanId)
+        val dialInStatus = getDialInStatus(shots, beanId)
+        val grindCoaching = analyzeGrindCoachingEffectiveness(shots, beanId)
+
+        // Only return insights if we have at least one piece of useful information
+        return if (recentTrend != null || dialInStatus != null || grindCoaching != null) {
+            CoachingInsights(
+                beanId = beanId,
+                beanName = beanName,
+                recentTrend = recentTrend,
+                dialInStatus = dialInStatus,
+                grindCoachingEffectiveness = grindCoaching
+            )
+        } else {
+            null
+        }
+    }
+
+    /**
+     * Analyze the last 3-5 shots for recent brewing patterns.
+     *
+     * @param shots List of shots (assumed sorted by timestamp descending)
+     * @param beanId Optional bean ID for filtering
+     * @return RecentTrend or null if insufficient data
+     */
+    private fun calculateRecentTrend(shots: List<Shot>, beanId: String?): RecentTrend? {
+        val recentShots = shots.filter { beanId == null || it.beanId == beanId }.take(MAX_RECENT_SHOTS)
+        if (recentShots.size < MIN_SHOTS_FOR_TREND) return null
+
+        var perfectCount = 0
+        var goodCount = 0
+        var totalQuality = 0
+
+        recentShots.forEach { shot ->
+            val quality = calculateShotQualityScore(shot)
+            totalQuality += quality
+
+            when {
+                quality >= SCORE_PERFECT_THRESHOLD -> perfectCount++
+                quality >= SCORE_GOOD_THRESHOLD -> goodCount++
+            }
+        }
+
+        val avgQuality = totalQuality / recentShots.size
+        val message = buildConsistencyMessage(recentShots.size, perfectCount, goodCount, beanId)
+
+        return RecentTrend(
+            shotCount = recentShots.size,
+            perfectShotCount = perfectCount,
+            goodShotCount = goodCount,
+            averageQualityScore = avgQuality,
+            consistencyMessage = message
+        )
+    }
+
+    /**
+     * Build a human-readable consistency message for recent shots.
+     */
+    private fun buildConsistencyMessage(
+        shotCount: Int,
+        perfectCount: Int,
+        goodCount: Int,
+        beanId: String?
+    ): String {
+        val beanName = beanId?.let { getBeanName(it) } ?: ""
+
+        return when {
+            perfectCount >= 2 -> {
+                if (beanId != null) {
+                    stringResourceProvider.getString(
+                        R.string.coaching_recent_trend_perfect_with_bean,
+                        shotCount,
+                        beanName,
+                        perfectCount
+                    )
+                } else {
+                    stringResourceProvider.getString(R.string.coaching_recent_trend_perfect, shotCount, perfectCount)
+                }
+            }
+            perfectCount + goodCount >= shotCount - 1 -> {
+                if (beanId != null) {
+                    stringResourceProvider.getString(
+                        R.string.coaching_recent_trend_consistent_with_bean,
+                        beanName,
+                        perfectCount,
+                        goodCount
+                    )
+                } else {
+                    stringResourceProvider.getString(R.string.coaching_recent_trend_consistent, perfectCount, goodCount)
+                }
+            }
+            perfectCount + goodCount >= shotCount / 2 -> {
+                if (beanId != null) {
+                    stringResourceProvider.getString(R.string.coaching_recent_trend_progress_with_bean, beanName)
+                } else {
+                    stringResourceProvider.getString(R.string.coaching_recent_trend_progress)
+                }
+            }
+            else -> {
+                if (beanId != null) {
+                    stringResourceProvider.getString(R.string.coaching_recent_trend_exploring_with_bean, beanName)
+                } else {
+                    stringResourceProvider.getString(R.string.coaching_recent_trend_exploring)
+                }
+            }
+        }
+    }
+
+    /**
+     * Determine dial-in status for a specific bean.
+     *
+     * @param shots List of all shots
+     * @param beanId Bean ID to analyze (required)
+     * @return DialInStatus or null if not enough data or beanId is null
+     */
+    private fun getDialInStatus(shots: List<Shot>, beanId: String?): DialInStatus? {
+        if (beanId == null) return null // Dial-in is bean-specific
+
+        val beanShots = shots.filter { it.beanId == beanId }.sortedBy { it.timestamp }
+        if (beanShots.size < MIN_SHOTS_FOR_DIAL_IN) return null
+
+        // Check last 3 shots for consistency
+        val recentShots = beanShots.takeLast(MIN_SHOTS_FOR_DIAL_IN)
+        val recentQualityScores = recentShots.map { calculateShotQualityScore(it) }
+        val avgRecentQuality = recentQualityScores.average().toInt()
+
+        val isDialedIn = avgRecentQuality >= DIAL_IN_CONSISTENCY_THRESHOLD &&
+            recentQualityScores.all { it >= DIAL_IN_MIN_SCORE }
+
+        // If dialed in, find when they achieved it
+        val shotsToDialIn = if (isDialedIn) {
+            findDialInPoint(beanShots)
+        } else {
+            null
+        }
+
+        val beanName = getBeanName(beanId)
+        val message = if (isDialedIn) {
+            stringResourceProvider.getString(
+                R.string.coaching_dial_in_achieved,
+                beanName,
+                shotsToDialIn ?: beanShots.size
+            )
+        } else {
+            stringResourceProvider.getString(
+                R.string.coaching_dial_in_exploring,
+                beanName,
+                beanShots.size
+            )
+        }
+
+        return DialInStatus(
+            isDialedIn = isDialedIn,
+            shotCount = beanShots.size,
+            shotsToDialIn = shotsToDialIn,
+            statusMessage = message
+        )
+    }
+
+    /**
+     * Find at which shot number the bean was dialed in.
+     * Returns the index of the first shot in a consistent good streak.
+     */
+    private fun findDialInPoint(beanShots: List<Shot>): Int? {
+        if (beanShots.size < MIN_SHOTS_FOR_DIAL_IN) return null
+
+        // Look for first occurrence of 3 consecutive good shots
+        for (i in 0..beanShots.size - MIN_SHOTS_FOR_DIAL_IN) {
+            val threeShots = beanShots.subList(i, i + MIN_SHOTS_FOR_DIAL_IN)
+            val allGood = threeShots.all { calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE }
+            if (allGood) {
+                return i + MIN_SHOTS_FOR_DIAL_IN // Return the count when they achieved it
+            }
+        }
+
+        return null
+    }
+
+    /**
+     * Analyze how effective grind coaching has been.
+     * Note: Currently a placeholder as we need to track recommendation follow-through.
+     *
+     * @param shots List of shots
+     * @param beanId Optional bean ID for filtering
+     * @return GrindCoachingEffectiveness or null if no grind coaching data
+     */
+    @Suppress("UnusedParameter")
+    private fun analyzeGrindCoachingEffectiveness(
+        shots: List<Shot>,
+        beanId: String?
+    ): GrindCoachingEffectiveness? {
+        // Placeholder: Will be implemented when recommendation tracking is added to Shot model
+        return null
+    }
+
+    /**
+     * Calculate a quality score for a shot (0-100).
+     * Based on extraction time optimality and brew ratio.
+     */
+    private fun calculateShotQualityScore(shot: Shot): Int {
+        var score = 0
+
+        // Optimal extraction time (25-30s) = 40 points
+        if (shot.isOptimalExtractionTime()) {
+            score += SCORE_OPTIMAL_TIME_POINTS
+        } else {
+            // Partial points for close times
+            val timeDiff = when {
+                shot.extractionTimeSeconds < MIN_OPTIMAL_EXTRACTION_TIME ->
+                    MIN_OPTIMAL_EXTRACTION_TIME - shot.extractionTimeSeconds
+                shot.extractionTimeSeconds > MAX_OPTIMAL_EXTRACTION_TIME ->
+                    shot.extractionTimeSeconds - MAX_OPTIMAL_EXTRACTION_TIME
+                else -> 0
+            }
+            score += maxOf(0, SCORE_OPTIMAL_TIME_POINTS - (timeDiff * SCORE_TIME_PENALTY_PER_SECOND))
+        }
+
+        // Typical brew ratio (1.5-3.0) = 40 points
+        if (shot.isTypicalBrewRatio()) {
+            score += SCORE_TYPICAL_RATIO_POINTS
+        } else {
+            // Partial points for close ratios
+            val ratioDiff = when {
+                shot.brewRatio < MIN_TYPICAL_BREW_RATIO -> MIN_TYPICAL_BREW_RATIO - shot.brewRatio
+                shot.brewRatio > MAX_TYPICAL_BREW_RATIO -> shot.brewRatio - MAX_TYPICAL_BREW_RATIO
+                else -> 0.0
+            }
+            score += maxOf(0, SCORE_TYPICAL_RATIO_POINTS - (ratioDiff * SCORE_RATIO_PENALTY_MULTIPLIER).toInt())
+        }
+
+        // Consistency bonus (reasonable weights) = 20 points
+        val isReasonableWeights = shot.coffeeWeightIn in MIN_REASONABLE_WEIGHT_IN..MAX_REASONABLE_WEIGHT_IN &&
+            shot.coffeeWeightOut in MIN_REASONABLE_WEIGHT_OUT..MAX_REASONABLE_WEIGHT_OUT
+        if (isReasonableWeights) {
+            score += SCORE_REASONABLE_WEIGHTS_POINTS
+        }
+
+        return score.coerceIn(0, 100)
+    }
+
+    // ACHIEVEMENT DETECTION METHODS
+
+    /**
+     * Get the achievement for a specific shot, if any.
+     * Checks for bean-specific milestones.
+     *
+     * @param shot The shot to check for achievements
+     * @return Achievement or null if no achievement
+     */
+    fun getAchievementForShot(shot: Shot): Achievement? {
+        val allShots = _uiState.value.shots
+        val beanName = getBeanName(shot.beanId)
+
+        return when {
+            isFirstPerfectForBean(shot, allShots) -> Achievement(
+                type = AchievementType.FIRST_PERFECT,
+                label = stringResourceProvider.getString(R.string.achievement_first_perfect, beanName),
+                emoji = "🎉",
+                beanId = shot.beanId,
+                beanName = beanName
+            )
+            isDialInMilestone(shot, allShots) -> Achievement(
+                type = AchievementType.DIALED_IN,
+                label = stringResourceProvider.getString(R.string.achievement_dialed_in, beanName),
+                emoji = "🎯",
+                beanId = shot.beanId,
+                beanName = beanName
+            )
+            else -> {
+                val consistencyStreak = isBeanConsistencyMilestone(shot, allShots)
+                consistencyStreak?.let {
+                    Achievement(
+                        type = AchievementType.CONSISTENCY,
+                        label = stringResourceProvider.getString(
+                            R.string.achievement_consistency_streak,
+                            it,
+                            beanName
+                        ),
+                        emoji = "🔥",
+                        beanId = shot.beanId,
+                        beanName = beanName
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if this is the first perfect shot with this bean.
+     */
+    private fun isFirstPerfectForBean(shot: Shot, allShots: List<Shot>): Boolean {
+        val quality = calculateShotQualityScore(shot)
+        if (quality < SCORE_PERFECT_THRESHOLD) return false
+
+        // Get all shots for this bean, sorted by timestamp
+        val beanShots = allShots
+            .filter { it.beanId == shot.beanId }
+            .sortedBy { it.timestamp }
+
+        // Find all perfect shots before this one
+        val perfectShotsBeforeThis = beanShots
+            .filter { it.timestamp < shot.timestamp }
+            .filter { calculateShotQualityScore(it) >= SCORE_PERFECT_THRESHOLD }
+
+        return perfectShotsBeforeThis.isEmpty()
+    }
+
+    /**
+     * Check if this shot represents the moment the bean was dialed in.
+     * True if this is the 3rd consecutive good shot with this bean.
+     */
+    private fun isDialInMilestone(shot: Shot, allShots: List<Shot>): Boolean {
+        // Get all shots for this bean, sorted by timestamp
+        val beanShots = allShots
+            .filter { it.beanId == shot.beanId }
+            .sortedBy { it.timestamp }
+
+        // Find the index of this shot
+        val shotIndex = beanShots.indexOfFirst { it.id == shot.id }
+        if (shotIndex < 2) return false // Need at least 3 shots total
+
+        // Check if this is the 3rd consecutive good shot
+        val lastThreeShots = beanShots.subList(maxOf(0, shotIndex - 2), shotIndex + 1)
+        if (lastThreeShots.size != MIN_SHOTS_FOR_DIAL_IN) return false
+
+        val allGood = lastThreeShots.all { calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE }
+        if (!allGood) return false
+
+        // Make sure there weren't 3 good shots in a row before this
+        if (shotIndex >= MIN_SHOTS_FOR_DIAL_IN) {
+            val previousThree = beanShots.subList(shotIndex - MIN_SHOTS_FOR_DIAL_IN, shotIndex)
+            val previouslyDialedIn = previousThree.all {
+                calculateShotQualityScore(it) >= DIAL_IN_MIN_SCORE
+            }
+            if (previouslyDialedIn) return false
+        }
+
+        return true
+    }
+
+    /**
+     * Check if this shot represents a consistency milestone.
+     * Returns the streak count if this is part of a notable consistency streak (3+ good shots).
+     */
+    private fun isBeanConsistencyMilestone(shot: Shot, allShots: List<Shot>): Int? {
+        val quality = calculateShotQualityScore(shot)
+        if (quality < DIAL_IN_MIN_SCORE) return null
+
+        // Get all shots for this bean, sorted by timestamp
+        val beanShots = allShots
+            .filter { it.beanId == shot.beanId }
+            .sortedBy { it.timestamp }
+
+        // Find the index of this shot
+        val shotIndex = beanShots.indexOfFirst { it.id == shot.id }
+        if (shotIndex < 0) return null
+
+        // Count consecutive good shots ending with this one
+        val streakCount = countConsecutiveGoodShots(beanShots, shotIndex)
+
+        // Only show achievement for streaks of 3, 5, or 10+
+        return when {
+            streakCount == MIN_SHOTS_FOR_DIAL_IN -> MIN_SHOTS_FOR_DIAL_IN
+            streakCount == MAX_RECENT_SHOTS -> MAX_RECENT_SHOTS
+            streakCount >= CONSISTENCY_MILESTONE_TEN &&
+                streakCount % CONSISTENCY_MILESTONE_INTERVAL == 0 -> streakCount
+            else -> null
+        }
+    }
+
+    private fun countConsecutiveGoodShots(beanShots: List<Shot>, fromIndex: Int): Int {
+        var count = 0
+        for (i in fromIndex downTo 0) {
+            if (calculateShotQualityScore(beanShots[i]) >= DIAL_IN_MIN_SCORE) {
+                count++
+            } else {
+                break
+            }
+        }
+        return count
+    }
 }
 
 /**
@@ -462,11 +900,81 @@ data class ShotHistoryUiState(
     val grinderSettingAnalysis: GrinderSettingAnalysis? = null,
     // Pagination state
     val isLoadingMore: Boolean = false,
-    val hasMorePages: Boolean = true
+    val hasMorePages: Boolean = true,
+    // Coaching insights
+    val coachingInsights: CoachingInsights? = null
 ) {
     val isEmpty: Boolean
         get() = shots.isEmpty() && !isLoading
 
     val hasAnalysisData: Boolean
         get() = overallStatistics != null || shotTrends != null || brewRatioAnalysis != null
+}
+
+/**
+ * Coaching insights for the current bean or filtered view.
+ * Provides retrospective analysis to help users understand their brewing journey.
+ */
+data class CoachingInsights(
+    val beanId: String?, // null if showing all beans
+    val beanName: String?, // null if showing all beans
+    val recentTrend: RecentTrend?,
+    val dialInStatus: DialInStatus?,
+    val grindCoachingEffectiveness: GrindCoachingEffectiveness?
+)
+
+/**
+ * Recent trend analysis for the last 3-5 shots with a specific bean.
+ * Helps users understand their recent brewing patterns.
+ */
+data class RecentTrend(
+    val shotCount: Int, // Number of recent shots analyzed (3-5)
+    val perfectShotCount: Int, // How many were perfect
+    val goodShotCount: Int, // How many were good (within range)
+    val averageQualityScore: Int, // Average quality score (0-100)
+    val consistencyMessage: String // E.g., "Your last 3 shots were consistently good!"
+)
+
+/**
+ * Dial-in status for a specific bean.
+ * Tracks the journey to finding optimal settings.
+ */
+data class DialInStatus(
+    val isDialedIn: Boolean, // Has the user found good settings?
+    val shotCount: Int, // Total shots with this bean
+    val shotsToDialIn: Int?, // How many shots it took to dial in (null if not yet dialed in)
+    val statusMessage: String // E.g., "Dialed in Fazenda in 5 shots!"
+)
+
+/**
+ * Analysis of how effective grind coaching suggestions have been.
+ * Tracks if users followed suggestions and the outcomes.
+ */
+data class GrindCoachingEffectiveness(
+    val suggestionFollowRate: Int, // Percentage of suggestions followed (0-100)
+    val successRateWhenFollowed: Int, // Percentage of successful shots when suggestions followed
+    val totalSuggestionsGiven: Int, // Total number of suggestions provided
+    val totalSuggestionsFollowed: Int, // How many were actually followed
+    val effectivenessMessage: String // E.g., "Following grind suggestions helped achieve 80% perfect shots"
+)
+
+/**
+ * Achievement for a specific shot with a specific bean.
+ * Represents a milestone or notable accomplishment in the brewing journey.
+ */
+data class Achievement(
+    val type: AchievementType,
+    val label: String, // Translatable label text
+    val emoji: String, // Visual indicator
+    val beanId: String, // Bean this achievement is tied to
+    val beanName: String // Bean name for display
+)
+
+/**
+ * Type of achievement to determine display color and significance.
+ */
+enum class AchievementType {
+    FIRST_PERFECT, // First perfect shot with this bean
+    DIALED_IN, // Successfully dialed in the bean
+    CONSISTENCY // Consistency streak with the bean
 }

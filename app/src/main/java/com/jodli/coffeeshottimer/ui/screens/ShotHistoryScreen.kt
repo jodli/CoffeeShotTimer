@@ -48,6 +48,7 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.ui.components.CardHeader
+import com.jodli.coffeeshottimer.ui.components.CoachingInsightsCard
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CompactTasteDisplay
 import com.jodli.coffeeshottimer.ui.components.EmptyState
@@ -59,6 +60,8 @@ import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
+import com.jodli.coffeeshottimer.ui.viewmodel.Achievement
+import com.jodli.coffeeshottimer.ui.viewmodel.AchievementType
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryViewModel
 import java.time.format.DateTimeFormatter
@@ -73,6 +76,7 @@ fun ShotHistoryScreen(
     val currentFilter by viewModel.currentFilter.collectAsState()
 
     var showFilterDialog by remember { mutableStateOf(false) }
+    var coachingInsightsExpanded by remember { mutableStateOf(false) }
 
     // Auto-refresh when screen becomes visible
     LaunchedEffect(Unit) {
@@ -92,6 +96,8 @@ fun ShotHistoryScreen(
                 onLoadMore = { viewModel.loadMore() },
                 onClearFilters = { viewModel.clearFilters() },
                 getBeanName = { beanId -> viewModel.getBeanName(beanId) },
+                coachingInsightsExpanded = coachingInsightsExpanded,
+                onToggleCoachingInsights = { coachingInsightsExpanded = !coachingInsightsExpanded },
                 spacing = spacing
             )
         },
@@ -106,6 +112,8 @@ fun ShotHistoryScreen(
                 onLoadMore = { viewModel.loadMore() },
                 onClearFilters = { viewModel.clearFilters() },
                 getBeanName = { beanId -> viewModel.getBeanName(beanId) },
+                coachingInsightsExpanded = coachingInsightsExpanded,
+                onToggleCoachingInsights = { coachingInsightsExpanded = !coachingInsightsExpanded },
                 spacing = spacing
             )
         }
@@ -139,6 +147,8 @@ private fun ShotHistoryPortraitContent(
     onLoadMore: () -> Unit,
     onClearFilters: () -> Unit,
     getBeanName: (String) -> String,
+    coachingInsightsExpanded: Boolean,
+    onToggleCoachingInsights: () -> Unit,
     spacing: Spacing,
     modifier: Modifier = Modifier
 ) {
@@ -156,6 +166,17 @@ private fun ShotHistoryPortraitContent(
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
+
+        // Coaching insights card
+        uiState.coachingInsights?.let { insights ->
+            CoachingInsightsCard(
+                insights = insights,
+                isExpanded = coachingInsightsExpanded,
+                onToggleExpanded = onToggleCoachingInsights,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(spacing.medium))
+        }
 
         // Active filters display
         if (currentFilter.hasFilters()) {
@@ -196,6 +217,8 @@ private fun ShotHistoryLandscapeContent(
     onLoadMore: () -> Unit,
     onClearFilters: () -> Unit,
     getBeanName: (String) -> String,
+    coachingInsightsExpanded: Boolean,
+    onToggleCoachingInsights: () -> Unit,
     spacing: Spacing,
     modifier: Modifier = Modifier
 ) {
@@ -215,6 +238,17 @@ private fun ShotHistoryLandscapeContent(
         )
 
         Spacer(modifier = Modifier.height(landscapeSpacing))
+
+        // Coaching insights card
+        uiState.coachingInsights?.let { insights ->
+            CoachingInsightsCard(
+                insights = insights,
+                isExpanded = coachingInsightsExpanded,
+                onToggleExpanded = onToggleCoachingInsights,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(landscapeSpacing))
+        }
 
         // Active filters display
         if (currentFilter.hasFilters()) {
@@ -468,7 +502,8 @@ private fun ShotHistoryLandscapeListContent(
             ShotHistoryLandscapeItem(
                 shot = shot,
                 beanName = getBeanName(shot.beanId),
-                onClick = { onShotClick(shot.id) }
+                onClick = { onShotClick(shot.id) },
+                viewModel = hiltViewModel()
             )
         }
 
@@ -494,6 +529,7 @@ private fun ShotHistoryLandscapeItem(
     shot: Shot,
     beanName: String,
     onClick: () -> Unit,
+    viewModel: ShotHistoryViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -551,6 +587,11 @@ private fun ShotHistoryLandscapeItem(
                         value = shot.grinderSetting,
                         isNeutral = true
                     )
+                }
+
+                // Achievement badge
+                viewModel.getAchievementForShot(shot)?.let { achievement ->
+                    AchievementBadge(achievement = achievement)
                 }
             }
 
@@ -810,7 +851,8 @@ private fun ShotHistoryList(
             ShotHistoryItem(
                 shot = shot,
                 beanName = getBeanName(shot.beanId),
-                onClick = { onShotClick(shot.id) }
+                onClick = { onShotClick(shot.id) },
+                viewModel = hiltViewModel()
             )
         }
 
@@ -832,6 +874,7 @@ private fun ShotHistoryItem(
     shot: Shot,
     beanName: String,
     onClick: () -> Unit,
+    viewModel: ShotHistoryViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -895,6 +938,11 @@ private fun ShotHistoryItem(
                         tastePrimary = shot.tastePrimary,
                         tasteSecondary = shot.tasteSecondary
                     )
+
+                    // Achievement badge
+                    viewModel.getAchievementForShot(shot)?.let { achievement ->
+                        AchievementBadge(achievement = achievement)
+                    }
                 }
             }
 
@@ -923,6 +971,61 @@ private fun ShotHistoryItem(
                     modifier = Modifier.padding(top = spacing.extraSmall)
                 )
             }
+        }
+    }
+}
+
+/**
+ * Achievement badge component showing bean-specific milestones.
+ */
+@Composable
+private fun AchievementBadge(
+    achievement: Achievement,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+
+    // Color based on achievement type
+    val backgroundColor = when (achievement.type) {
+        AchievementType.FIRST_PERFECT -> MaterialTheme.colorScheme.primaryContainer
+        AchievementType.DIALED_IN -> MaterialTheme.colorScheme.tertiaryContainer
+        AchievementType.CONSISTENCY -> MaterialTheme.colorScheme.secondaryContainer
+    }
+
+    val contentColor = when (achievement.type) {
+        AchievementType.FIRST_PERFECT -> MaterialTheme.colorScheme.onPrimaryContainer
+        AchievementType.DIALED_IN -> MaterialTheme.colorScheme.onTertiaryContainer
+        AchievementType.CONSISTENCY -> MaterialTheme.colorScheme.onSecondaryContainer
+    }
+
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(spacing.cornerLarge),
+        color = backgroundColor
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = spacing.small,
+                vertical = spacing.extraSmall
+            ),
+            horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Emoji
+            Text(
+                text = achievement.emoji,
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            // Label
+            Text(
+                text = achievement.label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Medium,
+                color = contentColor,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
