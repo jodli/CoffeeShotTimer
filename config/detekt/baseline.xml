@@ -18,6 +18,7 @@
     <ID>CyclomaticComplexMethod:ShotHistoryScreen.kt$private fun getActiveFilterTexts( filter: ShotHistoryFilter, availableBeans: List&lt;com.jodli.coffeeshottimer.data.model.Bean&gt; ): List&lt;String&gt;</ID>
     <ID>CyclomaticComplexMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
     <ID>ExplicitGarbageCollectionCall:MemoryOptimizer.kt$MemoryOptimizer$gc()</ID>
+    <ID>Filename:package-info.kt$com.jodli.coffeeshottimer.ui.components.analytics.package-info.kt</ID>
     <ID>FunctionParameterNaming:TimerComponents.kt$timer_seconds_suffix: String = "s"</ID>
     <ID>LargeClass:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
     <ID>LargeClass:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest</ID>
@@ -305,6 +306,7 @@
     <ID>MagicNumber:WeightSliderComponents.kt$3</ID>
     <ID>MagicNumber:WeightsDisplay.kt$1.5</ID>
     <ID>MagicNumber:WeightsDisplay.kt$2.5</ID>
+    <ID>MatchingDeclarationName:TrendLineGraph.kt$TrendDataPoint</ID>
     <ID>MatchingDeclarationName:ValidationComponents.kt$ValidationUtils</ID>
     <ID>MaximumLineLength:AddEditBeanViewModel.kt$AddEditBeanViewModel$ </ID>
     <ID>MaximumLineLength:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$ </ID>

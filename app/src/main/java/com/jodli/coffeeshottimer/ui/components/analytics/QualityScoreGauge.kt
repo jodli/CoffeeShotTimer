@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber") // Animation and arc drawing require literal numeric values
+
 package com.jodli.coffeeshottimer.ui.components.analytics
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -136,6 +138,7 @@ fun QualityScoreGauge(
     }
 }
 
+@Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
 private fun QualityScoreGaugePreview() {

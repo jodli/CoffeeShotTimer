@@ -1,6 +1,9 @@
+@file:Suppress("MagicNumber") // Canvas drawing coordinates and graph calculations require literal values
+
 package com.jodli.coffeeshottimer.ui.components.analytics
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,7 +36,6 @@ import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 /**
@@ -61,6 +63,7 @@ data class TrendDataPoint(
  * @param dataPoints List of trend data points (last 10-30 quality scores)
  * @param modifier Modifier for the graph
  */
+@Suppress("LongMethod") // Canvas drawing logic is inherently sequential and verbose
 @Composable
 fun TrendLineGraph(
     dataPoints: List<TrendDataPoint>,
@@ -256,21 +259,7 @@ fun TrendLineGraph(
     }
 }
 
-// Extension function for tap gestures (simplified version)
-private suspend fun androidx.compose.ui.input.pointer.PointerInputScope.detectTapGestures(
-    onTap: (Offset) -> Unit
-) {
-    awaitPointerEventScope {
-        while (true) {
-            val event = awaitPointerEvent()
-            if (event.changes.any { it.pressed }) {
-                val position = event.changes.first().position
-                onTap(position)
-            }
-        }
-    }
-}
-
+@Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
 private fun TrendLineGraphPreview() {
@@ -295,6 +284,7 @@ private fun TrendLineGraphPreview() {
     }
 }
 
+@Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
 private fun TrendLineGraphEmptyPreview() {

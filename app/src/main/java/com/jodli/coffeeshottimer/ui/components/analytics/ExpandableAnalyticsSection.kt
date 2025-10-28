@@ -113,6 +113,7 @@ fun ExpandableAnalyticsSection(
     }
 }
 
+@Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
 private fun ExpandableAnalyticsSectionPreview() {

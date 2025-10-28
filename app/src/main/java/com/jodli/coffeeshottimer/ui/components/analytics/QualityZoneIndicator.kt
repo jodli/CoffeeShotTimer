@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber") // Zone percentages and canvas drawing require literal values
+
 package com.jodli.coffeeshottimer.ui.components.analytics
 
 import androidx.compose.foundation.Canvas
@@ -119,6 +121,7 @@ fun QualityZoneIndicator(
     }
 }
 
+@Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
 private fun QualityZoneIndicatorPreview() {
