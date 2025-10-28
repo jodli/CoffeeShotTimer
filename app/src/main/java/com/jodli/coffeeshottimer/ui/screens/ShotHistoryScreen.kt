@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -56,6 +55,10 @@ import com.jodli.coffeeshottimer.ui.components.ErrorState
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.ShotHistoryFilterDialog
+import com.jodli.coffeeshottimer.ui.components.analytics.EnhancedBrewRatioCard
+import com.jodli.coffeeshottimer.ui.components.analytics.EnhancedExtractionQualityCard
+import com.jodli.coffeeshottimer.ui.components.analytics.EnhancedShotTrendsCard
+import com.jodli.coffeeshottimer.ui.components.analytics.QualityScoreGaugeCard
 import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
@@ -1120,7 +1123,8 @@ private fun QualityIndicator(
 @Composable
 private fun ShotAnalysisView(
     uiState: ShotHistoryUiState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: ShotHistoryViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
     val isLandscape = LocalIsLandscape.current
@@ -1152,11 +1156,13 @@ private fun ShotAnalysisView(
     if (isLandscape) {
         ShotAnalysisLandscapeContent(
             uiState = uiState,
+            viewModel = viewModel,
             modifier = modifier
         )
     } else {
         ShotAnalysisPortraitContent(
             uiState = uiState,
+            viewModel = viewModel,
             modifier = modifier
         )
     }
@@ -1165,6 +1171,7 @@ private fun ShotAnalysisView(
 @Composable
 private fun ShotAnalysisPortraitContent(
     uiState: ShotHistoryUiState,
+    viewModel: ShotHistoryViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -1174,38 +1181,57 @@ private fun ShotAnalysisPortraitContent(
         verticalArrangement = Arrangement.spacedBy(spacing.medium),
         contentPadding = PaddingValues(bottom = spacing.large)
     ) {
-        // Overall Statistics
-        uiState.overallStatistics?.let { stats ->
+        // 1. Quality Score Gauge (NEW)
+        uiState.aggregateQualityAnalysis?.let { analysis ->
             item {
-                OverallStatisticsCard(statistics = stats)
+                QualityScoreGaugeCard(
+                    analysis = analysis,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 
-        // Shot Trends
+        // 2. Enhanced Shot Trends (NEW)
         uiState.shotTrends?.let { trends ->
             item {
-                ShotTrendsCard(trends = trends)
+                val qualityScores = uiState.shots.map { shot ->
+                    shot.timestamp to viewModel.getShotQualityScore(shot)
+                }
+                EnhancedShotTrendsCard(
+                    trends = trends,
+                    qualityScores = qualityScores,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 
-        // Brew Ratio Analysis
-        uiState.brewRatioAnalysis?.let { analysis ->
-            item {
-                BrewRatioAnalysisCard(analysis = analysis)
-            }
-        }
-
-        // Extraction Time Analysis
+        // 3. Enhanced Extraction Quality (NEW)
         uiState.extractionTimeAnalysis?.let { analysis ->
             item {
-                ExtractionTimeAnalysisCard(analysis = analysis)
+                EnhancedExtractionQualityCard(
+                    analysis = analysis,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
 
-        // Grinder Setting Analysis (if available)
+        // 4. Enhanced Brew Ratio (NEW)
+        uiState.brewRatioAnalysis?.let { analysis ->
+            item {
+                EnhancedBrewRatioCard(
+                    analysis = analysis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // 5. Grinder Setting Analysis (preserved - conditional on bean filter)
         uiState.grinderSettingAnalysis?.let { analysis ->
             item {
-                GrinderSettingAnalysisCard(analysis = analysis)
+                GrinderSettingAnalysisCard(
+                    analysis = analysis,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -1214,15 +1240,14 @@ private fun ShotAnalysisPortraitContent(
 @Composable
 private fun ShotAnalysisLandscapeContent(
     uiState: ShotHistoryUiState,
+    viewModel: ShotHistoryViewModel,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     val landscapeSpacing = spacing.landscapeSpacing()
 
     Row(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(landscapeSpacing),
+        modifier = modifier.fillMaxSize(),
         horizontalArrangement = Arrangement.spacedBy(landscapeSpacing)
     ) {
         // Left column - Primary analysis
@@ -1231,24 +1256,27 @@ private fun ShotAnalysisLandscapeContent(
             verticalArrangement = Arrangement.spacedBy(landscapeSpacing),
             contentPadding = PaddingValues(bottom = spacing.large)
         ) {
-            // Overall Statistics
-            uiState.overallStatistics?.let { stats ->
+            // Quality Score Gauge (NEW)
+            uiState.aggregateQualityAnalysis?.let { analysis ->
                 item {
-                    OverallStatisticsCard(statistics = stats)
+                    QualityScoreGaugeCard(
+                        analysis = analysis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
 
-            // Shot Trends
+            // Enhanced Shot Trends (NEW)
             uiState.shotTrends?.let { trends ->
                 item {
-                    ShotTrendsCard(trends = trends)
-                }
-            }
-
-            // Grinder Setting Analysis (if available)
-            uiState.grinderSettingAnalysis?.let { analysis ->
-                item {
-                    GrinderSettingAnalysisCard(analysis = analysis)
+                    val qualityScores = uiState.shots.map { shot ->
+                        shot.timestamp to viewModel.getShotQualityScore(shot)
+                    }
+                    EnhancedShotTrendsCard(
+                        trends = trends,
+                        qualityScores = qualityScores,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
@@ -1259,382 +1287,33 @@ private fun ShotAnalysisLandscapeContent(
             verticalArrangement = Arrangement.spacedBy(landscapeSpacing),
             contentPadding = PaddingValues(bottom = spacing.large)
         ) {
-            // Brew Ratio Analysis
-            uiState.brewRatioAnalysis?.let { analysis ->
-                item {
-                    BrewRatioAnalysisCard(analysis = analysis)
-                }
-            }
-
-            // Extraction Time Analysis
+            // Enhanced Extraction Quality (NEW)
             uiState.extractionTimeAnalysis?.let { analysis ->
                 item {
-                    ExtractionTimeAnalysisCard(analysis = analysis)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun OverallStatisticsCard(
-    statistics: com.jodli.coffeeshottimer.domain.usecase.OverallStatistics,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.Info,
-            title = stringResource(R.string.text_overall_statistics)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Key metrics grid
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_total_shots),
-                value = statistics.totalShots.toString(),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_beans_used),
-                value = statistics.uniqueBeans.toString(),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_avg_ratio),
-                value = stringResource(R.string.format_avg_brew_ratio_display, statistics.avgBrewRatio),
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_avg_time),
-                value = stringResource(
-                    R.string.format_avg_extraction_time_display,
-                    statistics.avgExtractionTime.toInt()
-                ),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_optimal_time),
-                value = stringResource(
-                    R.string.format_optimal_extraction_percentage,
-                    statistics.optimalExtractionPercentage
-                ),
-                isGood = statistics.optimalExtractionPercentage > 50,
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_good_ratio),
-                value = stringResource(R.string.format_typical_ratio_percentage, statistics.typicalRatioPercentage),
-                isGood = statistics.typicalRatioPercentage > 50,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        statistics.mostUsedGrinderSetting?.let { setting ->
-            Spacer(modifier = Modifier.height(spacing.medium))
-            Text(
-                text = stringResource(R.string.format_most_used_grinder_setting, setting),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
-private fun ShotTrendsCard(
-    trends: com.jodli.coffeeshottimer.domain.usecase.ShotTrends,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.AutoMirrored.Filled.List,
-            title = stringResource(R.string.format_shot_trends, trends.daysAnalyzed)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Trend indicators
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            TrendItem(
-                label = stringResource(R.string.label_shots_per_day),
-                value = String.format(java.util.Locale.ROOT, "%.1f", trends.shotsPerDay),
-                modifier = Modifier.weight(1f)
-            )
-            TrendItem(
-                label = stringResource(R.string.label_ratio_trend),
-                value = if (trends.brewRatioTrend >= 0) {
-                    "+${
-                        String.format(
-                            java.util.Locale.ROOT,
-                            "%.2f",
-                            trends.brewRatioTrend
-                        )
-                    }"
-                } else {
-                    String.format(java.util.Locale.ROOT, "%.2f", trends.brewRatioTrend)
-                },
-                isImproving = kotlin.math.abs(trends.brewRatioTrend) < 0.1,
-                modifier = Modifier.weight(1f)
-            )
-            TrendItem(
-                label = stringResource(R.string.label_time_trend),
-                value = if (trends.extractionTimeTrend >= 0) {
-                    "+${
-                        String.format(
-                            java.util.Locale.ROOT,
-                            "%.1f",
-                            trends.extractionTimeTrend
-                        )
-                    }s"
-                } else {
-                    stringResource(R.string.format_extraction_time_trend_display, trends.extractionTimeTrend)
-                },
-                isImproving = kotlin.math.abs(trends.extractionTimeTrend) < 2,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Overall improvement indicator
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(spacing.qualityIndicator + spacing.extraSmall)
-                    .clip(CircleShape)
-                    .background(
-                        if (trends.isImproving) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.outline
-                        }
-                    )
-            )
-            Spacer(modifier = Modifier.width(spacing.small))
-            Text(
-                text = if (trends.isImproving) {
-                    stringResource(
-                        R.string.text_improving_consistency
-                    )
-                } else {
-                    stringResource(R.string.text_room_for_improvement)
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = if (trends.isImproving) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            )
-        }
-    }
-}
-
-@Composable
-private fun BrewRatioAnalysisCard(
-    analysis: com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.Info,
-            title = stringResource(R.string.text_brew_ratio_analysis)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Key statistics
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_average),
-                value = stringResource(R.string.format_avg_brew_ratio_display, analysis.avgRatio),
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_range),
-                value = stringResource(R.string.format_brew_ratio_range, analysis.minRatio, analysis.maxRatio),
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Quality breakdown
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            StatisticItem(
-                label = stringResource(R.string.label_typical_range),
-                value = stringResource(R.string.format_typical_ratio_percentage, analysis.typicalRatioPercentage),
-                isGood = analysis.typicalRatioPercentage > 70,
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_under_extracted),
-                value = stringResource(
-                    R.string.format_under_extracted_percentage,
-                    analysis.underExtractedPercentage
-                ),
-                isGood = analysis.underExtractedPercentage < 20,
-                modifier = Modifier.weight(1f)
-            )
-            StatisticItem(
-                label = stringResource(R.string.label_over_extracted),
-                value = stringResource(R.string.format_over_extracted_percentage, analysis.overExtractedPercentage),
-                isGood = analysis.overExtractedPercentage < 20,
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Distribution
-        Text(
-            text = stringResource(R.string.text_distribution),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Medium
-        )
-        Spacer(modifier = Modifier.height(spacing.small))
-
-        analysis.distribution.forEach { (range, count) ->
-            if (count > 0) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = range,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.format_shots_count, count),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    EnhancedExtractionQualityCard(
+                        analysis = analysis,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
-        }
-    }
-}
 
-@Composable
-private fun ExtractionTimeAnalysisCard(
-    analysis: com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(modifier = modifier) {
-        Column {
-            Text(
-                text = stringResource(R.string.text_extraction_time_analysis),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Key statistics
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = stringResource(R.string.label_average),
-                    value = stringResource(R.string.format_avg_extraction_time_display, analysis.avgTime.toInt()),
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_range),
-                    value = stringResource(R.string.format_time_range_display, analysis.minTime, analysis.maxTime),
-                    modifier = Modifier.weight(1f)
-                )
+            // Enhanced Brew Ratio (NEW)
+            uiState.brewRatioAnalysis?.let { analysis ->
+                item {
+                    EnhancedBrewRatioCard(
+                        analysis = analysis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Quality breakdown
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                StatisticItem(
-                    label = stringResource(R.string.label_optimal_time_range_short),
-                    value = stringResource(
-                        R.string.format_optimal_extraction_percentage,
-                        analysis.optimalTimePercentage
-                    ),
-                    isGood = analysis.optimalTimePercentage > 50,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_too_fast),
-                    value = stringResource(R.string.format_too_fast_percentage, analysis.tooFastPercentage),
-                    isGood = analysis.tooFastPercentage < 30,
-                    modifier = Modifier.weight(1f)
-                )
-                StatisticItem(
-                    label = stringResource(R.string.label_too_slow),
-                    value = stringResource(R.string.format_too_slow_percentage, analysis.tooSlowPercentage),
-                    isGood = analysis.tooSlowPercentage < 30,
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Distribution
-            Text(
-                text = stringResource(R.string.text_distribution),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium
-            )
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            analysis.distribution.forEach { (range, count) ->
-                if (count > 0) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = range,
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                        Text(
-                            text = stringResource(R.string.format_shots_count, count),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+            // Grinder Setting Analysis (preserved - conditional on bean filter)
+            uiState.grinderSettingAnalysis?.let { analysis ->
+                item {
+                    GrinderSettingAnalysisCard(
+                        analysis = analysis,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
@@ -1764,64 +1443,6 @@ private fun GrinderSettingItem(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun StatisticItem(
-    label: String,
-    value: String,
-    isGood: Boolean? = null,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = when (isGood) {
-                true -> MaterialTheme.colorScheme.primary
-                false -> MaterialTheme.colorScheme.error
-                null -> MaterialTheme.colorScheme.onSurface
-            }
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-@Composable
-private fun TrendItem(
-    label: String,
-    value: String,
-    isImproving: Boolean? = null,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            color = when (isImproving) {
-                true -> MaterialTheme.colorScheme.primary
-                false -> MaterialTheme.colorScheme.error
-                null -> MaterialTheme.colorScheme.onSurface
-            }
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

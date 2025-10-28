@@ -772,6 +772,18 @@ class ShotHistoryViewModel @Inject constructor(
     }
 
     /**
+     * Get the quality score for a specific shot.
+     * Used by UI to display quality trends in enhanced cards.
+     *
+     * @param shot The shot to calculate quality for
+     * @return Quality score (0-100)
+     */
+    fun getShotQualityScore(shot: Shot): Int {
+        val allShots = _uiState.value.shots
+        return getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, allShots)
+    }
+
+    /**
      * Check if this is the first perfect shot with this bean.
      */
     private fun isFirstPerfectForBean(shot: Shot, allShots: List<Shot>): Boolean {
