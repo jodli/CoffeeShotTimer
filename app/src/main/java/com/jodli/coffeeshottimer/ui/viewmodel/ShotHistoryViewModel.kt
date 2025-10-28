@@ -353,6 +353,9 @@ class ShotHistoryViewModel @Inject constructor(
                 }
                 val grinderAnalysis = grinderAnalysisResult.getOrNull()
 
+                // Load aggregate quality analysis (Epic 5)
+                loadAggregateQualityAnalysis()
+
                 _uiState.value = _uiState.value.copy(
                     analysisLoading = false,
                     overallStatistics = overallStats,
@@ -374,6 +377,26 @@ class ShotHistoryViewModel @Inject constructor(
         if (_uiState.value.showAnalysis) {
             loadAnalysisData()
         }
+    }
+
+    /**
+     * Load aggregate quality analysis for the current shots.
+     * Calculates quality metrics, trends, and distribution for visual dashboard.
+     */
+    private suspend fun loadAggregateQualityAnalysis() {
+        val shots = _uiState.value.shots
+        if (shots.isEmpty()) {
+            _uiState.value = _uiState.value.copy(aggregateQualityAnalysis = null)
+            return
+        }
+
+        // Use current shots as context for quality calculation
+        val aggregateAnalysis = getShotQualityAnalysisUseCase.calculateAggregateQualityAnalysis(
+            shots = shots,
+            allShots = shots
+        )
+
+        _uiState.value = _uiState.value.copy(aggregateQualityAnalysis = aggregateAnalysis)
     }
 
     fun loadMore() {
@@ -462,7 +485,8 @@ class ShotHistoryViewModel @Inject constructor(
                 shotTrends = null,
                 brewRatioAnalysis = null,
                 extractionTimeAnalysis = null,
-                grinderSettingAnalysis = null
+                grinderSettingAnalysis = null,
+                aggregateQualityAnalysis = null
             )
         }
 
@@ -864,7 +888,9 @@ data class ShotHistoryUiState(
     val isLoadingMore: Boolean = false,
     val hasMorePages: Boolean = true,
     // Coaching insights
-    val coachingInsights: CoachingInsights? = null
+    val coachingInsights: CoachingInsights? = null,
+    // Aggregate quality analysis (Epic 5)
+    val aggregateQualityAnalysis: com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis? = null
 ) {
     val isEmpty: Boolean
         get() = shots.isEmpty() && !isLoading

@@ -20,6 +20,7 @@
     <ID>ExplicitGarbageCollectionCall:MemoryOptimizer.kt$MemoryOptimizer$gc()</ID>
     <ID>FunctionParameterNaming:TimerComponents.kt$timer_seconds_suffix: String = "s"</ID>
     <ID>LargeClass:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
+    <ID>LargeClass:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest</ID>
     <ID>LargeClass:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>LongMethod:AboutScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AboutScreen( onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier, debugViewModel: DebugViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:AddEditBeanScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AddEditBeanScreen( beanId: String? = null, onNavigateBack: () -&gt; Unit = {}, viewModel: AddEditBeanViewModel = hiltViewModel(), isOnboardingMode: Boolean = false, onSubmit: ((com.jodli.coffeeshottimer.data.model.Bean) -&gt; Unit)? = null )</ID>
@@ -124,7 +125,6 @@
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$0.3</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$0.5</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$1.5</ID>
-    <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$100</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$25</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$3.0</ID>
     <ID>MagicNumber:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$5</ID>
