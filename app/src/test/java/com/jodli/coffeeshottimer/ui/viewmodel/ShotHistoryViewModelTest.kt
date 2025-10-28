@@ -455,4 +455,301 @@ class ShotHistoryViewModelTest {
         // Then - should be empty
         assertTrue(uiStateNotLoading.isEmpty)
     }
+
+    // Epic 5 Phase 2: Aggregate Quality Analysis Tests
+
+    @Test
+    fun `loadAggregateQualityAnalysis_withShots_updatesState`() = runTest {
+        // Given - shots are present
+        val testShots = listOf(
+            com.jodli.coffeeshottimer.data.model.Shot(
+                id = "shot1",
+                beanId = "bean1",
+                coffeeWeightIn = 18.0,
+                coffeeWeightOut = 36.0,
+                extractionTimeSeconds = 28,
+                timestamp = LocalDateTime.now(),
+                grinderSetting = "15",
+                tastePrimary = com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT
+            )
+        )
+
+        val mockAggregateAnalysis = com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis(
+            totalShots = 1,
+            overallQualityScore = 85,
+            qualityTier = com.jodli.coffeeshottimer.domain.usecase.QualityTier.EXCELLENT,
+            excellentCount = 1,
+            goodCount = 0,
+            needsWorkCount = 0,
+            trendDirection = com.jodli.coffeeshottimer.domain.usecase.TrendDirection.STABLE,
+            recentAverage = 85,
+            overallAverage = 85,
+            improvementRate = 0.0,
+            consistencyScore = 100
+        )
+
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(testShots, 1, 0, 20, false, true)
+        )
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(testShots))
+        every {
+            getShotQualityAnalysisUseCase.calculateAggregateQualityAnalysis(testShots, testShots)
+        } returns mockAggregateAnalysis
+
+        // When - load shots first, then toggle analysis view
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        viewModel.toggleAnalysisView()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Then - aggregate quality analysis should be present
+        val uiState = viewModel.uiState.value
+        assertNotNull("Aggregate quality analysis should be present", uiState.aggregateQualityAnalysis)
+        assertEquals(mockAggregateAnalysis, uiState.aggregateQualityAnalysis)
+        assertEquals(1, uiState.aggregateQualityAnalysis?.totalShots)
+        assertEquals(85, uiState.aggregateQualityAnalysis?.overallQualityScore)
+    }
+
+    @Test
+    fun `loadAggregateQualityAnalysis_noShots_setsNull`() = runTest {
+        // Given - no shots present
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(emptyList(), 0, 0, 20, false, false)
+        )
+
+        // When - toggle analysis view
+        viewModel.toggleAnalysisView()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Then - aggregate quality analysis should be null
+        val uiState = viewModel.uiState.value
+        assertNull(uiState.aggregateQualityAnalysis)
+    }
+
+    @Test
+    fun `loadAnalysisData_includesAggregateQuality`() = runTest {
+        // Given - shots with quality analysis
+        val testShots = listOf(
+            com.jodli.coffeeshottimer.data.model.Shot(
+                id = "shot1",
+                beanId = "bean1",
+                coffeeWeightIn = 18.0,
+                coffeeWeightOut = 36.0,
+                extractionTimeSeconds = 28,
+                timestamp = LocalDateTime.now(),
+                grinderSetting = "15",
+                tastePrimary = null
+            ),
+            com.jodli.coffeeshottimer.data.model.Shot(
+                id = "shot2",
+                beanId = "bean1",
+                coffeeWeightIn = 18.0,
+                coffeeWeightOut = 38.0,
+                extractionTimeSeconds = 26,
+                timestamp = LocalDateTime.now().minusHours(1),
+                grinderSetting = "15",
+                tastePrimary = com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT
+            )
+        )
+
+        val mockAggregateAnalysis = com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis(
+            totalShots = 2,
+            overallQualityScore = 75,
+            qualityTier = com.jodli.coffeeshottimer.domain.usecase.QualityTier.GOOD,
+            excellentCount = 0,
+            goodCount = 2,
+            needsWorkCount = 0,
+            trendDirection = com.jodli.coffeeshottimer.domain.usecase.TrendDirection.IMPROVING,
+            recentAverage = 75,
+            overallAverage = 72,
+            improvementRate = 4.2,
+            consistencyScore = 88
+        )
+
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(testShots, 2, 0, 20, false, true)
+        )
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(testShots))
+        every {
+            getShotQualityAnalysisUseCase.calculateAggregateQualityAnalysis(testShots, testShots)
+        } returns mockAggregateAnalysis
+
+        // When - load shots then toggle analysis view
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        viewModel.toggleAnalysisView()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Then - should include aggregate quality in state
+        val uiState = viewModel.uiState.value
+        assertTrue(uiState.showAnalysis)
+        assertNotNull(uiState.aggregateQualityAnalysis)
+        assertEquals(2, uiState.aggregateQualityAnalysis?.totalShots)
+        assertEquals(
+            com.jodli.coffeeshottimer.domain.usecase.TrendDirection.IMPROVING,
+            uiState.aggregateQualityAnalysis?.trendDirection
+        )
+    }
+
+    @Test
+    fun `toggleAnalysisView_preservesAggregateQuality`() = runTest {
+        // Given - analysis view with quality data loaded
+        val testShots = listOf(
+            com.jodli.coffeeshottimer.data.model.Shot(
+                id = "shot1",
+                beanId = "bean1",
+                coffeeWeightIn = 18.0,
+                coffeeWeightOut = 36.0,
+                extractionTimeSeconds = 28,
+                timestamp = LocalDateTime.now(),
+                grinderSetting = "15",
+                tastePrimary = com.jodli.coffeeshottimer.domain.model.TastePrimary.PERFECT
+            )
+        )
+
+        val mockAggregateAnalysis = com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis(
+            totalShots = 1,
+            overallQualityScore = 90,
+            qualityTier = com.jodli.coffeeshottimer.domain.usecase.QualityTier.EXCELLENT,
+            excellentCount = 1,
+            goodCount = 0,
+            needsWorkCount = 0,
+            trendDirection = com.jodli.coffeeshottimer.domain.usecase.TrendDirection.STABLE,
+            recentAverage = 90,
+            overallAverage = 90,
+            improvementRate = 0.0,
+            consistencyScore = 100
+        )
+
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(testShots, 1, 0, 20, false, true)
+        )
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(testShots))
+        every {
+            getShotQualityAnalysisUseCase.calculateAggregateQualityAnalysis(testShots, testShots)
+        } returns mockAggregateAnalysis
+
+        // Load shots first
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Load analysis data first time
+        viewModel.toggleAnalysisView()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        val firstLoadState = viewModel.uiState.value
+        assertNotNull(firstLoadState.aggregateQualityAnalysis)
+        assertEquals(90, firstLoadState.aggregateQualityAnalysis?.overallQualityScore)
+
+        // When - toggle away and back
+        viewModel.toggleAnalysisView() // Hide
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        viewModel.toggleAnalysisView() // Show again
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Then - aggregate quality should still be present (cached)
+        val finalState = viewModel.uiState.value
+        assertTrue(finalState.showAnalysis)
+        assertNotNull(finalState.aggregateQualityAnalysis)
+    }
+
+    @Test
+    fun `applyFilter_refreshesAggregateQuality_whenAnalysisShown`() = runTest {
+        // Given - analysis view is shown
+        val initialShots = listOf(
+            com.jodli.coffeeshottimer.data.model.Shot(
+                id = "shot1",
+                beanId = "bean1",
+                coffeeWeightIn = 18.0,
+                coffeeWeightOut = 36.0,
+                extractionTimeSeconds = 28,
+                timestamp = LocalDateTime.now(),
+                grinderSetting = "15",
+                tastePrimary = null
+            ),
+            com.jodli.coffeeshottimer.data.model.Shot(
+                id = "shot2",
+                beanId = "bean2",
+                coffeeWeightIn = 18.0,
+                coffeeWeightOut = 40.0,
+                extractionTimeSeconds = 30,
+                timestamp = LocalDateTime.now().minusHours(1),
+                grinderSetting = "16",
+                tastePrimary = null
+            )
+        )
+
+        val filteredShots = listOf(initialShots[0]) // Only bean1
+
+        coEvery { getShotHistoryUseCase.getShotsPaginated(any()) } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(initialShots, 2, 0, 20, false, true)
+        )
+        coEvery {
+            getShotHistoryUseCase.getFilteredShotsPaginated("bean1", any(), any(), any())
+        } returns Result.success(
+            com.jodli.coffeeshottimer.data.model.PaginatedResult(filteredShots, 1, 0, 20, false, true)
+        )
+
+        val mockInitialAnalysis = com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis(
+            totalShots = 2,
+            overallQualityScore = 70,
+            qualityTier = com.jodli.coffeeshottimer.domain.usecase.QualityTier.GOOD,
+            excellentCount = 0,
+            goodCount = 2,
+            needsWorkCount = 0,
+            trendDirection = com.jodli.coffeeshottimer.domain.usecase.TrendDirection.STABLE,
+            recentAverage = 70,
+            overallAverage = 70,
+            improvementRate = 0.0,
+            consistencyScore = 85
+        )
+
+        val mockFilteredAnalysis = com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis(
+            totalShots = 1,
+            overallQualityScore = 80,
+            qualityTier = com.jodli.coffeeshottimer.domain.usecase.QualityTier.GOOD,
+            excellentCount = 0,
+            goodCount = 1,
+            needsWorkCount = 0,
+            trendDirection = com.jodli.coffeeshottimer.domain.usecase.TrendDirection.STABLE,
+            recentAverage = 80,
+            overallAverage = 80,
+            improvementRate = 0.0,
+            consistencyScore = 100
+        )
+
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(Result.success(initialShots))
+        every {
+            getShotQualityAnalysisUseCase.calculateAggregateQualityAnalysis(initialShots, initialShots)
+        } returns mockInitialAnalysis
+        every {
+            getShotQualityAnalysisUseCase.calculateAggregateQualityAnalysis(filteredShots, filteredShots)
+        } returns mockFilteredAnalysis
+
+        // Load shots first
+        viewModel.refreshData()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Show analysis first
+        viewModel.toggleAnalysisView()
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        assertEquals(2, viewModel.uiState.value.aggregateQualityAnalysis?.totalShots)
+
+        // When - apply bean filter
+        val testFilter = ShotHistoryFilter(beanId = "bean1")
+        every { getShotHistoryUseCase.getFilteredShots(testFilter) } returns
+            flowOf(Result.success(filteredShots))
+        viewModel.applyFilter(testFilter)
+        testDispatcher.scheduler.advanceTimeBy(500)
+
+        // Then - aggregate quality should be updated for filtered shots
+        val finalState = viewModel.uiState.value
+        assertNotNull(finalState.aggregateQualityAnalysis)
+        assertEquals(1, finalState.aggregateQualityAnalysis?.totalShots)
+        assertEquals(80, finalState.aggregateQualityAnalysis?.overallQualityScore)
+    }
 }
