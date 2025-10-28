@@ -22,6 +22,14 @@ import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
+private const val PREVIEW_SAMPLE_TOTAL_SHOTS = 50
+private const val PREVIEW_SAMPLE_MIN_TIME = 22
+private const val PREVIEW_SAMPLE_MAX_TIME = 35
+private const val PREVIEW_DIST_20_25 = 6
+private const val PREVIEW_DIST_25_30 = 36
+private const val PREVIEW_DIST_30_35 = 7
+private const val PREVIEW_DIST_35_PLUS = 1
+
 /**
  * Enhanced extraction quality card with visual zone indicator.
  *
@@ -200,19 +208,19 @@ private fun MetricRow(
 private fun EnhancedExtractionQualityCardPreview() {
     CoffeeShotTimerTheme {
         val sampleAnalysis = ExtractionTimeAnalysis(
-            totalShots = 50,
+            totalShots = PREVIEW_SAMPLE_TOTAL_SHOTS,
             avgTime = 27.3,
-            minTime = 22,
-            maxTime = 35,
+            minTime = PREVIEW_SAMPLE_MIN_TIME,
+            maxTime = PREVIEW_SAMPLE_MAX_TIME,
             medianTime = 27.0,
             optimalTimePercentage = 73.0,
             tooFastPercentage = 12.0,
             tooSlowPercentage = 15.0,
             distribution = mapOf(
-                "20-25s" to 6,
-                "25-30s" to 36,
-                "30-35s" to 7,
-                "35s+" to 1
+                "20-25s" to PREVIEW_DIST_20_25,
+                "25-30s" to PREVIEW_DIST_25_30,
+                "30-35s" to PREVIEW_DIST_30_35,
+                "35s+" to PREVIEW_DIST_35_PLUS
             )
         )
 

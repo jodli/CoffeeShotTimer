@@ -29,9 +29,18 @@ import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
-import java.time.LocalDate
 import java.time.LocalDateTime
 import kotlin.math.abs
+
+private const val MIN_SHOTS_FOR_TRENDS = 5
+private const val RATIO_STABLE_THRESHOLD = 0.1
+private const val TIME_STABLE_THRESHOLD = 2.0
+private const val COLOR_GREEN = 0xFF4CAF50
+private const val COLOR_ORANGE = 0xFF9800
+private const val COLOR_RED = 0xFF5722
+private const val PREVIEW_SHOT_COUNT = 10
+private const val PREVIEW_BASE_SCORE = 65
+private const val PREVIEW_SCORE_INCREMENT = 3
 
 /**
  * Enhanced trends card with line graph and expandable details.
@@ -70,13 +79,13 @@ fun EnhancedShotTrendsCard(
                 color = MaterialTheme.colorScheme.onSurface
             )
 
-            if (trends == null || trends.totalShots < 5) {
+            if (trends == null || trends.totalShots < MIN_SHOTS_FOR_TRENDS) {
                 // Minimum data message
                 Text(
                     text = if (trends == null || trends.totalShots == 0) {
-                        "Record 5 shots to see trends"
+                        "Record $MIN_SHOTS_FOR_TRENDS shots to see trends"
                     } else {
-                        "Record ${5 - trends.totalShots} more shots for trend analysis"
+                        "Record ${MIN_SHOTS_FOR_TRENDS - trends.totalShots} more shots for trend analysis"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -156,26 +165,26 @@ fun EnhancedShotTrendsCard(
 private fun getTrendIndicator(trends: ShotTrends): Triple<ImageVector, String, androidx.compose.ui.graphics.Color> {
     val ratioChange = trends.brewRatioTrend
     val timeChange = trends.extractionTimeTrend
-    
+
     return if (trends.isImproving) {
         val changePoints = abs(ratioChange + timeChange).toInt()
         Triple(
             Icons.Default.TrendingUp,
             "Improving - up $changePoints points",
-            androidx.compose.ui.graphics.Color(0xFF4CAF50) // Green
+            androidx.compose.ui.graphics.Color(COLOR_GREEN)
         )
-    } else if (abs(ratioChange) < 0.1 && abs(timeChange) < 2.0) {
+    } else if (abs(ratioChange) < RATIO_STABLE_THRESHOLD && abs(timeChange) < TIME_STABLE_THRESHOLD) {
         Triple(
             Icons.Default.TrendingFlat,
             "Stable - consistent performance",
-            androidx.compose.ui.graphics.Color(0xFFFF9800) // Orange
+            androidx.compose.ui.graphics.Color(COLOR_ORANGE)
         )
     } else {
         val changePoints = abs(ratioChange + timeChange).toInt()
         Triple(
             Icons.Default.TrendingDown,
             "Declining - down $changePoints points",
-            androidx.compose.ui.graphics.Color(0xFFFF5722) // Red
+            androidx.compose.ui.graphics.Color(COLOR_RED)
         )
     }
 }
@@ -224,10 +233,10 @@ private fun EnhancedShotTrendsCardPreview() {
             isImproving = true
         )
 
-        val sampleScores = (0..9).map { index ->
+        val sampleScores = (0 until PREVIEW_SHOT_COUNT).map { index ->
             Pair(
-                LocalDateTime.now().minusDays((9 - index).toLong()),
-                65 + index * 3
+                LocalDateTime.now().minusDays((PREVIEW_SHOT_COUNT - 1 - index).toLong()),
+                PREVIEW_BASE_SCORE + index * PREVIEW_SCORE_INCREMENT
             )
         }
 

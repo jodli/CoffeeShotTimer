@@ -70,8 +70,8 @@ fun QualityScoreGaugeCard(
                 // Distribution chips text
                 Text(
                     text = "${analysis.excellentCount} excellent • " +
-                            "${analysis.goodCount} good • " +
-                            "${analysis.needsWorkCount} needs work",
+                        "${analysis.goodCount} good • " +
+                        "${analysis.needsWorkCount} needs work",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center

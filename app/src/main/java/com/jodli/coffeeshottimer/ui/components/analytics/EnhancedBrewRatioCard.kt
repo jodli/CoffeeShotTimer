@@ -14,7 +14,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -29,6 +28,17 @@ import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+
+private const val CANVAS_HORIZONTAL_MARGIN = 0.2f
+private const val CANVAS_HORIZONTAL_RANGE = 0.6f
+private const val TEXT_OFFSET = 8f
+private const val PREVIEW_SAMPLE_TOTAL_SHOTS = 50
+private const val PREVIEW_SAMPLE_MIN_RATIO = 1.8
+private const val PREVIEW_SAMPLE_MAX_RATIO = 2.8
+private const val PREVIEW_DIST_1_5_2_0 = 12
+private const val PREVIEW_DIST_2_0_2_5 = 28
+private const val PREVIEW_DIST_2_5_3_0 = 8
+private const val PREVIEW_DIST_3_0_PLUS = 2
 
 /**
  * Enhanced brew ratio card with visual range indicator.
@@ -182,7 +192,7 @@ private fun BrewRatioRangeIndicator(
         val normalizedAvg = ((avgRatio - minRatio) / (maxRatio - minRatio))
             .coerceIn(0.0, 1.0)
             .toFloat()
-        val avgX = canvasWidth * 0.2f + (canvasWidth * 0.6f * normalizedAvg)
+        val avgX = canvasWidth * CANVAS_HORIZONTAL_MARGIN + (canvasWidth * CANVAS_HORIZONTAL_RANGE * normalizedAvg)
 
         // Draw left arrow and text
         val minText = String.format("%.1f", minRatio)
@@ -223,13 +233,13 @@ private fun BrewRatioRangeIndicator(
 
         // Draw arrows pointing to average
         val arrowY = centerY
-        val arrowLeftEnd = avgX - avgTextLayout.size.width / 2f - 8f
-        val arrowRightStart = avgX + avgTextLayout.size.width / 2f + 8f
+        val arrowLeftEnd = avgX - avgTextLayout.size.width / 2f - TEXT_OFFSET
+        val arrowRightStart = avgX + avgTextLayout.size.width / 2f + TEXT_OFFSET
 
         // Left arrow
         drawLine(
             color = Color.Gray,
-            start = Offset(minTextLayout.size.width + 8f, arrowY),
+            start = Offset(minTextLayout.size.width + TEXT_OFFSET, arrowY),
             end = Offset(arrowLeftEnd, arrowY),
             strokeWidth = 2f
         )
@@ -238,7 +248,7 @@ private fun BrewRatioRangeIndicator(
         drawLine(
             color = Color.Gray,
             start = Offset(arrowRightStart, arrowY),
-            end = Offset(canvasWidth - maxTextLayout.size.width - 8f, arrowY),
+            end = Offset(canvasWidth - maxTextLayout.size.width - TEXT_OFFSET, arrowY),
             strokeWidth = 2f
         )
     }
@@ -302,19 +312,19 @@ private fun MetricRow(
 private fun EnhancedBrewRatioCardPreview() {
     CoffeeShotTimerTheme {
         val sampleAnalysis = BrewRatioAnalysis(
-            totalShots = 50,
+            totalShots = PREVIEW_SAMPLE_TOTAL_SHOTS,
             avgRatio = 2.15,
-            minRatio = 1.8,
-            maxRatio = 2.8,
+            minRatio = PREVIEW_SAMPLE_MIN_RATIO,
+            maxRatio = PREVIEW_SAMPLE_MAX_RATIO,
             medianRatio = 2.1,
             typicalRatioPercentage = 85.0,
             underExtractedPercentage = 8.0,
             overExtractedPercentage = 7.0,
             distribution = mapOf(
-                "1.5-2.0" to 12,
-                "2.0-2.5" to 28,
-                "2.5-3.0" to 8,
-                "3.0+" to 2
+                "1.5-2.0" to PREVIEW_DIST_1_5_2_0,
+                "2.0-2.5" to PREVIEW_DIST_2_0_2_5,
+                "2.5-3.0" to PREVIEW_DIST_2_5_3_0,
+                "3.0+" to PREVIEW_DIST_3_0_PLUS
             )
         )
 
