@@ -65,7 +65,7 @@ fun QualityScoreGaugeCard(
                     modifier = Modifier
                 )
 
-                Spacer(modifier = Modifier.height(spacing.medium))
+                Spacer(modifier = Modifier.height(spacing.small))
 
                 // Distribution chips text
                 Text(

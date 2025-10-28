@@ -66,74 +66,66 @@ fun QualityScoreGauge(
     ) {
         val gaugeSize = size ?: minOf(maxWidth.value, maxHeight.value).dp.coerceIn(200.dp, 300.dp)
 
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
+        // Circular gauge canvas
+        Canvas(
             modifier = Modifier.size(gaugeSize)
         ) {
-            // Circular gauge canvas
-            Canvas(
-                modifier = Modifier
-                    .size(gaugeSize)
-                    .weight(1f)
-            ) {
-                val canvasWidth = this.size.width
-                val canvasHeight = this.size.height
-                val diameter = min(canvasWidth, canvasHeight)
-                val strokeWidth = diameter * 0.12f // 12% of diameter
-                val radius = (diameter - strokeWidth) / 2f
-                val center = Offset(canvasWidth / 2f, canvasHeight / 2f)
+            val canvasWidth = this.size.width
+            val canvasHeight = this.size.height
+            val diameter = min(canvasWidth, canvasHeight)
+            val strokeWidth = diameter * 0.12f // 12% of diameter
+            val radius = (diameter - strokeWidth) / 2f
+            val center = Offset(canvasWidth / 2f, canvasHeight / 2f)
 
-                val arcSize = Size(radius * 2f, radius * 2f)
-                val arcTopLeft = Offset(center.x - radius, center.y - radius)
+            val arcSize = Size(radius * 2f, radius * 2f)
+            val arcTopLeft = Offset(center.x - radius, center.y - radius)
 
-                // Background arc (light gray)
-                drawArc(
-                    color = Color.LightGray.copy(alpha = 0.2f),
-                    startAngle = 135f,
-                    sweepAngle = 270f,
-                    useCenter = false,
-                    topLeft = arcTopLeft,
-                    size = arcSize,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                )
+            // Background arc (light gray)
+            drawArc(
+                color = Color.LightGray.copy(alpha = 0.2f),
+                startAngle = 135f,
+                sweepAngle = 270f,
+                useCenter = false,
+                topLeft = arcTopLeft,
+                size = arcSize,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
 
-                // Colored arc based on score
-                val sweepAngle = (animatedScore / 100f) * 270f
-                val arcColor = when {
-                    score >= 85 -> ExtractionOptimal // Green
-                    score >= 60 -> ExtractionTooFast // Orange
-                    else -> ExtractionTooSlow // Red
-                }
-
-                drawArc(
-                    color = arcColor,
-                    startAngle = 135f,
-                    sweepAngle = sweepAngle,
-                    useCenter = false,
-                    topLeft = arcTopLeft,
-                    size = arcSize,
-                    style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                )
+            // Colored arc based on score
+            val sweepAngle = (animatedScore / 100f) * 270f
+            val arcColor = when {
+                score >= 85 -> ExtractionOptimal // Green
+                score >= 60 -> ExtractionTooFast // Orange
+                else -> ExtractionTooSlow // Red
             }
 
-            // Center content with score and tier
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(
-                    text = score.toString(),
-                    fontSize = 48.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+            drawArc(
+                color = arcColor,
+                startAngle = 135f,
+                sweepAngle = sweepAngle,
+                useCenter = false,
+                topLeft = arcTopLeft,
+                size = arcSize,
+                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+            )
+        }
 
-                Text(
-                    text = tier,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+        // Center content with score and tier, overlaid on the gauge
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = score.toString(),
+                fontSize = 48.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Text(
+                text = tier,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
