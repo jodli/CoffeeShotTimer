@@ -85,6 +85,7 @@ fun SimplifiedMetricCard(
     }
 }
 
+@Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
 private fun SimplifiedMetricCardPreview() {
