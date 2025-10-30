@@ -144,6 +144,61 @@
     <string name="text_active_filters">Aktive Filter</string>
     <string name="format_more_filters">+%1$d weitere</string>
     <string name="text_no_analysis_data">Keine Analysedaten verfügbar</string>
+    <string name="text_overall_quality">Gesamtqualität</string>
+
+    <!-- Analytics Dashboard -->
+    <!-- Quality Score -->
+    <string name="analytics_quality_score_empty">Nimm deinen ersten Shot auf, um die Qualitätsbewertung zu sehen</string>
+    <string name="analytics_quality_tier_excellent">Ausgezeichnet</string>
+    <string name="analytics_quality_tier_good">Gut</string>
+    <string name="analytics_quality_tier_needs_work">Verbesserungsbedarf</string>
+    <string name="analytics_distribution_format">%1$d ausgezeichnet • %2$d gut • %3$d verbesserungsbedürftig</string>
+
+    <!-- Trends -->
+    <string name="analytics_trends_title">Aktuelle Trends</string>
+    <string name="analytics_trend_improving">Verbessernd</string>
+    <string name="analytics_trend_stable">Stabil</string>
+    <string name="analytics_trend_declining">Abnehmend</string>
+    <string name="analytics_trend_improving_format">Verbessernd - um %1$d Punkte gestiegen</string>
+    <string name="analytics_trend_stable_text">Stabil - gleichbleibende Leistung</string>
+    <string name="analytics_trend_declining_format">Abnehmend - um %1$d Punkte gefallen</string>
+    <string name="analytics_trend_insufficient_data">Nimm %1$d Shots auf, um Trends zu sehen</string>
+    <string name="analytics_trend_min_shots_format">Nimm %1$d weitere Shots für Trend-Analyse auf</string>
+    <string name="analytics_raw_metrics">Rohdaten</string>
+    <string name="analytics_label_days_analyzed">Analysierte Tage</string>
+
+    <!-- Extraction Quality -->
+    <string name="analytics_extraction_title">Extraktionsqualität</string>
+    <string name="analytics_extraction_min_shots">Nimm 3 Shots auf, um die Extraktions-Analyse zu sehen</string>
+    <string name="analytics_optimal_zone_format">%1$d%% im optimalen Bereich</string>
+    <string name="analytics_zone_too_fast">Zu schnell (&lt;25s)</string>
+    <string name="analytics_zone_optimal">Optimal (25-30s)</string>
+    <string name="analytics_zone_too_slow">Zu langsam (&gt;30s)</string>
+    <string name="analytics_extraction_details">Extraktions-Details</string>
+
+    <!-- Brew Ratio -->
+    <string name="analytics_ratio_title">Brühverhältnis</string>
+    <string name="analytics_ratio_min_shots">Nimm 3 Shots auf, um die Brühverhältnis-Analyse zu sehen</string>
+    <string name="analytics_typical_range_format">%1$d%% im typischen Bereich</string>
+    <string name="analytics_ratio_under_extracted">Unterextrahiert (&lt;1.5)</string>
+    <string name="analytics_ratio_typical">Typisch (1.5-3.0)</string>
+    <string name="analytics_ratio_over_extracted">Überextrahiert (&gt;3.0)</string>
+    <string name="analytics_ratio_details">Brühverhältnis-Details</string>
+
+    <!-- Common Analytics Labels -->
+    <string name="analytics_statistics">Statistiken</string>
+    <string name="analytics_label_average_time">Durchschnittszeit</string>
+    <string name="analytics_label_median_time">Medianzeit</string>
+    <string name="analytics_label_average_ratio">Durchschnittsverhältnis</string>
+    <string name="analytics_label_median_ratio">Medianverhältnis</string>
+    <string name="analytics_label_avg_brew_ratio">Ø Brühverhältnis</string>
+    <string name="analytics_label_avg_extraction_time">Ø Extraktionszeit</string>
+
+    <!-- Content Descriptions for Analytics -->
+    <string name="cd_quality_score_gauge">Qualitätsbewertung: %1$d von 100, %2$s</string>
+    <string name="cd_zone_indicator">%1$d%% der Shots im optimalen Extraktionsbereich</string>
+    <string name="cd_expand">Aufklappen</string>
+    <string name="cd_collapse">Zuklappen</string>
 
     <string name="text_dialog_ok">OK</string>
     <string name="text_dialog_cancel">Abbrechen</string>

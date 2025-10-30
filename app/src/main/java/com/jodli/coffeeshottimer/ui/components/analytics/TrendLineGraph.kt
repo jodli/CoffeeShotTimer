@@ -18,7 +18,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
@@ -92,6 +91,9 @@ fun TrendLineGraph(
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        val axisColor = MaterialTheme.colorScheme.outline
+        val lineColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+        val tooltipBgColor = MaterialTheme.colorScheme.surfaceVariant
 
         Canvas(
             modifier = modifier
@@ -140,7 +142,7 @@ fun TrendLineGraph(
 
             // Y-axis line
             drawLine(
-                color = Color.Gray.copy(alpha = 0.3f),
+                color = axisColor,
                 start = Offset(graphLeft, graphBottom),
                 end = Offset(graphLeft, graphBottom - graphHeight),
                 strokeWidth = 2f
@@ -148,7 +150,7 @@ fun TrendLineGraph(
 
             // X-axis line
             drawLine(
-                color = Color.Gray.copy(alpha = 0.3f),
+                color = axisColor,
                 start = Offset(graphLeft, graphBottom),
                 end = Offset(canvasWidth - 20f, graphBottom),
                 strokeWidth = 2f
@@ -179,7 +181,7 @@ fun TrendLineGraph(
 
                 drawCircle(
                     color = dotColor,
-                    radius = 6f,
+                    radius = 8f,
                     center = Offset(x, y)
                 )
 
@@ -187,7 +189,7 @@ fun TrendLineGraph(
                 if (selectedIndex == index) {
                     drawCircle(
                         color = dotColor,
-                        radius = 10f,
+                        radius = 14f,
                         center = Offset(x, y),
                         alpha = 0.3f
                     )
@@ -210,11 +212,10 @@ fun TrendLineGraph(
             }
 
             // Draw line path
-            val lineColor = androidx.compose.ui.graphics.Color(0xFFFF8C42).copy(alpha = 0.5f)
             drawPath(
                 path = path,
                 color = lineColor,
-                style = Stroke(width = 2f)
+                style = Stroke(width = 3f)
             )
 
             // Draw selected value tooltip
@@ -232,7 +233,6 @@ fun TrendLineGraph(
                 )
 
                 // Tooltip background
-                val tooltipBgColor = androidx.compose.ui.graphics.Color(0xFFF5EDE4)
                 drawRoundRect(
                     color = tooltipBgColor,
                     topLeft = Offset(

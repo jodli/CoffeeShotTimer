@@ -170,15 +170,17 @@ private fun ShotHistoryPortraitContent(
 
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        // Coaching insights card
-        uiState.coachingInsights?.let { insights ->
-            CoachingInsightsCard(
-                insights = insights,
-                isExpanded = coachingInsightsExpanded,
-                onToggleExpanded = onToggleCoachingInsights,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(spacing.medium))
+        // Coaching insights card (only in list view, not in analysis view)
+        if (!uiState.showAnalysis) {
+            uiState.coachingInsights?.let { insights ->
+                CoachingInsightsCard(
+                    insights = insights,
+                    isExpanded = coachingInsightsExpanded,
+                    onToggleExpanded = onToggleCoachingInsights,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(spacing.medium))
+            }
         }
 
         // Active filters display
@@ -242,15 +244,17 @@ private fun ShotHistoryLandscapeContent(
 
         Spacer(modifier = Modifier.height(landscapeSpacing))
 
-        // Coaching insights card
-        uiState.coachingInsights?.let { insights ->
-            CoachingInsightsCard(
-                insights = insights,
-                isExpanded = coachingInsightsExpanded,
-                onToggleExpanded = onToggleCoachingInsights,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(landscapeSpacing))
+        // Coaching insights card (only in list view, not in analysis view)
+        if (!uiState.showAnalysis) {
+            uiState.coachingInsights?.let { insights ->
+                CoachingInsightsCard(
+                    insights = insights,
+                    isExpanded = coachingInsightsExpanded,
+                    onToggleExpanded = onToggleCoachingInsights,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(landscapeSpacing))
+            }
         }
 
         // Active filters display

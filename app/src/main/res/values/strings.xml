@@ -155,6 +155,7 @@
 
     <!-- Analysis and Statistics -->
     <string name="text_overall_statistics">Overall Statistics</string>
+    <string name="text_overall_quality">Overall Quality</string>
     <string name="text_extraction_time_analysis">Extraction Time Analysis</string>
     <string name="text_brew_ratio_analysis">Brew Ratio Analysis</string>
     <string name="text_grinder_setting_analysis">Grinder Setting Analysis</string>
@@ -164,6 +165,60 @@
     <string name="text_active_filters">Active Filters</string>
     <string name="format_more_filters">+%1$d more</string>
     <string name="text_no_analysis_data">No analysis data available</string>
+
+    <!-- Analytics Dashboard -->
+    <!-- Quality Score -->
+    <string name="analytics_quality_score_empty">Record your first shot to see quality score</string>
+    <string name="analytics_quality_tier_excellent">Excellent</string>
+    <string name="analytics_quality_tier_good">Good</string>
+    <string name="analytics_quality_tier_needs_work">Needs Work</string>
+    <string name="analytics_distribution_format">%1$d excellent • %2$d good • %3$d needs work</string>
+
+    <!-- Trends -->
+    <string name="analytics_trends_title">Recent Trends</string>
+    <string name="analytics_trend_improving">Improving</string>
+    <string name="analytics_trend_stable">Stable</string>
+    <string name="analytics_trend_declining">Declining</string>
+    <string name="analytics_trend_improving_format">Improving - up %1$d points</string>
+    <string name="analytics_trend_stable_text">Stable - consistent performance</string>
+    <string name="analytics_trend_declining_format">Declining - down %1$d points</string>
+    <string name="analytics_trend_insufficient_data">Record %1$d shots to see trends</string>
+    <string name="analytics_trend_min_shots_format">Record %1$d more shots for trend analysis</string>
+    <string name="analytics_raw_metrics">Raw Metrics</string>
+    <string name="analytics_label_days_analyzed">Days Analyzed</string>
+
+    <!-- Extraction Quality -->
+    <string name="analytics_extraction_title">Extraction Quality</string>
+    <string name="analytics_extraction_min_shots">Record 3 shots to see extraction analysis</string>
+    <string name="analytics_optimal_zone_format">%1$d%% in optimal zone</string>
+    <string name="analytics_zone_too_fast">Too Fast (&lt;25s)</string>
+    <string name="analytics_zone_optimal">Optimal (25-30s)</string>
+    <string name="analytics_zone_too_slow">Too Slow (&gt;30s)</string>
+    <string name="analytics_extraction_details">Extraction Details</string>
+
+    <!-- Brew Ratio -->
+    <string name="analytics_ratio_title">Brew Ratio</string>
+    <string name="analytics_ratio_min_shots">Record 3 shots to see brew ratio analysis</string>
+    <string name="analytics_typical_range_format">%1$d%% in typical range</string>
+    <string name="analytics_ratio_under_extracted">Under-extracted (&lt;1.5)</string>
+    <string name="analytics_ratio_typical">Typical (1.5-3.0)</string>
+    <string name="analytics_ratio_over_extracted">Over-extracted (&gt;3.0)</string>
+    <string name="analytics_ratio_details">Brew Ratio Details</string>
+
+    <!-- Common Analytics Labels -->
+    <string name="analytics_statistics">Statistics</string>
+    <string name="analytics_label_average_time">Average Time</string>
+    <string name="analytics_label_median_time">Median Time</string>
+    <string name="analytics_label_average_ratio">Average Ratio</string>
+    <string name="analytics_label_median_ratio">Median Ratio</string>
+    <string name="analytics_label_avg_brew_ratio">Avg Brew Ratio</string>
+    <string name="analytics_label_avg_extraction_time">Avg Extraction Time</string>
+
+    <!-- Content Descriptions for Analytics -->
+    <string name="cd_quality_score_gauge">Quality score: %1$d out of 100, %2$s</string>
+    <string name="cd_zone_indicator">%1$d%% of shots in optimal extraction zone</string>
+    <string name="cd_expand">Expand</string>
+    <string name="cd_collapse">Collapse</string>
 
     <string name="text_dialog_ok">OK</string>
     <string name="text_dialog_cancel">Cancel</string>
