@@ -232,6 +232,8 @@
     <string name="text_coffee_bean">Coffee Bean</string>
     <string name="text_all_beans">All beans</string>
     <string name="text_unknown_bean">Unknown bean</string>
+    <string name="text_filter_chip_bean">Bean</string>
+    <string name="text_filter_chip_dates">Dates</string>
     <string name="text_all">All</string>
     <string name="text_active">Active</string>
     <string name="text_date_range">Date Range</string>
@@ -327,6 +329,9 @@
     <string name="cd_filter_shots">Filter shots</string>
     <string name="cd_shot_list">Show shot list</string>
     <string name="cd_analysis">Show shot analysis</string>
+    <string name="text_filters">Filters</string>
+    <string name="text_view_list">List</string>
+    <string name="text_view_analysis">Analysis</string>
     <string name="cd_no_shots">No shots found</string>
     <string name="cd_no_shots_recorded">No shots yet – ready to brew?</string>
 
