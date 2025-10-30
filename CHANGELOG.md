@@ -8,6 +8,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Added
 
+- [*] Visual shot analysis dashboard with quality score gauge, performance trends chart, and statistics cards to track your brewing progress.
 - [*] Shot History now shows bean-specific coaching insights and celebrates achievements like your first perfect shot, dial-in milestones, and consistency streaks.
 
 ### Changed
