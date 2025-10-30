@@ -233,6 +233,8 @@
     <string name="text_coffee_bean">Kaffeebohne</string>
     <string name="text_all_beans">Alle Bohnen</string>
     <string name="text_unknown_bean">Unbekannte Bohne</string>
+    <string name="text_filter_chip_bean">Bohne</string>
+    <string name="text_filter_chip_dates">Daten</string>
     <string name="text_all">Alle</string>
     <string name="text_active">Aktiv</string>
     <string name="text_date_range">Datumsbereich</string>
@@ -327,6 +329,9 @@
     <string name="cd_filter_shots">Shots filtern</string>
     <string name="cd_shot_list">Shot-Liste anzeigen</string>
     <string name="cd_analysis">Shot-Analyse anzeigen</string>
+    <string name="text_filters">Filter</string>
+    <string name="text_view_list">Liste</string>
+    <string name="text_view_analysis">Analyse</string>
     <string name="cd_no_shots">Keine Shots gefunden</string>
     <string name="cd_no_shots_recorded">Noch keine Shots – bereit zu brühen?</string>
     <string name="cd_shot_recorded_success">Shot erfolgreich aufgenommen</string>

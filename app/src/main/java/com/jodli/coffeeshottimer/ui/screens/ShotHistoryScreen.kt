@@ -19,16 +19,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,11 +48,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
-import com.jodli.coffeeshottimer.ui.components.CardHeader
 import com.jodli.coffeeshottimer.ui.components.CoachingInsightsCard
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CompactTasteDisplay
@@ -160,12 +166,14 @@ private fun ShotHistoryPortraitContent(
             .fillMaxSize()
             .padding(spacing.screenPadding)
     ) {
-        // Action buttons only
-        ShotHistoryActionButtons(
+        // Integrated filter and view toggle bar
+        IntegratedFilterAndViewBar(
             currentFilter = currentFilter,
             showAnalysis = uiState.showAnalysis,
             onToggleAnalysisView = onToggleAnalysisView,
-            onShowFilterDialog = onShowFilterDialog
+            onShowFilterDialog = onShowFilterDialog,
+            onClearFilters = onClearFilters,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(spacing.medium))
@@ -181,17 +189,6 @@ private fun ShotHistoryPortraitContent(
                 )
                 Spacer(modifier = Modifier.height(spacing.medium))
             }
-        }
-
-        // Active filters display
-        if (currentFilter.hasFilters()) {
-            ActiveFiltersDisplay(
-                filter = currentFilter,
-                availableBeans = uiState.availableBeans,
-                onClearFilters = onClearFilters,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
 
         // Content
@@ -234,12 +231,14 @@ private fun ShotHistoryLandscapeContent(
             .fillMaxSize()
             .padding(landscapeSpacing)
     ) {
-        // Action buttons only
-        ShotHistoryActionButtons(
+        // Integrated filter and view toggle bar
+        IntegratedFilterAndViewBar(
             currentFilter = currentFilter,
             showAnalysis = uiState.showAnalysis,
             onToggleAnalysisView = onToggleAnalysisView,
-            onShowFilterDialog = onShowFilterDialog
+            onShowFilterDialog = onShowFilterDialog,
+            onClearFilters = onClearFilters,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(landscapeSpacing))
@@ -257,17 +256,6 @@ private fun ShotHistoryLandscapeContent(
             }
         }
 
-        // Active filters display
-        if (currentFilter.hasFilters()) {
-            ActiveFiltersDisplay(
-                filter = currentFilter,
-                availableBeans = uiState.availableBeans,
-                onClearFilters = onClearFilters,
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(landscapeSpacing))
-        }
-
         // Content with landscape-optimized shot items
         ShotHistoryLandscapeList(
             uiState = uiState,
@@ -282,55 +270,92 @@ private fun ShotHistoryLandscapeContent(
 }
 
 /**
- * Action buttons for analysis toggle and filtering
- * No redundant screen title since navigation bar provides context
+ * Integrated bar combining filters and view toggle (List/Analysis)
+ * Always visible for better discoverability
  */
 @Composable
-private fun ShotHistoryActionButtons(
+@OptIn(ExperimentalMaterial3Api::class)
+private fun IntegratedFilterAndViewBar(
     currentFilter: ShotHistoryFilter,
     showAnalysis: Boolean,
     onToggleAnalysisView: () -> Unit,
     onShowFilterDialog: () -> Unit,
+    onClearFilters: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val spacing = LocalSpacing.current
+
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Analysis toggle button
-        IconButton(
-            onClick = onToggleAnalysisView
-        ) {
-            Icon(
-                imageVector = if (showAnalysis) Icons.AutoMirrored.Filled.List else Icons.Default.Info,
-                contentDescription = if (showAnalysis) {
-                    stringResource(
-                        R.string.cd_shot_list
+        // Left: Filter chip with badge indicator
+        Box {
+            FilterChip(
+                selected = currentFilter.hasFilters(),
+                onClick = onShowFilterDialog,
+                label = { Text(stringResource(R.string.text_filters)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.FilterList,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
                     )
-                } else {
-                    stringResource(R.string.cd_analysis)
-                },
-                tint = if (showAnalysis) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
                 }
             )
+
+            // Active filter indicator badge
+            if (currentFilter.hasFilters()) {
+                Badge(
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Text(stringResource(R.string.badge_recommendation_alert))
+                }
+            }
         }
 
-        // Filter button
-        IconButton(
-            onClick = onShowFilterDialog
+        // Center: Segmented button for List/Analysis toggle
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.padding(horizontal = spacing.small)
         ) {
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = stringResource(R.string.cd_filter_shots),
-                tint = if (currentFilter.hasFilters()) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                }
-            )
+            SegmentedButton(
+                selected = !showAnalysis,
+                onClick = { if (showAnalysis) onToggleAnalysisView() },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+            ) {
+                Text(
+                    text = stringResource(R.string.text_view_list),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+            SegmentedButton(
+                selected = showAnalysis,
+                onClick = { if (!showAnalysis) onToggleAnalysisView() },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+            ) {
+                Text(
+                    text = stringResource(R.string.text_view_analysis),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+
+        // Right: Clear filters button (when active)
+        if (currentFilter.hasFilters()) {
+            IconButton(
+                onClick = onClearFilters,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(R.string.button_clear_all),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        } else {
+            // Spacer to maintain layout consistency
+            Spacer(modifier = Modifier.size(40.dp))
         }
     }
 }
@@ -632,210 +657,6 @@ private fun ShotHistoryLandscapeItem(
             }
         }
     }
-}
-
-@Composable
-private fun ActiveFiltersDisplay(
-    filter: ShotHistoryFilter,
-    availableBeans: List<com.jodli.coffeeshottimer.data.model.Bean>,
-    onClearFilters: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val isLandscape = LocalIsLandscape.current
-
-    if (isLandscape) {
-        // Compact landscape version - horizontal chip layout
-        ActiveFiltersLandscapeDisplay(
-            filter = filter,
-            availableBeans = availableBeans,
-            onClearFilters = onClearFilters,
-            modifier = modifier
-        )
-    } else {
-        // Full portrait version - vertical card layout
-        ActiveFiltersPortraitDisplay(
-            filter = filter,
-            availableBeans = availableBeans,
-            onClearFilters = onClearFilters,
-            modifier = modifier
-        )
-    }
-}
-
-@Composable
-private fun ActiveFiltersPortraitDisplay(
-    filter: ShotHistoryFilter,
-    availableBeans: List<com.jodli.coffeeshottimer.data.model.Bean>,
-    onClearFilters: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
-    ) {
-        CardHeader(
-            icon = Icons.Default.FilterList,
-            title = stringResource(R.string.text_active_filters),
-            actions = {
-                TextButton(onClick = onClearFilters) {
-                    Text(stringResource(R.string.button_clear_all))
-                }
-            }
-        )
-
-        Spacer(modifier = Modifier.height(spacing.small))
-
-        // Display active filters
-        val filterTexts = getActiveFilterTexts(filter, availableBeans)
-
-        filterTexts.forEach { text ->
-            Text(
-                text = stringResource(R.string.symbol_bullet, text),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
-    }
-}
-
-@Composable
-private fun ActiveFiltersLandscapeDisplay(
-    filter: ShotHistoryFilter,
-    availableBeans: List<com.jodli.coffeeshottimer.data.model.Bean>,
-    onClearFilters: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val filterTexts = getActiveFilterTexts(filter, availableBeans)
-
-    // Compact horizontal layout for landscape
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(spacing.cornerLarge),
-        color = MaterialTheme.colorScheme.primaryContainer
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacing.medium),
-            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Filter icon
-            Icon(
-                imageVector = Icons.Default.FilterList,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(spacing.iconSmall)
-            )
-
-            // Filter chips in horizontal flow
-            FlowRow(
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-            ) {
-                filterTexts.take(3).forEach { text -> // Limit to 3 filters to prevent overflow
-                    FilterChip(
-                        text = text,
-                        modifier = Modifier
-                    )
-                }
-
-                if (filterTexts.size > 3) {
-                    FilterChip(
-                        text = stringResource(R.string.format_more_filters, filterTexts.size - 3),
-                        modifier = Modifier
-                    )
-                }
-            }
-
-            // Clear button
-            TextButton(
-                onClick = onClearFilters,
-                contentPadding = PaddingValues(horizontal = spacing.small, vertical = spacing.extraSmall)
-            ) {
-                Text(
-                    text = stringResource(R.string.button_clear_all),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun FilterChip(
-    text: String,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(spacing.cornerMedium),
-        color = MaterialTheme.colorScheme.primary
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.padding(horizontal = spacing.small, vertical = spacing.extraSmall / 2),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
-
-private fun getActiveFilterTexts(
-    filter: ShotHistoryFilter,
-    availableBeans: List<com.jodli.coffeeshottimer.data.model.Bean>
-): List<String> {
-    val filterTexts = mutableListOf<String>()
-
-    filter.beanId?.let { beanId ->
-        val beanName = availableBeans.find { it.id == beanId }?.name ?: "Unknown Bean"
-        filterTexts.add("Bean: $beanName")
-    }
-
-    if (filter.startDate != null || filter.endDate != null) {
-        val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
-        val startText = filter.startDate?.format(dateFormatter) ?: "Start"
-        val endText = filter.endDate?.format(dateFormatter) ?: "End"
-        filterTexts.add("$startText - $endText")
-    }
-
-    filter.grinderSetting?.let { setting ->
-        filterTexts.add("Grinder: $setting")
-    }
-
-    if (filter.minBrewRatio != null || filter.maxBrewRatio != null) {
-        val min = filter.minBrewRatio?.let { "%.1f".format(it) } ?: "0"
-        val max = filter.maxBrewRatio?.let { "%.1f".format(it) } ?: "∞"
-        filterTexts.add("Ratio: $min-$max")
-    }
-
-    if (filter.minExtractionTime != null || filter.maxExtractionTime != null) {
-        val min = filter.minExtractionTime ?: 0
-        val max = filter.maxExtractionTime ?: 999
-        filterTexts.add("Time: ${min}s-${max}s")
-    }
-
-    if (filter.onlyOptimalExtractionTime == true) {
-        filterTexts.add("Optimal Time")
-    }
-
-    if (filter.onlyTypicalBrewRatio == true) {
-        filterTexts.add("Typical Ratio")
-    }
-
-    return filterTexts
 }
 
 @Composable
