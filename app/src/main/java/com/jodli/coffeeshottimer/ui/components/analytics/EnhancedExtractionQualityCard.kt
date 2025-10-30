@@ -14,9 +14,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.usecase.ExtractionTimeAnalysis
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
@@ -57,7 +59,7 @@ fun EnhancedExtractionQualityCard(
         ) {
             // Header
             Text(
-                text = "Extraction Quality",
+                text = stringResource(R.string.analytics_extraction_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -66,7 +68,7 @@ fun EnhancedExtractionQualityCard(
             if (analysis == null || analysis.totalShots == 0) {
                 // Empty state
                 Text(
-                    text = "Record 3 shots to see extraction analysis",
+                    text = stringResource(R.string.analytics_extraction_min_shots),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -81,7 +83,10 @@ fun EnhancedExtractionQualityCard(
 
                 // Large percentage text
                 Text(
-                    text = "${analysis.optimalTimePercentage.toInt()}% in optimal zone",
+                    text = stringResource(
+                        R.string.analytics_optimal_zone_format,
+                        analysis.optimalTimePercentage.toInt()
+                    ),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -89,7 +94,7 @@ fun EnhancedExtractionQualityCard(
 
                 // Expandable details section
                 ExpandableAnalyticsSection(
-                    title = "Extraction Details",
+                    title = stringResource(R.string.analytics_extraction_details),
                     isExpanded = isExpanded,
                     onToggle = { isExpanded = !isExpanded }
                 ) {
@@ -101,21 +106,21 @@ fun EnhancedExtractionQualityCard(
                             verticalArrangement = Arrangement.spacedBy(spacing.small)
                         ) {
                             Text(
-                                text = "Distribution",
+                                text = stringResource(R.string.text_distribution),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             DistributionRow(
-                                label = "Too Fast (<25s)",
+                                label = stringResource(R.string.analytics_zone_too_fast),
                                 percentage = analysis.tooFastPercentage.toInt()
                             )
                             DistributionRow(
-                                label = "Optimal (25-30s)",
+                                label = stringResource(R.string.analytics_zone_optimal),
                                 percentage = analysis.optimalTimePercentage.toInt()
                             )
                             DistributionRow(
-                                label = "Too Slow (>30s)",
+                                label = stringResource(R.string.analytics_zone_too_slow),
                                 percentage = analysis.tooSlowPercentage.toInt()
                             )
                         }
@@ -125,21 +130,21 @@ fun EnhancedExtractionQualityCard(
                             verticalArrangement = Arrangement.spacedBy(spacing.small)
                         ) {
                             Text(
-                                text = "Statistics",
+                                text = stringResource(R.string.analytics_statistics),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             MetricRow(
-                                label = "Average Time",
+                                label = stringResource(R.string.analytics_label_average_time),
                                 value = String.format("%.1fs", analysis.avgTime)
                             )
                             MetricRow(
-                                label = "Median Time",
+                                label = stringResource(R.string.analytics_label_median_time),
                                 value = String.format("%.1fs", analysis.medianTime)
                             )
                             MetricRow(
-                                label = "Range",
+                                label = stringResource(R.string.label_range),
                                 value = "${analysis.minTime}s - ${analysis.maxTime}s"
                             )
                         }

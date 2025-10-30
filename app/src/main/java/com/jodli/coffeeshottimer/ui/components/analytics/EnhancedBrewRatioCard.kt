@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.usecase.BrewRatioAnalysis
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
@@ -67,7 +69,7 @@ fun EnhancedBrewRatioCard(
         ) {
             // Header
             Text(
-                text = "Brew Ratio",
+                text = stringResource(R.string.text_brew_ratio),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -76,7 +78,7 @@ fun EnhancedBrewRatioCard(
             if (analysis == null || analysis.totalShots == 0) {
                 // Empty state
                 Text(
-                    text = "Record 3 shots to see brew ratio analysis",
+                    text = stringResource(R.string.analytics_ratio_min_shots),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -93,7 +95,10 @@ fun EnhancedBrewRatioCard(
 
                 // Large percentage text
                 Text(
-                    text = "${analysis.typicalRatioPercentage.toInt()}% in typical range",
+                    text = stringResource(
+                        R.string.analytics_typical_range_format,
+                        analysis.typicalRatioPercentage.toInt()
+                    ),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -101,7 +106,7 @@ fun EnhancedBrewRatioCard(
 
                 // Expandable details section
                 ExpandableAnalyticsSection(
-                    title = "Brew Ratio Details",
+                    title = stringResource(R.string.analytics_ratio_details),
                     isExpanded = isExpanded,
                     onToggle = { isExpanded = !isExpanded }
                 ) {
@@ -113,21 +118,21 @@ fun EnhancedBrewRatioCard(
                             verticalArrangement = Arrangement.spacedBy(spacing.small)
                         ) {
                             Text(
-                                text = "Distribution",
+                                text = stringResource(R.string.text_distribution),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             DistributionRow(
-                                label = "Under-extracted (<1.5)",
+                                label = stringResource(R.string.analytics_ratio_under_extracted),
                                 percentage = analysis.underExtractedPercentage.toInt()
                             )
                             DistributionRow(
-                                label = "Typical (1.5-3.0)",
+                                label = stringResource(R.string.analytics_ratio_typical),
                                 percentage = analysis.typicalRatioPercentage.toInt()
                             )
                             DistributionRow(
-                                label = "Over-extracted (>3.0)",
+                                label = stringResource(R.string.analytics_ratio_over_extracted),
                                 percentage = analysis.overExtractedPercentage.toInt()
                             )
                         }
@@ -137,21 +142,21 @@ fun EnhancedBrewRatioCard(
                             verticalArrangement = Arrangement.spacedBy(spacing.small)
                         ) {
                             Text(
-                                text = "Statistics",
+                                text = stringResource(R.string.analytics_statistics),
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             MetricRow(
-                                label = "Average Ratio",
+                                label = stringResource(R.string.analytics_label_average_ratio),
                                 value = String.format("%.2f:1", analysis.avgRatio)
                             )
                             MetricRow(
-                                label = "Median Ratio",
+                                label = stringResource(R.string.analytics_label_median_ratio),
                                 value = String.format("%.2f:1", analysis.medianRatio)
                             )
                             MetricRow(
-                                label = "Range",
+                                label = stringResource(R.string.label_range),
                                 value = String.format("%.2f - %.2f", analysis.minRatio, analysis.maxRatio)
                             )
                         }

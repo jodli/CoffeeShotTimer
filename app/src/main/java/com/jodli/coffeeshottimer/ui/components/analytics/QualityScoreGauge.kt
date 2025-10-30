@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.contentDescription
@@ -59,6 +58,7 @@ fun QualityScoreGauge(
     )
 
     val contentDescriptionText = "Quality score: $score out of 100, $tier"
+    val backgroundArcColor = MaterialTheme.colorScheme.outlineVariant
 
     BoxWithConstraints(
         modifier = modifier.semantics { contentDescription = contentDescriptionText },
@@ -80,9 +80,9 @@ fun QualityScoreGauge(
             val arcSize = Size(radius * 2f, radius * 2f)
             val arcTopLeft = Offset(center.x - radius, center.y - radius)
 
-            // Background arc (light gray)
+            // Background arc
             drawArc(
-                color = Color.LightGray.copy(alpha = 0.2f),
+                color = backgroundArcColor,
                 startAngle = 135f,
                 sweepAngle = 270f,
                 useCenter = false,

@@ -22,9 +22,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
 import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
@@ -73,7 +75,7 @@ fun EnhancedShotTrendsCard(
         ) {
             // Header
             Text(
-                text = "Recent Trends",
+                text = stringResource(R.string.analytics_trends_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -83,9 +85,12 @@ fun EnhancedShotTrendsCard(
                 // Minimum data message
                 Text(
                     text = if (trends == null || trends.totalShots == 0) {
-                        "Record $MIN_SHOTS_FOR_TRENDS shots to see trends"
+                        stringResource(R.string.analytics_trend_insufficient_data, MIN_SHOTS_FOR_TRENDS)
                     } else {
-                        "Record ${MIN_SHOTS_FOR_TRENDS - trends.totalShots} more shots for trend analysis"
+                        stringResource(
+                            R.string.analytics_trend_min_shots_format,
+                            MIN_SHOTS_FOR_TRENDS - trends.totalShots
+                        )
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -129,7 +134,7 @@ fun EnhancedShotTrendsCard(
 
                 // Expandable details section
                 ExpandableAnalyticsSection(
-                    title = "Raw Metrics",
+                    title = stringResource(R.string.analytics_raw_metrics),
                     isExpanded = isExpanded,
                     onToggle = { isExpanded = !isExpanded }
                 ) {
@@ -137,19 +142,19 @@ fun EnhancedShotTrendsCard(
                         verticalArrangement = Arrangement.spacedBy(spacing.small)
                     ) {
                         MetricRow(
-                            label = "Avg Brew Ratio",
+                            label = stringResource(R.string.analytics_label_avg_brew_ratio),
                             value = String.format("%.2f:1", trends.secondHalfAvgRatio)
                         )
                         MetricRow(
-                            label = "Avg Extraction Time",
+                            label = stringResource(R.string.analytics_label_avg_extraction_time),
                             value = String.format("%.1fs", trends.secondHalfAvgTime)
                         )
                         MetricRow(
-                            label = "Shots Per Day",
+                            label = stringResource(R.string.label_shots_per_day),
                             value = String.format("%.1f", trends.shotsPerDay)
                         )
                         MetricRow(
-                            label = "Days Analyzed",
+                            label = stringResource(R.string.analytics_label_days_analyzed),
                             value = trends.daysAnalyzed.toString()
                         )
                     }
@@ -162,6 +167,7 @@ fun EnhancedShotTrendsCard(
 /**
  * Helper to determine trend indicator display.
  */
+@Composable
 private fun getTrendIndicator(trends: ShotTrends): Triple<ImageVector, String, androidx.compose.ui.graphics.Color> {
     val ratioChange = trends.brewRatioTrend
     val timeChange = trends.extractionTimeTrend
@@ -170,20 +176,20 @@ private fun getTrendIndicator(trends: ShotTrends): Triple<ImageVector, String, a
         val changePoints = abs(ratioChange + timeChange).toInt()
         Triple(
             Icons.Default.TrendingUp,
-            "Improving - up $changePoints points",
+            stringResource(R.string.analytics_trend_improving_format, changePoints),
             androidx.compose.ui.graphics.Color(COLOR_GREEN)
         )
     } else if (abs(ratioChange) < RATIO_STABLE_THRESHOLD && abs(timeChange) < TIME_STABLE_THRESHOLD) {
         Triple(
             Icons.Default.TrendingFlat,
-            "Stable - consistent performance",
+            stringResource(R.string.analytics_trend_stable_text),
             androidx.compose.ui.graphics.Color(COLOR_ORANGE)
         )
     } else {
         val changePoints = abs(ratioChange + timeChange).toInt()
         Triple(
             Icons.Default.TrendingDown,
-            "Declining - down $changePoints points",
+            stringResource(R.string.analytics_trend_declining_format, changePoints),
             androidx.compose.ui.graphics.Color(COLOR_RED)
         )
     }

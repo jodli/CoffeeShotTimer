@@ -17,11 +17,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
 import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
@@ -45,7 +47,9 @@ fun QualityZoneIndicator(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    val contentDescriptionText = "$optimalPercentage% of shots in optimal extraction zone"
+    val contentDescriptionText = stringResource(R.string.cd_zone_indicator, optimalPercentage)
+
+    val markerColor = MaterialTheme.colorScheme.onSurface
 
     Column(
         modifier = modifier.semantics { contentDescription = contentDescriptionText },
@@ -103,17 +107,16 @@ fun QualityZoneIndicator(
                 close()
             }
 
-            val markerColor = androidx.compose.ui.graphics.Color(0xFF000000).copy(alpha = 0.8f)
             drawPath(
                 path = markerPath,
-                color = markerColor,
+                color = markerColor.copy(alpha = 0.8f),
                 style = Fill
             )
         }
 
         // Percentage text
         Text(
-            text = "$optimalPercentage% in optimal zone",
+            text = stringResource(R.string.analytics_optimal_zone_format, optimalPercentage),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
