@@ -20,6 +20,9 @@ import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
+private const val EXTRACTION_TIME_FAST_THRESHOLD = -3
+private const val EXTRACTION_TIME_SLOW_THRESHOLD = 3
+
 /**
  * Dialog shown after successfully recording a shot, with optional recommendations.
  */
@@ -133,9 +136,9 @@ fun ShotRecordedDialog(
                 if (grindAdjustment != null) {
                     // Determine the explanation text first
                     val explanationText = when {
-                        grindAdjustment.extractionTimeDeviation < -3 ->
+                        grindAdjustment.extractionTimeDeviation < EXTRACTION_TIME_FAST_THRESHOLD ->
                             stringResource(R.string.feedback_shot_ran_fast)
-                        grindAdjustment.extractionTimeDeviation > 3 ->
+                        grindAdjustment.extractionTimeDeviation > EXTRACTION_TIME_SLOW_THRESHOLD ->
                             stringResource(R.string.feedback_shot_ran_slow)
                         grindAdjustment.tasteIssue == TastePrimary.SOUR ->
                             stringResource(R.string.feedback_sour_taste)

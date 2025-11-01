@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TrendingDown
-import androidx.compose.material.icons.filled.TrendingFlat
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingFlat
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -175,20 +175,20 @@ private fun getTrendIndicator(trends: ShotTrends): Triple<ImageVector, String, a
     return if (trends.isImproving) {
         val changePoints = abs(ratioChange + timeChange).toInt()
         Triple(
-            Icons.Default.TrendingUp,
+            Icons.AutoMirrored.Filled.TrendingUp,
             stringResource(R.string.analytics_trend_improving_format, changePoints),
             androidx.compose.ui.graphics.Color(COLOR_GREEN)
         )
     } else if (abs(ratioChange) < RATIO_STABLE_THRESHOLD && abs(timeChange) < TIME_STABLE_THRESHOLD) {
         Triple(
-            Icons.Default.TrendingFlat,
+            Icons.AutoMirrored.Filled.TrendingFlat,
             stringResource(R.string.analytics_trend_stable_text),
             androidx.compose.ui.graphics.Color(COLOR_ORANGE)
         )
     } else {
         val changePoints = abs(ratioChange + timeChange).toInt()
         Triple(
-            Icons.Default.TrendingDown,
+            Icons.AutoMirrored.Filled.TrendingDown,
             stringResource(R.string.analytics_trend_declining_format, changePoints),
             androidx.compose.ui.graphics.Color(COLOR_RED)
         )

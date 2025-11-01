@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -94,13 +94,13 @@ private fun SimplifiedMetricCardPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             SimplifiedMetricCard(
-                icon = Icons.Default.TrendingUp,
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 primaryText = "92",
                 secondaryText = "Quality Score"
             )
 
             SimplifiedMetricCard(
-                icon = Icons.Default.TrendingUp,
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 primaryText = "85%",
                 secondaryText = "In Optimal Zone",
                 onClick = { }
