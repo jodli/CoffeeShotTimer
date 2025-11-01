@@ -129,32 +129,38 @@ fun ShotRecordedDialog(
                     }
                 }
 
-                // Simple contextual explanation (if grind adjustment exists)
-                if (grindAdjustment != null && grindAdjustment.hasAdjustment()) {
-                    HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
+                // Simple contextual explanation (if grind adjustment exists with meaningful content)
+                if (grindAdjustment != null) {
+                    // Determine the explanation text first
+                    val explanationText = when {
+                        grindAdjustment.extractionTimeDeviation < -3 ->
+                            stringResource(R.string.feedback_shot_ran_fast)
+                        grindAdjustment.extractionTimeDeviation > 3 ->
+                            stringResource(R.string.feedback_shot_ran_slow)
+                        grindAdjustment.tasteIssue == TastePrimary.SOUR ->
+                            stringResource(R.string.feedback_sour_taste)
+                        grindAdjustment.tasteIssue == TastePrimary.BITTER ->
+                            stringResource(R.string.feedback_bitter_taste)
+                        else -> "" // Don't show for perfect shots
+                    }
 
-                    Surface(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = MaterialTheme.shapes.medium,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = when {
-                                grindAdjustment.extractionTimeDeviation < -3 ->
-                                    stringResource(R.string.feedback_shot_ran_fast)
-                                grindAdjustment.extractionTimeDeviation > 3 ->
-                                    stringResource(R.string.feedback_shot_ran_slow)
-                                grindAdjustment.tasteIssue == TastePrimary.SOUR ->
-                                    stringResource(R.string.feedback_sour_taste)
-                                grindAdjustment.tasteIssue == TastePrimary.BITTER ->
-                                    stringResource(R.string.feedback_bitter_taste)
-                                else -> "" // Don't show for perfect shots
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(spacing.medium)
-                        )
+                    // Only render the Surface if there's actual content
+                    if (explanationText.isNotEmpty()) {
+                        HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
+
+                        Surface(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = MaterialTheme.shapes.medium,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = explanationText,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(spacing.medium)
+                            )
+                        }
                     }
                 }
             }
