@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [2.1.0]
+
 ### Added
 
 - [*] Visual shot analysis dashboard with quality score gauge, performance trends chart, and statistics cards to track your brewing progress.
@@ -14,6 +16,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 ### Changed
 
 - [*] Redesigned Shot Details screen with conversational insights, quality score breakdown, and shot ranking.
+
+### Fixed
+
+- [ ] Removed empty box in Shot Recorded Dialog.
 
 ## [2.0.0]
 
