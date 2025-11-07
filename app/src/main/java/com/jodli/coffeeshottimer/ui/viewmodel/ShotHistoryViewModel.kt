@@ -16,8 +16,11 @@ import com.jodli.coffeeshottimer.domain.usecase.GrinderSettingAnalysis
 import com.jodli.coffeeshottimer.domain.usecase.OverallStatistics
 import com.jodli.coffeeshottimer.domain.usecase.ShotHistoryFilter
 import com.jodli.coffeeshottimer.domain.usecase.ShotTrends
+import com.jodli.coffeeshottimer.ui.util.BeanStatus
+import com.jodli.coffeeshottimer.ui.util.BeanStatusConstants
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
+import com.jodli.coffeeshottimer.ui.util.calculateBeanStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -60,14 +63,7 @@ class ShotHistoryViewModel @Inject constructor(
         // Coaching insights thresholds
         private const val MIN_SHOTS_FOR_TREND = 3
         private const val MAX_RECENT_SHOTS = 5
-        private const val MIN_SHOTS_FOR_DIAL_IN = 3
         private const val MIN_SHOTS_FOR_GRIND_ANALYSIS = 5
-        private const val DIAL_IN_CONSISTENCY_THRESHOLD = 70
-        private const val DIAL_IN_MIN_SCORE = 60
-
-        // Quality score constants
-        private const val SCORE_PERFECT_THRESHOLD = 80
-        private const val SCORE_GOOD_THRESHOLD = 60
         private const val SCORE_OPTIMAL_TIME_POINTS = 40
         private const val SCORE_TYPICAL_RATIO_POINTS = 40
         private const val SCORE_REASONABLE_WEIGHTS_POINTS = 20
@@ -563,8 +559,8 @@ class ShotHistoryViewModel @Inject constructor(
             totalQuality += quality
 
             when {
-                quality >= SCORE_PERFECT_THRESHOLD -> perfectCount++
-                quality >= SCORE_GOOD_THRESHOLD -> goodCount++
+                quality >= BeanStatusConstants.SCORE_PERFECT_THRESHOLD -> perfectCount++
+                quality >= BeanStatusConstants.SCORE_GOOD_THRESHOLD -> goodCount++
             }
         }
 
@@ -644,17 +640,11 @@ class ShotHistoryViewModel @Inject constructor(
         if (beanId == null) return null // Dial-in is bean-specific
 
         val beanShots = shots.filter { it.beanId == beanId }.sortedBy { it.timestamp }
-        if (beanShots.size < MIN_SHOTS_FOR_DIAL_IN) return null
+        if (beanShots.size < BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN) return null
 
-        // Check last 3 shots for consistency
-        val recentShots = beanShots.takeLast(MIN_SHOTS_FOR_DIAL_IN)
-        val recentQualityScores = recentShots.map {
-            getShotQualityAnalysisUseCase.calculateShotQualityScore(it, beanShots)
-        }
-        val avgRecentQuality = recentQualityScores.average().toInt()
-
-        val isDialedIn = avgRecentQuality >= DIAL_IN_CONSISTENCY_THRESHOLD &&
-            recentQualityScores.all { it >= DIAL_IN_MIN_SCORE }
+        // Use shared bean status calculator
+        val beanStatus = calculateBeanStatus(beanShots, getShotQualityAnalysisUseCase)
+        val isDialedIn = beanStatus == BeanStatus.DIALED_IN
 
         // If dialed in, find when they achieved it
         val shotsToDialIn = if (isDialedIn) {
@@ -691,16 +681,16 @@ class ShotHistoryViewModel @Inject constructor(
      * Returns the index of the first shot in a consistent good streak.
      */
     private fun findDialInPoint(beanShots: List<Shot>): Int? {
-        if (beanShots.size < MIN_SHOTS_FOR_DIAL_IN) return null
+        if (beanShots.size < BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN) return null
 
         // Look for first occurrence of 3 consecutive good shots
-        for (i in 0..beanShots.size - MIN_SHOTS_FOR_DIAL_IN) {
-            val threeShots = beanShots.subList(i, i + MIN_SHOTS_FOR_DIAL_IN)
+        for (i in 0..beanShots.size - BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN) {
+            val threeShots = beanShots.subList(i, i + BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN)
             val allGood = threeShots.all {
-                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, beanShots) >= DIAL_IN_MIN_SCORE
+                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, beanShots) >= BeanStatusConstants.DIAL_IN_MIN_SCORE
             }
             if (allGood) {
-                return i + MIN_SHOTS_FOR_DIAL_IN // Return the count when they achieved it
+                return i + BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN // Return the count when they achieved it
             }
         }
 
@@ -788,7 +778,7 @@ class ShotHistoryViewModel @Inject constructor(
      */
     private fun isFirstPerfectForBean(shot: Shot, allShots: List<Shot>): Boolean {
         val quality = getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, allShots)
-        if (quality < SCORE_PERFECT_THRESHOLD) return false
+        if (quality < BeanStatusConstants.SCORE_PERFECT_THRESHOLD) return false
 
         // Get all shots for this bean, sorted by timestamp
         val beanShots = allShots
@@ -798,7 +788,9 @@ class ShotHistoryViewModel @Inject constructor(
         // Find all perfect shots before this one
         val perfectShotsBeforeThis = beanShots
             .filter { it.timestamp < shot.timestamp }
-            .filter { getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= SCORE_PERFECT_THRESHOLD }
+            .filter {
+                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= BeanStatusConstants.SCORE_PERFECT_THRESHOLD
+            }
 
         return perfectShotsBeforeThis.isEmpty()
     }
@@ -819,18 +811,18 @@ class ShotHistoryViewModel @Inject constructor(
 
         // Check if this is the 3rd consecutive good shot
         val lastThreeShots = beanShots.subList(maxOf(0, shotIndex - 2), shotIndex + 1)
-        if (lastThreeShots.size != MIN_SHOTS_FOR_DIAL_IN) return false
+        if (lastThreeShots.size != BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN) return false
 
         val allGood = lastThreeShots.all {
-            getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= DIAL_IN_MIN_SCORE
+            getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= BeanStatusConstants.DIAL_IN_MIN_SCORE
         }
         if (!allGood) return false
 
         // Make sure there weren't 3 good shots in a row before this
-        if (shotIndex >= MIN_SHOTS_FOR_DIAL_IN) {
-            val previousThree = beanShots.subList(shotIndex - MIN_SHOTS_FOR_DIAL_IN, shotIndex)
+        if (shotIndex >= BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN) {
+            val previousThree = beanShots.subList(shotIndex - BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN, shotIndex)
             val previouslyDialedIn = previousThree.all {
-                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= DIAL_IN_MIN_SCORE
+                getShotQualityAnalysisUseCase.calculateShotQualityScore(it, allShots) >= BeanStatusConstants.DIAL_IN_MIN_SCORE
             }
             if (previouslyDialedIn) return false
         }
@@ -844,7 +836,7 @@ class ShotHistoryViewModel @Inject constructor(
      */
     private fun isBeanConsistencyMilestone(shot: Shot, allShots: List<Shot>): Int? {
         val quality = getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, allShots)
-        if (quality < DIAL_IN_MIN_SCORE) return null
+        if (quality < BeanStatusConstants.DIAL_IN_MIN_SCORE) return null
 
         // Get all shots for this bean, sorted by timestamp
         val beanShots = allShots
@@ -860,7 +852,7 @@ class ShotHistoryViewModel @Inject constructor(
 
         // Only show achievement for streaks of 3, 5, or 10+
         return when {
-            streakCount == MIN_SHOTS_FOR_DIAL_IN -> MIN_SHOTS_FOR_DIAL_IN
+            streakCount == BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN -> BeanStatusConstants.MIN_SHOTS_FOR_DIAL_IN
             streakCount == MAX_RECENT_SHOTS -> MAX_RECENT_SHOTS
             streakCount >= CONSISTENCY_MILESTONE_TEN &&
                 streakCount % CONSISTENCY_MILESTONE_INTERVAL == 0 -> streakCount
@@ -871,7 +863,7 @@ class ShotHistoryViewModel @Inject constructor(
     private fun countConsecutiveGoodShots(beanShots: List<Shot>, fromIndex: Int): Int {
         var count = 0
         for (i in fromIndex downTo 0) {
-            if (getShotQualityAnalysisUseCase.calculateShotQualityScore(beanShots[i], beanShots) >= DIAL_IN_MIN_SCORE) {
+            if (getShotQualityAnalysisUseCase.calculateShotQualityScore(beanShots[i], beanShots) >= BeanStatusConstants.DIAL_IN_MIN_SCORE) {
                 count++
             } else {
                 break

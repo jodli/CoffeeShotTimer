@@ -910,4 +910,10 @@
     <string name="achievement_first_perfect">Erster perfekter Shot mit %1$s!</string>
     <string name="achievement_dialed_in">%1$s eingestellt</string>
     <string name="achievement_consistency_streak">%1$d Serie mit %2$s</string>
+
+    <!-- Bean Management - Last Used Date Formatting -->
+    <string name="bean_last_used_today">Heute verwendet</string>
+    <string name="bean_last_used_yesterday">Gestern verwendet</string>
+    <string name="bean_last_used_days">Vor %d Tagen verwendet</string>
+    <string name="bean_last_used_never">Nie verwendet</string>
 </resources>
