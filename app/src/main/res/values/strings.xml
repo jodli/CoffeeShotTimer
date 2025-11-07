@@ -909,4 +909,10 @@
     <string name="achievement_first_perfect">First perfect with %1$s!</string>
     <string name="achievement_dialed_in">Dialed in %1$s</string>
     <string name="achievement_consistency_streak">%1$d streak with %2$s</string>
+
+    <!-- Bean Management - Last Used Date Formatting -->
+    <string name="bean_last_used_today">Used today</string>
+    <string name="bean_last_used_yesterday">Used yesterday</string>
+    <string name="bean_last_used_days">Used %d days ago</string>
+    <string name="bean_last_used_never">Never used</string>
 </resources>
