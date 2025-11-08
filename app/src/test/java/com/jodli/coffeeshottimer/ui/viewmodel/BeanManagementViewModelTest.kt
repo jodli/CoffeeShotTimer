@@ -1,8 +1,10 @@
 package com.jodli.coffeeshottimer.ui.viewmodel
 
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
+import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
+import com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import io.mockk.every
@@ -33,6 +35,8 @@ class BeanManagementViewModelTest {
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase = mockk()
     private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
     private val beanRepository: BeanRepository = mockk(relaxed = true)
+    private val shotRepository: ShotRepository = mockk(relaxed = true)
+    private val qualityAnalysisUseCase: GetShotQualityAnalysisUseCase = mockk(relaxed = true)
     private val domainErrorTranslator: DomainErrorTranslator = mockk(relaxed = true)
 
     private lateinit var viewModel: BeanManagementViewModel
@@ -46,12 +50,15 @@ class BeanManagementViewModelTest {
         every { getActiveBeansUseCase.execute() } returns flowOf(Result.success(emptyList()))
         every { getActiveBeansUseCase.getActiveBeansWithSearch(any()) } returns flowOf(Result.success(emptyList()))
         every { getBeanHistoryUseCase.getBeanHistoryWithSearch(any(), any()) } returns flowOf(Result.success(emptyList()))
+        every { shotRepository.getShotsByBean(any()) } returns flowOf(Result.success(emptyList()))
 
         viewModel = BeanManagementViewModel(
             getActiveBeansUseCase,
             getBeanHistoryUseCase,
             updateBeanUseCase,
             beanRepository,
+            shotRepository,
+            qualityAnalysisUseCase,
             domainErrorTranslator
         )
     }
