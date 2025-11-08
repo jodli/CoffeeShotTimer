@@ -48,6 +48,7 @@
     <string name="text_currently_selected">Currently Selected</string>
     <string name="text_add_bean">Add Bean</string>
     <string name="text_use_for_shot">Use for Shot</string>
+    <string name="text_view_shots">View Shots</string>
     <string name="text_selected_bean">Selected Bean</string>
     <string name="text_extraction_timer">Extraction Timer</string>
     <string name="text_notes_optional">Notes (Optional)</string>
@@ -87,6 +88,23 @@
     <string name="text_weak_extraction">Weak Extraction</string>
     <string name="text_typical_extraction">Typical espresso range</string>
     <string name="text_record_successfully">Shot recorded successfully! Brew ratio: %1$s, Time: %2$s</string>
+
+    <!-- Bean Management -->
+    <string name="bean_select_button">Select</string>
+    <string name="bean_selected_badge">Selected</string>
+    <string name="bean_grinder_not_set">Not set</string>
+    <string name="bean_shot_count">%d shots</string>
+    <string name="bean_no_shots">No shots yet</string>
+    <string name="bean_view_shots">View %d shots</string>
+    
+    <!-- Bean Status Tooltips -->
+    <string name="bean_status_dialed_in">Dialed In - Consistent results</string>
+    <string name="bean_status_experimenting">Experimenting - Keep dialing in</string>
+    <string name="bean_status_needs_work">Needs Work - Try following suggestions</string>
+    <string name="bean_status_fresh_start">New Bean - No shots yet</string>
+    
+    <!-- Content Descriptions -->
+    <string name="cd_view_shot_history">View shot history for this bean</string>
 
     <!-- Taste Feedback -->
     <string name="text_how_did_it_taste">How did it taste?</string>

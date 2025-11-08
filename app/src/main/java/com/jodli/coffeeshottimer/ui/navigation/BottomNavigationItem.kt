@@ -22,22 +22,22 @@ data class BottomNavigationItem(
 @Composable
 fun getBottomNavigationItems(): List<BottomNavigationItem> = listOf(
     BottomNavigationItem(
-        route = NavigationDestinations.RecordShot.route,
+        route = NavigationDestinations.RecordShot.baseRoute,
         icon = Icons.Default.Coffee,
         label = stringResource(R.string.view_home)
     ),
     BottomNavigationItem(
-        route = NavigationDestinations.ShotHistory.route,
+        route = NavigationDestinations.ShotHistory.createRoute(null), // Navigate to shot history without filter
         icon = Icons.AutoMirrored.Filled.List,
         label = stringResource(R.string.view_history)
     ),
     BottomNavigationItem(
-        route = NavigationDestinations.BeanManagement.route,
+        route = NavigationDestinations.BeanManagement.baseRoute,
         icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
         label = stringResource(R.string.view_beans)
     ),
     BottomNavigationItem(
-        route = NavigationDestinations.More.route,
+        route = NavigationDestinations.More.baseRoute,
         icon = Icons.Default.Settings,
         label = stringResource(R.string.view_more)
     )

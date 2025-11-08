@@ -40,11 +40,22 @@ fun AppNavigation(
             )
         }
 
-        composable(NavigationDestinations.ShotHistory.route) {
+        composable(
+            route = NavigationDestinations.ShotHistory.route,
+            arguments = listOf(
+                androidx.navigation.navArgument(NavigationDestinations.ShotHistory.BEAN_ID_ARG) {
+                    type = androidx.navigation.NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
+            val beanId = backStackEntry.arguments?.getString(NavigationDestinations.ShotHistory.BEAN_ID_ARG)
             ShotHistoryScreen(
                 onShotClick = { shotId ->
                     navController.navigate(NavigationDestinations.ShotDetails.createRoute(shotId))
-                }
+                },
+                initialBeanIdFilter = beanId
             )
         }
 
@@ -56,8 +67,8 @@ fun AppNavigation(
                 onEditBeanClick = { beanId ->
                     navController.navigate(NavigationDestinations.AddEditBean.createRoute(beanId))
                 },
-                onNavigateToRecordShot = {
-                    navController.navigate(NavigationDestinations.RecordShot.route)
+                onNavigateToShotHistory = { beanId ->
+                    navController.navigate(NavigationDestinations.ShotHistory.createRoute(beanId))
                 }
             )
         }
