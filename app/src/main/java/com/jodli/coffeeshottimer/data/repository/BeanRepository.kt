@@ -208,42 +208,6 @@ class BeanRepository @Inject constructor(
     }
 
     /**
-     * Update the last grinder setting for a specific bean.
-     * @param beanId The ID of the bean
-     * @param grinderSetting The grinder setting to save
-     * @return Result indicating success or failure
-     */
-    suspend fun updateLastGrinderSetting(beanId: String, grinderSetting: String): Result<Unit> {
-        return try {
-            if (beanId.isBlank()) {
-                return Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
-            }
-            if (grinderSetting.isBlank()) {
-                return Result.failure(RepositoryException.ValidationError("Grinder setting cannot be empty"))
-            }
-            if (grinderSetting.length > 50) {
-                return Result.failure(
-                    RepositoryException.ValidationError("Grinder setting cannot exceed 50 characters")
-                )
-            }
-
-            // Check if bean exists
-            val existingBean = beanDao.getBeanById(beanId)
-                ?: return Result.failure(RepositoryException.NotFoundError("Bean not found"))
-
-            beanDao.updateLastGrinderSetting(beanId, grinderSetting)
-            Result.success(Unit)
-        } catch (exception: Exception) {
-            Result.failure(
-                RepositoryException.DatabaseError(
-                    "Failed to update grinder setting",
-                    exception
-                )
-            )
-        }
-    }
-
-    /**
      * Set a bean as active or inactive.
      * @param beanId The ID of the bean
      * @param isActive Whether the bean should be active

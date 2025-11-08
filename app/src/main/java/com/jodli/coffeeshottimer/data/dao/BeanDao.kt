@@ -59,12 +59,6 @@ interface BeanDao {
     suspend fun deleteBean(bean: Bean)
 
     /**
-     * Update the last grinder setting for a specific bean.
-     */
-    @Query("UPDATE beans SET lastGrinderSetting = :grinderSetting WHERE id = :beanId")
-    suspend fun updateLastGrinderSetting(beanId: String, grinderSetting: String)
-
-    /**
      * Set a bean as active/inactive.
      */
     @Query("UPDATE beans SET isActive = :isActive WHERE id = :beanId")
