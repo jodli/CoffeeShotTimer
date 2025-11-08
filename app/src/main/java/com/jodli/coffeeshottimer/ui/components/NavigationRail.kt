@@ -28,6 +28,9 @@ fun AppNavigationRail(
 
     NavigationRail {
         getBottomNavigationItems().forEach { item ->
+            // Strip query parameters from current route for comparison
+            val currentRouteBase = currentRoute?.substringBefore('?')
+
             NavigationRailItem(
                 icon = {
                     Icon(
@@ -38,19 +41,17 @@ fun AppNavigationRail(
                 label = {
                     Text(text = item.label)
                 },
-                selected = currentRoute == item.route,
+                selected = currentRouteBase == item.route,
                 onClick = {
-                    if (currentRoute != item.route) {
-                        navController.navigate(item.route) {
-                            // Pop up to the start destination to avoid building up a large stack
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            // Avoid multiple copies of the same destination when reselecting the same item
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
+                    navController.navigate(item.route) {
+                        // Pop up to the start destination to avoid building up a large stack
+                        popUpTo(navController.graph.startDestinationId) {
+                            saveState = false // Don't save state to avoid restoring stale filters
                         }
+                        // Avoid multiple copies of the same destination when reselecting the same item
+                        launchSingleTop = true
+                        // Don't restore state to avoid bringing back filtered views
+                        restoreState = false
                     }
                 }
             )

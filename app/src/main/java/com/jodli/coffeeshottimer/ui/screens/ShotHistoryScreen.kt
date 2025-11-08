@@ -78,6 +78,7 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun ShotHistoryScreen(
     onShotClick: (String) -> Unit = {},
+    initialBeanIdFilter: String? = null,
     viewModel: ShotHistoryViewModel = hiltViewModel()
 ) {
     val spacing = LocalSpacing.current
@@ -86,6 +87,13 @@ fun ShotHistoryScreen(
 
     var showFilterDialog by remember { mutableStateOf(false) }
     var coachingInsightsExpanded by remember { mutableStateOf(false) }
+
+    // Apply initial bean filter if provided
+    LaunchedEffect(initialBeanIdFilter) {
+        if (initialBeanIdFilter != null) {
+            viewModel.applyFilter(ShotHistoryFilter(beanId = initialBeanIdFilter))
+        }
+    }
 
     // Auto-refresh when screen becomes visible
     LaunchedEffect(Unit) {
