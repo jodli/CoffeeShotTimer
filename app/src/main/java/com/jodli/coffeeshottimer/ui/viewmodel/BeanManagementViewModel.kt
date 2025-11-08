@@ -85,21 +85,22 @@ class BeanManagementViewModel @Inject constructor(
                         val beans = result.getOrNull() ?: emptyList()
 
                         // Load statistics for all beans
-                        val (statuses, shotCounts, lastUsedDates) = loadBeanStatistics(beans)
+                        val statistics = loadBeanStatistics(beans)
 
                         // Sort beans intelligently
                         val sortedBeans = sortBeans(
                             beans = beans,
-                            statuses = statuses,
-                            lastUsedDates = lastUsedDates,
+                            statuses = statistics.statuses,
+                            lastUsedDates = statistics.lastUsedDates,
                             currentBeanId = _uiState.value.currentBeanId
                         )
 
                         _uiState.value = _uiState.value.copy(
                             beans = sortedBeans,
-                            beanStatuses = statuses,
-                            beanShotCounts = shotCounts,
-                            beanLastUsed = lastUsedDates,
+                            beanStatuses = statistics.statuses,
+                            beanShotCounts = statistics.shotCounts,
+                            beanLastUsed = statistics.lastUsedDates,
+                            beanGrinderSettings = statistics.grinderSettings,
                             isLoading = false,
                             error = null
                         )
@@ -139,21 +140,22 @@ class BeanManagementViewModel @Inject constructor(
                         val beans = result.getOrNull() ?: emptyList()
 
                         // Load statistics for all beans
-                        val (statuses, shotCounts, lastUsedDates) = loadBeanStatistics(beans)
+                        val statistics = loadBeanStatistics(beans)
 
                         // Sort beans intelligently
                         val sortedBeans = sortBeans(
                             beans = beans,
-                            statuses = statuses,
-                            lastUsedDates = lastUsedDates,
+                            statuses = statistics.statuses,
+                            lastUsedDates = statistics.lastUsedDates,
                             currentBeanId = _uiState.value.currentBeanId
                         )
 
                         _uiState.value = _uiState.value.copy(
                             beans = sortedBeans,
-                            beanStatuses = statuses,
-                            beanShotCounts = shotCounts,
-                            beanLastUsed = lastUsedDates,
+                            beanStatuses = statistics.statuses,
+                            beanShotCounts = statistics.shotCounts,
+                            beanLastUsed = statistics.lastUsedDates,
+                            beanGrinderSettings = statistics.grinderSettings,
                             isLoading = false,
                             error = null
                         )
@@ -218,17 +220,18 @@ class BeanManagementViewModel @Inject constructor(
     }
 
     /**
-     * Load bean statistics including status, shot count, and last used date.
+     * Load bean statistics including status, shot count, last used date, and grinder setting.
      *
      * @param beans List of beans to load statistics for
-     * @return Triple of (statuses, shot counts, last used dates)
+     * @return BeanStatistics containing all computed statistics
      */
     private suspend fun loadBeanStatistics(
         beans: List<Bean>
-    ): Triple<Map<String, BeanStatus>, Map<String, Int>, Map<String, LocalDateTime?>> {
+    ): BeanStatistics {
         val statuses = mutableMapOf<String, BeanStatus>()
         val shotCounts = mutableMapOf<String, Int>()
         val lastUsedDates = mutableMapOf<String, LocalDateTime?>()
+        val grinderSettings = mutableMapOf<String, String?>()
 
         beans.forEach { bean ->
             val shotsResult = shotRepository.getShotsByBean(bean.id).first()
@@ -236,10 +239,19 @@ class BeanManagementViewModel @Inject constructor(
 
             statuses[bean.id] = calculateBeanStatus(shots, qualityAnalysisUseCase)
             shotCounts[bean.id] = shots.size
-            lastUsedDates[bean.id] = shots.maxByOrNull { it.timestamp }?.timestamp
+            
+            // Get the most recent shot for last used date and grinder setting
+            val mostRecentShot = shots.maxByOrNull { it.timestamp }
+            lastUsedDates[bean.id] = mostRecentShot?.timestamp
+            grinderSettings[bean.id] = mostRecentShot?.grinderSetting
         }
 
-        return Triple(statuses, shotCounts, lastUsedDates)
+        return BeanStatistics(
+            statuses = statuses,
+            shotCounts = shotCounts,
+            lastUsedDates = lastUsedDates,
+            grinderSettings = grinderSettings
+        )
     }
 
     /**
@@ -272,46 +284,39 @@ class BeanManagementViewModel @Inject constructor(
     /**
      * Set a bean as the current active bean for shot recording.
      * Implements requirement 3.2 for connecting bean selection between screens.
-     * Updates the grinder setting memory for the bean.
      */
-    fun setCurrentBean(beanId: String, grinderSetting: String? = null) {
+    fun setCurrentBean(beanId: String) {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            // Update grinder setting if provided
-            val grinderResult = if (!grinderSetting.isNullOrBlank()) {
-                updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
-            } else {
-                Result.success(Unit)
-            }
+            // Set the bean as current in the repository
+            val result = beanRepository.setCurrentBean(beanId)
 
-            if (grinderResult.isSuccess) {
-                // Set the bean as current in the repository
-                val result = beanRepository.setCurrentBean(beanId)
-
-                if (result.isSuccess) {
-                    // Update UI state to reflect the current bean selection
-                    _uiState.value = _uiState.value.copy(
-                        currentBeanId = beanId,
-                        isLoading = false
-                    )
-                    // Refresh the bean list to show updated grinder setting
-                    loadFilteredBeans(_searchQuery.value, _showInactive.value)
-                } else {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = domainErrorTranslator.translateResultError(result)
-                    )
-                }
+            if (result.isSuccess) {
+                // Update UI state to reflect the current bean selection
+                _uiState.value = _uiState.value.copy(
+                    currentBeanId = beanId,
+                    isLoading = false
+                )
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = domainErrorTranslator.translateResultError(grinderResult)
+                    error = domainErrorTranslator.translateResultError(result)
                 )
             }
         }
     }
 }
+
+/**
+ * Data class containing statistics for beans.
+ */
+private data class BeanStatistics(
+    val statuses: Map<String, BeanStatus>,
+    val shotCounts: Map<String, Int>,
+    val lastUsedDates: Map<String, LocalDateTime?>,
+    val grinderSettings: Map<String, String?>
+)
 
 /**
  * UI state for the bean management screen.
@@ -322,6 +327,7 @@ data class BeanManagementUiState(
     val beanStatuses: Map<String, BeanStatus> = emptyMap(),
     val beanShotCounts: Map<String, Int> = emptyMap(),
     val beanLastUsed: Map<String, LocalDateTime?> = emptyMap(),
+    val beanGrinderSettings: Map<String, String?> = emptyMap(),
     val currentBeanId: String? = null,
     val hasActiveBeans: Boolean = true,
     val isLoading: Boolean = false,
