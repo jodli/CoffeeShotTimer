@@ -50,6 +50,10 @@ class BeanManagementViewModel @Inject constructor(
     val showInactive: StateFlow<Boolean> = _showInactive.asStateFlow()
 
     init {
+        // Load the current bean ID from repository
+        _uiState.value = _uiState.value.copy(
+            currentBeanId = beanRepository.getCurrentBeanId()
+        )
         loadBeans()
         observeSearchAndFilter()
     }

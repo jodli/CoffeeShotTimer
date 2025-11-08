@@ -11,7 +11,7 @@ class NavigationTest {
     @Test
     fun `navigation destinations have correct routes`() {
         assertEquals("record_shot", NavigationDestinations.RecordShot.route)
-        assertEquals("shot_history", NavigationDestinations.ShotHistory.route)
+        assertEquals("shot_history?beanId={beanId}", NavigationDestinations.ShotHistory.route)
         assertEquals("bean_management", NavigationDestinations.BeanManagement.route)
         assertEquals("shot_details/{shotId}", NavigationDestinations.ShotDetails.route)
         assertEquals("add_edit_bean?beanId={beanId}", NavigationDestinations.AddEditBean.route)
@@ -42,9 +42,20 @@ class NavigationTest {
     @Test
     fun `bottom navigation destinations are correct`() {
         // Test that the navigation destinations used in bottom navigation are correct
-        assertEquals("record_shot", NavigationDestinations.RecordShot.route)
-        assertEquals("shot_history", NavigationDestinations.ShotHistory.route)
-        assertEquals("bean_management", NavigationDestinations.BeanManagement.route)
+        assertEquals("record_shot", NavigationDestinations.RecordShot.baseRoute)
+        assertEquals("shot_history", NavigationDestinations.ShotHistory.baseRoute)
+        assertEquals("bean_management", NavigationDestinations.BeanManagement.baseRoute)
+    }
+
+    @Test
+    fun `shot history creates correct routes with and without bean filter`() {
+        // Test shot history without bean ID
+        assertEquals("shot_history", NavigationDestinations.ShotHistory.createRoute(null))
+
+        // Test shot history with bean ID
+        val beanId = "test-bean-789"
+        val expectedRoute = "shot_history?beanId=$beanId"
+        assertEquals(expectedRoute, NavigationDestinations.ShotHistory.createRoute(beanId))
     }
 
     @Test

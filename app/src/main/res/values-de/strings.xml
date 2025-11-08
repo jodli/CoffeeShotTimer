@@ -50,6 +50,7 @@
     <string name="text_currently_selected">Aktuell ausgewählt</string>
     <string name="text_add_bean">Bohne hinzufügen</string>
     <string name="text_use_for_shot">Für Shot verwenden</string>
+    <string name="text_view_shots">Shots ansehen</string>
     <string name="text_selected_bean">Ausgewählte Bohne</string>
     <string name="text_extraction_timer">Extraktions-Timer</string>
     <string name="text_notes_optional">Notizen (Optional)</string>
@@ -89,6 +90,29 @@
     <string name="text_weak_extraction">Schwache Extraktion</string>
     <string name="text_typical_extraction">Typischer Espresso-Bereich</string>
 	<string name="text_record_successfully">Shot erfolgreich aufgenommen! Brühverhältnis: %1$s, Zeit: %2$s</string>
+
+    <!-- Bean Management -->
+    <string name="bean_select_button">Auswählen</string>
+    <string name="bean_selected_badge">Ausgewählt</string>
+    <string name="bean_grinder_not_set">Nicht gesetzt</string>
+    <string name="bean_shot_count">%d Shots</string>
+    <string name="bean_no_shots">Noch keine Shots</string>
+    <string name="bean_view_shots">%d Shots ansehen</string>
+    
+    <!-- Bean Status Tooltips -->
+    <string name="bean_status_dialed_in">Eingestellt - Konsistente Ergebnisse</string>
+    <string name="bean_status_experimenting">Experimentieren - Weiter einstellen</string>
+    <string name="bean_status_needs_work">Braucht Arbeit - Versuche Vorschläge zu befolgen</string>
+    <string name="bean_status_fresh_start">Neue Bohne - Noch keine Shots</string>
+    
+    <!-- Content Descriptions -->
+    <string name="cd_view_shot_history">Shot-Verlauf für diese Bohne ansehen</string>
+
+    <!-- Bean Management - Last Used Date Formatting -->
+    <string name="bean_last_used_today">Heute verwendet</string>
+    <string name="bean_last_used_yesterday">Gestern verwendet</string>
+    <string name="bean_last_used_days">Vor %d Tagen verwendet</string>
+    <string name="bean_last_used_never">Nie verwendet</string>
 
     <!-- Labels -->
     <string name="label_ratio">Verhältnis</string>
@@ -910,10 +934,4 @@
     <string name="achievement_first_perfect">Erster perfekter Shot mit %1$s!</string>
     <string name="achievement_dialed_in">%1$s eingestellt</string>
     <string name="achievement_consistency_streak">%1$d Serie mit %2$s</string>
-
-    <!-- Bean Management - Last Used Date Formatting -->
-    <string name="bean_last_used_today">Heute verwendet</string>
-    <string name="bean_last_used_yesterday">Gestern verwendet</string>
-    <string name="bean_last_used_days">Vor %d Tagen verwendet</string>
-    <string name="bean_last_used_never">Nie verwendet</string>
 </resources>
