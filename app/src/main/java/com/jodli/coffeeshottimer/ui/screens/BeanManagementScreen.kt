@@ -269,6 +269,7 @@ private fun BeanManagementContent(
                     beanStatuses = uiState.beanStatuses,
                     beanShotCounts = uiState.beanShotCounts,
                     beanLastUsed = uiState.beanLastUsed,
+                    beanGrinderSettings = uiState.beanGrinderSettings,
                     currentBeanId = uiState.currentBeanId,
                     onEditBeanClick = onEditBeanClick,
                     onDeleteBean = onDeleteBean,
@@ -343,6 +344,7 @@ private fun BeanList(
     beanStatuses: Map<String, com.jodli.coffeeshottimer.ui.util.BeanStatus>,
     beanShotCounts: Map<String, Int>,
     beanLastUsed: Map<String, java.time.LocalDateTime?>,
+    beanGrinderSettings: Map<String, String?>,
     currentBeanId: String?,
     onEditBeanClick: (String) -> Unit,
     onDeleteBean: (Bean) -> Unit,
@@ -368,6 +370,7 @@ private fun BeanList(
                             ?: com.jodli.coffeeshottimer.ui.util.BeanStatus.FRESH_START,
                         shotCount = beanShotCounts[bean.id] ?: 0,
                         lastUsedDate = beanLastUsed[bean.id],
+                        grinderSetting = beanGrinderSettings[bean.id],
                         isCurrentBean = bean.id == currentBeanId,
                         onEdit = { onEditBeanClick(bean.id) },
                         onDelete = { onDeleteBean(bean) },
@@ -402,6 +405,7 @@ private fun BeanList(
                             ?: com.jodli.coffeeshottimer.ui.util.BeanStatus.FRESH_START,
                         shotCount = beanShotCounts[bean.id] ?: 0,
                         lastUsedDate = beanLastUsed[bean.id],
+                        grinderSetting = beanGrinderSettings[bean.id],
                         isCurrentBean = bean.id == currentBeanId,
                         onEdit = { onEditBeanClick(bean.id) },
                         onDelete = { onDeleteBean(bean) },
@@ -443,6 +447,7 @@ private fun BeanListItem(
     beanStatus: com.jodli.coffeeshottimer.ui.util.BeanStatus,
     shotCount: Int,
     lastUsedDate: java.time.LocalDateTime?,
+    grinderSetting: String?,
     isCurrentBean: Boolean,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
@@ -537,6 +542,7 @@ private fun BeanListItem(
                 beanStatus = beanStatus,
                 shotCount = shotCount,
                 lastUsedDate = lastUsedDate,
+                grinderSetting = grinderSetting,
                 onViewHistory = onViewHistory,
                 spacing = spacing,
                 modifier = Modifier.weight(1f)
@@ -560,6 +566,7 @@ private fun BeanInformation(
     beanStatus: com.jodli.coffeeshottimer.ui.util.BeanStatus,
     shotCount: Int,
     lastUsedDate: java.time.LocalDateTime?,
+    grinderSetting: String?,
     onViewHistory: () -> Unit,
     spacing: com.jodli.coffeeshottimer.ui.theme.Spacing,
     modifier: Modifier = Modifier
@@ -577,7 +584,7 @@ private fun BeanInformation(
         Spacer(modifier = Modifier.height(spacing.small))
 
         GrinderSettingWithStatus(
-            bean = bean,
+            grinderSetting = grinderSetting,
             beanStatus = beanStatus,
             spacing = spacing
         )
@@ -656,7 +663,7 @@ private fun RoastFreshnessIndicator(
 
 @Composable
 private fun GrinderSettingWithStatus(
-    bean: Bean,
+    grinderSetting: String?,
     beanStatus: com.jodli.coffeeshottimer.ui.util.BeanStatus,
     spacing: com.jodli.coffeeshottimer.ui.theme.Spacing
 ) {
@@ -690,7 +697,7 @@ private fun GrinderSettingWithStatus(
         }
 
         Text(
-            text = bean.lastGrinderSetting?.takeIf { it.isNotBlank() }
+            text = grinderSetting?.takeIf { it.isNotBlank() }
                 ?: stringResource(R.string.bean_grinder_not_set),
             style = MaterialTheme.typography.titleLarge.copy(
                 fontWeight = FontWeight.Bold

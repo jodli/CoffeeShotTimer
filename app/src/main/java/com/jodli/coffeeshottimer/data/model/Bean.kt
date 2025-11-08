@@ -27,6 +27,10 @@ data class Bean(
     val roastDate: LocalDate,
     val notes: String = "",
     val isActive: Boolean = true,
+    @Deprecated(
+        message = "Deprecated: This field is no longer used. Grinder settings are now queried from the shots table for single source of truth.",
+        level = DeprecationLevel.WARNING
+    )
     val lastGrinderSetting: String? = null,
     val photoPath: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now()

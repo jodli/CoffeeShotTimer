@@ -25,7 +25,6 @@ class UpdateBeanUseCase @Inject constructor(
      * @param roastDate Updated roast date (cannot be future, max 365 days ago)
      * @param notes Updated notes about the bean (max 500 characters)
      * @param isActive Whether the bean should be active
-     * @param lastGrinderSetting Updated grinder setting
      * @return Result containing the updated bean or validation errors
      */
     suspend fun execute(
@@ -33,8 +32,7 @@ class UpdateBeanUseCase @Inject constructor(
         name: String,
         roastDate: LocalDate,
         notes: String = "",
-        isActive: Boolean = true,
-        lastGrinderSetting: String? = null
+        isActive: Boolean = true
     ): Result<Bean> {
         return try {
             // Validate bean ID
@@ -60,7 +58,7 @@ class UpdateBeanUseCase @Inject constructor(
                 roastDate = roastDate,
                 notes = notes.trim(),
                 isActive = isActive,
-                lastGrinderSetting = lastGrinderSetting?.trim()?.takeIf { it.isNotEmpty() }
+                lastGrinderSetting = existingBean.lastGrinderSetting // Preserve deprecated field for DB compatibility
             )
 
             // Validate updated bean through repository (includes uniqueness check)
@@ -89,46 +87,6 @@ class UpdateBeanUseCase @Inject constructor(
                 DomainException(
                     DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error updating bean",
-                    exception
-                )
-            )
-        }
-    }
-
-    /**
-     * Update only the grinder setting for a bean (grinder setting memory functionality).
-     * @param beanId ID of the bean to update
-     * @param grinderSetting New grinder setting to remember
-     * @return Result indicating success or failure
-     */
-    suspend fun updateGrinderSetting(
-        beanId: String,
-        grinderSetting: String
-    ): Result<Unit> {
-        return try {
-            if (beanId.trim().isEmpty()) {
-                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
-            }
-
-            if (grinderSetting.trim().isEmpty()) {
-                return Result.failure(DomainException(DomainErrorCode.GRINDER_SETTING_EMPTY))
-            }
-
-            val result =
-                beanRepository.updateLastGrinderSetting(beanId.trim(), grinderSetting.trim())
-            if (result.isSuccess) {
-                Result.success(Unit)
-            } else {
-                Result.failure(
-                    result.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update grinder setting")
-                )
-            }
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.UNKNOWN_ERROR,
-                    "Unexpected error updating grinder setting",
                     exception
                 )
             )
