@@ -84,14 +84,16 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
                 // Determine if navigation should be shown
-                val showNavigation = when (currentRoute) {
-                    NavigationDestinations.RecordShot.route,
-                    NavigationDestinations.ShotHistory.route,
-                    NavigationDestinations.BeanManagement.route,
-                    NavigationDestinations.More.route -> true
+                // Strip query parameters for route matching
+                val currentRouteBase = currentRoute?.substringBefore('?')
+                val showNavigation = when (currentRouteBase) {
+                    NavigationDestinations.RecordShot.baseRoute,
+                    NavigationDestinations.ShotHistory.baseRoute,
+                    NavigationDestinations.BeanManagement.baseRoute,
+                    NavigationDestinations.More.baseRoute -> true
                     // Hide navigation during onboarding
-                    NavigationDestinations.OnboardingIntroduction.route,
-                    NavigationDestinations.OnboardingEquipmentSetup.route -> false
+                    NavigationDestinations.OnboardingIntroduction.baseRoute,
+                    NavigationDestinations.OnboardingEquipmentSetup.baseRoute -> false
                     else -> false
                 }
 
@@ -138,13 +140,15 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 val configuration = LocalConfiguration.current
                 val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-                val showNavigation = when (currentRoute) {
-                    NavigationDestinations.RecordShot.route,
-                    NavigationDestinations.ShotHistory.route,
-                    NavigationDestinations.BeanManagement.route,
-                    NavigationDestinations.More.route -> true
-                    NavigationDestinations.OnboardingIntroduction.route,
-                    NavigationDestinations.OnboardingEquipmentSetup.route -> false
+                // Strip query parameters for route matching
+                val currentRouteBase = currentRoute?.substringBefore('?')
+                val showNavigation = when (currentRouteBase) {
+                    NavigationDestinations.RecordShot.baseRoute,
+                    NavigationDestinations.ShotHistory.baseRoute,
+                    NavigationDestinations.BeanManagement.baseRoute,
+                    NavigationDestinations.More.baseRoute -> true
+                    NavigationDestinations.OnboardingIntroduction.baseRoute,
+                    NavigationDestinations.OnboardingEquipmentSetup.baseRoute -> false
                     else -> false
                 }
 

@@ -225,9 +225,6 @@ class ShotRepository @Inject constructor(
             // Record the shot
             shotDao.insertShot(shot)
 
-            // Update the bean's last grinder setting with the successful settings
-            beanDao.updateLastGrinderSetting(shot.beanId, shot.grinderSetting)
-
             Result.success(Unit)
         } catch (exception: Exception) {
             Result.failure(RepositoryException.DatabaseError("Failed to record shot", exception))
@@ -550,22 +547,17 @@ class ShotRepository @Inject constructor(
     }
 
     /**
-     * Get suggested grinder setting for a bean based on last successful shot.
+     * Get suggested grinder setting for a bean from the most recent shot.
+     * Single source of truth: always queries from shots table.
      * @param beanId The ID of the bean
-     * @return Result containing suggested grinder setting or null if no history
+     * @return Result containing suggested grinder setting or null if no shots
      */
     suspend fun getSuggestedGrinderSetting(beanId: String): Result<String?> {
         return try {
             if (beanId.isBlank()) {
                 Result.failure(RepositoryException.ValidationError("Bean ID cannot be empty"))
             } else {
-                // First check the bean's last grinder setting
-                val bean = beanDao.getBeanById(beanId)
-                if (bean?.lastGrinderSetting != null) {
-                    return Result.success(bean.lastGrinderSetting)
-                }
-
-                // If no saved setting, get from last shot
+                // Get grinder setting from most recent shot
                 val lastShot = shotDao.getLastShotForBean(beanId)
                 Result.success(lastShot?.grinderSetting)
             }

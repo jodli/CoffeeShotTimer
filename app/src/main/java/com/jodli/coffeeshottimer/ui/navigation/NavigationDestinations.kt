@@ -4,8 +4,20 @@ package com.jodli.coffeeshottimer.ui.navigation
  * Navigation destinations for the app
  */
 sealed class NavigationDestinations(val route: String) {
+    /**
+     * Base route without query parameters or path variables.
+     * Used for bottom navigation matching.
+     */
+    open val baseRoute: String
+        get() = route.substringBefore('?').substringBefore('/')
+
     object RecordShot : NavigationDestinations("record_shot")
-    object ShotHistory : NavigationDestinations("shot_history")
+    object ShotHistory : NavigationDestinations("shot_history?beanId={beanId}") {
+        const val BEAN_ID_ARG = "beanId"
+        override val baseRoute = "shot_history"
+        fun createRoute(beanId: String? = null) =
+            if (beanId != null) "shot_history?beanId=$beanId" else "shot_history"
+    }
     object BeanManagement : NavigationDestinations("bean_management")
     object More : NavigationDestinations("more")
 

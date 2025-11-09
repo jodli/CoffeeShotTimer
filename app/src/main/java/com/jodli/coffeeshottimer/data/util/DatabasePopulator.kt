@@ -196,7 +196,7 @@ class DatabasePopulator @Inject constructor(
                 roastDate = LocalDate.now().minusDays((3..20).random().toLong()),
                 notes = profile.notes,
                 isActive = true,
-                lastGrinderSetting = profile.grinderSetting,
+                lastGrinderSetting = null, // Deprecated: kept for DB compatibility, not used
                 createdAt = LocalDateTime.now().minusDays(index.toLong())
             )
         }
@@ -253,7 +253,7 @@ class DatabasePopulator @Inject constructor(
         val extractionTime = (profile.extractionTimeSeconds + timeVariation).coerceIn(15, 50)
 
         // Calculate grinder setting with skill-level consistency
-        val baseGrinderSetting = bean.lastGrinderSetting?.toDoubleOrNull() ?: 3.0
+        val baseGrinderSetting = 3.0 // Default grinder setting
         val grinderVariation = Random.nextDouble(-skillVariations.grinderVariance, skillVariations.grinderVariance)
         val grinderSetting = String.format(
             java.util.Locale.ROOT,

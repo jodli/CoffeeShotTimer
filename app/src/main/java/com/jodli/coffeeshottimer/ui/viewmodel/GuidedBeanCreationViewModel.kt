@@ -142,7 +142,7 @@ class GuidedBeanCreationViewModel @Inject constructor(
                     notes = formState.notes.trim().ifBlank { null } ?: "",
                     photoPath = formState.photoPath,
                     isActive = true,
-                    lastGrinderSetting = null
+                    lastGrinderSetting = null // Deprecated: kept for DB compatibility, not used
                 )
 
                 val result = beanRepository.addBean(bean)
