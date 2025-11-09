@@ -143,6 +143,7 @@
     <string name="label_bean_name_required">Bean Name *</string>
     <string name="label_roast_date_required">Roast Date *</string>
     <string name="label_search_beans">Search beans</string>
+    <string name="label_search">Search</string>
     <string name="label_coffee_weight_in">Coffee Weight In</string>
     <string name="label_coffee_weight_out">Coffee Weight Out</string>
     <string name="label_extraction_time">Extraction Time</string>
