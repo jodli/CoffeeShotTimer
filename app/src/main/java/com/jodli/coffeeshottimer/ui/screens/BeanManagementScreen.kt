@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -30,10 +29,17 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Badge
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -71,6 +77,7 @@ import com.jodli.coffeeshottimer.ui.util.formatLastUsed
 import com.jodli.coffeeshottimer.ui.util.getStatusColor
 import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BeanManagementScreen(
     onAddBeanClick: () -> Unit = {},
@@ -197,87 +204,105 @@ private fun BeanManagementContent(
     onRetry: () -> Unit,
     spacing: com.jodli.coffeeshottimer.ui.theme.Spacing
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(spacing.medium)
-    ) {
-        // Action button row - no header needed
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            CoffeePrimaryButton(
-                text = stringResource(R.string.text_add_bean),
+    var showSearchDialog by remember { mutableStateOf(false) }
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(
                 onClick = onAddBeanClick,
-                icon = Icons.Default.Add,
-                fillMaxWidth = false,
-                modifier = Modifier.widthIn(min = 120.dp, max = 160.dp)
-            )
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.text_add_bean)
+                )
+            }
         }
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    start = spacing.medium,
+                    top = spacing.medium,
+                    end = spacing.medium,
+                    bottom = paddingValues.calculateBottomPadding() + spacing.medium
+                )
+        ) {
+            // Integrated Search and Filter Bar
+            IntegratedSearchAndFilterBar(
+                searchQuery = searchQuery,
+                showInactive = showInactive,
+                onShowSearchDialog = { showSearchDialog = true },
+                onToggleShowInactive = onToggleShowInactive,
+                onClearFilters = {
+                    onSearchQueryChange("")
+                    if (showInactive) onToggleShowInactive()
+                },
+                spacing = spacing
+            )
 
-        Spacer(modifier = Modifier.height(spacing.medium))
+            Spacer(modifier = Modifier.height(spacing.medium))
 
-        // Search and Filter Row
-        SearchAndFilterRow(
-            searchQuery = searchQuery,
-            showInactive = showInactive,
-            onSearchQueryChange = onSearchQueryChange,
-            onToggleShowInactive = onToggleShowInactive,
-            spacing = spacing
-        )
+            // Content
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LoadingIndicator(message = stringResource(R.string.loading_beans))
+                    }
+                }
 
-        Spacer(modifier = Modifier.height(spacing.medium))
+                uiState.error != null -> {
+                    ErrorState(
+                        title = stringResource(R.string.error_loading_beans),
+                        message = uiState.error ?: "Unknown error occurred",
+                        onRetry = onRetry,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
 
-        // Content
-        when {
-            uiState.isLoading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LoadingIndicator(message = stringResource(R.string.loading_beans))
+                uiState.beans.isEmpty() -> {
+                    EmptyState(
+                        icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+                        title = stringResource(R.string.text_no_beans_available),
+                        description = if (searchQuery.isNotEmpty()) {
+                            stringResource(R.string.text_search_beans_hint)
+                        } else {
+                            stringResource(R.string.text_add_first_bean)
+                        },
+                        actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null
+                    )
+                }
+
+                else -> {
+                    BeanList(
+                        beans = uiState.beans,
+                        beanStatuses = uiState.beanStatuses,
+                        beanShotCounts = uiState.beanShotCounts,
+                        beanLastUsed = uiState.beanLastUsed,
+                        beanGrinderSettings = uiState.beanGrinderSettings,
+                        currentBeanId = uiState.currentBeanId,
+                        onEditBeanClick = onEditBeanClick,
+                        onDeleteBean = onDeleteBean,
+                        onSelectBean = onSelectBean,
+                        onNavigateToShotHistory = onNavigateToShotHistory,
+                        onReactivateBean = onReactivateBean,
+                        onPhotoClick = onPhotoClick,
+                        spacing = spacing
+                    )
                 }
             }
 
-            uiState.error != null -> {
-                ErrorState(
-                    title = stringResource(R.string.error_loading_beans),
-                    message = uiState.error ?: "Unknown error occurred",
-                    onRetry = onRetry,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-
-            uiState.beans.isEmpty() -> {
-                EmptyState(
-                    icon = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                    title = stringResource(R.string.text_no_beans_available),
-                    description = if (searchQuery.isNotEmpty()) {
-                        stringResource(R.string.text_search_beans_hint)
-                    } else {
-                        stringResource(R.string.text_add_first_bean)
-                    },
-                    actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null
-                )
-            }
-
-            else -> {
-                BeanList(
-                    beans = uiState.beans,
-                    beanStatuses = uiState.beanStatuses,
-                    beanShotCounts = uiState.beanShotCounts,
-                    beanLastUsed = uiState.beanLastUsed,
-                    beanGrinderSettings = uiState.beanGrinderSettings,
-                    currentBeanId = uiState.currentBeanId,
-                    onEditBeanClick = onEditBeanClick,
-                    onDeleteBean = onDeleteBean,
-                    onSelectBean = onSelectBean,
-                    onNavigateToShotHistory = onNavigateToShotHistory,
-                    onReactivateBean = onReactivateBean,
-                    onPhotoClick = onPhotoClick,
-                    spacing = spacing
+            // Search Dialog
+            if (showSearchDialog) {
+                BeanSearchDialog(
+                    currentQuery = searchQuery,
+                    onDismiss = { showSearchDialog = false },
+                    onApply = onSearchQueryChange
                 )
             }
         }
@@ -336,6 +361,155 @@ private fun SearchAndFilterRow(
             }
         )
     }
+}
+
+/**
+ * Integrated search and filter bar following ShotHistoryScreen pattern.
+ * Displays search chip, Active/All segmented button, and clear button.
+ */
+@Composable
+private fun IntegratedSearchAndFilterBar(
+    searchQuery: String,
+    showInactive: Boolean,
+    onShowSearchDialog: () -> Unit,
+    onToggleShowInactive: () -> Unit,
+    onClearFilters: () -> Unit,
+    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Left: Search chip with badge indicator
+        Box {
+            FilterChip(
+                selected = searchQuery.isNotEmpty(),
+                onClick = onShowSearchDialog,
+                label = { Text(stringResource(R.string.label_search)) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            )
+
+            // Active search indicator badge
+            if (searchQuery.isNotEmpty()) {
+                Badge(
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Text(stringResource(R.string.badge_recommendation_alert))
+                }
+            }
+        }
+
+        // Center: Segmented button for Active/All toggle
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier.padding(horizontal = spacing.small)
+        ) {
+            SegmentedButton(
+                selected = !showInactive,
+                onClick = { if (showInactive) onToggleShowInactive() },
+                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
+            ) {
+                Text(
+                    text = stringResource(R.string.text_active),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+            SegmentedButton(
+                selected = showInactive,
+                onClick = { if (!showInactive) onToggleShowInactive() },
+                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
+            ) {
+                Text(
+                    text = stringResource(R.string.text_all),
+                    style = MaterialTheme.typography.labelLarge
+                )
+            }
+        }
+
+        // Right: Clear filters button (when active)
+        if (searchQuery.isNotEmpty() || showInactive) {
+            IconButton(
+                onClick = onClearFilters,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Clear,
+                    contentDescription = stringResource(R.string.button_clear_all),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        } else {
+            // Spacer to maintain layout consistency
+            Spacer(modifier = Modifier.size(40.dp))
+        }
+    }
+}
+
+/**
+ * Dialog for entering search query.
+ * Opens when search chip is clicked in IntegratedSearchAndFilterBar.
+ */
+@Composable
+private fun BeanSearchDialog(
+    currentQuery: String,
+    onDismiss: () -> Unit,
+    onApply: (String) -> Unit
+) {
+    var searchText by remember { mutableStateOf(currentQuery) }
+    val spacing = LocalSpacing.current
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(stringResource(R.string.label_search_beans))
+        },
+        text = {
+            Column {
+                Text(
+                    text = stringResource(R.string.placeholder_enter_bean_name_search),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(spacing.medium))
+                CoffeeTextField(
+                    value = searchText,
+                    onValueChange = { searchText = it },
+                    label = stringResource(R.string.label_search_beans),
+                    placeholder = stringResource(R.string.placeholder_enter_bean_name_search),
+                    leadingIcon = Icons.Default.Search,
+                    trailingIcon = if (searchText.isNotEmpty()) Icons.Default.Clear else null,
+                    onTrailingIconClick = if (searchText.isNotEmpty()) {
+                        { searchText = "" }
+                    } else {
+                        null
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onApply(searchText)
+                    onDismiss()
+                }
+            ) {
+                Text(stringResource(R.string.button_apply))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.text_dialog_cancel))
+            }
+        }
+    )
 }
 
 @Composable

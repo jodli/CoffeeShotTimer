@@ -215,7 +215,6 @@ class GetBeanHistoryUseCase @Inject constructor(
             }
     }
 
-
     /**
      * Get bean statistics for historical analysis.
      * @return Result containing BeanHistoryStats

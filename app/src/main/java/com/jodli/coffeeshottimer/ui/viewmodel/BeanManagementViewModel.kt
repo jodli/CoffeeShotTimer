@@ -239,7 +239,7 @@ class BeanManagementViewModel @Inject constructor(
 
             statuses[bean.id] = calculateBeanStatus(shots, qualityAnalysisUseCase)
             shotCounts[bean.id] = shots.size
-            
+
             // Get the most recent shot for last used date and grinder setting
             val mostRecentShot = shots.maxByOrNull { it.timestamp }
             lastUsedDates[bean.id] = mostRecentShot?.timestamp
