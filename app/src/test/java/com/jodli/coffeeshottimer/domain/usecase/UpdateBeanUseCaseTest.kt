@@ -49,7 +49,6 @@ class UpdateBeanUseCaseTest {
         val updatedRoastDate = LocalDate.now().minusDays(5)
         val updatedNotes = "Updated notes"
         val updatedActive = false
-        val updatedGrinderSetting = "16"
 
         coEvery { beanRepository.getBeanById(beanId) } returns Result.success(testBean)
 
@@ -63,8 +62,7 @@ class UpdateBeanUseCaseTest {
             updatedName,
             updatedRoastDate,
             updatedNotes,
-            updatedActive,
-            updatedGrinderSetting
+            updatedActive
         )
 
         // Then
@@ -76,7 +74,6 @@ class UpdateBeanUseCaseTest {
         assertEquals(updatedRoastDate, updatedBean?.roastDate)
         assertEquals(updatedNotes, updatedBean?.notes)
         assertEquals(updatedActive, updatedBean?.isActive)
-        assertEquals(updatedGrinderSetting, updatedBean?.lastGrinderSetting)
         assertEquals(testBean.createdAt, updatedBean?.createdAt) // Should preserve original creation time
 
         coVerify { beanRepository.getBeanById(beanId) }
@@ -90,7 +87,6 @@ class UpdateBeanUseCaseTest {
         val beanId = "  test-id  "
         val updatedName = "  Ethiopian Yirgacheffe  "
         val updatedNotes = "  Updated notes  "
-        val updatedGrinderSetting = "  16  "
         val updatedRoastDate = LocalDate.now().minusDays(5)
 
         coEvery { beanRepository.getBeanById("test-id") } returns Result.success(testBean)
@@ -105,8 +101,7 @@ class UpdateBeanUseCaseTest {
             updatedName,
             updatedRoastDate,
             updatedNotes,
-            true,
-            updatedGrinderSetting
+            true
         )
 
         // Then
@@ -114,35 +109,6 @@ class UpdateBeanUseCaseTest {
         val updatedBean = result.getOrNull()
         assertEquals("Ethiopian Yirgacheffe", updatedBean?.name)
         assertEquals("Updated notes", updatedBean?.notes)
-        assertEquals("16", updatedBean?.lastGrinderSetting)
-    }
-
-    @Test
-    fun `execute should handle empty grinder setting`() = runTest {
-        // Given
-        val beanId = "test-id"
-        val updatedName = "Ethiopian Yirgacheffe"
-        val updatedRoastDate = LocalDate.now().minusDays(5)
-        val updatedGrinderSetting = ""
-
-        coEvery { beanRepository.getBeanById(beanId) } returns Result.success(testBean)
-
-        val validationResult = ValidationResult(isValid = true, errors = emptyList())
-        coEvery { beanRepository.validateBean(any()) } returns validationResult
-        coEvery { beanRepository.updateBean(any()) } returns Result.success(Unit)
-
-        // When
-        val result = updateBeanUseCase.execute(
-            beanId,
-            updatedName,
-            updatedRoastDate,
-            lastGrinderSetting = updatedGrinderSetting
-        )
-
-        // Then
-        assertTrue(result.isSuccess)
-        val updatedBean = result.getOrNull()
-        assertNull(updatedBean?.lastGrinderSetting)
     }
 
     @Test
@@ -208,54 +174,6 @@ class UpdateBeanUseCaseTest {
         assertTrue(exception?.message?.contains("Bean name cannot be empty") == true)
 
         coVerify(exactly = 0) { beanRepository.updateBean(any()) }
-    }
-
-    @Test
-    fun `updateGrinderSetting should update grinder setting successfully`() = runTest {
-        // Given
-        val beanId = "test-id"
-        val grinderSetting = "17"
-
-        coEvery { beanRepository.updateLastGrinderSetting(beanId, grinderSetting) } returns Result.success(Unit)
-
-        // When
-        val result = updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
-
-        // Then
-        assertTrue(result.isSuccess)
-        coVerify { beanRepository.updateLastGrinderSetting(beanId, grinderSetting) }
-    }
-
-    @Test
-    fun `updateGrinderSetting should fail with empty bean ID`() = runTest {
-        // Given
-        val beanId = ""
-        val grinderSetting = "17"
-
-        // When
-        val result = updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
-
-        // Then
-        assertTrue(result.isFailure)
-        val exception = result.exceptionOrNull()
-        assertTrue(exception is DomainException)
-        assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_ID_EMPTY)
-    }
-
-    @Test
-    fun `updateGrinderSetting should fail with empty grinder setting`() = runTest {
-        // Given
-        val beanId = "test-id"
-        val grinderSetting = ""
-
-        // When
-        val result = updateBeanUseCase.updateGrinderSetting(beanId, grinderSetting)
-
-        // Then
-        assertTrue(result.isFailure)
-        val exception = result.exceptionOrNull()
-        assertTrue(exception is DomainException)
-        assertEquals((exception as DomainException).errorCode, DomainErrorCode.GRINDER_SETTING_EMPTY)
     }
 
     @Test

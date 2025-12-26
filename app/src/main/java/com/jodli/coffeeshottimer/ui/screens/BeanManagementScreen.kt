@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
@@ -306,60 +305,6 @@ private fun BeanManagementContent(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun SearchAndFilterRow(
-    searchQuery: String,
-    showInactive: Boolean,
-    onSearchQueryChange: (String) -> Unit,
-    onToggleShowInactive: () -> Unit,
-    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(spacing.small),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Search Field
-        CoffeeTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange,
-            label = stringResource(R.string.label_search_beans),
-            placeholder = stringResource(R.string.placeholder_enter_bean_name_search),
-            leadingIcon = Icons.Default.Search,
-            trailingIcon = if (searchQuery.isNotEmpty()) Icons.Default.Clear else null,
-            onTrailingIconClick = if (searchQuery.isNotEmpty()) {
-                { onSearchQueryChange("") }
-            } else {
-                null
-            },
-            modifier = Modifier.weight(1f)
-        )
-
-        // Filter Toggle
-        FilterChip(
-            onClick = onToggleShowInactive,
-            label = {
-                Text(
-                    text = if (showInactive) {
-                        stringResource(R.string.text_all)
-                    } else {
-                        stringResource(R.string.text_active)
-                    },
-                    style = MaterialTheme.typography.labelMedium
-                )
-            },
-            selected = showInactive,
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = null,
-                    modifier = Modifier.size(spacing.iconSmall)
-                )
-            }
-        )
     }
 }
 

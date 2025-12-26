@@ -565,19 +565,6 @@ class ShotRepositoryTest {
     }
 
     @Test
-    fun getSuggestedGrinderSetting_fromBeanLastSetting_returnsCorrectSetting() = runTest {
-        // Given
-        beanRepository.updateLastGrinderSetting(testBean.id, "16.5")
-
-        // When
-        val result = shotRepository.getSuggestedGrinderSetting(testBean.id)
-
-        // Then
-        assertTrue("Getting suggested grinder setting should succeed", result.isSuccess)
-        assertEquals("Should return bean's last grinder setting", "16.5", result.getOrNull())
-    }
-
-    @Test
     fun getSuggestedGrinderSetting_fromLastShot_returnsCorrectSetting() = runTest {
         // Given
         val shot = createTestShot(testBean.id, grinderSetting = "17.0")

@@ -252,32 +252,6 @@ class BeanRepositoryTest {
     }
 
     @Test
-    fun updateLastGrinderSetting_validData_succeeds() = runTest {
-        // Given
-        val bean = createTestBean("Test Bean")
-        repository.addBean(bean)
-
-        // When
-        val result = repository.updateLastGrinderSetting(bean.id, "15.5")
-
-        // Then
-        assertTrue("Updating grinder setting should succeed", result.isSuccess)
-
-        val updatedBean = repository.getBeanById(bean.id).getOrNull()
-        assertEquals("Grinder setting should be updated", "15.5", updatedBean?.lastGrinderSetting)
-    }
-
-    @Test
-    fun updateLastGrinderSetting_nonExistentBean_fails() = runTest {
-        // When
-        val result = repository.updateLastGrinderSetting("non-existent-id", "15.5")
-
-        // Then
-        assertTrue("Updating grinder setting for non-existent bean should fail", result.isFailure)
-        assertTrue("Should be not found error", result.exceptionOrNull() is RepositoryException.NotFoundError)
-    }
-
-    @Test
     fun updateBeanActiveStatus_validData_succeeds() = runTest {
         // Given
         val bean = createTestBean("Test Bean", isActive = true)

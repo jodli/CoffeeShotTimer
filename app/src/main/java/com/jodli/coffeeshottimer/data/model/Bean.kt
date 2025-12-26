@@ -28,7 +28,7 @@ data class Bean(
     val notes: String = "",
     val isActive: Boolean = true,
     @Deprecated(
-        message = "Deprecated: This field is no longer used. Grinder settings are now queried from the shots table for single source of truth.",
+        message = "Grinder settings are now queried from shots table for single source of truth.",
         level = DeprecationLevel.WARNING
     )
     val lastGrinderSetting: String? = null,
