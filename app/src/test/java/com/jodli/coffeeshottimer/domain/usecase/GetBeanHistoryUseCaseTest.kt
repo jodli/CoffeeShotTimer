@@ -284,30 +284,6 @@ class GetBeanHistoryUseCaseTest {
     }
 
     @Test
-    fun `getBeansWithGrinderSettings should filter beans with grinder settings`() = runTest {
-        // Given
-        coEvery { beanRepository.getAllBeans() } returns flowOf(Result.success(testBeans))
-
-        // When
-        val results = getBeanHistoryUseCase.getBeansWithGrinderSettings().toList()
-
-        // Then
-        assertEquals(1, results.size)
-        val result = results.first()
-        assertTrue(result.isSuccess)
-
-        val beans = result.getOrNull()
-        assertNotNull(beans)
-        assertEquals(3, beans?.size) // All except bean3 which has null grinder setting
-
-        // Should not include bean3 which has null grinder setting
-        assertFalse(beans?.any { it.id == "bean3" } == true)
-        assertTrue(beans?.any { it.id == "bean1" } == true)
-        assertTrue(beans?.any { it.id == "bean2" } == true)
-        assertTrue(beans?.any { it.id == "bean4" } == true)
-    }
-
-    @Test
     fun `getBeanHistoryStats should return correct statistics`() = runTest {
         // Given
         coEvery { beanRepository.getAllBeans() } returns flowOf(Result.success(testBeans))
@@ -323,7 +299,6 @@ class GetBeanHistoryUseCaseTest {
         assertEquals(4, stats?.totalBeans)
         assertEquals(2, stats?.activeBeans) // bean1, bean3
         assertEquals(2, stats?.inactiveBeans) // bean2, bean4
-        assertEquals(3, stats?.beansWithGrinderSettings) // All except bean3
         assertEquals(2, stats?.freshBeans) // bean1 (7 days) and bean3 (20 days) are fresh
 
         // Average days since roast: (7 + 3 + 20 + 45) / 4 = 18.75
@@ -349,7 +324,6 @@ class GetBeanHistoryUseCaseTest {
         assertEquals(0, stats?.totalBeans)
         assertEquals(0, stats?.activeBeans)
         assertEquals(0, stats?.inactiveBeans)
-        assertEquals(0, stats?.beansWithGrinderSettings)
         assertEquals(0, stats?.freshBeans)
         assertEquals(0.0, stats?.averageDaysSinceRoast ?: 0.0, 0.01)
         assertNull(stats?.oldestRoastDate)
@@ -439,7 +413,6 @@ class GetBeanHistoryUseCaseTest {
         assertEquals(0, stats.totalBeans)
         assertEquals(0, stats.activeBeans)
         assertEquals(0, stats.inactiveBeans)
-        assertEquals(0, stats.beansWithGrinderSettings)
         assertEquals(0, stats.freshBeans)
         assertEquals(0.0, stats.averageDaysSinceRoast, 0.01)
         assertNull(stats.oldestRoastDate)
