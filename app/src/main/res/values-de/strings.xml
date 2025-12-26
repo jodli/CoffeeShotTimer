@@ -129,6 +129,7 @@
     <string name="label_bean_name_required">Bohnenname *</string>
     <string name="label_roast_date_required">Röstdatum *</string>
     <string name="label_search_beans">Bohnen suchen</string>
+    <string name="label_search">Suche</string>
     <string name="label_coffee_weight_in">Pulvergewicht Rein</string>
     <string name="label_coffee_weight_out">Kaffeegewicht Raus</string>
     <string name="label_extraction_time">Extraktionszeit</string>
