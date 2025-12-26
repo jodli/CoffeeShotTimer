@@ -36,3 +36,6 @@ ehthumbs.db
 
 # Log files
 *.log
+
+# Local ADB device config
+.adb-device
