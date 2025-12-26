@@ -1409,6 +1409,43 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
+     * Refresh the current bean selection from the repository.
+     * Called when returning from other screens (e.g., BeanManagementScreen)
+     * to ensure the selected bean is up-to-date with any changes made in other screens.
+     */
+    fun refreshCurrentBean() {
+        viewModelScope.launch {
+            val result = beanRepository.getCurrentBean()
+            result.fold(
+                onSuccess = { currentBean ->
+                    if (currentBean != null) {
+                        // Check if bean is still active
+                        val activeBeans = _activeBeans.value
+                        val isBeanStillActive = activeBeans.any { it.id == currentBean.id }
+
+                        if (isBeanStillActive) {
+                            // Only update if different from currently selected bean
+                            if (_selectedBean.value?.id != currentBean.id) {
+                                selectBean(currentBean)
+                            }
+                        } else {
+                            // Current bean is no longer active, clear it from repository
+                            beanRepository.clearCurrentBean()
+                            // Auto-select first available bean
+                            if (activeBeans.isNotEmpty()) {
+                                selectBean(activeBeans.first())
+                            }
+                        }
+                    }
+                },
+                onFailure = {
+                    // Silently handle error - current bean is optional
+                }
+            )
+        }
+    }
+
+    /**
      * Check if the current grinder setting matches the persistent recommendation within tolerance.
      * Epic 4: Used for tracking recommendation follow-through rates.
      */

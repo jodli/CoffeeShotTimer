@@ -246,7 +246,6 @@ class DatabasePopulatorTest {
             assertTrue("Bean name should be realistic", bean.name in expectedNames)
             assertTrue("Bean should be active", bean.isActive)
             assertTrue("Bean should have notes", bean.notes.isNotBlank())
-            assertTrue("Bean should have grinder setting", bean.lastGrinderSetting?.isNotBlank() == true)
 
             // Verify roast date is within reasonable range (3-20 days ago)
             val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now())

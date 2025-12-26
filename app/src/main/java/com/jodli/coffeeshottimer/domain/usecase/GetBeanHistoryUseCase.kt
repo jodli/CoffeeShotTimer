@@ -216,35 +216,6 @@ class GetBeanHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Get beans with grinder settings history.
-     * Useful for analyzing grinder setting patterns across different beans.
-     * @return Flow of Result containing list of beans that have grinder settings
-     */
-    fun getBeansWithGrinderSettings(): Flow<Result<List<Bean>>> {
-        return beanRepository.getAllBeans()
-            .map { result ->
-                if (result.isSuccess) {
-                    val beans = result.getOrNull() ?: emptyList()
-                    val beansWithSettings = beans.filter { !it.lastGrinderSetting.isNullOrBlank() }
-                    Result.success(beansWithSettings.sortedByDescending { it.createdAt })
-                } else {
-                    result
-                }
-            }
-            .catch { exception ->
-                emit(
-                    Result.failure(
-                        DomainException(
-                            DomainErrorCode.FAILED_TO_GET_ACTIVE_BEANS,
-                            "Failed to get beans with grinder settings",
-                            exception
-                        )
-                    )
-                )
-            }
-    }
-
-    /**
      * Get bean statistics for historical analysis.
      * @return Result containing BeanHistoryStats
      */
@@ -260,9 +231,6 @@ class GetBeanHistoryUseCase @Inject constructor(
                     val totalBeans = beans.size
                     val activeBeans = beans.count { it.isActive }
                     val inactiveBeans = totalBeans - activeBeans
-                    val beansWithGrinderSettings =
-                        beans.count { !it.lastGrinderSetting.isNullOrBlank() }
-
                     val freshBeans = beans.count { it.isFresh() }
                     val averageDaysSinceRoast = if (beans.isNotEmpty()) {
                         beans.map { it.daysSinceRoast() }.average()
@@ -277,7 +245,6 @@ class GetBeanHistoryUseCase @Inject constructor(
                         totalBeans = totalBeans,
                         activeBeans = activeBeans,
                         inactiveBeans = inactiveBeans,
-                        beansWithGrinderSettings = beansWithGrinderSettings,
                         freshBeans = freshBeans,
                         averageDaysSinceRoast = averageDaysSinceRoast,
                         oldestRoastDate = oldestBean?.roastDate,
@@ -347,7 +314,6 @@ data class BeanHistoryStats(
     val totalBeans: Int = 0,
     val activeBeans: Int = 0,
     val inactiveBeans: Int = 0,
-    val beansWithGrinderSettings: Int = 0,
     val freshBeans: Int = 0,
     val averageDaysSinceRoast: Double = 0.0,
     val oldestRoastDate: LocalDate? = null,

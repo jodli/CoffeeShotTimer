@@ -43,6 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -126,6 +127,12 @@ fun RecordShotScreen(
     var showGrinderSheet by remember { mutableStateOf(false) }
     var showCoffeeInDialog by remember { mutableStateOf(false) }
     var showManualTimeDialog by remember { mutableStateOf(false) }
+
+    // Refresh current bean when screen becomes visible
+    // This ensures the selected bean is updated if changed in BeanManagementScreen
+    LaunchedEffect(Unit) {
+        viewModel.refreshCurrentBean()
+    }
 
     RecordShotScreenContent(
         selectedBean = selectedBean,

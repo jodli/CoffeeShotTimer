@@ -25,7 +25,6 @@ class UpdateBeanUseCase @Inject constructor(
      * @param roastDate Updated roast date (cannot be future, max 365 days ago)
      * @param notes Updated notes about the bean (max 500 characters)
      * @param isActive Whether the bean should be active
-     * @param lastGrinderSetting Updated grinder setting
      * @return Result containing the updated bean or validation errors
      */
     suspend fun execute(
@@ -33,57 +32,30 @@ class UpdateBeanUseCase @Inject constructor(
         name: String,
         roastDate: LocalDate,
         notes: String = "",
-        isActive: Boolean = true,
-        lastGrinderSetting: String? = null
+        isActive: Boolean = true
     ): Result<Bean> {
+        val trimmedBeanId = beanId.trim()
+        if (trimmedBeanId.isEmpty()) {
+            return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
+        }
+
         return try {
-            // Validate bean ID
-            if (beanId.trim().isEmpty()) {
-                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
-            }
+            val existingBean = getExistingBeanOrThrow(trimmedBeanId)
 
-            // Get existing bean to preserve creation timestamp
-            val existingBeanResult = beanRepository.getBeanById(beanId.trim())
-            if (existingBeanResult.isFailure) {
-                return Result.failure(
-                    existingBeanResult.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to get existing bean")
-                )
-            }
-
-            val existingBean = existingBeanResult.getOrNull()
-                ?: return Result.failure(DomainException(DomainErrorCode.BEAN_NOT_FOUND))
-
-            // Create updated bean instance
             val updatedBean = existingBean.copy(
                 name = name.trim(),
                 roastDate = roastDate,
                 notes = notes.trim(),
                 isActive = isActive,
-                lastGrinderSetting = lastGrinderSetting?.trim()?.takeIf { it.isNotEmpty() }
+                lastGrinderSetting = existingBean.lastGrinderSetting
             )
 
-            // Validate updated bean through repository (includes uniqueness check)
-            val validationResult = beanRepository.validateBean(updatedBean)
-            if (!validationResult.isValid) {
-                return Result.failure(
-                    DomainException(
-                        DomainErrorCode.VALIDATION_FAILED,
-                        "Bean validation failed: ${validationResult.errors.joinToString(", ")}"
-                    )
-                )
-            }
+            validateBeanOrThrow(updatedBean)
+            updateBeanOrThrow(updatedBean)
 
-            // Update bean in repository
-            val updateResult = beanRepository.updateBean(updatedBean)
-            if (updateResult.isSuccess) {
-                Result.success(updatedBean)
-            } else {
-                Result.failure(
-                    updateResult.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update bean")
-                )
-            }
+            Result.success(updatedBean)
+        } catch (exception: DomainException) {
+            Result.failure(exception)
         } catch (exception: Exception) {
             Result.failure(
                 DomainException(
@@ -95,43 +67,32 @@ class UpdateBeanUseCase @Inject constructor(
         }
     }
 
-    /**
-     * Update only the grinder setting for a bean (grinder setting memory functionality).
-     * @param beanId ID of the bean to update
-     * @param grinderSetting New grinder setting to remember
-     * @return Result indicating success or failure
-     */
-    suspend fun updateGrinderSetting(
-        beanId: String,
-        grinderSetting: String
-    ): Result<Unit> {
-        return try {
-            if (beanId.trim().isEmpty()) {
-                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
-            }
+    private suspend fun getExistingBeanOrThrow(beanId: String): Bean {
+        val result = beanRepository.getBeanById(beanId)
+        if (result.isFailure) {
+            throw result.exceptionOrNull() as? DomainException
+                ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to get existing bean")
+        }
 
-            if (grinderSetting.trim().isEmpty()) {
-                return Result.failure(DomainException(DomainErrorCode.GRINDER_SETTING_EMPTY))
-            }
+        return result.getOrNull()
+            ?: throw DomainException(DomainErrorCode.BEAN_NOT_FOUND)
+    }
 
-            val result =
-                beanRepository.updateLastGrinderSetting(beanId.trim(), grinderSetting.trim())
-            if (result.isSuccess) {
-                Result.success(Unit)
-            } else {
-                Result.failure(
-                    result.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update grinder setting")
-                )
-            }
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.UNKNOWN_ERROR,
-                    "Unexpected error updating grinder setting",
-                    exception
-                )
+    private suspend fun validateBeanOrThrow(bean: Bean) {
+        val validationResult = beanRepository.validateBean(bean)
+        if (!validationResult.isValid) {
+            throw DomainException(
+                DomainErrorCode.VALIDATION_FAILED,
+                "Bean validation failed: ${validationResult.errors.joinToString(", ")}"
             )
+        }
+    }
+
+    private suspend fun updateBeanOrThrow(bean: Bean) {
+        val updateResult = beanRepository.updateBean(bean)
+        if (updateResult.isFailure) {
+            throw updateResult.exceptionOrNull() as? DomainException
+                ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update bean")
         }
     }
 

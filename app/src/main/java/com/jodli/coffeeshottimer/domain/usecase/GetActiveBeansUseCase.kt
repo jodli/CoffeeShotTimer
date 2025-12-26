@@ -121,35 +121,6 @@ class GetActiveBeansUseCase @Inject constructor(
     }
 
     /**
-     * Get active beans that have grinder settings saved.
-     * Useful for quick shot recording with remembered settings.
-     * @return Flow of Result containing list of active beans with grinder settings
-     */
-    fun getActiveBeansWithGrinderSettings(): Flow<Result<List<Bean>>> {
-        return beanRepository.getActiveBeans()
-            .map { result ->
-                if (result.isSuccess) {
-                    val beans = result.getOrNull() ?: emptyList()
-                    val beansWithSettings = beans.filter { !it.lastGrinderSetting.isNullOrBlank() }
-                    Result.success(beansWithSettings.sortedByDescending { it.createdAt })
-                } else {
-                    result
-                }
-            }
-            .catch { exception ->
-                emit(
-                    Result.failure(
-                        DomainException(
-                            DomainErrorCode.UNKNOWN_ERROR,
-                            "Failed to get active beans with grinder settings",
-                            exception
-                        )
-                    )
-                )
-            }
-    }
-
-    /**
      * Get count of active beans.
      * @return Result containing the count of active beans
      */
