@@ -34,54 +34,28 @@ class UpdateBeanUseCase @Inject constructor(
         notes: String = "",
         isActive: Boolean = true
     ): Result<Bean> {
+        val trimmedBeanId = beanId.trim()
+        if (trimmedBeanId.isEmpty()) {
+            return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
+        }
+
         return try {
-            // Validate bean ID
-            if (beanId.trim().isEmpty()) {
-                return Result.failure(DomainException(DomainErrorCode.BEAN_ID_EMPTY))
-            }
+            val existingBean = getExistingBeanOrThrow(trimmedBeanId)
 
-            // Get existing bean to preserve creation timestamp
-            val existingBeanResult = beanRepository.getBeanById(beanId.trim())
-            if (existingBeanResult.isFailure) {
-                return Result.failure(
-                    existingBeanResult.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to get existing bean")
-                )
-            }
-
-            val existingBean = existingBeanResult.getOrNull()
-                ?: return Result.failure(DomainException(DomainErrorCode.BEAN_NOT_FOUND))
-
-            // Create updated bean instance
             val updatedBean = existingBean.copy(
                 name = name.trim(),
                 roastDate = roastDate,
                 notes = notes.trim(),
                 isActive = isActive,
-                lastGrinderSetting = existingBean.lastGrinderSetting // Preserve deprecated field for DB compatibility
+                lastGrinderSetting = existingBean.lastGrinderSetting
             )
 
-            // Validate updated bean through repository (includes uniqueness check)
-            val validationResult = beanRepository.validateBean(updatedBean)
-            if (!validationResult.isValid) {
-                return Result.failure(
-                    DomainException(
-                        DomainErrorCode.VALIDATION_FAILED,
-                        "Bean validation failed: ${validationResult.errors.joinToString(", ")}"
-                    )
-                )
-            }
+            validateBeanOrThrow(updatedBean)
+            updateBeanOrThrow(updatedBean)
 
-            // Update bean in repository
-            val updateResult = beanRepository.updateBean(updatedBean)
-            if (updateResult.isSuccess) {
-                Result.success(updatedBean)
-            } else {
-                Result.failure(
-                    updateResult.exceptionOrNull()
-                        ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update bean")
-                )
-            }
+            Result.success(updatedBean)
+        } catch (exception: DomainException) {
+            Result.failure(exception)
         } catch (exception: Exception) {
             Result.failure(
                 DomainException(
@@ -90,6 +64,35 @@ class UpdateBeanUseCase @Inject constructor(
                     exception
                 )
             )
+        }
+    }
+
+    private suspend fun getExistingBeanOrThrow(beanId: String): Bean {
+        val result = beanRepository.getBeanById(beanId)
+        if (result.isFailure) {
+            throw result.exceptionOrNull() as? DomainException
+                ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to get existing bean")
+        }
+
+        return result.getOrNull()
+            ?: throw DomainException(DomainErrorCode.BEAN_NOT_FOUND)
+    }
+
+    private suspend fun validateBeanOrThrow(bean: Bean) {
+        val validationResult = beanRepository.validateBean(bean)
+        if (!validationResult.isValid) {
+            throw DomainException(
+                DomainErrorCode.VALIDATION_FAILED,
+                "Bean validation failed: ${validationResult.errors.joinToString(", ")}"
+            )
+        }
+    }
+
+    private suspend fun updateBeanOrThrow(bean: Bean) {
+        val updateResult = beanRepository.updateBean(bean)
+        if (updateResult.isFailure) {
+            throw updateResult.exceptionOrNull() as? DomainException
+                ?: DomainException(DomainErrorCode.UNKNOWN_ERROR, "Failed to update bean")
         }
     }
 

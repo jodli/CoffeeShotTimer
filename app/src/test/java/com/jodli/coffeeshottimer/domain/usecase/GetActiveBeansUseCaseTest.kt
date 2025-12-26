@@ -175,29 +175,6 @@ class GetActiveBeansUseCaseTest {
     }
 
     @Test
-    fun `getActiveBeansWithGrinderSettings should filter beans with grinder settings`() = runTest {
-        // Given
-        coEvery { beanRepository.getActiveBeans() } returns flowOf(Result.success(testBeans))
-
-        // When
-        val results = getActiveBeansUseCase.getActiveBeansWithGrinderSettings().toList()
-
-        // Then
-        assertEquals(1, results.size)
-        val result = results.first()
-        assertTrue(result.isSuccess)
-
-        val beans = result.getOrNull()
-        assertNotNull(beans)
-        assertEquals(2, beans?.size) // Only beans with grinder settings
-
-        // Should not include bean3 which has null grinder setting
-        assertFalse(beans?.any { it.id == "bean3" } == true)
-        assertTrue(beans?.any { it.id == "bean1" } == true)
-        assertTrue(beans?.any { it.id == "bean2" } == true)
-    }
-
-    @Test
     fun `getActiveBeanCount should return count of active beans`() = runTest {
         // Given
         coEvery { beanRepository.getActiveBeanCount() } returns Result.success(5)

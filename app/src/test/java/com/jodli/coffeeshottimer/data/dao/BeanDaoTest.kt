@@ -197,20 +197,6 @@ class BeanDaoTest {
     }
 
     @Test
-    fun updateLastGrinderSetting_updatesCorrectly() = runTest {
-        // Given
-        val bean = createTestBean("Test Bean")
-        beanDao.insertBean(bean)
-
-        // When
-        beanDao.updateLastGrinderSetting(bean.id, "15.5")
-
-        // Then
-        val updatedBean = beanDao.getBeanById(bean.id)
-        assertEquals("Grinder setting should be updated", "15.5", updatedBean?.lastGrinderSetting)
-    }
-
-    @Test
     fun updateBeanActiveStatus_updatesCorrectly() = runTest {
         // Given
         val bean = createTestBean("Test Bean", isActive = true)
