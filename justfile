@@ -65,3 +65,8 @@ adb-restart:
     adb kill-server
     adb start-server
     @adb devices
+
+# Take screenshot from device and copy to clipboard
+screenshot:
+    adb exec-out screencap -p | wl-copy -t image/png
+    @echo "Screenshot copied to clipboard!"
