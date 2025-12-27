@@ -49,7 +49,27 @@ com.jodli.coffeeshottimer/
 
 ## Essential Workflows
 
-### Build & Release
+### Development Commands (justfile)
+
+All common tasks are available via `just`. Run `just --list` to see all recipes.
+
+**Build & Test:**
+- `just build` - Build debug APK (devDebug)
+- `just test` - Run unit tests
+- `just lint` - Run Android lint
+- `just detekt` - Run detekt static analysis
+- `just check` - Run all checks (detekt + lint + tests)
+- `just clean` - Clean build artifacts
+
+**Device:**
+- `just install` - Install debug APK on connected device
+- `just screenshot` - Take screenshot from device, copy to clipboard
+- `just adb-connect` - Auto-discover and connect via mDNS
+- `just adb-pair <ip> <port>` - Pair with device (one-time setup)
+- `just adb-status` - Show connected devices
+- `just adb-restart` - Restart ADB server
+
+### Release Build
 - **Windows release**: Use `build-release.bat` (includes keystore validation, tests, APK+AAB generation)
 - **Signing**: Requires `keystore.properties` file (template available)
 - **Build flavors**: `debug` (with suffix) and `release` (minified, signed)
