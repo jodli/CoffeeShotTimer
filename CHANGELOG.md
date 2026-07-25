@@ -6,6 +6,23 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [2.2.0]
+
+### Added
+
+- [*] Redesigned Bean Management screen with photo-prominent bean cards, smart sorting, and live status indicators (active, low, finished).
+- [*] Filter your shot history by bean to focus on one coffee at a time.
+- Last-used date shown for each bean so you can see what you've been brewing lately.
+
+### Changed
+
+- Streamlined grind-setting management for a faster, less error-prone bean setup flow.
+
+### Fixed
+
+- Selected bean now reliably reloads on the Record Shot screen after navigation.
+- Restored missing German translation for search.
+
 ## [2.1.0]
 
 ### Added
