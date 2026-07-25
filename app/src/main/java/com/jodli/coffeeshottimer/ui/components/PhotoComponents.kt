@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -774,7 +775,49 @@ private fun PhotoDeleteDialog(
 }
 
 /**
- * Small photo thumbnail for bean list items
+ * Renders the photo [Card] wrapping a Coil [AsyncImage] at the given [size],
+ * with the shared shape/elevation/click-to-open-viewer wiring. Caller is
+ * responsible for the no-photo branch — this helper does not handle null
+ * [photoPath] (extracted so [BeanPhotoThumbnail] and [BeanPhotoThumbnailLarge]
+ * do not duplicate the Coil/Clickable logic).
+ */
+@Composable
+private fun BeanPhotoCard(
+    photoPath: String,
+    size: Dp,
+    onPhotoClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    val context = LocalContext.current
+    Card(
+        modifier = modifier
+            .size(size)
+            .then(
+                if (onPhotoClick != null) {
+                    Modifier.clickable { onPhotoClick() }
+                } else {
+                    Modifier
+                }
+            ),
+        shape = RoundedCornerShape(spacing.cornerSmall),
+        elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
+    ) {
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(File(photoPath))
+                .crossfade(true)
+                .build(),
+            contentDescription = stringResource(R.string.cd_bean_photo_thumbnail),
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+/**
+ * Small photo thumbnail (48dp) for bean list items. Renders a transparent
+ * same-sized [Box] when [photoPath] is null so row height stays consistent.
  */
 @Composable
 fun BeanPhotoThumbnail(
@@ -783,36 +826,41 @@ fun BeanPhotoThumbnail(
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
-    val context = LocalContext.current
-
     if (photoPath != null) {
-        Card(
+        BeanPhotoCard(
+            photoPath = photoPath,
+            size = spacing.thumbnailSize,
+            onPhotoClick = onPhotoClick,
             modifier = modifier
-                .size(spacing.thumbnailSize)
-                .then(
-                    if (onPhotoClick != null) {
-                        Modifier.clickable { onPhotoClick() }
-                    } else {
-                        Modifier
-                    }
-                ),
-            shape = RoundedCornerShape(spacing.cornerSmall),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(File(photoPath))
-                    .crossfade(true)
-                    .build(),
-                contentDescription = stringResource(R.string.cd_bean_photo_thumbnail),
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
+        )
     } else {
         // Empty placeholder for consistent spacing
         Box(
             modifier = modifier.size(spacing.thumbnailSize)
+        )
+    }
+}
+
+/**
+ * Hero photo (64dp, `spacing.photoSizeLarge`) for the S1 bean card header.
+ * Renders **nothing** when [photoPath] is null — no spacer Box — so the meta
+ * column reflows naturally to the card edge (Q5 resolution: no padding
+ * arithmetic). The caller decides the no-photo treatment (e.g. an inline
+ * bean icon before the name).
+ */
+@Composable
+fun BeanPhotoThumbnailLarge(
+    photoPath: String?,
+    onPhotoClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    val spacing = LocalSpacing.current
+    if (photoPath != null) {
+        BeanPhotoCard(
+            photoPath = photoPath,
+            size = spacing.photoSizeLarge,
+            onPhotoClick = onPhotoClick,
+            modifier = modifier
         )
     }
 }

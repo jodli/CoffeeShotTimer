@@ -84,6 +84,7 @@
     <string name="text_fair">Fair</string>
     <string name="text_needs_work">Needs Work</string>
     <string name="text_stale">Stale</string>
+    <string name="text_ok_freshness">OK</string>
     <string name="text_strong_extraction">Strong Extraction</string>
     <string name="text_weak_extraction">Weak Extraction</string>
     <string name="text_typical_extraction">Typical espresso range</string>
@@ -102,6 +103,12 @@
     <string name="bean_status_experimenting">Experimenting - Keep dialing in</string>
     <string name="bean_status_needs_work">Needs Work - Try following suggestions</string>
     <string name="bean_status_fresh_start">New Bean - No shots yet</string>
+
+    <!-- Bean Status Short Labels (used by S1 status text badges) -->
+    <string name="bean_status_dialed_in_short">Dialed In</string>
+    <string name="bean_status_experimenting_short">Experimenting</string>
+    <string name="bean_status_needs_work_short">Needs Work</string>
+    <string name="bean_status_fresh_start_short">New Bean</string>
     
     <!-- Content Descriptions -->
     <string name="cd_view_shot_history">View shot history for this bean</string>

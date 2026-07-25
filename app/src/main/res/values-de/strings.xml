@@ -86,6 +86,7 @@
     <string name="text_fair">Ordentlich</string>
     <string name="text_needs_work">Verbesserungsbedarf</string>
     <string name="text_stale">Alt</string>
+    <string name="text_ok_freshness">OK</string>
     <string name="text_strong_extraction">Starke Extraktion</string>
     <string name="text_weak_extraction">Schwache Extraktion</string>
     <string name="text_typical_extraction">Typischer Espresso-Bereich</string>
@@ -104,6 +105,12 @@
     <string name="bean_status_experimenting">Experimentieren - Weiter einstellen</string>
     <string name="bean_status_needs_work">Braucht Arbeit - Versuche Vorschläge zu befolgen</string>
     <string name="bean_status_fresh_start">Neue Bohne - Noch keine Shots</string>
+
+    <!-- Bean Status Short Labels (used by S1 status text badges) -->
+    <string name="bean_status_dialed_in_short">Eingestellt</string>
+    <string name="bean_status_experimenting_short">Experimentieren</string>
+    <string name="bean_status_needs_work_short">Braucht Arbeit</string>
+    <string name="bean_status_fresh_start_short">Neue Bohne</string>
     
     <!-- Content Descriptions -->
     <string name="cd_view_shot_history">Shot-Verlauf für diese Bohne ansehen</string>
