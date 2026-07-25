@@ -258,6 +258,40 @@ class AddEditBeanViewModel @Inject constructor(
     }
 
     /**
+     * Soft-deletes the bean currently being edited by deactivating it.
+     * Mirrors [BeanManagementViewModel.deleteBean] via the shared
+     * [updateBeanUseCase.updateActiveStatus] path. Surfaces failures through
+     * [domainErrorTranslator] into [_uiState]; on success sets [AddEditBeanUiState.deleteSuccess]
+     * so the screen can navigate back. Reactivation is handled separately by the
+     * `isActive` Switch in the edit screen — no work needed here.
+     *
+     * No-op when not in edit mode (no [editingBeanId]).
+     */
+    fun deleteBean() {
+        val id = editingBeanId ?: return
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isSaving = true, error = null)
+
+            val result = updateBeanUseCase.updateActiveStatus(id, false)
+            if (result.isSuccess) {
+                _uiState.value = _uiState.value.copy(
+                    isSaving = false,
+                    deleteSuccess = true
+                )
+            } else {
+                _uiState.value = _uiState.value.copy(
+                    isSaving = false,
+                    error = domainErrorTranslator.translateResultError(result)
+                )
+            }
+        }
+    }
+
+    fun resetDeleteSuccess() {
+        _uiState.value = _uiState.value.copy(deleteSuccess = false)
+    }
+
+    /**
      * Adds or replaces a photo for the bean.
      * In create mode, stores the photo URI temporarily until bean is saved.
      * In edit mode, immediately updates the bean's photo.
@@ -543,6 +577,7 @@ data class AddEditBeanUiState(
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
     val savedBean: Bean? = null, // The saved/created bean for onboarding mode
+    val deleteSuccess: Boolean = false, // Soft-delete completed in edit mode -> screen pops back
     val error: String? = null,
     val isEditMode: Boolean = false,
     val isPhotoLoading: Boolean = false,

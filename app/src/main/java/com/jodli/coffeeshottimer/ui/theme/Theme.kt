@@ -51,6 +51,7 @@ data class Spacing(
     val iconButtonSize: Dp = 32.dp,
     val sliderHeightSmall: Dp = 24.dp,
     val thumbnailSize: Dp = 48.dp,
+    val photoSizeLarge: Dp = 64.dp, // S1 card hero photo (Phase 3 target)
     // Landscape-specific values
     val landscapeTimerSize: Dp = 220.dp, // Used as fallback when BoxWithConstraints isn't available
     val landscapeContentSpacing: Dp = 12.dp

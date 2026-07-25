@@ -12,19 +12,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -78,6 +85,7 @@ fun AddEditBeanScreen(
     var showDatePicker by remember { mutableStateOf(false) }
     var showPhotoViewer by remember { mutableStateOf(false) }
     var showPhotoActionSheet by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
     var cameraPermissionGranted by remember { mutableStateOf(viewModel.isCameraPermissionGranted(context)) }
 
@@ -212,6 +220,14 @@ fun AddEditBeanScreen(
                 onNavigateBack()
             }
             viewModel.resetSaveSuccess()
+        }
+    }
+
+    // Handle delete success — navigate back to the bean list
+    LaunchedEffect(uiState.deleteSuccess) {
+        if (uiState.deleteSuccess) {
+            onNavigateBack()
+            viewModel.resetDeleteSuccess()
         }
     }
 
@@ -363,6 +379,30 @@ fun AddEditBeanScreen(
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
+
+                                Spacer(modifier = Modifier.height(spacing.medium))
+
+                                // Destructive delete action — relocated off the bean card per S1.
+                                OutlinedButton(
+                                    onClick = { showDeleteDialog = true },
+                                    enabled = !uiState.isSaving,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(spacing.cornerMedium),
+                                    colors = ButtonDefaults.outlinedButtonColors(
+                                        contentColor = MaterialTheme.colorScheme.error
+                                    )
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(spacing.iconSmall)
+                                    )
+                                    Spacer(modifier = Modifier.width(spacing.small))
+                                    Text(
+                                        text = stringResource(R.string.button_delete_bean),
+                                        style = MaterialTheme.typography.labelLarge
+                                    )
+                                }
                             }
                         }
 
@@ -513,6 +553,30 @@ fun AddEditBeanScreen(
                                             style = MaterialTheme.typography.bodySmall,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
+
+                                        Spacer(modifier = Modifier.height(spacing.medium))
+
+                                        // Destructive delete action — relocated off the bean card per S1.
+                                        OutlinedButton(
+                                            onClick = { showDeleteDialog = true },
+                                            enabled = !uiState.isSaving,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(spacing.cornerMedium),
+                                            colors = ButtonDefaults.outlinedButtonColors(
+                                                contentColor = MaterialTheme.colorScheme.error
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(spacing.iconSmall)
+                                            )
+                                            Spacer(modifier = Modifier.width(spacing.small))
+                                            Text(
+                                                text = stringResource(R.string.button_delete_bean),
+                                                style = MaterialTheme.typography.labelLarge
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -643,6 +707,42 @@ fun AddEditBeanScreen(
             },
             onRequestStoragePermission = {
                 // No storage permission needed for Photo Picker
+            }
+        )
+    }
+
+    // Delete Confirmation Dialog — lifted from BeanManagementScreen, reusing the
+    // shared updateActiveStatus(id, false) soft-delete path via viewModel.deleteBean().
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = {
+                Text(stringResource(R.string.button_delete_bean))
+            },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.format_delete_bean_confirmation,
+                        uiState.name
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        viewModel.deleteBean()
+                    }
+                ) {
+                    Text(stringResource(R.string.text_bean_management_delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showDeleteDialog = false }
+                ) {
+                    Text(stringResource(R.string.text_dialog_cancel))
+                }
             }
         )
     }
