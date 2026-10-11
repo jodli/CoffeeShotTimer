@@ -3,243 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Expert coffee brewing guides - Perfect your espresso shots, learn optimal ratios, and master your grinder settings with Coffee Shot Timer.">
-    <meta name="keywords" content="espresso guides, coffee brewing, shot timing, brew ratios, grinder settings, coffee extraction">
-    <meta name="robots" content="index, follow">
-    <title>Coffee Brewing Guides - Coffee Shot Timer</title>
-    
-    <!-- Favicon -->
+    <title>Brewing guides: Coffee Shot Timer</title>
+    <meta name="description" content="Espresso brewing guides: shot timing, brew ratios, grinder settings, troubleshooting and bean storage.">
+    <meta name="theme-color" content="#f6f6f1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#10161d" media="(prefers-color-scheme: dark)">
+    <link rel="canonical" href="https://jodli.github.io/CoffeeShotTimer/guides.html">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-    
-    <!-- Immediate theme detection to prevent flash -->
-    <script>
-        (function() {
-            try {
-                const savedTheme = localStorage.getItem('coffee-shot-timer-theme');
-                const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const theme = savedTheme || systemTheme;
-                document.documentElement.setAttribute('data-theme', theme);
-            } catch (e) {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        })();
-    </script>
-    
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/components.css">
-    
-    <!-- Additional styles for guides -->
-    <style>
-        /* Use standard coffee-card styles as base, add guide-specific overrides */
-        .guide-full-width {
-            grid-column: 1 / -1;
-        }
-        
-        /* Make all cards full width on small screens */
-        @media (max-width: 768px) {
-            .coffee-card {
-                grid-column: 1 / -1;
-            }
-            
-            .recipe-table {
-                font-size: var(--font-size-xs);
-            }
-        }
-        
-        .coffee-card h4 {
-            margin-top: var(--space-l);
-            margin-bottom: var(--space-s);
-            color: var(--color-on-surface);
-        }
-        
-        .highlight {
-            background: var(--color-primary-container);
-            padding: var(--space-m);
-            border-radius: var(--radius-m);
-            margin: var(--space-m) 0;
-            border-left: 4px solid var(--color-primary);
-        }
-        
-        .highlight strong {
-            color: var(--color-primary);
-        }
-        
-        /* Responsive table wrapper */
-        .table-wrapper {
-            overflow-x: auto;
-            margin: var(--space-m) 0;
-        }
-        
-        .recipe-table {
-            width: 100%;
-            min-width: 320px;
-            border-collapse: collapse;
-            background: var(--color-surface-variant);
-            border-radius: var(--radius-m);
-            overflow: hidden;
-            font-size: var(--font-size-s);
-        }
-        
-        .recipe-table th,
-        .recipe-table td {
-            padding: var(--space-s);
-            text-align: left;
-            border-bottom: 1px solid var(--color-outline-variant);
-        }
-        
-        .recipe-table th {
-            background: var(--color-primary-container);
-            color: var(--color-on-primary-container);
-            font-weight: var(--font-weight-semibold);
-        }
-        
-        .recipe-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .tip-box {
-            background: var(--color-secondary-container);
-            color: var(--color-on-secondary-container);
-            padding: var(--space-m);
-            border-radius: var(--radius-m);
-            margin: var(--space-m) 0;
-            border-left: 4px solid var(--color-secondary);
-        }
-        
-        .tip-box h4 {
-            margin: 0 0 var(--space-s) 0;
-            color: var(--color-secondary);
-            font-weight: var(--font-weight-bold);
-            font-size: var(--font-size-m);
-        }
-        
-        .tip-box ul {
-            margin: var(--space-s) 0;
-            padding-left: var(--space-l);
-        }
-        
-        .step-list {
-            list-style: none;
-            padding: 0;
-            counter-reset: step-counter;
-        }
-        
-        .step-list li {
-            counter-increment: step-counter;
-            position: relative;
-            padding: var(--space-s) 0 var(--space-s) var(--space-l);
-            margin: var(--space-s) 0;
-            border-left: 2px solid var(--color-primary-container);
-        }
-        
-        .step-list li::before {
-            content: counter(step-counter);
-            position: absolute;
-            left: calc(-12px);
-            top: var(--space-s);
-            background: var(--color-primary);
-            color: white;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: var(--font-weight-bold);
-            font-size: var(--font-size-xs);
-        }
-    </style>
+    <link rel="preload" href="assets/fonts/archivo-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-    <!-- Navigation Header -->
-    <header class="nav-header" role="banner">
-        <nav class="nav-container container" role="navigation" aria-label="Main navigation">
-            <a href="index.html" class="nav-logo" aria-label="Coffee Shot Timer Home">
-                <img src="icon.png" alt="Coffee Shot Timer Icon" width="32" height="32">
-                Coffee Shot Timer
-            </a>
-            
-            <ul class="nav-menu">
-                <li><a href="index.html#features">Features</a></li>
-                <li><a href="guides.html">Guides</a></li>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="site-nav">
+        <nav class="wrap" aria-label="Main">
+            <a class="wordmark" href="./"><img src="icon.png" alt="" width="32" height="32">Coffee Shot Timer</a>
+            <ul>
+                <li><a href="guides.html" aria-current="page">Guides</a></li>
                 <li><a href="roadmap.html">Roadmap</a></li>
                 <li><a href="contribute.html">Contribute</a></li>
             </ul>
-            
-            <div class="nav-actions">
-                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                </button>
-                
-                <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary">
-                    Download App
-                </a>
-                
-                <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
+            <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" rel="noopener"><span>Get it<span class="long"> on Google Play</span></span></a>
         </nav>
     </header>
 
-    <!-- Main Content -->
-    <main id="main-content" role="main">
-        <section class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h1>Coffee Brewing Guides</h1>
-                    <p>Master the art of espresso with these expert-approved brewing techniques and timing guidelines.</p>
-                </div>
-            
-                <!-- Guides Grid -->
-                <div class="grid grid-2">
-                    
-                    <!-- Espresso Shot Timing Guide -->
-                    <article class="coffee-card">
-                        <h3>📏 Perfect Espresso Shot Timing</h3>
-                        <p>The foundation of great espresso lies in precise timing. Here's how to achieve the perfect extraction:</p>
-                        
-                        <div class="highlight">
-                            <strong>Golden Rule:</strong> 25-30 seconds for a double shot (18-20g coffee → 36-40g espresso)
-                        </div>
-                        
-                        <ol class="step-list">
-                            <li><strong>Start your timer</strong> when you begin extraction</li>
-                            <li><strong>Watch the flow:</strong> First drops typically appear in 5-10 seconds</li>
-                            <li><strong>Monitor the extraction:</strong> Aim for steady, honey-like flow</li>
-                            <li><strong>Stop at target yield</strong> based on your recipe</li>
-                        </ol>
-                        
-                        <div class="tip-box">
-                            <h4>💡 Pro Tip</h4>
-                            <p>Use Coffee Shot Timer to track your extraction time and weight ratio. The app helps you identify patterns and perfect your technique.</p>
-                        </div>
-                    </article>
-                    
-                    <!-- Troubleshooting Guide - moved up to pair with timing -->
-                    <article class="coffee-card">
-                        <h3>🔧 Troubleshooting Common Issues</h3>
-                        <p>Even experienced baristas encounter problems. Here's how to diagnose and fix common espresso issues:</p>
-                        
-                        <div class="tip-box">
-                            <h4>⚡ Shot Too Fast (Under 20s)</h4>
+    <main id="main">
+        <div class="page-head">
+            <div class="wrap">
+                <h1>Brewing guides</h1>
+                <p>Timing, ratios, grind and beans: the basics behind every recommendation the app makes.</p>
+            </div>
+        </div>
+        <div class="wrap doc">
+            <nav class="doc-toc" aria-label="On this page">
+                <ol>
+                    <li><a href="#timing">Shot timing</a></li>
+                    <li><a href="#troubleshooting">Troubleshooting</a></li>
+                    <li><a href="#ratios">Brew ratios</a></li>
+                    <li><a href="#grinder">Grinder and dialing in</a></li>
+                    <li><a href="#advanced">Advanced techniques</a></li>
+                    <li><a href="#beans">Beans and storage</a></li>
+                </ol>
+            </nav>
+            <div class="doc-body">
+                <section id="timing" aria-labelledby="timing-h">
+                    <h2 id="timing-h">Perfect espresso shot timing</h2>
+                    <p>The foundation of great espresso lies in precise timing. Here’s how to achieve the perfect extraction:</p>
+                    <div class="rule-line"><span class="label">Golden rule</span><p>25-30 seconds for a double shot (18-20g coffee → 36-40g espresso)</p></div>
+                    <ol>
+                        <li><strong>Start your timer</strong> when you begin extraction</li>
+                        <li><strong>Watch the flow:</strong> First drops typically appear in 5-10 seconds</li>
+                        <li><strong>Monitor the extraction:</strong> Aim for steady, honey-like flow</li>
+                        <li><strong>Stop at target yield</strong> based on your recipe</li>
+                    </ol>
+                    <div class="rule-line is-tip"><span class="label">Pro tip</span><p>Use Coffee Shot Timer to track your extraction time and weight ratio. The app helps you identify patterns and perfect your technique.</p></div>
+                </section>
+
+                <section id="troubleshooting" aria-labelledby="trouble-h">
+                    <h2 id="trouble-h">Troubleshooting common issues</h2>
+                    <p>Even experienced baristas encounter problems. Here’s how to diagnose and fix common espresso issues:</p>
+                    <div class="zone-grid">
+                        <div class="z-fast">
+                            <h3>Shot too fast (under 20s)</h3>
                             <ul>
                                 <li>Grind finer (1-2 steps)</li>
                                 <li>Increase dose slightly (+0.5g)</li>
@@ -247,9 +74,8 @@
                                 <li>Ensure even tamping pressure</li>
                             </ul>
                         </div>
-                        
-                        <div class="tip-box">
-                            <h4>🐌 Shot Too Slow (Over 35s)</h4>
+                        <div class="z-slow">
+                            <h3>Shot too slow (over 35s)</h3>
                             <ul>
                                 <li>Grind coarser (1-2 steps)</li>
                                 <li>Reduce dose slightly (-0.5g)</li>
@@ -257,9 +83,8 @@
                                 <li>Verify consistent distribution</li>
                             </ul>
                         </div>
-                        
-                        <div class="tip-box">
-                            <h4>💧 Weak or Sour Shots</h4>
+                        <div class="z-fast">
+                            <h3>Weak or sour shots</h3>
                             <ul>
                                 <li>Increase extraction time</li>
                                 <li>Use fresher beans (7-30 days post-roast)</li>
@@ -267,9 +92,8 @@
                                 <li>Grind finer for more surface area</li>
                             </ul>
                         </div>
-                        
-                        <div class="tip-box">
-                            <h4>😤 Bitter or Harsh Shots</h4>
+                        <div class="z-slow">
+                            <h3>Bitter or harsh shots</h3>
                             <ul>
                                 <li>Reduce extraction time</li>
                                 <li>Lower water temperature</li>
@@ -277,215 +101,107 @@
                                 <li>Check bean freshness (avoid over-roasted)</li>
                             </ul>
                         </div>
-                    </article>
-                    
-                    <!-- Brew Ratios Guide -->
-                    <article class="coffee-card guide-full-width">
-                        <h3>⚖️ Brew Ratios & Yields</h3>
-                        <p>The right coffee-to-water ratio is crucial for balanced extraction. Here are proven ratios for different styles:</p>
-                        
-                        <div class="table-wrapper">
-                        <table class="recipe-table">
-                            <thead>
-                                <tr>
-                                    <th>Style</th>
-                                    <th>Coffee (g)</th>
-                                    <th>Yield (g)</th>
-                                    <th>Ratio</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Ristretto</strong></td>
-                                    <td>18-20g</td>
-                                    <td>27-30g</td>
-                                    <td>1:1.5</td>
-                                    <td>20-25s</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Normale</strong></td>
-                                    <td>18-20g</td>
-                                    <td>36-40g</td>
-                                    <td>1:2</td>
-                                    <td>25-30s</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Lungo</strong></td>
-                                    <td>18-20g</td>
-                                    <td>45-50g</td>
-                                    <td>1:2.5</td>
-                                    <td>30-35s</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                        
-                        <div class="tip-box">
-                            <h4>🎯 Finding Your Sweet Spot</h4>
-                            <p>Start with 1:2 ratio and adjust based on taste. Sour? Extract more (finer grind/longer time). Bitter? Extract less (coarser grind/shorter time).</p>
-                        </div>
-                    </article>
-                    
-                    <!-- Grinder Settings Guide -->
-                    <article class="coffee-card guide-full-width">
-                        <h3>⚙️ Grinder Settings & Dialing In</h3>
-                        <p>Your grinder is the most important tool for consistent espresso. Here's how to dial in the perfect grind:</p>
-                        
-                        <div class="highlight">
-                            <strong>Starting Point:</strong> Medium-fine grind (finer than table salt)
-                        </div>
-                        
-                        <ol class="step-list">
-                            <li><strong>Dose consistently:</strong> Use the same amount of coffee each time</li>
-                            <li><strong>Distribute and tamp evenly:</strong> Consistent pressure, level surface</li>
-                            <li><strong>Pull a test shot:</strong> Time and weigh the output</li>
-                            <li><strong>Taste and adjust:</strong> Make small changes, one at a time</li>
-                        </ol>
-                        
-                        <h4>Common Adjustments:</h4>
-                        <div class="table-wrapper">
-                        <table class="recipe-table">
-                            <thead>
-                                <tr>
-                                    <th>Problem</th>
-                                    <th>Cause</th>
-                                    <th>Solution</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Sour, under-extracted</td>
-                                    <td>Too coarse/fast</td>
-                                    <td>Grind finer</td>
-                                </tr>
-                                <tr>
-                                    <td>Bitter, over-extracted</td>
-                                    <td>Too fine/slow</td>
-                                    <td>Grind coarser</td>
-                                </tr>
-                                <tr>
-                                    <td>Channeling (spurting)</td>
-                                    <td>Uneven distribution</td>
-                                    <td>Better distribution/tamp</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                    </article>
-                    
-                    <!-- Advanced Techniques -->
-                    <article class="coffee-card">
-                        <h3>🎓 Advanced Techniques</h3>
-                        <p>Ready to take your espresso to the next level? Try these advanced techniques used by professional baristas:</p>
-                        
-                        <h4>Pre-Infusion:</h4>
-                        <div class="tip-box">
-                            <h4>💧 Pre-Infusion Basics</h4>
-                            <p>If your machine supports it, pre-infusion can help wet the grounds evenly before full pressure extraction. Times vary by machine and preference.</p>
-                        </div>
-                        
-                        <h4>Distribution Methods:</h4>
-                        <ol class="step-list">
-                            <li><strong>WDT (Weiss Distribution Technique):</strong> Use thin needles to break up clumps</li>
-                            <li><strong>Stockfleth Move:</strong> Level grounds with finger in circular motion</li>
-                            <li><strong>Distribution Tool:</strong> Use calibrated distribution tool for consistency</li>
-                        </ol>
-                        
-                        <h4>Temperature Considerations:</h4>
-                        <div class="highlight">
-                            <strong>Light Roasts:</strong> Generally benefit from higher temperatures<br>
-                            <strong>Dark Roasts:</strong> Generally work well with lower temperatures
-                        </div>
-                    </article>
-                    
-                    <!-- Bean Management -->
-                    <article class="coffee-card">
-                        <h3>☕ Bean Management & Storage</h3>
-                        <p>Great espresso starts with great beans. Here's how to select, store, and track your coffee for optimal results:</p>
-                        
-                        <h4>Bean Selection Guidelines:</h4>
-                        <div class="highlight">
-                            <strong>Optimal Freshness:</strong> Typically 7-30 days from roast date
-                        </div>
-                        
-                        <ol class="step-list">
-                            <li><strong>Check roast date:</strong> Avoid beans over 4 weeks old</li>
-                            <li><strong>Look for quality packaging:</strong> One-way valve bags are ideal</li>
-                            <li><strong>Choose appropriate roast:</strong> Medium to medium-dark for espresso</li>
-                            <li><strong>Buy in small quantities:</strong> 1-2 weeks worth at a time</li>
-                        </ol>
-                        
-                        <div class="tip-box">
-                            <h4>📱 Track with Coffee Shot Timer</h4>
-                            <p>Use the app's bean management feature to track roast dates, origins, and your preferred grind settings for each bean. This helps you maintain consistency and discover your preferences.</p>
-                        </div>
-                    </article>
-                    
-                    <!-- Storage Best Practices Table -->
-                    <article class="coffee-card guide-full-width">
-                        <h3>📦 Storage Best Practices</h3>
-                        <p>Keep your beans fresh and flavorful with proper storage methods:</p>
-                        
-                        <div class="table-wrapper">
-                        <table class="recipe-table">
-                            <thead>
-                                <tr>
-                                    <th>Storage Method</th>
-                                    <th>Duration</th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Original bag with valve</strong></td>
-                                    <td>1-2 weeks</td>
-                                    <td>Best for daily use</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Airtight container</strong></td>
-                                    <td>2-3 weeks</td>
-                                    <td>Keep in cool, dark place</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Freezer (portioned)</strong></td>
-                                    <td>1-2 months</td>
-                                    <td>Freeze in small portions, thaw before use</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                        
-                        <div class="tip-box">
-                            <h4>🔬 Experiment Systematically</h4>
-                            <p>Change only one variable at a time. Use Coffee Shot Timer to log your results and build a database of what works with each bean and setup.</p>
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-    </main>
+                    </div>
+                </section>
 
+                <section id="ratios" aria-labelledby="ratios-h">
+                    <h2 id="ratios-h">Brew ratios and yields</h2>
+                    <p>The right coffee-to-water ratio is crucial for balanced extraction. Here are proven ratios for different styles:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th scope="col">Style</th><th scope="col">Coffee (g)</th><th scope="col">Yield (g)</th><th scope="col">Ratio</th><th scope="col">Time</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Ristretto</th><td>18-20g</td><td>27-30g</td><td>1:1.5</td><td>20-25s</td></tr>
+                                <tr><th scope="row">Normale</th><td>18-20g</td><td>36-40g</td><td>1:2</td><td>25-30s</td></tr>
+                                <tr><th scope="row">Lungo</th><td>18-20g</td><td>45-50g</td><td>1:2.5</td><td>30-35s</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="rule-line is-tip"><span class="label">Sweet spot</span><p>Start with 1:2 ratio and adjust based on taste. Sour? Extract more (finer grind/longer time). Bitter? Extract less (coarser grind/shorter time).</p></div>
+                </section>
 
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-        <div class="container">
-            <div class="footer-content">
-                <ul class="footer-links">
-                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener noreferrer" target="_blank">GitHub</a></li>
-                    <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
-                    <li><a href="roadmap.html">Roadmap</a></li>
-                    <li><a href="contribute.html">Contribute</a></li>
-                </ul>
-                
-                <p class="footer-copyright">
-                    © 2025 Coffee Shot Timer. Made with ☕ for coffee lovers everywhere.
-                </p>
+                <section id="grinder" aria-labelledby="grinder-h">
+                    <h2 id="grinder-h">Grinder settings and dialing in</h2>
+                    <p>Your grinder is the most important tool for consistent espresso. Here’s how to dial in the perfect grind:</p>
+                    <div class="rule-line"><span class="label">Starting point</span><p>Medium-fine grind (finer than table salt)</p></div>
+                    <ol>
+                        <li><strong>Dose consistently:</strong> Use the same amount of coffee each time</li>
+                        <li><strong>Distribute and tamp evenly:</strong> Consistent pressure, level surface</li>
+                        <li><strong>Pull a test shot:</strong> Time and weigh the output</li>
+                        <li><strong>Taste and adjust:</strong> Make small changes, one at a time</li>
+                    </ol>
+                    <h3>Common adjustments</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th scope="col">Problem</th><th scope="col">Cause</th><th scope="col">Solution</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Sour, under-extracted</th><td>Too coarse/fast</td><td>Grind finer</td></tr>
+                                <tr><th scope="row">Bitter, over-extracted</th><td>Too fine/slow</td><td>Grind coarser</td></tr>
+                                <tr><th scope="row">Channeling (spurting)</th><td>Uneven distribution</td><td>Better distribution/tamp</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="advanced" aria-labelledby="advanced-h">
+                    <h2 id="advanced-h">Advanced techniques</h2>
+                    <p>Ready to take your espresso to the next level? Try these advanced techniques used by professional baristas:</p>
+                    <h3>Pre-infusion</h3>
+                    <p>If your machine supports it, pre-infusion can help wet the grounds evenly before full pressure extraction. Times vary by machine and preference.</p>
+                    <h3>Distribution methods</h3>
+                    <ol>
+                        <li><strong>WDT (Weiss Distribution Technique):</strong> Use thin needles to break up clumps</li>
+                        <li><strong>Stockfleth Move:</strong> Level grounds with finger in circular motion</li>
+                        <li><strong>Distribution Tool:</strong> Use calibrated distribution tool for consistency</li>
+                    </ol>
+                    <h3>Temperature considerations</h3>
+                    <ul>
+                        <li><strong>Light roasts:</strong> Generally benefit from higher temperatures</li>
+                        <li><strong>Dark roasts:</strong> Generally work well with lower temperatures</li>
+                    </ul>
+                </section>
+
+                <section id="beans" aria-labelledby="beans-h">
+                    <h2 id="beans-h">Bean management and storage</h2>
+                    <p>Great espresso starts with great beans. Here’s how to select, store, and track your coffee for optimal results:</p>
+                    <div class="rule-line"><span class="label">Optimal freshness</span><p>Typically 7-30 days from roast date</p></div>
+                    <ol>
+                        <li><strong>Check roast date:</strong> Avoid beans over 4 weeks old</li>
+                        <li><strong>Look for quality packaging:</strong> One-way valve bags are ideal</li>
+                        <li><strong>Choose appropriate roast:</strong> Medium to medium-dark for espresso</li>
+                        <li><strong>Buy in small quantities:</strong> 1-2 weeks worth at a time</li>
+                    </ol>
+                    <div class="rule-line is-tip"><span class="label">Track it</span><p>Use the app’s bean management feature to track roast dates, origins, and your preferred grind settings for each bean. This helps you maintain consistency and discover your preferences.</p></div>
+                    <h3>Storage best practices</h3>
+                    <p>Keep your beans fresh and flavorful with proper storage methods:</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead><tr><th scope="col">Storage method</th><th scope="col">Duration</th><th scope="col">Notes</th></tr></thead>
+                            <tbody>
+                                <tr><th scope="row">Original bag with valve</th><td>1-2 weeks</td><td>Best for daily use</td></tr>
+                                <tr><th scope="row">Airtight container</th><td>2-3 weeks</td><td>Keep in cool, dark place</td></tr>
+                                <tr><th scope="row">Freezer (portioned)</th><td>1-2 months</td><td>Freeze in small portions, thaw before use</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="rule-line is-tip"><span class="label">One variable</span><p>Change only one variable at a time. Use Coffee Shot Timer to log your results and build a database of what works with each bean and setup.</p></div>
+                </section>
             </div>
         </div>
+    </main>
+
+    <footer class="site-foot">
+        <div class="wrap">
+            <ul>
+                <li><a href="privacy.html">Privacy</a></li>
+                <li><a href="guides.html">Guides</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+                <li><a href="contribute.html">Contribute</a></li>
+                <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener">GitHub</a></li>
+                <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
+            </ul>
+            <p>© 2026 Coffee Shot Timer · MIT License</p>
+        </div>
     </footer>
-    
-    <script src="assets/js/theme.js"></script>
 </body>
 </html>

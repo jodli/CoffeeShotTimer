@@ -1,432 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Meta tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Track and log your espresso shots with precise timing. 100% offline, privacy-focused espresso timer app for Android.">
-    <meta name="keywords" content="espresso timer, coffee shot timer, espresso extraction, coffee brewing app, android, barista tools, home espresso">
-    <meta name="author" content="Coffee Shot Timer">
-    <meta name="theme-color" content="#B8763D">
-    
-    <!-- Open Graph / Facebook -->
+    <title>Coffee Shot Timer: say how it tasted, get the next grind</title>
+    <meta name="description" content="Espresso shot timer for Android that turns sour or bitter into a concrete grinder setting for your next shot. Free, open source, works fully offline.">
+    <meta name="theme-color" content="#f6f6f1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#10161d" media="(prefers-color-scheme: dark)">
+
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Coffee Shot Timer - Espresso Shot Timer">
-    <meta property="og:description" content="Track your espresso extractions with precise timing and shot logging. 100% offline Android app.">
-    <meta property="og:image" content="https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/og-image.svg">
-    <meta property="og:url" content="https://jodli.github.io/CoffeeShotTimer_landing_page/">
+    <meta property="og:title" content="Coffee Shot Timer: say how it tasted, get the next grind">
+    <meta property="og:description" content="Pull a shot, tap sour, perfect or bitter, and get the grinder setting for the next one. Free, offline, open source Android app.">
+    <meta property="og:image" content="https://jodli.github.io/CoffeeShotTimer/banner.png">
+    <meta property="og:url" content="https://jodli.github.io/CoffeeShotTimer/">
     <meta property="og:site_name" content="Coffee Shot Timer">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Coffee Shot Timer - Precision Espresso Tracking">
-    <meta property="twitter:description" content="The precision app for perfect espresso extraction">
-    <meta property="twitter:image" content="https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/og-image.svg">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://jodli.github.io/CoffeeShotTimer_landing_page/">
-    
-    <!-- Favicon -->
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="canonical" href="https://jodli.github.io/CoffeeShotTimer/">
     <link rel="icon" type="image/png" href="icon.png">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="icon" type="image/png" href="icon.png">
     <link rel="apple-touch-icon" href="icon.png">
-    
-    <!-- Schema.org markup -->
+    <link rel="preload" href="assets/fonts/archivo-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "MobileApplication",
         "name": "Coffee Shot Timer",
-        "alternateName": "Espresso Timer",
-        "description": "Espresso shot timer for home baristas. Track your extractions with timing and shot history logging.",
-        "operatingSystem": "Android",
+        "description": "Espresso shot timer for home baristas. Taste feedback turns into a grind recommendation for the next shot, saved per bean.",
+        "operatingSystem": "Android 7.0+",
         "applicationCategory": "LifestyleApplication",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Person",
-            "name": "jodli"
-        },
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Person", "name": "jodli" },
         "datePublished": "2024-12-20",
-        "screenshot": [
-            "https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/feature-timer.svg",
-            "https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/feature-beans.svg",
-            "https://jodli.github.io/CoffeeShotTimer_landing_page/assets/images/feature-analysis.svg"
-        ],
-        "featureList": [
-            "Shot timer with easy controls",
-            "Bean management and tracking",
-            "Shot history logging",
-            "100% offline functionality",
-            "Grinder settings tracking"
-        ]
+        "url": "https://jodli.github.io/CoffeeShotTimer/",
+        "installUrl": "https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer"
     }
     </script>
-    
-    <title>Coffee Shot Timer - Precision Espresso Tracking</title>
-    
-    <!-- Immediate theme detection to prevent flash -->
-    <script>
-        (function() {
-            try {
-                const savedTheme = localStorage.getItem('coffee-shot-timer-theme');
-                const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const theme = savedTheme || systemTheme;
-                document.documentElement.setAttribute('data-theme', theme);
-                
-                // Update theme-color meta tag
-                const themeColors = { light: '#B8763D', dark: '#E6B577' };
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', themeColors[theme]);
-            } catch (e) {
-                // Fallback to light theme if anything fails
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        })();
-    </script>
-    
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/components.css">
+
+    <link rel="stylesheet" href="assets/css/site.css">
 </head>
 <body>
-    <!-- Skip to content link for accessibility -->
-    <a href="#main-content" class="sr-only">Skip to main content</a>
-    
-    <!-- Navigation Header -->
-    <header class="nav-header" role="banner">
-        <nav class="nav-container container" role="navigation" aria-label="Main navigation">
-            <a href="#" class="nav-logo" aria-label="Coffee Shot Timer Home">
-                <img src="icon.png" alt="Coffee Shot Timer Icon" width="32" height="32">
-                Coffee Shot Timer
-            </a>
-            
-            <ul class="nav-menu">
-                <li><a href="#features">Features</a></li>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="site-nav">
+        <nav class="wrap" aria-label="Main">
+            <a class="wordmark" href="./"><img src="icon.png" alt="" width="32" height="32">Coffee Shot Timer</a>
+            <ul>
                 <li><a href="guides.html">Guides</a></li>
                 <li><a href="roadmap.html">Roadmap</a></li>
                 <li><a href="contribute.html">Contribute</a></li>
             </ul>
-            
-            <div class="nav-actions">
-                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                </button>
-                
-                <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary">
-                    Download App
-                </a>
-                
-                <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
+            <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" rel="noopener"><span>Get it<span class="long"> on Google Play</span></span></a>
         </nav>
     </header>
 
-    <!-- Main Content -->
-    <main id="main-content" role="main">
-        <!-- Hero Section -->
-        <section class="section-hero" role="banner">
-            <div class="container">
-                <div class="hero-content">
-                    <h1 class="hero-title">The Espresso Timer for Home Baristas</h1>
-                    <p class="hero-subtitle">Track your espresso shots with precise timing and detailed logging. 100% offline and privacy-focused.</p>
-                    
+    <main id="main">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="wrap">
+                <div class="hero-copy">
+                    <h1 id="hero-title">Say how it tasted. Get the next grind.</h1>
+                    <p class="hero-lead">Coffee Shot Timer times your espresso, logs it against the bean, and turns “sour” or “bitter” into the grinder setting for your next shot.</p>
                     <div class="hero-actions">
-                        <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary coffee-button-large" id="download">
-                            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7,10 12,15 17,10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            Download on Google Play
-                        </a>
-                        <a href="https://github.com/jodli/CoffeeShotTimer" class="coffee-button coffee-button-secondary coffee-button-large" rel="noopener noreferrer" target="_blank">
-                            <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                            </svg>
-                            View on GitHub
+                        <a class="btn btn-primary btn-lg" href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" rel="noopener">
+                            Get it on Google Play
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="square" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
                         </a>
                     </div>
-                    
-                    <div class="hero-visual">
-                        <img src="assets/images/hero-ring-animation.svg" alt="Coffee extraction process visualization" class="hero-animation" width="280" height="280">
+                    <ul class="facts" aria-label="At a glance">
+                        <li>Free</li>
+                        <li>Works offline</li>
+                        <li>Open source</li>
+                        <li>Android 7+</li>
+                    </ul>
+                </div>
+
+                <figure class="chart" id="demo" aria-labelledby="demo-caption">
+                    <figcaption class="chart-head">
+                        <span class="label" id="demo-caption">Try it<span class="cap-long">: a new bag, dialed in shot by shot</span></span>
+                        <span class="label">Example</span>
+                    </figcaption>
+
+                    <svg viewBox="0 0 720 504" role="img" aria-labelledby="chart-title chart-desc">
+                        <title id="chart-title">Shot chart</title>
+                        <desc id="chart-desc">Extraction time from 10 to 45 seconds against brew ratio from 1:1.5 to 1:3. The target box covers 25 to 30 seconds and 1:2.0 to 1:2.5. Shots are plotted as numbered dots.</desc>
+
+                        <rect class="zone-fast" x="64" y="24" width="272.6" height="416"/>
+                        <rect class="zone-slow" x="427.4" y="24" width="272.6" height="416"/>
+
+                        <g class="plot-grid" aria-hidden="true">
+                            <line x1="154.9" y1="24" x2="154.9" y2="440"/>
+                            <line x1="245.7" y1="24" x2="245.7" y2="440"/>
+                            <line x1="336.6" y1="24" x2="336.6" y2="440"/>
+                            <line x1="427.4" y1="24" x2="427.4" y2="440"/>
+                            <line x1="518.3" y1="24" x2="518.3" y2="440"/>
+                            <line x1="609.1" y1="24" x2="609.1" y2="440"/>
+                            <line x1="700" y1="24" x2="700" y2="440"/>
+                            <line x1="64" y1="24" x2="700" y2="24"/>
+                            <line x1="64" y1="93.3" x2="700" y2="93.3"/>
+                            <line x1="64" y1="162.7" x2="700" y2="162.7"/>
+                            <line x1="64" y1="232" x2="700" y2="232"/>
+                            <line x1="64" y1="301.3" x2="700" y2="301.3"/>
+                            <line x1="64" y1="370.7" x2="700" y2="370.7"/>
+                        </g>
+
+                        <rect class="zone-target" x="336.6" y="162.7" width="90.8" height="138.6"/>
+
+                        <g aria-hidden="true">
+                            <text class="zone-label" x="76" y="46">Fast · tends sour</text>
+                            <text class="zone-label" x="688" y="46" text-anchor="end">Slow · tends bitter</text>
+                            <text class="zone-label target" x="382" y="152" text-anchor="middle">Target</text>
+                        </g>
+
+                        <line class="plot-axis" x1="64" y1="440" x2="700" y2="440"/>
+                        <line class="plot-axis" x1="64" y1="24" x2="64" y2="440"/>
+
+                        <g aria-hidden="true">
+                            <text class="tick" x="64" y="462" text-anchor="middle">10</text>
+                            <text class="tick" x="154.9" y="462" text-anchor="middle">15</text>
+                            <text class="tick" x="245.7" y="462" text-anchor="middle">20</text>
+                            <text class="tick" x="336.6" y="462" text-anchor="middle">25</text>
+                            <text class="tick" x="427.4" y="462" text-anchor="middle">30</text>
+                            <text class="tick" x="518.3" y="462" text-anchor="middle">35</text>
+                            <text class="tick" x="609.1" y="462" text-anchor="middle">40</text>
+                            <text class="tick" x="700" y="462" text-anchor="middle">45</text>
+                            <text class="axis-title" x="382" y="494" text-anchor="middle">Extraction time (s)</text>
+
+                            <text class="tick" x="54" y="444" text-anchor="end">1:1.5</text>
+                            <text class="tick" x="54" y="305" text-anchor="end">1:2.0</text>
+                            <text class="tick" x="54" y="167" text-anchor="end">1:2.5</text>
+                            <text class="tick" x="54" y="28" text-anchor="end">1:3.0</text>
+                            <text class="axis-title axis-y" transform="translate(16 232) rotate(-90)" text-anchor="middle">Brew ratio</text>
+                            <text class="axis-title axis-y-short" transform="translate(20 236) rotate(-90)" text-anchor="middle">Ratio</text>
+                        </g>
+
+                        <g id="trails"></g>
+                        <g id="shots"></g>
+                    </svg>
+
+                    <div class="chart-panel">
+                        <p class="shot-readout" id="readout">
+                            <span class="label">Shot 1</span>
+                            Grind 3.0 · 18 g → 38 g (1:2.1) · 19 s
+                        </p>
+                        <div class="taste" role="group" aria-label="How did it taste?">
+                            <button type="button" data-taste="sour">Sour</button>
+                            <button type="button" data-taste="perfect">Perfect</button>
+                            <button type="button" data-taste="bitter">Bitter</button>
+                        </div>
+                        <div class="verdict" id="verdict" data-empty aria-live="polite">
+                            <p class="verdict-main" id="verdict-main">How did it taste? Pick one to see the next grind.</p>
+                            <button type="button" class="reset" id="reset" hidden>Start over</button>
+                            <p class="verdict-why" id="verdict-why" hidden></p>
+                        </div>
                     </div>
+                    <p class="chart-note">Example grinder with 0.1 steps. The shots are made up; the recommendations use the app’s own rules.</p>
+                </figure>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="rules-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="rules-title">No magic. Three rules and your grinder’s step size.</h2>
+                    <p>Taste decides the direction. When you skip the taste, the timer decides. How far the shot missed 25 to 30 seconds decides how big the step is.</p>
+                </div>
+
+                <figure class="rule-strip" aria-labelledby="strip-cap">
+                    <figcaption class="visually-hidden" id="strip-cap">The three rules laid on the extraction time axis from 10 to 45 seconds.</figcaption>
+                    <div class="rs-zones">
+                        <div class="rs-zone rs-fast">
+                            <h3>Grind finer</h3>
+                            <p class="rs-cond">Tastes sour, or runs under 25 s</p>
+                            <p>The water ran through too easily and left the sweetness behind. A finer grind slows it down.</p>
+                            <q>“Try grinding finer”</q>
+                        </div>
+                        <div class="rs-zone rs-ok">
+                            <h3>Keep it</h3>
+                            <p class="rs-cond">25 to 30 s, tastes right</p>
+                            <p>The setting is stored with the bean for the next time you open that bag.</p>
+                            <q>“Keep current setting”</q>
+                        </div>
+                        <div class="rs-zone rs-slow">
+                            <h3>Grind coarser</h3>
+                            <p class="rs-cond">Tastes bitter, or runs over 30 s</p>
+                            <p>The shot ran long and pulled out the harsh stuff. A coarser grind lets the water through faster.</p>
+                            <q>“Try grinding coarser”</q>
+                        </div>
+                    </div>
+                    <div class="rs-axis" aria-hidden="true">
+                        <div class="rs-bar"></div>
+                        <svg class="rs-path" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M25.71 5 H45.71" vector-effect="non-scaling-stroke"/></svg>
+                        <span class="rs-dot" style="left: 25.71%">1</span>
+                        <span class="rs-dot" style="left: 40%">2</span>
+                        <span class="rs-dot is-ok" style="left: 45.71%">3</span>
+                        <span class="rs-tick is-start" style="left: 0%">10</span>
+                        <span class="rs-tick" style="left: 14.29%">15</span>
+                        <span class="rs-tick" style="left: 28.57%">20</span>
+                        <span class="rs-tick" style="left: 42.86%">25</span>
+                        <span class="rs-tick" style="left: 57.14%">30</span>
+                        <span class="rs-tick" style="left: 71.43%">35</span>
+                        <span class="rs-tick" style="left: 85.71%">40</span>
+                        <span class="rs-tick is-end" style="left: 100%">45</span>
+                    </div>
+                    <p class="rs-title label" aria-hidden="true">Extraction time (s) · the example shots from the chart above</p>
+                </figure>
+
+                <table class="steps-table">
+                    <caption>How far to turn</caption>
+                    <thead>
+                        <tr><th scope="col">Time outside 25 to 30 s</th><th scope="col">Recommendation</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Up to 3 seconds</td><td class="big">1 step</td></tr>
+                        <tr><td>4 to 6 seconds</td><td class="big">2 steps</td></tr>
+                        <tr><td>More than 6 seconds</td><td class="big">3 steps</td></tr>
+                    </tbody>
+                </table>
+                <p class="footnote">You set your grinder’s scale and step size once during setup, so “1 step” means a click on a stepped grinder or 0.1 on a stepless dial. The app never suggests a setting outside your grinder’s range.</p>
+            </div>
+        </section>
+
+        <section class="section" aria-labelledby="beans-title" style="padding-top: 0">
+            <div class="wrap split">
+                <div>
+                    <div class="section-head">
+                        <h2 id="beans-title">Every bag keeps its own dial.</h2>
+                        <p>Switch from the Ethiopian to the Colombian and the app switches with you: last grind, roast date and the next-shot recommendation come along with the bean.</p>
+                    </div>
+                    <dl class="spec">
+                        <div><dt>Next-shot guidance</dt><dd>The last recommendation is saved per bean and waiting when you come back to it.</dd></div>
+                        <div><dt>Last grind setting</dt><dd>Shown on the bean, so a re-opened bag starts where you left off.</dd></div>
+                        <div><dt>Roast date</dt><dd>Days since roast next to the bean name while you pull the shot.</dd></div>
+                        <div><dt>Package photo</dt><dd>Snap the bag so you recognise it when you buy it again.</dd></div>
+                        <div><dt>Dial-in status</dt><dd>New Bean, Experimenting, Needs Work or Dialed In, from your recent shots with that bean.</dd></div>
+                    </dl>
+                </div>
+                <div class="phones">
+                    <figure class="shot-fig">
+                        <img src="assets/shots/main_screen.webp" width="600" height="1333" loading="lazy" alt="Timer screen with the bean Ethiopian Yirgacheffe selected, 33 days since roast, grinder setting 48.9, a green ring at 29 seconds and 17 g to 34 g.">
+                        <figcaption><b>Timer.</b> Bean, roast age and grind sit above the ring.</figcaption>
+                    </figure>
+                    <figure class="shot-fig">
+                        <img src="assets/shots/bean_photo.webp" width="600" height="1333" loading="lazy" alt="Edit bean screen with roast date, tasting notes, grinder setting 2.8 and a photo of the coffee bag.">
+                        <figcaption><b>Bean.</b> Roast date, notes, grind and a photo of the bag.</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
 
-        <!-- Value Proposition Section -->
-        <section class="section" id="features">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Why Coffee Shot Timer?</h2>
-                    <p>Everything you need to perfect your espresso extractions in one beautiful, offline-first app.</p>
+        <section class="section" aria-labelledby="phone-title" style="padding-top: 0">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="phone-title">After the shot, the numbers explain themselves.</h2>
+                    <p>Each shot gets a score out of 100 and a plain sentence about what happened. Over a few days you see whether the bag is getting better or drifting.</p>
                 </div>
-                
-                <div class="value-grid">
-                    <div class="coffee-card value-card">
-                        <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12,6 12,12 16,14"></polyline>
-                        </svg>
-                        <h3>Precision Timing</h3>
-                        <p>Track your extraction time with a large, easy-to-read timer designed for use in the kitchen.</p>
-                        <ul class="quality-list">
-                            <li><span class="quality-indicator quality-indicator-good"></span>Clear time display</li>
-                            <li><span class="quality-indicator quality-indicator-good"></span>Start/stop controls</li>
-                            <li><span class="quality-indicator quality-indicator-good"></span>Easy to use interface</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="coffee-card value-card">
-                        <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 20V10"></path>
-                            <path d="M12 20V4"></path>
-                            <path d="M6 20v-6"></path>
-                        </svg>
-                        <h3>Smart Tracking</h3>
-                        <p>Log your shots with detailed information including timing, ratios, and grinder settings.</p>
-                        <ul class="quality-list">
-                            <li><span class="quality-indicator quality-indicator-good"></span>Shot history logging</li>
-                            <li><span class="quality-indicator quality-indicator-good"></span>Bean management</li>
-                            <li><span class="quality-indicator quality-indicator-good"></span>Grinder settings tracking</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="coffee-card value-card">
-                        <svg class="icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z"></path>
-                            <path d="m22 6-10 7L2 6"></path>
-                        </svg>
-                        <h3>100% Offline & Dark Mode</h3>
-                        <p>No internet required. Your data stays on your device. Beautiful dark and light themes for any time of day.</p>
-                        <ul class="quality-list">
-                            <li><span class="quality-indicator quality-indicator-good"></span>No tracking or accounts</li>
-                            <li><span class="quality-indicator quality-indicator-good"></span>Local data only</li>
-                            <li><span class="quality-indicator quality-indicator-good"></span>Light & dark themes</li>
-                        </ul>
-                    </div>
+                <div class="strip">
+                    <figure class="shot-fig">
+                        <img src="assets/shots/shot_details.webp" width="600" height="1333" loading="lazy" alt="Shot details: ratio 1:2.2, 18 g to 40 g in 29 seconds, taste Perfect, score 100 out of 100 with a breakdown and the line: Perfect taste. Time was in the sweet spot.">
+                        <figcaption><b>Shot details.</b> Score breakdown and what happened.</figcaption>
+                    </figure>
+                    <figure class="shot-fig">
+                        <img src="assets/shots/shot_analysis.webp" width="600" height="1333" loading="lazy" alt="Analysis screen with an overall quality gauge at 72 and a recent trends line chart.">
+                        <figcaption><b>Analysis.</b> Overall quality and the trend across recent shots.</figcaption>
+                    </figure>
+                    <figure class="shot-fig">
+                        <img src="assets/shots/shot_history.webp" width="600" height="1333" loading="lazy" alt="Shot history for Colombian Supremo: a summary saying 3 of the last 5 shots were perfect, then shots with ratio, time, grinder setting, taste and a Dialed in badge.">
+                        <figcaption><b>History.</b> Every shot with ratio, time, grind and taste.</figcaption>
+                    </figure>
+                    <figure class="shot-fig">
+                        <img src="assets/shots/filter_shots.webp" width="600" height="1333" loading="lazy" alt="Filter shots sheet with grinder setting, brew ratio range, extraction time range and an option for optimal extraction time only, 25 to 30 seconds.">
+                        <figcaption><b>Filters.</b> Narrow history by grind, ratio or time.</figcaption>
+                    </figure>
                 </div>
             </div>
         </section>
 
-        <!-- Feature Showcase Section -->
-        <section class="section">
-            <div class="container">
-                <div class="feature-showcase">
-                    <!-- Feature 1: Timer -->
-                    <div class="feature-item">
-                        <div class="feature-content">
-                            <h3>Precision Shot Timer with Weight Tracking</h3>
-                            <p>Track your extraction time with a visual progress ring that shows when you're in the optimal zone. Record both input and output weights with intuitive sliders for perfect brew ratios.</p>
-                            <ul class="quality-list">
-                                <li><span class="quality-indicator quality-indicator-good"></span>Visual timer with optimal zone indicator</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Weight in/out tracking (18g → 36g)</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Visual weight sliders for easy input</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Selected bean display with freshness</li>
-                            </ul>
-                        </div>
-                        <div class="feature-image">
-                            <div class="device-frame">
-                                <div class="device-volume"></div>
-                                <div class="device-screen">
-                                    <img src="en-US/light_mode.png" alt="Coffee Shot Timer - Main Timer Interface" loading="lazy">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <section class="section inverse" aria-labelledby="privacy-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="privacy-title">Nothing leaves your phone.</h2>
+                    <p>The app has no internet permission. That isn’t a setting you can forget to turn off: Android won’t let it go online.</p>
+                </div>
+                <table class="ledger">
+                    <tbody>
+                        <tr><th scope="row">Internet access</th><td class="val">None</td><td class="note">No network permission in the app manifest.</td></tr>
+                        <tr><th scope="row">Account</th><td class="val">None</td><td class="note">Open it and start pulling shots.</td></tr>
+                        <tr><th scope="row">Tracking and analytics</th><td class="val">None</td><td class="note">No analytics or crash-reporting libraries.</td></tr>
+                        <tr><th scope="row">Permissions</th><td class="val">2</td><td class="note">Camera for bean photos, vibration for timer feedback.</td></tr>
+                        <tr><th scope="row">Price</th><td class="val">Free</td><td class="note">No ads, no subscription.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-                    <!-- Feature 2: Bean Management -->
-                    <div class="feature-item">
-                        <div class="feature-content">
-                            <h3>Smart Bean Management with Photos</h3>
-                            <p>Organize your coffee collection with package photos and automatic freshness tracking. See at a glance which beans are fresh and track your last grind settings for each.</p>
-                            <ul class="quality-list">
-                                <li><span class="quality-indicator quality-indicator-good"></span>Bean package photo capture</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Automatic freshness indicators</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Last grind setting per bean</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Tasting notes and descriptions</li>
-                            </ul>
-                        </div>
-                        <div class="feature-image">
-                            <div class="device-frame">
-                                <div class="device-volume"></div>
-                                <div class="device-screen">
-                                    <img src="en-US/bean_management.png" alt="Coffee Shot Timer - Bean Management" loading="lazy">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Feature 3: Analysis -->
-                    <div class="feature-item">
-                        <div class="feature-content">
-                            <h3>Advanced Shot Analytics</h3>
-                            <p>Get detailed insights with statistics on extraction times, brew ratios, and trends. Identify your most-used grinder settings and see distribution charts of your shot quality.</p>
-                            <ul class="quality-list">
-                                <li><span class="quality-indicator quality-indicator-good"></span>Overall statistics dashboard</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>30-day trend analysis</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Brew ratio distribution charts</li>
-                                <li><span class="quality-indicator quality-indicator-good"></span>Extraction time analysis</li>
-                            </ul>
-                        </div>
-                        <div class="feature-image">
-                            <div class="device-frame">
-                                <div class="device-volume"></div>
-                                <div class="device-screen">
-                                    <img src="en-US/shot_analysis.png" alt="Coffee Shot Timer - Shot Analysis and History" loading="lazy">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <section class="section" aria-labelledby="oss-title">
+            <div class="wrap">
+                <div class="section-head">
+                    <h2 id="oss-title">Built in the open.</h2>
+                    <p>MIT licensed and developed on GitHub. Report a bug, suggest a rule, or help translate. The app ships in English and German.</p>
+                </div>
+                <div class="links-grid">
+                    <a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener"><strong>Source code</strong><span>Kotlin and Jetpack Compose, on GitHub.</span></a>
+                    <a href="contribute.html"><strong>Contribute</strong><span>Bugs, features, code and translations.</span></a>
+                    <a href="guides.html"><strong>Brewing guides</strong><span>Timing, ratios, grinder and bean basics.</span></a>
+                    <a href="https://buymeacoffee.com/jodli" rel="noopener"><strong>Buy me a coffee</strong><span>The only way this app makes money.</span></a>
                 </div>
             </div>
         </section>
 
-        <!-- Target Audience Section -->
-        <section class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Perfect For</h2>
-                    <p>Whether you're just starting your espresso journey or you're a seasoned home barista, Coffee Shot Timer adapts to your needs.</p>
-                </div>
-                
-                <div class="audience-grid">
-                    <div class="audience-chip">
-                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path>
-                        </svg>
-                        <div class="content">
-                            <h4>Espresso Machine Owners</h4>
-                            <p>Get consistent results from your home espresso setup</p>
-                        </div>
-                    </div>
-                    
-                    <div class="audience-chip">
-                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="9" cy="21" r="1"></circle>
-                            <circle cx="20" cy="21" r="1"></circle>
-                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                        </svg>
-                        <div class="content">
-                            <h4>Coffee Enthusiasts</h4>
-                            <p>Explore different beans and brewing parameters systematically</p>
-                        </div>
-                    </div>
-                    
-                    <div class="audience-chip">
-                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M18 20V10"></path>
-                            <path d="M12 20V4"></path>
-                            <path d="M6 20v-6"></path>
-                        </svg>
-                        <div class="content">
-                            <h4>Data-Driven Perfectionists</h4>
-                            <p>Track, measure, and optimize every aspect of your brewing</p>
-                        </div>
-                    </div>
-                    
-                    <div class="audience-chip">
-                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                            <path d="m2 17 10 5 10-5"></path>
-                            <path d="m2 12 10 5 10-5"></path>
-                        </svg>
-                        <div class="content">
-                            <h4>Home Barista Beginners</h4>
-                            <p>Learn proper timing and technique with guided feedback</p>
-                        </div>
-                    </div>
-                    
-                    <div class="audience-chip">
-                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="3"></circle>
-                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1 1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                        </svg>
-                        <div class="content">
-                            <h4>Professionals at Home</h4>
-                            <p>Bring professional timing techniques to your home setup</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Open Source Section -->
-        <section class="section">
-            <div class="container">
-                <div class="section-header">
-                    <h2>Proudly Open Source</h2>
-                    <p>Coffee Shot Timer is built with ❤️ by the community. Contribute, suggest features, or explore the code.</p>
-                </div>
-                
-                <div class="github-stats">
-                    <a href="https://github.com/jodli/CoffeeShotTimer" class="github-badge" rel="noopener noreferrer" target="_blank">
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                        </svg>
-                        Stars
+        <section class="section close" aria-labelledby="close-title">
+            <div class="wrap">
+                <div>
+                    <h2 id="close-title">Open the bag. Pull a shot. Ask what’s next.</h2>
+                    <p>Free on Google Play for Android 7 and newer.</p>
+                    <a class="btn btn-primary btn-lg" href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" rel="noopener">
+                        Get it on Google Play
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="square" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
                     </a>
-                    <a href="https://github.com/jodli/CoffeeShotTimer/network/members" class="github-badge" rel="noopener noreferrer" target="_blank">
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M17 6.1H3a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2z"></path>
-                            <polyline points="22,6.1 12,13.1 2,6.1"></polyline>
-                        </svg>
-                        Forks
-                    </a>
-                    <a href="https://github.com/jodli/CoffeeShotTimer/issues" class="github-badge" rel="noopener noreferrer" target="_blank">
-                        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <path d="m9 12 2 2 4-4"></path>
-                        </svg>
-                        Issues
-                    </a>
                 </div>
-                
-                <div class="text-center">
-                    <a href="contribute.html" class="coffee-button coffee-button-secondary">Learn How to Contribute</a>
-                </div>
+                <svg class="close-mark" viewBox="0 0 360 260" aria-hidden="true">
+                    <line x1="0" y1="65" x2="360" y2="65"/><line x1="0" y1="130" x2="360" y2="130"/><line x1="0" y1="195" x2="360" y2="195"/>
+                    <line x1="90" y1="0" x2="90" y2="260"/><line x1="180" y1="0" x2="180" y2="260"/><line x1="270" y1="0" x2="270" y2="260"/>
+                    <rect class="box" x="160" y="70" width="110" height="110"/>
+                    <path d="M30 230 L110 190 L205 128"/>
+                    <circle cx="30" cy="230" r="9"/><circle cx="110" cy="190" r="9"/><circle cx="205" cy="128" r="13"/>
+                </svg>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="footer" role="contentinfo">
-        <div class="container">
-            <div class="footer-content">
-                <ul class="footer-links">
-                    <li><a href="privacy.html">Privacy Policy</a></li>
-                    <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener noreferrer" target="_blank">GitHub</a></li>
-                    <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
-                    <li><a href="roadmap.html">Roadmap</a></li>
-                    <li><a href="contribute.html">Contribute</a></li>
-                </ul>
-                
-                <p class="footer-copyright">
-                    © 2025 Coffee Shot Timer. Made with ☕ for coffee lovers everywhere.
-                </p>
-            </div>
+    <footer class="site-foot">
+        <div class="wrap">
+            <ul>
+                <li><a href="privacy.html">Privacy</a></li>
+                <li><a href="guides.html">Guides</a></li>
+                <li><a href="roadmap.html">Roadmap</a></li>
+                <li><a href="contribute.html">Contribute</a></li>
+                <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener">GitHub</a></li>
+                <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
+            </ul>
+            <p>© 2026 Coffee Shot Timer · MIT License</p>
         </div>
     </footer>
-    
-    <script src="assets/js/theme.js"></script>
+
+    <script src="assets/js/chart.js" defer></script>
 </body>
 </html>

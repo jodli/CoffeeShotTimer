@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap location
-Sitemap: https://jodli.github.io/CoffeeShotTimer_landing_page/sitemap.xml
+Sitemap: https://jodli.github.io/CoffeeShotTimer/sitemap.xml
 
 # Disallow crawling of assets that don't need indexing
 Disallow: /assets/js/

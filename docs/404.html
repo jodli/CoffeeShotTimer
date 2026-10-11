@@ -3,96 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page not found: Coffee Shot Timer</title>
+    <meta name="description" content="Page not found.">
+    <meta name="theme-color" content="#f6f6f1" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#10161d" media="(prefers-color-scheme: dark)">
     <meta name="robots" content="noindex">
-    <title>404 - Page Not Found | Coffee Shot Timer</title>
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="icon.png">
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    
-    <!-- Immediate theme detection -->
-    <script>
-        (function() {
-            try {
-                const savedTheme = localStorage.getItem('coffee-shot-timer-theme');
-                const systemTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                const theme = savedTheme || systemTheme;
-                document.documentElement.setAttribute('data-theme', theme);
-            } catch (e) {
-                document.documentElement.setAttribute('data-theme', 'light');
-            }
-        })();
-    </script>
-    
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="canonical" href="https://jodli.github.io/CoffeeShotTimer/404.html">
+    <link rel="icon" type="image/png" href="/CoffeeShotTimer/icon.png">
+    <link rel="icon" type="image/x-icon" href="/CoffeeShotTimer/favicon.ico">
+    <link rel="apple-touch-icon" href="/CoffeeShotTimer/icon.png">
+    <link rel="preload" href="/CoffeeShotTimer/assets/fonts/archivo-latin-var.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/CoffeeShotTimer/assets/css/site.css">
 </head>
 <body>
-    <!-- Navigation Header -->
-    <header class="nav-header" role="banner">
-        <nav class="nav-container container" role="navigation" aria-label="Main navigation">
-            <a href="index.html" class="nav-logo" aria-label="Coffee Shot Timer Home">
-                <img src="icon.png" alt="Coffee Shot Timer Icon" width="32" height="32">
-                Coffee Shot Timer
-            </a>
-            
-            <ul class="nav-menu">
-                <li><a href="index.html#features">Features</a></li>
-                <li><a href="guides.html">Guides</a></li>
-                <li><a href="roadmap.html">Roadmap</a></li>
-                <li><a href="contribute.html">Contribute</a></li>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <header class="site-nav">
+        <nav class="wrap" aria-label="Main">
+            <a class="wordmark" href="/CoffeeShotTimer/"><img src="/CoffeeShotTimer/icon.png" alt="" width="32" height="32">Coffee Shot Timer</a>
+            <ul>
+                <li><a href="/CoffeeShotTimer/guides.html">Guides</a></li>
+                <li><a href="/CoffeeShotTimer/roadmap.html">Roadmap</a></li>
+                <li><a href="/CoffeeShotTimer/contribute.html">Contribute</a></li>
             </ul>
-            
-            <div class="nav-actions">
-                <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="5"></circle>
-                        <line x1="12" y1="1" x2="12" y2="3"></line>
-                        <line x1="12" y1="21" x2="12" y2="23"></line>
-                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                        <line x1="1" y1="12" x2="3" y2="12"></line>
-                        <line x1="21" y1="12" x2="23" y2="12"></line>
-                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                    </svg>
-                </button>
-                
-                <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-primary">
-                    Download App
-                </a>
-                
-                <button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
+            <a class="btn btn-primary" href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" rel="noopener"><span>Get it<span class="long"> on Google Play</span></span></a>
         </nav>
     </header>
-    
-    <main role="main" style="min-height: calc(100vh - 64px); display: flex; align-items: center; justify-content: center;">
-        <div class="container text-center">
-            <div class="coffee-card" style="max-width: 600px; margin: 0 auto;">
-                <div style="font-size: 72px; margin-bottom: var(--space-l);">☕</div>
-                <h1 style="font-size: var(--font-size-3xl); margin-bottom: var(--space-m);">404</h1>
-                <h2>Oops! Your extraction went a bit off...</h2>
-                <p style="margin-bottom: var(--space-xl);">The page you're looking for seems to have gone stale. Let's get you back on track!</p>
-                
-                <div style="display: flex; gap: var(--space-m); justify-content: center; flex-wrap: wrap;">
-                    <a href="index.html" class="coffee-button coffee-button-primary">
-                        Back to Home
-                    </a>
-                    <a href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" target="_blank" rel="noopener noreferrer" class="coffee-button coffee-button-secondary">
-                        Get the App
-                    </a>
+
+    <main id="main" class="lost">
+        <div class="wrap">
+            <div>
+                <h1>404: this shot ran off the chart.</h1>
+                <p>The page you’re looking for isn’t here. It may have moved when the site was rebuilt.</p>
+                <div class="actions">
+                    <a class="btn btn-primary" href="/CoffeeShotTimer/">Back to the start</a>
+                    <a class="btn" href="https://play.google.com/store/apps/details?id=com.jodli.coffeeshottimer" rel="noopener">Get the app</a>
                 </div>
             </div>
+            <svg viewBox="0 0 440 320" aria-hidden="true">
+                <rect x="40" y="10" width="380" height="270" fill="none" stroke="var(--rule)" stroke-width="1.5"/>
+                <rect x="190" y="100" width="70" height="90" fill="var(--ideal-tint)" stroke="var(--ideal)" stroke-width="2.5"/>
+                <path d="M110 230 L180 160 L300 40 L405 -18" fill="none" stroke="var(--ink)" stroke-width="2" stroke-dasharray="6 6"/>
+                <circle cx="110" cy="230" r="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+                <circle cx="180" cy="160" r="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+                <circle cx="300" cy="40" r="12" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+                <circle cx="405" cy="-18" r="14" fill="var(--bitter)"/>
+                <text x="230" y="306" text-anchor="middle" style="fill:var(--ink-2);font:600 13px var(--font);font-stretch:78%;letter-spacing:.04em;text-transform:uppercase">Extraction time</text>
+            </svg>
         </div>
     </main>
-    
-    <script src="assets/js/theme.js"></script>
+
+    <footer class="site-foot">
+        <div class="wrap">
+            <ul>
+                <li><a href="/CoffeeShotTimer/privacy.html">Privacy</a></li>
+                <li><a href="/CoffeeShotTimer/guides.html">Guides</a></li>
+                <li><a href="/CoffeeShotTimer/roadmap.html">Roadmap</a></li>
+                <li><a href="/CoffeeShotTimer/contribute.html">Contribute</a></li>
+                <li><a href="https://github.com/jodli/CoffeeShotTimer" rel="noopener">GitHub</a></li>
+                <li><a href="mailto:jobst87@gmail.com">Contact</a></li>
+            </ul>
+            <p>© 2026 Coffee Shot Timer · MIT License</p>
+        </div>
+    </footer>
 </body>
 </html>
