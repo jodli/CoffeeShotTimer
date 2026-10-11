@@ -62,10 +62,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
+import com.jodli.coffeeshottimer.ui.theme.ExtractionZone
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.ZoneColors
 import com.jodli.coffeeshottimer.ui.theme.adaptiveTimerSize
+import com.jodli.coffeeshottimer.ui.theme.extractionZone
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -565,11 +567,12 @@ fun formatExtractionTime(timeMs: Long, timer_seconds_suffix: String = "s"): Stri
  * Determine extraction quality based on elapsed time in seconds
  */
 fun getExtractionQuality(elapsedSeconds: Int, isRunning: Boolean): ExtractionQuality {
-    return when {
-        !isRunning -> ExtractionQuality.NEUTRAL
-        elapsedSeconds < 20 -> ExtractionQuality.UNDER_EXTRACTED
-        elapsedSeconds <= 35 -> ExtractionQuality.OPTIMAL
-        else -> ExtractionQuality.OVER_EXTRACTED
+    if (!isRunning) return ExtractionQuality.NEUTRAL
+    // same 25-30 s window as the recommendations and the history chips
+    return when (extractionZone(elapsedSeconds)) {
+        ExtractionZone.FAST -> ExtractionQuality.UNDER_EXTRACTED
+        ExtractionZone.IDEAL -> ExtractionQuality.OPTIMAL
+        ExtractionZone.SLOW -> ExtractionQuality.OVER_EXTRACTED
     }
 }
 

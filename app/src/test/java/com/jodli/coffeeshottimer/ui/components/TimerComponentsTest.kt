@@ -35,19 +35,19 @@ class TimerComponentsTest {
 
     @Test
     fun `getExtractionQuality returns correct quality for different time ranges`() {
-        // Test under-extraction range (< 20s)
+        // Test under-extraction range (< 25s)
         assertEquals(ExtractionQuality.UNDER_EXTRACTED, getExtractionQuality(0, true))
         assertEquals(ExtractionQuality.UNDER_EXTRACTED, getExtractionQuality(10, true))
-        assertEquals(ExtractionQuality.UNDER_EXTRACTED, getExtractionQuality(19, true))
+        assertEquals(ExtractionQuality.UNDER_EXTRACTED, getExtractionQuality(24, true))
 
-        // Test optimal range (20-35s)
-        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(20, true))
+        // Test optimal range (25-30s)
+        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(27, true))
         assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(25, true))
         assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(30, true))
-        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(35, true))
+        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(28, true))
 
-        // Test over-extraction range (> 35s)
-        assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(36, true))
+        // Test over-extraction range (> 30s)
+        assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(31, true))
         assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(45, true))
         assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(60, true))
 
@@ -61,17 +61,17 @@ class TimerComponentsTest {
         // fast zone (tends sour)
         val yellowColor = LightZoneColors.fast
         assertEquals(yellowColor, getExtractionTimeColor(10, true, LightZoneColors))
-        assertEquals(yellowColor, getExtractionTimeColor(19, true, LightZoneColors))
+        assertEquals(yellowColor, getExtractionTimeColor(24, true, LightZoneColors))
 
         // ideal zone
         val greenColor = LightZoneColors.ideal
-        assertEquals(greenColor, getExtractionTimeColor(20, true, LightZoneColors))
+        assertEquals(greenColor, getExtractionTimeColor(27, true, LightZoneColors))
         assertEquals(greenColor, getExtractionTimeColor(25, true, LightZoneColors))
-        assertEquals(greenColor, getExtractionTimeColor(35, true, LightZoneColors))
+        assertEquals(greenColor, getExtractionTimeColor(30, true, LightZoneColors))
 
         // slow zone (tends bitter)
         val redColor = LightZoneColors.slow
-        assertEquals(redColor, getExtractionTimeColor(36, true, LightZoneColors))
+        assertEquals(redColor, getExtractionTimeColor(31, true, LightZoneColors))
         assertEquals(redColor, getExtractionTimeColor(45, true, LightZoneColors))
 
         // Test neutral color (gray)
@@ -82,10 +82,10 @@ class TimerComponentsTest {
     @Test
     fun `extraction quality boundary conditions work correctly`() {
         // Test exact boundary values
-        assertEquals(ExtractionQuality.UNDER_EXTRACTED, getExtractionQuality(19, true))
-        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(20, true))
-        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(35, true))
-        assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(36, true))
+        assertEquals(ExtractionQuality.UNDER_EXTRACTED, getExtractionQuality(24, true))
+        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(25, true))
+        assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(30, true))
+        assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(31, true))
     }
 
     @Test
