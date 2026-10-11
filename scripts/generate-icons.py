@@ -1,7 +1,8 @@
 """Generates the app icon, splash icon and website icons from one geometry (108-unit adaptive icon grid).
 
-Mark: a sour shot and a dashed trail into the target box, where the dialed-in shot sits.
-Same language as the website hero chart.
+Mark: the shot timer dial. A 45 s ring (the website chart's time span), the 25-30 s target
+band at 7 to 8 o'clock, and the shot's progress arc stopping inside it at 27 s, marked by the
+same shot dot the website chart plots. On a 60 s ring the band was too short to read at 48 px.
 
 Usage (from the repo root): python3 scripts/generate-icons.py
 Needs rsvg-convert (brew install librsvg) and cwebp (brew install webp) for the raster fallbacks.
@@ -10,48 +11,51 @@ import math
 import os
 import struct
 import subprocess
-import sys
 import tempfile
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = tempfile.mkdtemp(prefix="icons-")
 RES = os.path.join(REPO, "app/src/main/res")
+OUT = tempfile.mkdtemp(prefix="icons-")
 
-LIGHT = dict(paper="#F6F6F1", ink="#17202B", grid="#D5D6D0", ideal="#3E8E5A", tint="#D5E3D6", dialed="#2C6E44")
-DARK = dict(paper="#10161D", ink="#E8E8E1", grid="#2C3542", ideal="#5DB37B", tint="#1C2F2C", dialed="#5DB37B")
+LIGHT = dict(paper="#F6F6F1", ink="#17202B", grid="#E2E3DC", track="#DCDDD6", ideal="#3E8E5A")
+DARK = dict(paper="#10161D", ink="#E8E8E1", grid="#1B232D", track="#2C3542", ideal="#5DB37B")
 
-BOX = (57, 34, 81, 58)  # x0, y0, x1, y1
-SOUR = (34, 67)  # first shot, ring
-DIALED = (69, 46)  # dialed-in shot, solid, inside the box
-R_SOUR, R_DIALED = 7, 8
-SW = 3
-RING_SW = 3.5
-DASH, GAP = 4.5, 3.2
+C = 54  # centre
+R = 25  # ring radius
+RING_W = 7
+BAND_W = 12
+DIAL_S = 45  # one revolution
+SHOT_S = 27  # where the shot stops
+HEAD_R = 4.6  # the shot dot, styled like the website chart: paper fill, ink ring
+HEAD_RING = 2
+TICK_IN, TICK_OUT, TICK_W = 32, 34.5, 1.6
 
 
-def dashes(a, b):
-    (x0, y0), (x1, y1) = a, b
-    length = math.hypot(x1 - x0, y1 - y0)
-    ux, uy = (x1 - x0) / length, (y1 - y0) / length
-    # start/stop at the dot edges so every visible dash is a full dash
-    t, end, segs = R_SOUR + 3, length - R_DIALED - 2.5, []
-    while t < end:
-        t2 = min(t + DASH, end)
-        segs.append(f"M{x0 + ux * t:.2f},{y0 + uy * t:.2f}L{x0 + ux * t2:.2f},{y0 + uy * t2:.2f}")
-        t = t2 + GAP
-    return "".join(segs)
+def deg(seconds):
+    return seconds / DIAL_S * 360
+
+
+def pt(angle, r):
+    a = math.radians(angle)
+    return C + r * math.sin(a), C - r * math.cos(a)
+
+
+def arc(a0, a1, r=R):
+    (x0, y0), (x1, y1) = pt(a0, r), pt(a1, r)
+    return f"M{x0:.2f},{y0:.2f}A{r},{r} 0 {1 if a1 - a0 > 180 else 0},1 {x1:.2f},{y1:.2f}"
 
 
 def circle(cx, cy, r):
-    return f"M{cx - r:.2f},{cy}a{r},{r} 0 1,0 {2 * r},0a{r},{r} 0 1,0 {-2 * r},0z"
+    return f"M{cx - r:.2f},{cy:.2f}a{r},{r} 0 1,0 {2 * r:.2f},0a{r},{r} 0 1,0 {-2 * r:.2f},0z"
 
 
-def box_path():
-    x0, y0, x1, y1 = BOX
-    return f"M{x0},{y0}H{x1}V{y1}H{x0}z"
-
-
-TRAIL = dashes(SOUR, DIALED)
+TRACK = circle(C, C, R)
+BAND = arc(deg(25), deg(30))
+PROGRESS = arc(0, deg(SHOT_S))
+HEAD = pt(deg(SHOT_S), R)
+TICKS = "".join(
+    "M{:.2f},{:.2f}L{:.2f},{:.2f}".format(*pt(a, TICK_IN), *pt(a, TICK_OUT)) for a in range(0, 360, 40)  # every 5 s
+)
 GRID = "".join(f"M{v},0V108M0,{v}H108" for v in range(6, 108, 12))
 
 
@@ -62,49 +66,58 @@ def svg(c, *, crop=0, grid=True, shape=None):
     size = 108 - 2 * crop
     clip = ""
     if shape == "round":
-        clip = f'<clipPath id="m"><circle cx="54" cy="54" r="{size / 2}"/></clipPath>'
+        clip = f'<clipPath id="m"><circle cx="{C}" cy="{C}" r="{size / 2}"/></clipPath>'
     elif shape == "squircle":
-        rr = size * 0.22
-        clip = f'<clipPath id="m"><rect x="{crop}" y="{crop}" width="{size}" height="{size}" rx="{rr}"/></clipPath>'
-    g = f'<path d="{GRID}" stroke="{c["grid"]}" stroke-width="0.6"/>' if grid else ""
-    (x1, y1), (x3, y3) = SOUR, DIALED
-    dots = f'<circle cx="{x1}" cy="{y1}" r="{R_SOUR}" fill="{c["paper"]}" stroke="{c["ink"]}" stroke-width="{RING_SW}"/>'
+        clip = f'<clipPath id="m"><rect x="{crop}" y="{crop}" width="{size}" height="{size}" rx="{size * 0.22}"/></clipPath>'
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{crop} {crop} {size} {size}">{clip}'
         f'<g{" clip-path=" + chr(34) + "url(#m)" + chr(34) if shape else ""}>'
-        f'<rect x="0" y="0" width="108" height="108" fill="{c["paper"]}"/>{g}'
-        f'<path d="{box_path()}" fill="{c["tint"]}" stroke="{c["ideal"]}" stroke-width="{SW}"/>'
-        f'<path d="{TRAIL}" fill="none" stroke="{c["ink"]}" stroke-width="{SW}"/>'
-        f'{dots}<circle cx="{x3}" cy="{y3}" r="{R_DIALED}" fill="{c["dialed"]}"/>'
-        "</g></svg>"
+        f'<rect width="108" height="108" fill="{c["paper"]}"/>'
+        + (f'<path d="{GRID}" stroke="{c["grid"]}" stroke-width="0.7"/>' if grid else "")
+        + mark_svg(c)
+        + "</g></svg>"
+    )
+
+
+def mark_svg(c, classes=False):
+    def attr(cls, **kw):
+        if classes:
+            return f'class="{cls}"' + "".join(f' {k.replace("_", "-")}="{v}"' for k, v in kw.items() if k == "stroke_width")
+        return " ".join(f'{k.replace("_", "-")}="{v}"' for k, v in kw.items())
+
+    hx, hy = HEAD
+    return (
+        f'<path d="{TRACK}" {attr("track", fill="none", stroke=c["track"], stroke_width=RING_W)}/>'
+        f'<path d="{PROGRESS}" {attr("ink", fill="none", stroke=c["ink"], stroke_width=RING_W)}/>'
+        f'<path d="{BAND}" {attr("band", fill="none", stroke=c["ideal"], stroke_width=BAND_W)}/>'
+        f'<path d="{TICKS}" {attr("ink", fill="none", stroke=c["ink"], stroke_width=TICK_W)}/>'
+        f'<circle cx="{hx:.2f}" cy="{hy:.2f}" r="{HEAD_R}" '
+        f'{attr("head", fill=c["paper"], stroke=c["ink"], stroke_width=HEAD_RING)}/>'
     )
 
 
 def svg_favicon():
     """Site favicon: follows the visitor's colour scheme via CSS classes."""
-    x0, y0, x1, y1 = BOX
-    (sx, sy), (dx, dy) = SOUR, DIALED
-    rule = lambda c: (
-        f".bg{{fill:{c['paper']}}}.box{{fill:{c['tint']};stroke:{c['ideal']}}}"
-        f".ink{{stroke:{c['ink']}}}.ring{{fill:{c['paper']};stroke:{c['ink']}}}.ok{{fill:{c['dialed']}}}"
-    )
+    def rule(c):
+        return (
+            f".bg{{fill:{c['paper']}}}.track{{fill:none;stroke:{c['track']}}}.band{{fill:none;stroke:{c['ideal']}}}"
+            f".ink{{fill:none;stroke:{c['ink']}}}.head{{fill:{c['paper']};stroke:{c['ink']}}}"
+        )
+
     return (
         '<svg xmlns="http://www.w3.org/2000/svg" viewBox="18 18 72 72">'
         f"<style>{rule(LIGHT)}@media (prefers-color-scheme:dark){{{rule(DARK)}}}</style>"
         '<rect class="bg" x="18" y="18" width="72" height="72" rx="15.84"/>'
-        f'<path class="box" d="{box_path()}" stroke-width="{SW}"/>'
-        f'<path class="ink" d="{TRAIL}" fill="none" stroke-width="{SW}"/>'
-        f'<circle class="ring" cx="{sx}" cy="{sy}" r="{R_SOUR}" stroke-width="{RING_SW}"/>'
-        f'<circle class="ok" cx="{dx}" cy="{dy}" r="{R_DIALED}"/>'
-        "</svg>\n"
+        + mark_svg(LIGHT, classes=True)
+        + "</svg>\n"
     )
 
 
 # ---------- Android vector drawables ----------
 
-HEAD = (
+HEAD_XML = (
     '<?xml version="1.0" encoding="utf-8"?>\n'
-    "<!-- Generated from the icon geometry; edit scripts/generate-icons.py instead. -->\n"
+    "<!-- Generated; edit scripts/generate-icons.py instead. -->\n"
 )
 VEC = (
     '<vector xmlns:android="http://schemas.android.com/apk/res/android"\n'
@@ -113,7 +126,7 @@ VEC = (
 )
 
 
-def p(d, fill=None, stroke=None, name=None, extra="", sw=SW):
+def p(d, fill=None, stroke=None, sw=None, name=None, extra=""):
     attrs = [f'android:pathData="{d}"']
     if name:
         attrs.insert(0, f'android:name="{name}"')
@@ -127,83 +140,99 @@ def p(d, fill=None, stroke=None, name=None, extra="", sw=SW):
     return "    <path\n        " + "\n        ".join(attrs) + " />\n"
 
 
-def dot_paths(c, i):
-    if i == 1:
-        return p(circle(*DIALED, R_DIALED), fill=c["dialed"])
-    return p(circle(*SOUR, R_SOUR), fill=c["paper"], stroke=c["ink"], sw=RING_SW)
+def head_paths(c):
+    hx, hy = HEAD
+    return p(circle(hx, hy, HEAD_R), fill=c["paper"], stroke=c["ink"], sw=HEAD_RING)
+
+
+def mark_paths(c, animated=False):
+    # the band sits on top of the progress arc: the ink visibly runs into the green zone
+    out = p(TRACK, stroke=c["track"], sw=RING_W)
+    if animated:
+        out += p(PROGRESS, stroke=c["ink"], sw=RING_W, name="progress", extra='android:trimPathEnd="0"')
+    else:
+        out += p(PROGRESS, stroke=c["ink"], sw=RING_W)
+    out += p(BAND, stroke=c["ideal"], sw=BAND_W)
+    out += p(TICKS, stroke=c["ink"], sw=TICK_W)
+    return out
 
 
 def foreground(c):
-    out = HEAD + VEC
-    out += p(box_path(), fill=c["tint"], stroke=c["ideal"])
-    out += p(TRAIL, stroke=c["ink"])
-    for i in range(2):
-        out += dot_paths(c, i)
-    return out + "</vector>\n"
+    return HEAD_XML + VEC + mark_paths(c) + head_paths(c) + "</vector>\n"
 
 
 def background(c):
-    return HEAD + VEC + p("M0,0h108v108h-108z", fill=c["paper"]) + p(GRID, stroke=c["grid"], sw=0.6) + "</vector>\n"
+    return HEAD_XML + VEC + p("M0,0h108v108h-108z", fill=c["paper"]) + p(GRID, stroke=c["grid"], sw=0.7) + "</vector>\n"
+
+
+def band_outline(half):
+    a0, a1 = deg(25), deg(30)
+    (ox0, oy0), (ox1, oy1) = pt(a0, R + half), pt(a1, R + half)
+    (ix1, iy1), (ix0, iy0) = pt(a1, R - half), pt(a0, R - half)
+    return (
+        f"M{ox0:.2f},{oy0:.2f}A{R + half},{R + half} 0 0,1 {ox1:.2f},{oy1:.2f}"
+        f"L{ix1:.2f},{iy1:.2f}A{R - half},{R - half} 0 0,0 {ix0:.2f},{iy0:.2f}z"
+    )
 
 
 def monochrome():
-    # Themed icons tint this as a single colour, so meaning has to come from shape:
-    # an open ring for the sour shot, a filled dot inside the box for the dialed-in one.
+    # Themed icons tint everything one colour: the track goes thin so the progress arc,
+    # the wide target band and the head still read as separate shapes.
     k = "#FF000000"
-    out = HEAD + VEC
-    out += p(box_path(), stroke=k)
-    out += p(TRAIL, stroke=k)
-    out += p(circle(*SOUR, R_SOUR), stroke=k, sw=RING_SW)
-    out += p(circle(*DIALED, R_DIALED), fill=k)
-    return out + "</vector>\n"
-
-
-def splash_animated(c):
-    """Splash icon for API 31+: the sour shot lands, the trail draws, the dialed-in shot lands in the box."""
-    out = HEAD.replace("-->", "Animated splash, API 31+. -->") + "<animated-vector\n"
-    out += '    xmlns:android="http://schemas.android.com/apk/res/android"\n'
-    out += '    xmlns:aapt="http://schemas.android.com/aapt">\n'
-    out += '    <aapt:attr name="android:drawable">\n'
-    inner = VEC.replace(' xmlns:android="http://schemas.android.com/apk/res/android"\n', "\n")
-    inner = inner.replace("\n    ", "\n            ").replace("<vector", "        <vector")
-    out += inner
-    out += indent(p(box_path(), fill=c["tint"], stroke=c["ideal"]), 8)
-    out += indent(p(TRAIL, stroke=c["ink"], name="trail", extra='android:trimPathEnd="0"'), 8)
-    for i, (x, y) in enumerate((SOUR, DIALED)):
-        out += (
-            f'            <group android:name="dot{i}" android:pivotX="{x}" android:pivotY="{y}"\n'
-            '                android:scaleX="0" android:scaleY="0">\n'
-        )
-        out += indent(dot_paths(c, i), 12)
-        out += "            </group>\n"
-    out += "        </vector>\n    </aapt:attr>\n"
-    # timeline (ms): sour shot 0-200, trail 200-640, dialed-in shot 640-880
-    steps = [("dot0", 0, 200), ("trail", 200, 440), ("dot1", 640, 240)]
-    for name, start, dur in steps:
-        out += f'    <target android:name="{name}">\n        <aapt:attr name="android:animation">\n'
-        if name.startswith("dot"):
-            out += "            <set>\n"
-            for prop in ("scaleX", "scaleY"):
-                out += (
-                    f'                <objectAnimator android:propertyName="{prop}"\n'
-                    f'                    android:startOffset="{start}" android:duration="{dur}"\n'
-                    '                    android:valueFrom="0" android:valueTo="1" android:valueType="floatType"\n'
-                    '                    android:interpolator="@android:interpolator/overshoot" />\n'
-                )
-            out += "            </set>\n"
-        else:
-            out += (
-                '            <objectAnimator android:propertyName="trimPathEnd"\n'
-                f'                android:startOffset="{start}" android:duration="{dur}"\n'
-                '                android:valueFrom="0" android:valueTo="1" android:valueType="floatType"\n'
-                '                android:interpolator="@android:interpolator/decelerate_cubic" />\n'
-            )
-        out += "        </aapt:attr>\n    </target>\n"
-    return out + "</animated-vector>\n"
+    hx, hy = HEAD
+    return (
+        HEAD_XML + VEC
+        + p(TRACK, stroke=k, sw=1.6)
+        + p(arc(0, deg(25)), stroke=k, sw=RING_W)
+        + p(TICKS, stroke=k, sw=TICK_W)
+        # one colour can't separate the head ring from a solid band, so the band is drawn as an
+        # outline here and the head sits inside it as a solid dot
+        + p(band_outline(BAND_W / 2 - 0.8), stroke=k, sw=1.6)
+        + p(circle(hx, hy, HEAD_R + 1), fill=k)
+        + "</vector>\n"
+    )
 
 
 def indent(s, n):
-    return "".join((" " * (n - 4)) + line if line.strip() else line for line in s.splitlines(True))
+    return "".join(" " * n + line if line.strip() else line for line in s.splitlines(True))
+
+
+def splash_animated(c):
+    """Splash icon for API 31+: the shot runs round the dial and stops in the target band."""
+    hx, hy = HEAD
+    inner = VEC.replace(' xmlns:android="http://schemas.android.com/apk/res/android"\n', "\n")
+    out = HEAD_XML + (
+        "<animated-vector\n"
+        '    xmlns:android="http://schemas.android.com/apk/res/android"\n'
+        '    xmlns:aapt="http://schemas.android.com/aapt">\n'
+        '    <aapt:attr name="android:drawable">\n'
+    )
+    out += indent(inner, 8)
+    out += indent(mark_paths(c, animated=True), 8)
+    out += f'            <group android:name="head" android:pivotX="{hx:.2f}" android:pivotY="{hy:.2f}"\n'
+    out += '                android:scaleX="0" android:scaleY="0">\n'
+    out += indent(head_paths(c), 12)
+    out += "            </group>\n        </vector>\n    </aapt:attr>\n"
+    # timeline (ms): arc sweeps 0-620 with a brake into the band, head lands 560-860
+    out += (
+        '    <target android:name="progress">\n        <aapt:attr name="android:animation">\n'
+        '            <objectAnimator android:propertyName="trimPathEnd"\n'
+        '                android:duration="620" android:valueFrom="0" android:valueTo="1"\n'
+        '                android:valueType="floatType"\n'
+        '                android:interpolator="@android:interpolator/decelerate_cubic" />\n'
+        "        </aapt:attr>\n    </target>\n"
+        '    <target android:name="head">\n        <aapt:attr name="android:animation">\n'
+        "            <set>\n"
+    )
+    for prop in ("scaleX", "scaleY"):
+        out += (
+            f'                <objectAnimator android:propertyName="{prop}"\n'
+            '                    android:startOffset="560" android:duration="300"\n'
+            '                    android:valueFrom="0" android:valueTo="1" android:valueType="floatType"\n'
+            '                    android:interpolator="@android:interpolator/overshoot" />\n'
+        )
+    out += "            </set>\n        </aapt:attr>\n    </target>\n</animated-vector>\n"
+    return out
 
 
 def write(path, text):
@@ -220,8 +249,8 @@ write(f"{RES}/drawable-night/splash_icon.xml", foreground(DARK))
 write(f"{RES}/drawable-v31/splash_icon_animated.xml", splash_animated(LIGHT))
 write(f"{RES}/drawable-night-v31/splash_icon_animated.xml", splash_animated(DARK))
 
-# raster fallbacks: legacy launchers (API 24/25), Play Store listing, website
 
+# raster fallbacks: legacy launchers (API 24/25), Play Store listing, website
 
 def render(svg_text, width, dest, webp=False):
     src = os.path.join(OUT, "src.svg")
@@ -245,7 +274,8 @@ pngs = []
 for w in sizes:
     path = os.path.join(OUT, f"fav{w}.png")
     render(svg(LIGHT, crop=18, grid=False, shape="squircle"), w, path)
-    pngs.append(open(path, "rb").read())
+    with open(path, "rb") as f:
+        pngs.append(f.read())
 header = struct.pack("<HHH", 0, 1, len(sizes))
 offset, entries = 6 + 16 * len(sizes), b""
 for w, data in zip(sizes, pngs):
@@ -253,4 +283,9 @@ for w, data in zip(sizes, pngs):
     offset += len(data)
 with open(f"{REPO}/docs/favicon.ico", "wb") as f:
     f.write(header + entries + b"".join(pngs))
-print("icons written")
+
+# previews for review, not committed
+for name, c in (("light", LIGHT), ("dark", DARK)):
+    render(svg(c, crop=18, shape="round"), 216, os.path.join(OUT, f"preview_{name}.png"))
+render(svg(LIGHT, crop=18, shape="round"), 48, os.path.join(OUT, "preview_48.png"))
+print(OUT)
