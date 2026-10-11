@@ -1,2 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <!-- Window and splash ground, matches Paper / NightPaper in ui/theme/Color.kt -->
+    <color name="paper">#F6F6F1</color>
+</resources>
