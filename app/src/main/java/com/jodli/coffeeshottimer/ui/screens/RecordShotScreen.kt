@@ -73,6 +73,14 @@ import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 
+// Timer dial sizing: the dial takes most of the card, the numeral scales with it
+private const val TIMER_SHARE_OF_CARD = 0.88f
+private val TIMER_MIN_SIZE = 220.dp
+private val TIMER_MAX_SIZE = 440.dp
+private const val TIMER_NUMERAL_OF_SIZE = 0.17f
+private const val TIMER_NUMERAL_MIN_SP = 44f
+private const val TIMER_NUMERAL_MAX_SP = 80f
+
 /**
  * RecordShotScreen - Production Implementation
  *
@@ -737,8 +745,9 @@ private fun TimerSection(
                 contentAlignment = Alignment.Center
             ) {
                 val availableSize = minOf(maxWidth, maxHeight)
-                val timerSize = (availableSize * 0.7f).coerceIn(200.dp, 400.dp)
-                val fontSize = (timerSize.value * 0.22f).coerceIn(48f, 96f).sp
+                val timerSize = (availableSize * TIMER_SHARE_OF_CARD).coerceIn(TIMER_MIN_SIZE, TIMER_MAX_SIZE)
+                val fontSize = (timerSize.value * TIMER_NUMERAL_OF_SIZE)
+                    .coerceIn(TIMER_NUMERAL_MIN_SP, TIMER_NUMERAL_MAX_SP).sp
 
                 when (timerMode) {
                     TimerMode.AUTOMATIC -> {

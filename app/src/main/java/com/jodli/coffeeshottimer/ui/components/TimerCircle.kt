@@ -1,47 +1,45 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import android.view.HapticFeedbackConstants
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.ProgressBarRangeInfo
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.progressBarRangeInfo
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.setProgress
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -49,34 +47,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
+import com.jodli.coffeeshottimer.ui.theme.ExtractionZone
 import com.jodli.coffeeshottimer.ui.theme.extractionZone
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
+import kotlin.math.roundToInt
 import kotlin.math.sin
 
+private const val WINDOW_START = ValidationUtils.OPTIMAL_EXTRACTION_TIME_MIN
+private const val WINDOW_END = ValidationUtils.OPTIMAL_EXTRACTION_TIME_MAX
+private const val TICK_EVERY_S = 5
+private const val LABEL_EVERY_S = 10
+private const val FRAME_MS = 16L
+private const val MS_PER_SECOND = 1000L
+private val MANUAL_RANGE =
+    ValidationUtils.MANUAL_TIMER_MIN_SECONDS.toFloat()..ValidationUtils.MANUAL_TIMER_MAX_SECONDS.toFloat()
+
+// Dial proportions, matched to the app icon (scripts/generate-icons.py)
+private const val RING_OF_SIDE = 0.062f
+private const val BAND_OF_RING = 1.8f
+private const val HEAD_OF_BAND = 0.5f
+private const val GRABBER_OF_BAND = 0.7f
+private const val GRABBER_CORE_OF_BAND = 0.22f
+private const val BAND_TINT_ALPHA = 0.32f
+private const val LABEL_SPACE_DP = 22f
+private const val TICK_LENGTH_DP = 7f
+private const val TICK_GAP_DP = 5f
+private const val TICK_WIDTH_DP = 1.5f
+private const val HEAD_RING_DP = 2.5f
+private const val LABEL_NUDGE_DP = 2f
+private const val DEGREES_PER_HALF_TURN = 180f
+
 /**
- * Automatic timer circle with color-coded extraction feedback and smooth animation.
+ * Automatic timer: tap the dial to start and pause.
  *
- * Features:
- * - Smooth millisecond-based ring animation when running (60 FPS)
- * - Color coding based on extraction time:
- *   - Gray (idle): 0 seconds - ready to start
- *   - Orange (too fast): < 25 seconds - under-extracted
- *   - Green (optimal): 25-30 seconds - perfect extraction
- *   - Red (too slow): > 30 seconds - over-extracted
- * - Visual feedback: paused state shows muted colors (50% opacity)
- * - Subtle pulsing animation on the progress arc when active
- * - Clean, centered seconds display
- *
- * @param size Size of the timer circle
- * @param fontSize Font size for the time display
- * @param isRunning Whether the timer is currently running
- * @param elapsedTimeMs Elapsed time in milliseconds (updates per second from parent)
- * @param onToggle Callback for start/pause toggle (single tap)
- * @param onReset Callback for timer reset (visible when paused with time)
- * @param modifier Modifier for the composable
+ * The dial is the app icon's: a 45 s ring with the 25-30 s target band. The arc runs in ink
+ * until the shot reaches the band, fills the band green while the shot is inside it, and turns
+ * rust past 30 s. The head is the shot dot from the website chart, solid ink while running.
  */
 @Composable
 fun AutomaticTimerCircle(
@@ -88,126 +97,52 @@ fun AutomaticTimerCircle(
     onReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Track smooth milliseconds for animation
+    // The parent ticks once per second; interpolate locally so the arc moves smoothly.
     var smoothElapsedMs by remember { mutableLongStateOf(elapsedTimeMs) }
-    var lastUpdateTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
-
-    // Update smooth timer for running state
     LaunchedEffect(isRunning) {
         if (isRunning) {
-            lastUpdateTime = System.currentTimeMillis()
-            while (isRunning) {
-                val currentTime = System.currentTimeMillis()
-                val delta = currentTime - lastUpdateTime
-                smoothElapsedMs += delta
-                lastUpdateTime = currentTime
-                kotlinx.coroutines.delay(16) // ~60 FPS
+            var last = System.currentTimeMillis()
+            while (true) {
+                val now = System.currentTimeMillis()
+                smoothElapsedMs += now - last
+                last = now
+                kotlinx.coroutines.delay(FRAME_MS)
             }
         }
     }
-
-    // Sync with external timer when not running or reset
     LaunchedEffect(elapsedTimeMs, isRunning) {
-        if (!isRunning) {
-            smoothElapsedMs = elapsedTimeMs
-        } else if (elapsedTimeMs == 0L) {
-            smoothElapsedMs = 0L
-        }
+        if (!isRunning || elapsedTimeMs == 0L) smoothElapsedMs = elapsedTimeMs
     }
 
     val displayMs = if (isRunning) smoothElapsedMs else elapsedTimeMs
-    val elapsedSeconds = (displayMs / 1000f)
+    val wholeSeconds = (displayMs / MS_PER_SECOND).toInt()
+    val timeText = stringResource(R.string.format_timer_seconds, wholeSeconds)
 
-    // Color-coded based on extraction time and running state
-    val borderColor = getExtractionColor(elapsedSeconds, isRunning)
-
-    // Pulsing animation for running state - only affects the progress arc
-    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-    val pulseAlpha by infiniteTransition.animateFloat(
-        initialValue = 0.8f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = FastOutSlowInEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "pulse_alpha"
-    )
-
-    Box(
-        modifier = modifier.size(size),
-        contentAlignment = Alignment.Center
+    TimerDial(
+        size = size,
+        secondsProvider = { displayMs / MS_PER_SECOND.toFloat() },
+        head = when {
+            displayMs == 0L -> HeadStyle.NONE
+            isRunning -> HeadStyle.RUNNING
+            else -> HeadStyle.STOPPED
+        },
+        modifier = modifier
+            .semantics {
+                role = Role.Button
+                stateDescription = timeText
+            }
+            .pointerInput(onToggle) { detectTapGestures(onTap = { onToggle() }) }
     ) {
-        Surface(
-            modifier = Modifier
-                .size(size)
-                .pointerInput(isRunning, onToggle) {
-                    detectTapGestures(
-                        onTap = { onToggle() }
-                    )
-                },
-            color = MaterialTheme.colorScheme.surface,
-            shape = CircleShape
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .drawBehind {
-                        val strokeWidth = 24f
-                        val radius = size.toPx() / 2f
-
-                        // Draw background circle with consistent alpha
-                        drawCircle(
-                            color = borderColor.copy(alpha = 0.2f),
-                            radius = radius - strokeWidth / 2,
-                            style = Stroke(width = strokeWidth)
-                        )
-
-                        // Draw smooth progress arc if running or has time
-                        if (displayMs > 0) {
-                            // Use milliseconds for smooth animation (60 second cycle)
-                            val sweepAngle = ((displayMs % 60000) / 60000f) * 360f
-
-                            // Only apply pulse alpha when running, keep it subtle
-                            val arcAlpha = if (isRunning) pulseAlpha else 0.9f
-
-                            drawArc(
-                                brush = Brush.sweepGradient(
-                                    0f to borderColor.copy(alpha = 0.6f),
-                                    0.5f to borderColor.copy(alpha = arcAlpha),
-                                    1f to borderColor.copy(alpha = 0.6f)
-                                ),
-                                startAngle = -90f,
-                                sweepAngle = sweepAngle,
-                                useCenter = false,
-                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                            )
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    // Time display - centered in the ring
+        TimeReadout(seconds = wholeSeconds, text = timeText, fontSize = fontSize)
+        // Reserve the reset row's height so the numeral doesn't jump when it appears
+        Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.Center) {
+            if (!isRunning && displayMs > 0) {
+                TextButton(onClick = onReset) {
                     Text(
-                        text = stringResource(R.string.format_timer_seconds, elapsedSeconds.toInt()),
-                        fontSize = fontSize,
-                        fontWeight = FontWeight.Bold,
-                        color = if (displayMs > 0) borderColor else MaterialTheme.colorScheme.onSurface
+                        text = stringResource(R.string.button_reset),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-
-                    // Reset button (only show when paused and has time)
-                    if (!isRunning && displayMs > 0) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        TextButton(onClick = onReset) {
-                            Text(
-                                text = stringResource(R.string.button_reset),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
-                    }
                 }
             }
         }
@@ -215,21 +150,10 @@ fun AutomaticTimerCircle(
 }
 
 /**
- * Manual timer circle with circular slider for time input.
+ * Manual timer: drag round the dial to set the time, tap the centre for exact entry.
  *
- * Features:
- * - Circular slider with drag gesture handling
- * - Non-linear scale (20-40s range gets more arc space)
- * - Color coding based on extraction quality
- * - Haptic feedback on value changes
- * - Center tap to open precise text input dialog
- *
- * @param size Size of the timer circle
- * @param fontSize Font size for the time display
- * @param manualTimeSeconds Current manually set time in seconds
- * @param onTimeChange Callback when time is changed via slider
- * @param onTapToEdit Callback when user taps center to edit time
- * @param modifier Modifier for the composable
+ * Same dial and scale as the automatic timer. Dragging covers 5-45 s; longer times
+ * (up to the manual maximum) come from the entry dialog and show as a full ring.
  */
 @Composable
 fun ManualTimerCircle(
@@ -241,204 +165,226 @@ fun ManualTimerCircle(
     modifier: Modifier = Modifier
 ) {
     val view = LocalView.current
-    var currentAngle by remember { mutableFloatStateOf(TimerScaleMapper.timeToAngle(manualTimeSeconds)) }
-    var isDragging by remember { mutableStateOf(false) }
+    val currentTime by rememberUpdatedState(manualTimeSeconds)
+    val currentOnTimeChange by rememberUpdatedState(onTimeChange)
+    val timeText = stringResource(R.string.format_timer_seconds, manualTimeSeconds)
 
-    // Track if user has performed haptic feedback recently (debounce)
-    var lastHapticTime by remember { mutableLongStateOf(0L) }
-
-    // Update angle when manualTimeSeconds changes externally (e.g., from dialog)
-    // But don't update while dragging to prevent jumps
-    LaunchedEffect(manualTimeSeconds) {
-        if (!isDragging) {
-            currentAngle = TimerScaleMapper.timeToAngle(manualTimeSeconds)
-        }
-    }
-
-    // Color coding based on extraction quality (manual mode is always "running" for display)
-    val borderColor = getExtractionColor(manualTimeSeconds.toFloat(), isRunning = true)
-
-    Box(
-        modifier = modifier.size(size),
-        contentAlignment = Alignment.Center
-    ) {
-        // Timer circle with background and progress arc
-        Surface(
-            modifier = Modifier
-                .size(size)
-                .pointerInput(Unit) {
-                    detectDragGestures(
-                        onDragStart = {
-                            isDragging = true
-                        },
-                        onDragEnd = {
-                            isDragging = false
-                        },
-                        onDragCancel = {
-                            isDragging = false
-                        },
-                        onDrag = { change, _ ->
-                            change.consume()
-
-                            // Calculate angle from center
-                            val centerX = size.toPx() / 2
-                            val centerY = size.toPx() / 2
-                            val touchX = change.position.x - centerX
-                            val touchY = change.position.y - centerY
-
-                            // Calculate angle in degrees (0° at top, clockwise)
-                            val angle = (atan2(touchY, touchX) * 180f / PI.toFloat() + 90f + 360f) % 360f
-                            currentAngle = angle
-
-                            // Convert angle to time
-                            val newTime = TimerScaleMapper.angleToTime(angle)
-
-                            // Only trigger callback and haptics if time actually changed
-                            if (newTime != manualTimeSeconds) {
-                                onTimeChange(newTime)
-
-                                // Debounced haptic feedback
-                                val now = System.currentTimeMillis()
-                                if (now - lastHapticTime > 100) {
-                                    view.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-                                    lastHapticTime = now
-                                }
-                            }
-                        }
-                    )
-                }
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = { onTapToEdit() }
-                    )
-                },
-            color = MaterialTheme.colorScheme.surface,
-            shape = CircleShape
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .drawBehind {
-                        val strokeWidth = 24f
-                        val radius = size.toPx() / 2f
-
-                        // Draw background circle
-                        drawCircle(
-                            color = borderColor.copy(alpha = 0.2f),
-                            radius = radius - strokeWidth / 2,
-                            style = Stroke(width = strokeWidth)
+    TimerDial(
+        size = size,
+        secondsProvider = { manualTimeSeconds.toFloat() },
+        head = HeadStyle.GRABBER,
+        modifier = modifier
+            .semantics {
+                stateDescription = timeText
+                progressBarRangeInfo = ProgressBarRangeInfo(
+                    current = manualTimeSeconds.toFloat(),
+                    range = MANUAL_RANGE,
+                    steps = ValidationUtils.MANUAL_TIMER_MAX_SECONDS - ValidationUtils.MANUAL_TIMER_MIN_SECONDS - 1
+                )
+                setProgress { target ->
+                    currentOnTimeChange(
+                        target.roundToInt().coerceIn(
+                            ValidationUtils.MANUAL_TIMER_MIN_SECONDS,
+                            ValidationUtils.MANUAL_TIMER_MAX_SECONDS
                         )
-
-                        // Draw progress arc from top (-90°) to current angle
-                        val sweepAngle = currentAngle
-                        if (sweepAngle > 0) {
-                            drawArc(
-                                brush = Brush.sweepGradient(
-                                    0f to borderColor.copy(alpha = 0.6f),
-                                    0.5f to borderColor.copy(alpha = 0.9f),
-                                    1f to borderColor.copy(alpha = 0.6f)
-                                ),
-                                startAngle = -90f,
-                                sweepAngle = sweepAngle,
-                                useCenter = false,
-                                style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
-                            )
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    // Time display - centered
-                    Text(
-                        text = stringResource(R.string.format_timer_seconds, manualTimeSeconds),
-                        fontSize = fontSize,
-                        fontWeight = FontWeight.Bold,
-                        color = borderColor
                     )
-
-                    // Hint text with consistent spacing (matches Reset button in AutomaticTimerCircle)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    TextButton(onClick = onTapToEdit) {
-                        Text(
-                            text = stringResource(R.string.cd_tap_to_edit_time),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    true
                 }
             }
+            .pointerInput(Unit) {
+                var dragTime = currentTime
+                detectDragGestures(
+                    onDragStart = { dragTime = currentTime },
+                    onDrag = { change, _ ->
+                        change.consume()
+                        val dx = change.position.x - this.size.width / 2f
+                        val dy = change.position.y - this.size.height / 2f
+                        val angle = (atan2(dy, dx) * 180f / PI.toFloat() + 90f + 360f) % 360f
+                        val next = TimerScaleMapper.dragToTime(angle, dragTime)
+                        if (next != dragTime) {
+                            // A firmer tick on the band edges, so the window can be felt without looking
+                            val crossedEdge = next == WINDOW_START || next == WINDOW_END
+                            view.performHapticFeedback(
+                                if (crossedEdge) {
+                                    HapticFeedbackConstants.CONTEXT_CLICK
+                                } else {
+                                    HapticFeedbackConstants.CLOCK_TICK
+                                }
+                            )
+                            dragTime = next
+                            currentOnTimeChange(next)
+                        }
+                    }
+                )
+            }
+            .pointerInput(Unit) { detectTapGestures(onTap = { onTapToEdit() }) }
+    ) {
+        TimeReadout(seconds = manualTimeSeconds, text = timeText, fontSize = fontSize)
+        Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.Center) {
+            TextButton(onClick = onTapToEdit) {
+                Text(
+                    text = stringResource(R.string.cd_tap_to_edit_time),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
+    }
+}
 
-        // Grabber handle - drawn outside Surface to prevent clipping
-        Box(
-            modifier = Modifier
-                .size(size)
-                .drawBehind {
-                    val strokeWidth = 24f
-                    val radius = size.toPx() / 2f
+private enum class HeadStyle { NONE, RUNNING, STOPPED, GRABBER }
 
-                    // Calculate grabber position
-                    val grabberAngle = (currentAngle - 90f) * PI.toFloat() / 180f
-                    val grabberRadius = radius - strokeWidth / 2
-                    val grabberCenterX = center.x + grabberRadius * cos(grabberAngle)
-                    val grabberCenterY = center.y + grabberRadius * sin(grabberAngle)
-                    val grabberSize = 40f
+/** The readout takes the zone's colour only once the shot is in or past the window. */
+@Composable
+private fun TimeReadout(seconds: Int, text: String, fontSize: TextUnit) {
+    val zones = MaterialTheme.zoneColors
+    val color = when {
+        seconds == 0 -> MaterialTheme.colorScheme.onSurfaceVariant
+        extractionZone(seconds) == ExtractionZone.FAST -> MaterialTheme.colorScheme.onSurface
+        else -> zones.ink(extractionZone(seconds))
+    }
+    Text(
+        text = text,
+        style = MaterialTheme.typography.displayLarge.copy(fontSize = fontSize, lineHeight = fontSize),
+        color = color
+    )
+}
 
-                    // Draw shadow
-                    drawCircle(
-                        color = Color.Black.copy(alpha = 0.2f),
-                        radius = grabberSize / 2 + 2f,
-                        center = Offset(grabberCenterX + 1f, grabberCenterY + 2f),
-                        style = Fill
-                    )
+@Composable
+private fun TimerDial(
+    size: Dp,
+    secondsProvider: () -> Float,
+    head: HeadStyle,
+    modifier: Modifier = Modifier,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    val colors = DialColors(
+        track = MaterialTheme.colorScheme.outlineVariant,
+        ink = MaterialTheme.colorScheme.onSurface,
+        tick = MaterialTheme.colorScheme.onSurfaceVariant,
+        paper = MaterialTheme.colorScheme.surface,
+        // the target has to read before the shot starts, on the card ground as well as on paper
+        bandTint = MaterialTheme.zoneColors.ideal.copy(alpha = BAND_TINT_ALPHA),
+        band = MaterialTheme.zoneColors.ideal,
+        slow = MaterialTheme.zoneColors.slow
+    )
+    val measurer = rememberTextMeasurer()
+    val labelStyle = MaterialTheme.typography.labelMedium.copy(color = colors.tick)
+    val labels = remember(measurer, labelStyle) {
+        (0 until TimerScaleMapper.DIAL_SECONDS step LABEL_EVERY_S).map { it to measurer.measure("$it", labelStyle) }
+    }
 
-                    // Draw outer white circle for contrast
-                    drawCircle(
-                        color = Color.White,
-                        radius = grabberSize / 2,
-                        center = Offset(grabberCenterX, grabberCenterY),
-                        style = Fill
-                    )
-
-                    // Draw inner colored circle
-                    drawCircle(
-                        color = borderColor,
-                        radius = (grabberSize / 2) - 5f,
-                        center = Offset(grabberCenterX, grabberCenterY),
-                        style = Fill
+    Box(
+        modifier = modifier
+            .size(size)
+            .drawBehind {
+                val g = DialGeometry(this.size.minDimension, density)
+                drawDial(g, colors, secondsProvider())
+                // axis numerals outside the ticks, like the website chart's time axis
+                labels.forEach { (s, layout) ->
+                    val p = g.point(s.toFloat(), g.labelRadius)
+                    drawText(
+                        layout,
+                        topLeft = Offset(p.x - layout.size.width / 2f, p.y - layout.size.height / 2f)
                     )
                 }
+                drawHead(g, colors, secondsProvider(), head)
+            },
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Spacer(modifier = Modifier.height(48.dp)) // balances the action row below the numeral
+            content()
+        }
+    }
+}
+
+private class DialColors(
+    val track: Color,
+    val ink: Color,
+    val tick: Color,
+    val paper: Color,
+    val bandTint: Color,
+    val band: Color,
+    val slow: Color
+)
+
+/** Proportions follow the app icon: ring, wider band, ticks, then numerals outside. */
+private class DialGeometry(side: Float, density: Float) {
+    val center = Offset(side / 2f, side / 2f)
+    val ringWidth = side * RING_OF_SIDE
+    val bandWidth = ringWidth * BAND_OF_RING
+    private val labelSpace = LABEL_SPACE_DP * density
+    private val tickLength = TICK_LENGTH_DP * density
+    private val tickGap = TICK_GAP_DP * density
+    val tickWidth = TICK_WIDTH_DP * density
+    val headRing = HEAD_RING_DP * density
+    val radius = side / 2f - labelSpace - tickLength - tickGap - bandWidth / 2f
+    val tickInner = radius + bandWidth / 2f + tickGap
+    val tickOuter = tickInner + tickLength
+    val labelRadius = tickOuter + labelSpace / 2f + LABEL_NUDGE_DP * density
+
+    fun point(seconds: Float, r: Float = radius): Offset {
+        val a = TimerScaleMapper.timeToAngle(seconds) * PI.toFloat() / DEGREES_PER_HALF_TURN
+        return Offset(center.x + r * sin(a), center.y - r * cos(a))
+    }
+}
+
+private fun DrawScope.arc(g: DialGeometry, from: Float, to: Float, color: Color, width: Float) {
+    if (to <= from) return
+    val start = TimerScaleMapper.timeToAngle(from)
+    val sweep = TimerScaleMapper.timeToAngle(to) - start
+    drawArc(
+        color = color,
+        startAngle = start - 90f,
+        sweepAngle = sweep,
+        useCenter = false,
+        topLeft = Offset(g.center.x - g.radius, g.center.y - g.radius),
+        size = Size(g.radius * 2, g.radius * 2),
+        style = Stroke(width = width)
+    )
+}
+
+private fun DrawScope.drawDial(g: DialGeometry, c: DialColors, seconds: Float) {
+    val dial = TimerScaleMapper.DIAL_SECONDS.toFloat()
+    val t = seconds.coerceIn(0f, dial)
+    val start = WINDOW_START.toFloat()
+    val end = WINDOW_END.toFloat()
+
+    drawCircle(color = c.track, radius = g.radius, center = g.center, style = Stroke(width = g.ringWidth))
+    arc(g, start, end, c.bandTint, g.bandWidth)
+    arc(g, 0f, minOf(t, start), c.ink, g.ringWidth)
+    arc(g, start, minOf(t, end), c.band, g.bandWidth)
+    arc(g, end, t, c.slow, g.ringWidth)
+
+    for (s in 0 until TimerScaleMapper.DIAL_SECONDS step TICK_EVERY_S) {
+        drawLine(
+            color = c.tick,
+            start = g.point(s.toFloat(), g.tickInner),
+            end = g.point(s.toFloat(), g.tickOuter),
+            strokeWidth = g.tickWidth
         )
     }
 }
 
-/**
- * Get the color for the timer based on extraction time.
- *
- * Color logic:
- * - 0 seconds: idle
- * - < 25 seconds: fast zone (tends sour)
- * - 25-30 seconds: ideal zone
- * - > 30 seconds: slow zone (tends bitter)
- * - Paused: Muted version of the extraction color
- */
-@Composable
-private fun getExtractionColor(elapsedSeconds: Float, isRunning: Boolean): Color {
-    val zones = MaterialTheme.zoneColors
-    val baseColor = if (elapsedSeconds == 0f) {
-        zones.idle
-    } else {
-        zones.fill(extractionZone(elapsedSeconds.toInt()))
-    }
-
-    // Apply muted/grayed effect when paused (except at 0 seconds)
-    return if (!isRunning && elapsedSeconds > 0f) {
-        baseColor.copy(alpha = 0.5f)
-    } else {
-        baseColor
+private fun DrawScope.drawHead(g: DialGeometry, c: DialColors, seconds: Float, head: HeadStyle) {
+    if (head == HeadStyle.NONE) return
+    val p = g.point(seconds)
+    when (head) {
+        HeadStyle.RUNNING -> drawCircle(c.ink, radius = g.bandWidth * HEAD_OF_BAND, center = p)
+        HeadStyle.STOPPED -> {
+            drawCircle(c.paper, radius = g.bandWidth * HEAD_OF_BAND, center = p)
+            drawCircle(c.ink, radius = g.bandWidth * HEAD_OF_BAND, center = p, style = Stroke(g.headRing))
+        }
+        // bigger, and solid with a paper core so it reads as something to grab
+        HeadStyle.GRABBER -> {
+            drawCircle(c.ink, radius = g.bandWidth * GRABBER_OF_BAND, center = p)
+            drawCircle(c.paper, radius = g.bandWidth * GRABBER_CORE_OF_BAND, center = p)
+        }
+        HeadStyle.NONE -> Unit
     }
 }
 
@@ -451,77 +397,42 @@ private fun getExtractionColor(elapsedSeconds: Float, isRunning: Boolean): Color
 @Composable
 private fun AutomaticTimerCirclePreview_Idle() {
     CoffeeShotTimerTheme {
-        AutomaticTimerCircle(
-            size = 280.dp,
-            fontSize = 64.sp,
-            isRunning = false,
-            elapsedTimeMs = 0L,
-            onToggle = {},
-            onReset = {}
-        )
+        AutomaticTimerCircle(280.dp, 64.sp, isRunning = false, elapsedTimeMs = 0L, onToggle = {}, onReset = {})
     }
 }
 
 @Suppress("UnusedPrivateMember")
-@Preview(name = "Timer - Too Fast (15s)", showBackground = true)
+@Preview(name = "Timer - Running, before the window (15s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_TooFast() {
     CoffeeShotTimerTheme {
-        AutomaticTimerCircle(
-            size = 280.dp,
-            fontSize = 64.sp,
-            isRunning = true,
-            elapsedTimeMs = 15000L,
-            onToggle = {},
-            onReset = {}
-        )
+        AutomaticTimerCircle(280.dp, 64.sp, isRunning = true, elapsedTimeMs = 15000L, onToggle = {}, onReset = {})
     }
 }
 
 @Suppress("UnusedPrivateMember")
-@Preview(name = "Timer - Optimal (25s)", showBackground = true)
+@Preview(name = "Timer - Stopped in the window (27s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_Optimal() {
     CoffeeShotTimerTheme {
-        AutomaticTimerCircle(
-            size = 280.dp,
-            fontSize = 64.sp,
-            isRunning = true,
-            elapsedTimeMs = 25000L,
-            onToggle = {},
-            onReset = {}
-        )
+        AutomaticTimerCircle(280.dp, 64.sp, isRunning = false, elapsedTimeMs = 27000L, onToggle = {}, onReset = {})
     }
 }
 
 @Suppress("UnusedPrivateMember")
-@Preview(name = "Timer - Too Slow (35s)", showBackground = true)
+@Preview(name = "Timer - Past the window (36s)", showBackground = true)
 @Composable
 private fun AutomaticTimerCirclePreview_TooSlow() {
     CoffeeShotTimerTheme {
-        AutomaticTimerCircle(
-            size = 280.dp,
-            fontSize = 64.sp,
-            isRunning = false,
-            elapsedTimeMs = 35000L,
-            onToggle = {},
-            onReset = {}
-        )
+        AutomaticTimerCircle(280.dp, 64.sp, isRunning = true, elapsedTimeMs = 36000L, onToggle = {}, onReset = {})
     }
 }
 
 @Suppress("UnusedPrivateMember")
-@Preview(name = "Timer - Dark Mode", showBackground = true)
+@Preview(name = "Manual timer - Dark", showBackground = true, backgroundColor = 0xFF10161D)
 @Composable
-private fun AutomaticTimerCirclePreview_Dark() {
+private fun ManualTimerCirclePreview_Dark() {
     CoffeeShotTimerTheme(darkTheme = true) {
-        AutomaticTimerCircle(
-            size = 280.dp,
-            fontSize = 64.sp,
-            isRunning = true,
-            elapsedTimeMs = 25000L,
-            onToggle = {},
-            onReset = {}
-        )
+        ManualTimerCircle(280.dp, 64.sp, manualTimeSeconds = 28, onTimeChange = {}, onTapToEdit = {})
     }
 }

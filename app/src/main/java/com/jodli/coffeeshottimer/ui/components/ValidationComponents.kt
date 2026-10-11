@@ -51,8 +51,6 @@ class ValidationUtils(
         // Manual timer constants
         const val MANUAL_TIMER_MIN_SECONDS = 5
         const val MANUAL_TIMER_MAX_SECONDS = 60
-        const val MANUAL_TIMER_PRECISION_RANGE_START = 20
-        const val MANUAL_TIMER_PRECISION_RANGE_END = 40
         const val MANUAL_TIMER_DEFAULT_SECONDS = 25 // Default to optimal extraction time
 
         // Text validation constants
