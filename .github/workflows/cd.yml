@@ -9,6 +9,7 @@ on:
       - "*.md"
       - ".github/**"
       - ".kiro/**"
+      - ".impeccable/**"
   workflow_dispatch:
     inputs:
       version_name:

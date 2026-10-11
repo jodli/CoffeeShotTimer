@@ -1,0 +1,543 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-11T09:03:23+00:00",
+  "title": "Design System: Coffee Shot Timer website",
+  "scope": "docs/ website only. The Android app's Material 3 theme in app/src/main/java/com/jodli/coffeeshottimer/ui/theme/ is out of scope.",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Chart Ink",
+        "tonalRamp": [
+          "#070c11",
+          "#1c2530",
+          "#37414d",
+          "#545f6c",
+          "#737e8c",
+          "#94a0ae",
+          "#b9c5d4",
+          "#e8eff9"
+        ],
+        "canonical": "oklch(24.0% 0.025 253.8)"
+      },
+      "ink-2": {
+        "role": "primary",
+        "displayName": "Pencil Grey",
+        "tonalRamp": [
+          "#070b12",
+          "#1d2431",
+          "#38404e",
+          "#555e6d",
+          "#747e8d",
+          "#959faf",
+          "#bac5d5",
+          "#e8eff9"
+        ],
+        "canonical": "oklch(44.0% 0.026 259.2)"
+      },
+      "sour": {
+        "role": "secondary",
+        "displayName": "Underextracted Yellow",
+        "tonalRamp": [
+          "#190600",
+          "#3e1a00",
+          "#5c3800",
+          "#7c5700",
+          "#9d7800",
+          "#c09a00",
+          "#e7c039",
+          "#ffeeb8"
+        ],
+        "canonical": "oklch(82.6% 0.151 92.1)"
+      },
+      "bitter": {
+        "role": "secondary",
+        "displayName": "Overextracted Rust",
+        "tonalRamp": [
+          "#210000",
+          "#4e0000",
+          "#71200f",
+          "#94402f",
+          "#b8614e",
+          "#dd826e",
+          "#ffa893",
+          "#ffded0"
+        ],
+        "canonical": "oklch(46.2% 0.117 33.2)"
+      },
+      "ideal": {
+        "role": "secondary",
+        "displayName": "Target Green",
+        "tonalRamp": [
+          "#001200",
+          "#003102",
+          "#004f20",
+          "#196f3d",
+          "#40905c",
+          "#63b37c",
+          "#89d9a1",
+          "#cdfcd9"
+        ],
+        "canonical": "oklch(58.3% 0.112 152.8)"
+      },
+      "ideal-ink": {
+        "role": "secondary",
+        "displayName": "Target Green Ink",
+        "tonalRamp": [
+          "#001101",
+          "#003009",
+          "#024d25",
+          "#2c6d43",
+          "#4d8e61",
+          "#6fb082",
+          "#94d6a7",
+          "#d3fadc"
+        ],
+        "canonical": "oklch(47.4% 0.095 152.6)"
+      },
+      "field-ok": {
+        "role": "secondary",
+        "displayName": "Target Field",
+        "tonalRamp": [
+          "#001102",
+          "#003009",
+          "#004e26",
+          "#2b6d43",
+          "#4d8e62",
+          "#6eb082",
+          "#93d7a7",
+          "#d2fadd"
+        ],
+        "canonical": "oklch(48.4% 0.096 153.0)"
+      },
+      "field-slow": {
+        "role": "secondary",
+        "displayName": "Slow Field",
+        "tonalRamp": [
+          "#210000",
+          "#4e0000",
+          "#71200f",
+          "#94402f",
+          "#b8614e",
+          "#dd826e",
+          "#ffa893",
+          "#ffded0"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Graph Paper",
+        "tonalRamp": [
+          "#0b0b09",
+          "#242421",
+          "#40403c",
+          "#5e5e5a",
+          "#7d7d79",
+          "#9f9f9a",
+          "#c4c4c0",
+          "#efefec"
+        ],
+        "canonical": "oklch(97.2% 0.007 106.5)"
+      },
+      "paper-2": {
+        "role": "neutral",
+        "displayName": "Paper Shade",
+        "tonalRamp": [
+          "#0b0b08",
+          "#24241f",
+          "#40403a",
+          "#5e5e57",
+          "#7e7e77",
+          "#9f9f97",
+          "#c5c5bd",
+          "#efefea"
+        ],
+        "canonical": "oklch(94.1% 0.011 106.6)"
+      },
+      "paper-night": {
+        "role": "neutral",
+        "displayName": "Graph Paper, dark scheme",
+        "tonalRamp": [
+          "#080b0f",
+          "#1e252c",
+          "#394049",
+          "#575e67",
+          "#767e87",
+          "#979fa9",
+          "#bdc5cf",
+          "#eaeff5"
+        ],
+        "canonical": "oklch(19.7% 0.017 252.6)"
+      },
+      "paper-2-night": {
+        "role": "neutral",
+        "displayName": "Paper Shade, dark scheme",
+        "tonalRamp": [
+          "#080b0f",
+          "#1e252c",
+          "#394049",
+          "#575e67",
+          "#767e87",
+          "#979fa9",
+          "#bdc5cf",
+          "#eaeff5"
+        ]
+      },
+      "ink-night": {
+        "role": "primary",
+        "displayName": "Night Chalk",
+        "tonalRamp": [
+          "#0b0b09",
+          "#24241f",
+          "#40403b",
+          "#5e5e58",
+          "#7e7e77",
+          "#9f9f98",
+          "#c5c5be",
+          "#efefea"
+        ],
+        "canonical": "oklch(92.9% 0.009 106.6)"
+      },
+      "ink-2-night": {
+        "role": "primary",
+        "displayName": "Pencil Grey, dark scheme",
+        "tonalRamp": [
+          "#070b12",
+          "#1d2431",
+          "#38404e",
+          "#555e6d",
+          "#747e8d",
+          "#959faf",
+          "#bac5d5",
+          "#e8eff9"
+        ]
+      },
+      "bitter-night": {
+        "role": "secondary",
+        "displayName": "Overextracted Rust, dark scheme",
+        "tonalRamp": [
+          "#230000",
+          "#520000",
+          "#751903",
+          "#993c27",
+          "#bd5d47",
+          "#e37e67",
+          "#ffa48c",
+          "#ffdecf"
+        ],
+        "canonical": "oklch(60.4% 0.129 34.0)"
+      },
+      "ideal-night": {
+        "role": "secondary",
+        "displayName": "Target Green, dark scheme",
+        "tonalRamp": [
+          "#001200",
+          "#003201",
+          "#00501f",
+          "#0b703d",
+          "#3a915b",
+          "#5eb47c",
+          "#84dba0",
+          "#cbfdd9"
+        ],
+        "canonical": "oklch(69.8% 0.118 153.6)"
+      },
+      "ideal-ink-night": {
+        "role": "secondary",
+        "displayName": "Target Green Ink, dark scheme",
+        "tonalRamp": [
+          "#001200",
+          "#003201",
+          "#00501f",
+          "#0b703d",
+          "#3a915b",
+          "#5eb47c",
+          "#84dba0",
+          "#cbfdd9"
+        ]
+      },
+      "plot-grid": {
+        "role": "neutral",
+        "displayName": "Plot Grid",
+        "darkValue": "rgb(232 232 225 / 0.11)"
+      },
+      "grid": {
+        "role": "neutral",
+        "displayName": "Grid Lines, minor",
+        "darkValue": "rgb(232 232 225 / 0.045)"
+      },
+      "grid-major": {
+        "role": "neutral",
+        "displayName": "Grid Lines, major",
+        "darkValue": "rgb(232 232 225 / 0.075)"
+      },
+      "sour-tint": {
+        "role": "secondary",
+        "displayName": "Sour Zone Tint",
+        "darkValue": "rgb(233 194 59 / 0.16)"
+      },
+      "bitter-tint": {
+        "role": "secondary",
+        "displayName": "Bitter Zone Tint",
+        "darkValue": "rgb(194 97 75 / 0.16)"
+      },
+      "ideal-tint": {
+        "role": "secondary",
+        "displayName": "Target Box Tint",
+        "darkValue": "rgb(93 179 123 / 0.16)"
+      },
+      "on-ink-2": {
+        "role": "neutral",
+        "displayName": "Inverse Pencil",
+        "darkValue": "#3c4552"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline, page-head titles, 404 and closing band headlines. Expanded 118%."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings. Expanded 118%."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Zone, card and row headings. Expanded 118%."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "The answer: chart verdict, step counts, ledger values, link titles, rule-line statements."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Intro paragraph under a heading, pencil grey, 36ch to 60ch."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Reading text, max 72ch, tabular numerals."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Condensed 78% uppercase data labels: axes, ticks, readouts, chart captions, rule-line categories. Never a heading kicker."
+      }
+    },
+    "shadows": [],
+    "rules": [
+      {
+        "name": "structural-rule",
+        "value": "1.5px solid var(--rule)",
+        "purpose": "Frames and closes blocks: nav, chart, tables, zone fields, buttons."
+      },
+      {
+        "name": "divider",
+        "value": "1px solid var(--plot-grid)",
+        "purpose": "Row and cell dividers inside a block."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 3px solid var(--sour); outline-offset: 3px",
+        "purpose": "Every focusable element."
+      },
+      {
+        "name": "paper-grid",
+        "value": "24px minor cells (var(--grid)), 120px major cells (var(--grid-major)) as stacked 1px linear-gradients on body",
+        "purpose": "The graph-paper ground."
+      },
+      {
+        "name": "trajectory",
+        "value": "stroke var(--ink), 2px, dasharray 6 6",
+        "purpose": "Path between plotted shots. Preview path uses 3 7 at 45% opacity."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Chart trail draw and dot arrival."
+      },
+      {
+        "name": "trail-draw",
+        "value": "700ms ease-out",
+        "purpose": "Dashed trajectory drawing to the next shot."
+      },
+      {
+        "name": "dot-arrive",
+        "value": "420ms ease-out, scale 0.4 to 1 with fade",
+        "purpose": "Next shot dot landing."
+      },
+      {
+        "name": "control-colour",
+        "value": "140ms to 160ms ease, background-color and color",
+        "purpose": "Button and taste button hover."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "animation and transition none",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "phone",
+        "value": "620px"
+      },
+      {
+        "name": "ledger",
+        "value": "700px"
+      },
+      {
+        "name": "nav",
+        "value": "760px"
+      },
+      {
+        "name": "split",
+        "value": "860px"
+      },
+      {
+        "name": "hero",
+        "value": "980px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Install and main actions. Ink fill, square, turns target-green ink on hover.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Get it on Google Play <svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.25\" stroke-linecap=\"square\" aria-hidden=\"true\"><path d=\"M5 12h13M13 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;gap:12px;min-height:48px;padding:0 22px;border:1.5px solid var(--ink,#17202b);background:var(--ink,#17202b);color:var(--paper,#f6f6f1);font-family:Archivo,'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:1.0625rem;text-decoration:none;cursor:pointer;transition:background-color 160ms ease,color 160ms ease}.ds-btn-primary svg{width:18px;height:18px}.ds-btn-primary:hover{background:var(--ideal-ink,#2a6b41);border-color:var(--ideal-ink,#2a6b41)}.ds-btn-primary:focus-visible{outline:3px solid var(--sour,#e9c23b);outline-offset:3px}"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Second action beside a primary. Ruled box that fills with ink on hover.",
+      "html": "<a class=\"ds-btn-outline\" href=\"#\">Get the app</a>",
+      "css": ".ds-btn-outline{display:inline-flex;align-items:center;min-height:48px;padding:0 22px;border:1.5px solid var(--ink,#17202b);background:transparent;color:var(--ink,#17202b);font-family:Archivo,'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:1.0625rem;text-decoration:none;cursor:pointer;transition:background-color 160ms ease,color 160ms ease}.ds-btn-outline:hover{background:var(--ink,#17202b);color:var(--paper,#f6f6f1)}.ds-btn-outline:focus-visible{outline:3px solid var(--sour,#e9c23b);outline-offset:3px}"
+    },
+    {
+      "name": "Taste Buttons",
+      "kind": "chip",
+      "refersTo": "button-taste",
+      "description": "Sour, Perfect, Bitter on the chart. Square zone swatch before the word.",
+      "html": "<div class=\"ds-taste\"><button data-t=\"sour\">Sour</button><button data-t=\"perfect\">Perfect</button><button data-t=\"bitter\">Bitter</button></div>",
+      "css": ".ds-taste{display:flex;gap:8px}.ds-taste button{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 16px;border:1.5px solid var(--ink,#17202b);background:var(--paper,#f6f6f1);color:var(--ink,#17202b);font-family:Archivo,'Helvetica Neue',Arial,sans-serif;font-weight:700;font-size:1.0625rem;cursor:pointer;transition:background-color 140ms ease,color 140ms ease}.ds-taste button::before{content:'';width:12px;height:12px;border:1px solid var(--ink,#17202b);background:var(--sw)}.ds-taste [data-t=sour]{--sw:var(--sour,#e9c23b)}.ds-taste [data-t=perfect]{--sw:var(--ideal,#3e8e5a)}.ds-taste [data-t=bitter]{--sw:var(--bitter,#8e3b2a)}.ds-taste button:hover{background:var(--ink,#17202b);color:var(--paper,#f6f6f1)}.ds-taste button:focus-visible{outline:3px solid var(--sour,#e9c23b);outline-offset:3px}"
+    },
+    {
+      "name": "Navigation Strip",
+      "kind": "nav",
+      "refersTo": "nav-bar",
+      "description": "Paper strip closed by a 1.5px ink rule: wordmark, text links, install button.",
+      "html": "<nav class=\"ds-nav\"><a class=\"ds-mark\" href=\"#\">Coffee Shot Timer</a><ul><li><a href=\"#\" aria-current=\"page\">Guides</a></li><li><a href=\"#\">Roadmap</a></li><li><a href=\"#\">Contribute</a></li></ul><a class=\"ds-nav-btn\" href=\"#\">Get it on Google Play</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:32px;min-height:72px;padding:0 24px;border-bottom:1.5px solid var(--ink,#17202b);background:var(--paper,#f6f6f1);color:var(--ink,#17202b);font-family:Archivo,'Helvetica Neue',Arial,sans-serif}.ds-mark{margin-right:auto;font-stretch:118%;font-weight:800;font-size:1.125rem;letter-spacing:-0.01em;text-decoration:none;color:inherit}.ds-nav ul{display:flex;gap:28px;margin:0;padding:0;list-style:none}.ds-nav ul a{display:inline-flex;align-items:center;min-height:48px;font-weight:500;text-decoration:none;color:inherit}.ds-nav ul a:hover,.ds-nav ul a[aria-current=page]{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:0.2em}.ds-nav-btn{display:inline-flex;align-items:center;min-height:44px;padding:0 18px;border:1.5px solid var(--ink,#17202b);background:var(--ink,#17202b);color:var(--paper,#f6f6f1);font-weight:700;text-decoration:none}.ds-nav-btn:hover{background:var(--ideal-ink,#2a6b41);border-color:var(--ideal-ink,#2a6b41)}.ds-nav a:focus-visible{outline:3px solid var(--sour,#e9c23b);outline-offset:3px}"
+    },
+    {
+      "name": "Control Chart",
+      "kind": "custom",
+      "refersTo": "chart-frame",
+      "description": "Signature component: ruled chart with sour, bitter and target zones, numbered shots on a dashed trajectory.",
+      "html": "<figure class=\"ds-chart\"><figcaption class=\"ds-chart-head\"><span>Try it</span><span>Example</span></figcaption><svg viewBox=\"0 0 360 240\"><rect x=\"30\" y=\"10\" width=\"130\" height=\"200\" fill=\"rgb(233 194 59 / 0.24)\"/><rect x=\"200\" y=\"10\" width=\"150\" height=\"200\" fill=\"rgb(142 59 42 / 0.13)\"/><rect x=\"160\" y=\"75\" width=\"40\" height=\"70\" fill=\"rgb(62 142 90 / 0.18)\" stroke=\"#3e8e5a\" stroke-width=\"2.5\"/><line x1=\"30\" y1=\"210\" x2=\"350\" y2=\"210\" stroke=\"#17202b\" stroke-width=\"1.5\"/><line x1=\"30\" y1=\"10\" x2=\"30\" y2=\"210\" stroke=\"#17202b\" stroke-width=\"1.5\"/><path d=\"M80 120 L150 115 L180 110\" fill=\"none\" stroke=\"#17202b\" stroke-width=\"2\" stroke-dasharray=\"6 6\"/><circle cx=\"80\" cy=\"120\" r=\"11\" fill=\"#f6f6f1\" stroke=\"#17202b\" stroke-width=\"2\"/><circle cx=\"150\" cy=\"115\" r=\"11\" fill=\"#17202b\"/><circle cx=\"180\" cy=\"110\" r=\"11\" fill=\"#3e8e5a\"/><text x=\"190\" y=\"232\" text-anchor=\"middle\">EXTRACTION TIME (S)</text></svg></figure>",
+      "css": ".ds-chart{margin:0;border:1.5px solid var(--ink,#17202b);background:var(--paper,#f6f6f1);font-family:Archivo,'Helvetica Neue',Arial,sans-serif}.ds-chart-head{display:flex;justify-content:space-between;padding:12px 16px;border-bottom:1px solid rgb(23 32 43 / 0.12);color:var(--ink-2,#4a5361);font-stretch:78%;font-weight:600;font-size:0.8125rem;letter-spacing:0.06em;text-transform:uppercase}.ds-chart svg{display:block;width:100%;height:auto}.ds-chart text{fill:#17202b;font-stretch:78%;font-weight:600;font-size:11px;letter-spacing:0.04em}"
+    },
+    {
+      "name": "Rule Strip Zones",
+      "kind": "card",
+      "refersTo": "zone-field-sour",
+      "description": "The three grind rules as solid zone columns at their true widths on the time axis.",
+      "html": "<div class=\"ds-zones\"><div class=\"ds-z ds-z-fast\"><h3>Grind finer</h3><p class=\"ds-cond\">Tastes sour, or runs under 25 s</p></div><div class=\"ds-z ds-z-ok\"><h3>Keep it</h3><p class=\"ds-cond\">25 to 30 s</p></div><div class=\"ds-z ds-z-slow\"><h3>Grind coarser</h3><p class=\"ds-cond\">Tastes bitter, or runs over 30 s</p></div></div>",
+      "css": ".ds-zones{display:grid;grid-template-columns:15fr 5fr 15fr;border:1.5px solid var(--ink,#17202b);font-family:Archivo,'Helvetica Neue',Arial,sans-serif}.ds-z{padding:24px;min-height:180px}.ds-z+.ds-z{border-left:1.5px solid var(--ink,#17202b)}.ds-z h3{margin:0;font-stretch:118%;font-weight:800;font-size:1.75rem;line-height:1;letter-spacing:-0.02em}.ds-cond{margin:10px 0 0;font-stretch:78%;font-weight:700}.ds-z-fast{background:#e9c23b;color:#17202b}.ds-z-ok{background:#2c6e44;color:#fff;padding-inline:14px}.ds-z-slow{background:#8e3b2a;color:#fff}"
+    },
+    {
+      "name": "Ruled Table",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Facts as ruled rows: 1.5px rules top and bottom, 1px dividers, answers in the figure style.",
+      "html": "<table class=\"ds-table\"><thead><tr><th>Time outside 25 to 30 s</th><th>Recommendation</th></tr></thead><tbody><tr><td>Up to 3 seconds</td><td class=\"ds-big\">1 step</td></tr><tr><td>4 to 6 seconds</td><td class=\"ds-big\">2 steps</td></tr><tr><td>More than 6 seconds</td><td class=\"ds-big\">3 steps</td></tr></tbody></table>",
+      "css": ".ds-table{width:100%;border-collapse:collapse;font-family:Archivo,'Helvetica Neue',Arial,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink,#17202b)}.ds-table th,.ds-table td{padding:14px 16px 14px 0;text-align:left;vertical-align:baseline;border-top:1px solid rgb(23 32 43 / 0.12)}.ds-table thead th{border-top:1.5px solid var(--ink,#17202b);color:var(--ink-2,#4a5361)}.ds-table tbody tr:last-child td{border-bottom:1.5px solid var(--ink,#17202b)}.ds-big{font-stretch:118%;font-weight:800;font-size:1.5rem}"
+    },
+    {
+      "name": "Rule Line",
+      "kind": "custom",
+      "refersTo": "",
+      "description": "Reading-page callout: condensed label naming the rule, the rule in the figure style, ruled above and below.",
+      "html": "<div class=\"ds-rule-line\"><span class=\"ds-label\">Starting point</span><p>Medium-fine grind (finer than table salt)</p></div>",
+      "css": ".ds-rule-line{display:grid;grid-template-columns:auto 1fr;gap:4px 16px;padding:18px 0;border-block:1.5px solid var(--ink,#17202b);font-family:Archivo,'Helvetica Neue',Arial,sans-serif;color:var(--ink,#17202b)}.ds-label{align-self:center;color:var(--ink-2,#4a5361);font-stretch:78%;font-weight:600;font-size:0.8125rem;letter-spacing:0.06em;text-transform:uppercase}.ds-rule-line p{margin:0;font-stretch:118%;font-weight:800;font-size:1.25rem;letter-spacing:-0.01em}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Brewing Control Chart",
+    "overview": "**Creative North Star: \"The Brewing Control Chart\"**\n\nEvery page is a sheet of graph paper with a shot plotted on it. The ground is a fine 24px grid with a heavier rule every fifth cell, drawn in the same ink as the type. Shots are numbered dots, the path between them is a dashed trajectory, and the goal is a green target box at 25 to 30 seconds. Three zone colours (sour yellow, bitter rust, ideal green) carry meaning and nothing else. The rest is one ink on paper.\n\nType is a single variable family, Archivo, used across its width axis: expanded and heavy for headings and figures, regular width for reading and buttons, condensed caps for axis and data labels. Numbers are tabular everywhere. Corners are square, lines are hairlines or 1.5px rules, and depth comes from inverting the sheet or filling a zone with solid colour, never from shadow.\n\nThe page reads as an instrument, not a brochure. Density is moderate: generous section rhythm, but each block is ruled and tabular, like a lab sheet. The site follows the system colour scheme (light paper or dark ink-navy) with no manual toggle.",
+    "keyCharacteristics": [
+      "Graph-paper ground: 24px minor cells, 120px major cells, both in ink at low alpha.",
+      "One ink for type, rules and axes; a second, lighter ink for secondary text only.",
+      "Three semantic zone colours: sour yellow, bitter rust, ideal green.",
+      "Archivo across its width axis: 118% for display and figures, 100% for body and controls, 78% for labels.",
+      "Square corners everywhere except plotted dots.",
+      "Plotted dots, dashed trajectories and target boxes are the only ornament.",
+      "Flat. No shadows. Depth by inversion and solid zone fields."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Type, rules and axes are drawn in a single ink. Secondary text uses the pencil grey; nothing else introduces a new neutral.",
+        "section": "colors"
+      },
+      {
+        "name": "The Zone Meaning Rule",
+        "body": "Yellow means sour or too fast, rust means bitter or too slow, green means ideal or go. A zone colour never appears as decoration. Yellow doubles as the focus and selection highlight, the one sanctioned non-zone use.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Field Rule",
+        "body": "Solid fields that carry white text (`field-ok`, `field-slow`) keep the same value in both schemes. White type never sits on the scheme-shifting `ideal` or `bitter` swatches.",
+        "section": "colors"
+      },
+      {
+        "name": "The Width Axis Rule",
+        "body": "Width carries role: 118% for headings and figures, 100% for body, buttons and nav, 78% for labels and axis data. Don't mix widths inside one element.",
+        "section": "typography"
+      },
+      {
+        "name": "The Data Label Rule",
+        "body": "The condensed caps label voice names data: an axis, a reading, a rule category. It never sits above a heading as a section kicker.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat Sheet Rule",
+        "body": "Surfaces never lift. If something needs emphasis, invert it, fill it with its zone colour, or frame it with a 1.5px rule.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Two Rule Weights Rule",
+        "body": "Structural rules are 1.5px ink. Internal dividers are 1px plot-grid. No third weight.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Only Round Thing Rule",
+        "body": "A circle is a shot. Nothing else gets a radius.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do set every surface on the 24px graph-paper ground with the 120px major grid.",
+      "Do use `sour`, `bitter` and `ideal` only for their zone meanings, and `sour` for focus and selection.",
+      "Do put white text only on `field-ok` or `field-slow`, which stay fixed across schemes.",
+      "Do frame blocks with 1.5px ink rules and divide inside them with 1px plot-grid lines.",
+      "Do present facts as ruled tables or spec rows, with the answer in the expanded 800 figure style.",
+      "Do use tabular numerals and real units (s, g, 1:x) for every number.",
+      "Do draw any new illustration as a chart: axes, target box, numbered dots, dashed trajectory.",
+      "Do keep primary controls at 48px minimum height."
+    ],
+    "donts": [
+      "Don't add box-shadows, blurs or lifted cards.",
+      "Don't round corners on anything except a plotted dot.",
+      "Don't use soft or decorative gradients. Hard-stop linear gradients are fine where they draw grid lines or a segmented bar.",
+      "Don't introduce a second typeface or a monospace; use Archivo's width axis instead.",
+      "Don't put the condensed label voice above a heading as a kicker.",
+      "Don't add icons beyond the inline stroke arrow on install buttons; no glyph or emoji icons.",
+      "Don't add a manual theme toggle; the site follows the system scheme."
+    ]
+  }
+}

@@ -39,3 +39,12 @@ ehthumbs.db
 
 # Local ADB device config
 .adb-device
+
+# Local Claude Code settings carry the TYPESAFE_API_KEY; keep them out of git.
+.claude/settings.local.json
+
+# Impeccable scratch output: decision mocks, review screenshots, question logs.
+# design.json (DESIGN.md sidecar) and surfaces/ (surface briefs) stay tracked.
+.impeccable/mocks/
+.impeccable/review/
+.impeccable/questions/
