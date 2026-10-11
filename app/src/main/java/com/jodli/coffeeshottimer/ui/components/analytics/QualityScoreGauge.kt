@@ -26,9 +26,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
-import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import kotlin.math.min
 
 /**
@@ -67,6 +65,7 @@ fun QualityScoreGauge(
         val gaugeSize = size ?: minOf(maxWidth.value, maxHeight.value).dp.coerceIn(200.dp, 300.dp)
 
         // Circular gauge canvas
+        val zones = MaterialTheme.zoneColors
         Canvas(
             modifier = Modifier.size(gaugeSize)
         ) {
@@ -93,11 +92,7 @@ fun QualityScoreGauge(
 
             // Colored arc based on score
             val sweepAngle = (animatedScore / 100f) * 270f
-            val arcColor = when {
-                score >= 85 -> ExtractionOptimal // Green
-                score >= 60 -> ExtractionTooFast // Orange
-                else -> ExtractionTooSlow // Red
-            }
+            val arcColor = zones.forScore(score)
 
             drawArc(
                 color = arcColor,

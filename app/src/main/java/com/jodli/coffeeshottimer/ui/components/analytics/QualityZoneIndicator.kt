@@ -25,10 +25,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
-import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 
 /**
  * Horizontal bar showing three extraction zones with current percentage marker.
@@ -57,6 +55,7 @@ fun QualityZoneIndicator(
         verticalArrangement = Arrangement.spacedBy(spacing.small)
     ) {
         // Horizontal bar with zones
+        val zones = MaterialTheme.zoneColors
         Canvas(
             modifier = Modifier
                 .fillMaxWidth()
@@ -67,26 +66,26 @@ fun QualityZoneIndicator(
             val barHeight = canvasHeight * 0.5f
             val barTop = (canvasHeight - barHeight) / 2f
 
-            val cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
+            val cornerRadius = CornerRadius(2.dp.toPx(), 2.dp.toPx())
 
-            // Left zone: Orange (too fast, 0-25%)
+            // Left zone: too fast, tends sour (0-25%)
             drawRoundRect(
-                color = ExtractionTooFast,
+                color = zones.fast,
                 topLeft = Offset(0f, barTop),
                 size = Size(canvasWidth * 0.25f, barHeight),
                 cornerRadius = cornerRadius
             )
 
-            // Middle zone: Green (optimal, 25-75%)
+            // Middle zone: ideal (25-75%)
             drawRect(
-                color = ExtractionOptimal,
+                color = zones.ideal,
                 topLeft = Offset(canvasWidth * 0.25f, barTop),
                 size = Size(canvasWidth * 0.5f, barHeight)
             )
 
-            // Right zone: Red (too slow, 75-100%)
+            // Right zone: too slow, tends bitter (75-100%)
             drawRoundRect(
-                color = ExtractionTooSlow,
+                color = zones.slow,
                 topLeft = Offset(canvasWidth * 0.75f, barTop),
                 size = Size(canvasWidth * 0.25f, barHeight),
                 cornerRadius = cornerRadius

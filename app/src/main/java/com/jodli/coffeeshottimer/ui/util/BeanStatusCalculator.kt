@@ -1,13 +1,11 @@
 package com.jodli.coffeeshottimer.ui.util
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase
-import com.jodli.coffeeshottimer.ui.theme.ExtractionIdle
-import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 
 /**
  * Represents the status of a coffee bean based on shot quality analysis.
@@ -74,9 +72,10 @@ fun calculateBeanStatus(
 @Composable
 fun getStatusColor(status: BeanStatus): Color {
     return when (status) {
-        BeanStatus.DIALED_IN -> ExtractionOptimal // Green - consistent good results
-        BeanStatus.EXPERIMENTING -> ExtractionTooFast // Orange - still dialing in
-        BeanStatus.NEEDS_WORK -> ExtractionTooSlow // Red - poor results
-        BeanStatus.FRESH_START -> ExtractionIdle // Gray - no data yet
+        // quality scale, not the zone colours: "needs work" isn't the same thing as "bitter"
+        BeanStatus.DIALED_IN -> MaterialTheme.zoneColors.qualityGood
+        BeanStatus.EXPERIMENTING -> MaterialTheme.zoneColors.qualityFair
+        BeanStatus.NEEDS_WORK -> MaterialTheme.colorScheme.onSurfaceVariant
+        BeanStatus.FRESH_START -> MaterialTheme.zoneColors.idle
     }
 }

@@ -24,8 +24,8 @@ class ComponentTypographyUsageTest {
     fun `CoffeeCard uses correct spacing values`() {
         // Requirement 4.3: Cards use consistent internal spacing
         assertEquals("Card padding should be 16.dp", 16.dp, spacing.cardPadding)
-        assertEquals("Card corner radius should be large (16.dp)", 16.dp, spacing.cornerLarge)
-        assertEquals("Card elevation should be 4.dp", 4.dp, spacing.elevationCard)
+        assertEquals("Card corner radius should be large (4.dp)", 4.dp, spacing.cornerLarge)
+        assertEquals("Cards are flat; rules separate them, not shadows", 0.dp, spacing.elevationCard)
 
         // Verify card spacing matches design system
         assertEquals("Card padding should match medium spacing", spacing.medium, spacing.cardPadding)
@@ -51,22 +51,22 @@ class ComponentTypographyUsageTest {
         // Requirement 4.1: Buttons use LocalSpacing values
         // Requirement 2.3: Buttons meet minimum touch target height
 
-        assertEquals("Button height should be touch target (44.dp)", 44.dp, spacing.touchTarget)
-        assertEquals("Button corner radius should be medium (8.dp)", 8.dp, spacing.cornerMedium)
+        assertEquals("Button height should be touch target (48.dp)", 48.dp, spacing.touchTarget)
+        assertEquals("Button corner radius should be medium (2.dp)", 2.dp, spacing.cornerMedium)
         assertEquals("Button icon size should be small (16.dp)", 16.dp, spacing.iconSmall)
         assertEquals("Button icon spacing should be small (8.dp)", 8.dp, spacing.small)
 
         // Verify accessibility compliance
         assertTrue(
             "Button touch target should meet accessibility minimum",
-            spacing.touchTarget.value >= 44f
+            spacing.touchTarget.value >= 48f
         )
     }
 
     @Test
     fun `CoffeeTextField uses correct spacing and typography`() {
         // Requirement 4.4: Text fields use consistent internal spacing
-        assertEquals("Text field corner radius should be medium (8.dp)", 8.dp, spacing.cornerMedium)
+        assertEquals("Text field corner radius should be medium (2.dp)", 2.dp, spacing.cornerMedium)
         assertEquals("Error message start padding should be medium (16.dp)", 16.dp, spacing.medium)
         assertEquals("Error message top padding should be extraSmall (4.dp)", 4.dp, spacing.extraSmall)
     }
@@ -172,19 +172,19 @@ class ComponentTypographyUsageTest {
         // Requirement 4.1: Corner radius should support visual hierarchy
 
         // Cards should have largest corners for prominence
-        assertEquals("Card corners should be large (16.dp)", 16.dp, spacing.cornerLarge)
+        assertEquals("Card corners should be large (4.dp)", 4.dp, spacing.cornerLarge)
 
         // Buttons and text fields should have medium corners
-        assertEquals("Button corners should be medium (8.dp)", 8.dp, spacing.cornerMedium)
+        assertEquals("Button corners should be medium (2.dp)", 2.dp, spacing.cornerMedium)
 
         // Small corners for subtle elements
-        assertEquals("Small corners should be 4.dp", 4.dp, spacing.cornerSmall)
+        assertEquals("Small corners should be 2.dp", 2.dp, spacing.cornerSmall)
 
         // Verify hierarchy
         assertTrue(
             "Corner radius hierarchy should be logical",
-            spacing.cornerLarge > spacing.cornerMedium &&
-                spacing.cornerMedium > spacing.cornerSmall
+            spacing.cornerLarge >= spacing.cornerMedium &&
+                spacing.cornerMedium >= spacing.cornerSmall
         )
     }
 
@@ -192,8 +192,8 @@ class ComponentTypographyUsageTest {
     fun `elevation values create depth hierarchy`() {
         // Requirement 4.1: Elevation should create proper depth hierarchy
 
-        assertEquals("Card elevation should be 4.dp", 4.dp, spacing.elevationCard)
-        assertEquals("Dialog elevation should be 8.dp", 8.dp, spacing.elevationDialog)
+        assertEquals("Cards are flat; rules separate them, not shadows", 0.dp, spacing.elevationCard)
+        assertEquals("Dialog elevation should be 2.dp", 2.dp, spacing.elevationDialog)
 
         // Verify hierarchy
         assertTrue(
@@ -234,12 +234,12 @@ class ComponentTypographyUsageTest {
 
         // Touch targets must meet minimum size requirements
         assertTrue(
-            "Touch target should meet WCAG minimum (44.dp)",
-            spacing.touchTarget.value >= 44f
+            "Touch target should meet WCAG minimum (48dp)",
+            spacing.touchTarget.value >= 48f
         )
 
         // Button heights should use touch target
-        assertEquals("Button height should use touch target", 44.dp, spacing.touchTarget)
+        assertEquals("Button height should use touch target", 48.dp, spacing.touchTarget)
 
         // Slider heights should provide adequate touch area
         assertTrue(
@@ -321,7 +321,7 @@ class ComponentTypographyUsageTest {
         assertEquals("Large icon should be 2x small icon", spacing.iconLarge, spacing.iconSmall * 2)
 
         // Corner radius should follow consistent scaling
-        assertEquals("Medium corner should be 2x small corner", spacing.cornerMedium, spacing.cornerSmall * 2)
+        assertTrue("Medium corner should not be smaller than small", spacing.cornerMedium >= spacing.cornerSmall)
         assertEquals("Large corner should be 2x medium corner", spacing.cornerLarge, spacing.cornerMedium * 2)
     }
 }

@@ -11,7 +11,7 @@ import org.junit.Test
  * Tests verify:
  * - Component configuration and properties
  * - Consistent styling and spacing values
- * - Touch target requirements (44.dp minimum)
+ * - Touch target requirements (48.dp minimum)
  * - Card padding and layout consistency
  * - Button icon sizing and spacing constants
  *
@@ -30,8 +30,8 @@ class StandardizedComponentsTest {
     @Test
     fun `CoffeeCard uses consistent elevation and corner radius`() {
         // Requirement 1.3: All cards have consistent elevation and corner radius
-        assertEquals("Corner radius should be 16.dp", 16.dp, testSpacing.cornerLarge)
-        assertEquals("Elevation should be 4.dp", 4.dp, testSpacing.elevationCard)
+        assertEquals("Corner radius should be 4.dp", 4.dp, testSpacing.cornerLarge)
+        assertEquals("Elevation should be 0.dp", 0.dp, testSpacing.elevationCard)
     }
 
     @Test
@@ -41,8 +41,8 @@ class StandardizedComponentsTest {
 
         // Verify card-specific constants
         assertEquals("Card padding should be consistent", 16.dp, spacing.cardPadding)
-        assertEquals("Card corner radius should be large", 16.dp, spacing.cornerLarge)
-        assertEquals("Card elevation should be consistent", 4.dp, spacing.elevationCard)
+        assertEquals("Card corner radius should be large", 4.dp, spacing.cornerLarge)
+        assertEquals("Card elevation should be consistent", 0.dp, spacing.elevationCard)
 
         // Verify these match the expected design system values
         assertTrue("Card padding should be same as medium spacing", spacing.cardPadding == spacing.medium)
@@ -50,10 +50,10 @@ class StandardizedComponentsTest {
 
     @Test
     fun `button components meet minimum touch target height requirement`() {
-        // Requirement 2.3: All buttons have minimum spacing.touchTarget (44.dp) height
-        assertEquals("Touch target should be 44.dp", 44.dp, testSpacing.touchTarget)
+        // Requirement 2.3: All buttons have minimum spacing.touchTarget (48.dp) height
+        assertEquals("Touch target should be 48.dp", 48.dp, testSpacing.touchTarget)
 
-        // Verify this meets accessibility guidelines (minimum 44.dp)
+        // Verify this meets accessibility guidelines (minimum 48.dp)
         assertTrue(
             "Touch target should meet accessibility minimum",
             testSpacing.touchTarget.value >= 44f
@@ -74,7 +74,7 @@ class StandardizedComponentsTest {
     @Test
     fun `button corner radius is consistent with design system`() {
         // Requirement 2.1, 2.4: Consistent button styling
-        assertEquals("Button corner radius should be 8.dp", 8.dp, testSpacing.cornerMedium)
+        assertEquals("Button corner radius should be 2.dp", 2.dp, testSpacing.cornerMedium)
 
         // Verify button corner radius is smaller than card corner radius for visual hierarchy
         assertTrue(
@@ -119,13 +119,13 @@ class StandardizedComponentsTest {
         assertEquals("small should be 8.dp", 8.dp, spacing.small)
         assertEquals("medium should be 16.dp", 16.dp, spacing.medium)
         assertEquals("large should be 24.dp", 24.dp, spacing.large)
-        assertEquals("touchTarget should be 44.dp", 44.dp, spacing.touchTarget)
+        assertEquals("touchTarget should be 48.dp", 48.dp, spacing.touchTarget)
         assertEquals("cardPadding should be 16.dp", 16.dp, spacing.cardPadding)
         assertEquals("iconSmall should be 16.dp", 16.dp, spacing.iconSmall)
         assertEquals("iconMedium should be 24.dp", 24.dp, spacing.iconMedium)
-        assertEquals("cornerLarge should be 16.dp", 16.dp, spacing.cornerLarge)
-        assertEquals("cornerMedium should be 8.dp", 8.dp, spacing.cornerMedium)
-        assertEquals("elevationCard should be 4.dp", 4.dp, spacing.elevationCard)
+        assertEquals("cornerLarge should be 4.dp", 4.dp, spacing.cornerLarge)
+        assertEquals("cornerMedium should be 2.dp", 2.dp, spacing.cornerMedium)
+        assertEquals("elevationCard should be 0.dp", 0.dp, spacing.elevationCard)
     }
 
     @Test
@@ -143,7 +143,7 @@ class StandardizedComponentsTest {
         assertTrue("iconMedium < iconLarge", spacing.iconMedium < spacing.iconLarge)
 
         // Corner radius hierarchy
-        assertTrue("cornerSmall < cornerMedium", spacing.cornerSmall < spacing.cornerMedium)
+        assertTrue("cornerSmall <= cornerMedium", spacing.cornerSmall <= spacing.cornerMedium)
         assertTrue("cornerMedium < cornerLarge", spacing.cornerMedium < spacing.cornerLarge)
     }
 
@@ -154,18 +154,18 @@ class StandardizedComponentsTest {
 
         // Card standardization (Requirements 1.1-1.4)
         assertEquals("Cards use consistent padding", 16.dp, spacing.cardPadding)
-        assertEquals("Cards use consistent corner radius", 16.dp, spacing.cornerLarge)
-        assertEquals("Cards use consistent elevation", 4.dp, spacing.elevationCard)
+        assertEquals("Cards use consistent corner radius", 4.dp, spacing.cornerLarge)
+        assertEquals("Cards use consistent elevation", 0.dp, spacing.elevationCard)
 
         // Button standardization (Requirements 2.1-2.4)
-        assertEquals("Buttons meet touch target minimum", 44.dp, spacing.touchTarget)
+        assertEquals("Buttons meet touch target minimum", 48.dp, spacing.touchTarget)
         assertEquals("Button icons use consistent size", 16.dp, spacing.iconSmall)
         assertEquals("Button icon spacing is consistent", 8.dp, spacing.small)
-        assertEquals("Button corners are consistent", 8.dp, spacing.cornerMedium)
+        assertEquals("Button corners are consistent", 2.dp, spacing.cornerMedium)
 
         // Verify accessibility compliance
         assertTrue(
-            "Touch targets meet accessibility minimum (44.dp)",
+            "Touch targets meet accessibility minimum (44dp)",
             spacing.touchTarget.value >= 44f
         )
     }

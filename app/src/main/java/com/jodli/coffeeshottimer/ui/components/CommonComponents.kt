@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
@@ -45,10 +47,14 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 fun CoffeeCard(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
-    colors: androidx.compose.material3.CardColors = CardDefaults.cardColors(),
+    colors: androidx.compose.material3.CardColors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+    ),
     content: @Composable ColumnScope.() -> Unit
 ) {
     val spacing = LocalSpacing.current
+    // flat card: a hairline rule instead of a shadow
+    val border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
 
     if (onClick != null) {
         Card(
@@ -56,6 +62,7 @@ fun CoffeeCard(
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(spacing.cornerLarge),
             elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard),
+            border = border,
             colors = colors
         ) {
             Column(
@@ -68,6 +75,7 @@ fun CoffeeCard(
             modifier = modifier.fillMaxWidth(),
             shape = RoundedCornerShape(spacing.cornerLarge),
             elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard),
+            border = border,
             colors = colors
         ) {
             Column(

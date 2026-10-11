@@ -48,13 +48,9 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.R
-import com.jodli.coffeeshottimer.ui.components.ValidationUtils.Companion.OPTIMAL_EXTRACTION_TIME_MAX
-import com.jodli.coffeeshottimer.ui.components.ValidationUtils.Companion.OPTIMAL_EXTRACTION_TIME_MIN
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
-import com.jodli.coffeeshottimer.ui.theme.ExtractionIdle
-import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
+import com.jodli.coffeeshottimer.ui.theme.extractionZone
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -150,8 +146,7 @@ fun AutomaticTimerCircle(
                     )
                 },
             color = MaterialTheme.colorScheme.surface,
-            shape = CircleShape,
-            shadowElevation = 6.dp
+            shape = CircleShape
         ) {
             Box(
                 modifier = Modifier
@@ -318,8 +313,7 @@ fun ManualTimerCircle(
                     )
                 },
             color = MaterialTheme.colorScheme.surface,
-            shape = CircleShape,
-            shadowElevation = 6.dp
+            shape = CircleShape
         ) {
             Box(
                 modifier = Modifier
@@ -425,19 +419,19 @@ fun ManualTimerCircle(
  * Get the color for the timer based on extraction time.
  *
  * Color logic:
- * - 0 seconds: Gray (idle)
- * - < 25 seconds: Orange (too fast)
- * - 25-30 seconds: Green (optimal)
- * - > 30 seconds: Red (too slow)
+ * - 0 seconds: idle
+ * - < 25 seconds: fast zone (tends sour)
+ * - 25-30 seconds: ideal zone
+ * - > 30 seconds: slow zone (tends bitter)
  * - Paused: Muted version of the extraction color
  */
 @Composable
 private fun getExtractionColor(elapsedSeconds: Float, isRunning: Boolean): Color {
-    val baseColor = when {
-        elapsedSeconds == 0f -> ExtractionIdle // Gray - idle
-        elapsedSeconds < OPTIMAL_EXTRACTION_TIME_MIN -> ExtractionTooFast // Orange - too fast
-        elapsedSeconds <= OPTIMAL_EXTRACTION_TIME_MAX -> ExtractionOptimal // Green - optimal
-        else -> ExtractionTooSlow // Red - too slow
+    val zones = MaterialTheme.zoneColors
+    val baseColor = if (elapsedSeconds == 0f) {
+        zones.idle
+    } else {
+        zones.fill(extractionZone(elapsedSeconds.toInt()))
     }
 
     // Apply muted/grayed effect when paused (except at 0 seconds)

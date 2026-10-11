@@ -1,6 +1,6 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.ui.graphics.Color
+import com.jodli.coffeeshottimer.ui.theme.LightZoneColors
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -58,39 +58,25 @@ class TimerComponentsTest {
 
     @Test
     fun `getExtractionTimeColor returns correct colors for different time ranges`() {
-        // Test under-extraction color (yellow)
-        val yellowColor = Color(0xFFFFC107)
-        assertEquals(yellowColor, getExtractionTimeColor(10, true))
-        assertEquals(yellowColor, getExtractionTimeColor(19, true))
+        // fast zone (tends sour)
+        val yellowColor = LightZoneColors.fast
+        assertEquals(yellowColor, getExtractionTimeColor(10, true, LightZoneColors))
+        assertEquals(yellowColor, getExtractionTimeColor(19, true, LightZoneColors))
 
-        // Test optimal color (green)
-        val greenColor = Color(0xFF4CAF50)
-        assertEquals(greenColor, getExtractionTimeColor(20, true))
-        assertEquals(greenColor, getExtractionTimeColor(25, true))
-        assertEquals(greenColor, getExtractionTimeColor(35, true))
+        // ideal zone
+        val greenColor = LightZoneColors.ideal
+        assertEquals(greenColor, getExtractionTimeColor(20, true, LightZoneColors))
+        assertEquals(greenColor, getExtractionTimeColor(25, true, LightZoneColors))
+        assertEquals(greenColor, getExtractionTimeColor(35, true, LightZoneColors))
 
-        // Test over-extraction color (red)
-        val redColor = Color(0xFFF44336)
-        assertEquals(redColor, getExtractionTimeColor(36, true))
-        assertEquals(redColor, getExtractionTimeColor(45, true))
+        // slow zone (tends bitter)
+        val redColor = LightZoneColors.slow
+        assertEquals(redColor, getExtractionTimeColor(36, true, LightZoneColors))
+        assertEquals(redColor, getExtractionTimeColor(45, true, LightZoneColors))
 
         // Test neutral color (gray)
-        val grayColor = Color.Gray.copy(alpha = 0.3f)
-        assertEquals(grayColor, getExtractionTimeColor(25, false))
-    }
-
-    @Test
-    fun `getTimerColor converts milliseconds to seconds correctly`() {
-        // Test that milliseconds are converted to seconds properly
-        val greenColor = Color(0xFF4CAF50)
-        assertEquals(greenColor, getTimerColor(25000L, true)) // 25 seconds
-        assertEquals(greenColor, getTimerColor(30000L, true)) // 30 seconds
-
-        val yellowColor = Color(0xFFFFC107)
-        assertEquals(yellowColor, getTimerColor(15000L, true)) // 15 seconds
-
-        val redColor = Color(0xFFF44336)
-        assertEquals(redColor, getTimerColor(40000L, true)) // 40 seconds
+        val grayColor = LightZoneColors.idle.copy(alpha = 0.3f)
+        assertEquals(grayColor, getExtractionTimeColor(25, false, LightZoneColors))
     }
 
     @Test
@@ -100,19 +86,6 @@ class TimerComponentsTest {
         assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(20, true))
         assertEquals(ExtractionQuality.OPTIMAL, getExtractionQuality(35, true))
         assertEquals(ExtractionQuality.OVER_EXTRACTED, getExtractionQuality(36, true))
-    }
-
-    @Test
-    fun `color consistency between different functions`() {
-        // Ensure getTimerColor and getExtractionTimeColor return same results
-        val timeMs = 25000L // 25 seconds
-        val elapsedSeconds = 25
-        val isRunning = true
-
-        assertEquals(
-            getTimerColor(timeMs, isRunning),
-            getExtractionTimeColor(elapsedSeconds, isRunning)
-        )
     }
 
     @Test

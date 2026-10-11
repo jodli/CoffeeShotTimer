@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -584,7 +583,7 @@ private fun HeaderSection(
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(12.dp),
+        shape = MaterialTheme.shapes.medium,
         onClick = onBeanClick
     ) {
         Row(
@@ -637,7 +636,7 @@ private fun HeaderSection(
             Box {
                 Surface(
                     color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = RoundedCornerShape(8.dp),
+                    shape = MaterialTheme.shapes.small,
                     onClick = onGrinderClick
                 ) {
                     Row(
@@ -694,7 +693,7 @@ private fun TimerSection(
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(16.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -785,8 +784,7 @@ private fun SaveShotButton(
     Surface(
         modifier = modifier,
         color = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(12.dp),
-        shadowElevation = if (enabled) 2.dp else 0.dp,
+        shape = MaterialTheme.shapes.medium,
         onClick = onClick,
         enabled = enabled
     ) {
@@ -820,7 +818,7 @@ private fun GrinderRecommendationCard(
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.primaryContainer,
-        shape = RoundedCornerShape(12.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
         Row(
             modifier = Modifier
@@ -851,7 +849,7 @@ private fun GrinderRecommendationCard(
 
             FilledTonalButton(
                 onClick = onApply,
-                shape = RoundedCornerShape(8.dp),
+                shape = MaterialTheme.shapes.small,
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
@@ -978,7 +976,7 @@ private fun GrinderAdjustmentBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = MaterialTheme.shapes.medium
             ) {
                 Text(
                     text = stringResource(R.string.button_apply_setting),

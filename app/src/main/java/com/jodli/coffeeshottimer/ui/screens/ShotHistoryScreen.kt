@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,7 +69,9 @@ import com.jodli.coffeeshottimer.ui.components.analytics.QualityScoreGaugeCard
 import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
+import com.jodli.coffeeshottimer.ui.theme.extractionZone
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import com.jodli.coffeeshottimer.ui.viewmodel.Achievement
 import com.jodli.coffeeshottimer.ui.viewmodel.AchievementType
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotHistoryUiState
@@ -613,19 +616,13 @@ private fun ShotHistoryLandscapeItem(
             ) {
                 MetricChip(
                     label = stringResource(R.string.label_ratio),
-                    value = shot.getFormattedBrewRatio(),
-                    isGood = shot.isTypicalBrewRatio()
+                    value = shot.getFormattedBrewRatio()
                 )
-                MetricChip(
-                    label = stringResource(R.string.label_time),
-                    value = shot.getFormattedExtractionTime(),
-                    isGood = shot.isOptimalExtractionTime()
-                )
+                TimeChip(shot.extractionTimeSeconds, shot.getFormattedExtractionTime())
                 if (shot.grinderSetting.isNotBlank()) {
                     MetricChip(
                         label = stringResource(R.string.label_grinder),
-                        value = shot.grinderSetting,
-                        isNeutral = true
+                        value = shot.grinderSetting
                     )
                 }
 
@@ -753,19 +750,13 @@ private fun ShotHistoryItem(
                 ) {
                     MetricChip(
                         label = stringResource(R.string.label_ratio),
-                        value = shot.getFormattedBrewRatio(),
-                        isGood = shot.isTypicalBrewRatio()
+                        value = shot.getFormattedBrewRatio()
                     )
-                    MetricChip(
-                        label = stringResource(R.string.label_time),
-                        value = shot.getFormattedExtractionTime(),
-                        isGood = shot.isOptimalExtractionTime()
-                    )
+                    TimeChip(shot.extractionTimeSeconds, shot.getFormattedExtractionTime())
                     if (shot.grinderSetting.isNotBlank()) {
                         MetricChip(
                             label = stringResource(R.string.label_grinder),
-                            value = shot.grinderSetting,
-                            isNeutral = true
+                            value = shot.grinderSetting
                         )
                     }
 
@@ -870,26 +861,15 @@ private fun AchievementBadge(
 private fun MetricChip(
     label: String,
     value: String,
-    isGood: Boolean = false,
-    isNeutral: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    contentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant
 ) {
     val spacing = LocalSpacing.current
-    val backgroundColor = when {
-        isNeutral -> MaterialTheme.colorScheme.surfaceVariant
-        isGood -> MaterialTheme.colorScheme.primaryContainer
-        else -> MaterialTheme.colorScheme.errorContainer
-    }
-
-    val contentColor = when {
-        isNeutral -> MaterialTheme.colorScheme.onSurfaceVariant
-        isGood -> MaterialTheme.colorScheme.onPrimaryContainer
-        else -> MaterialTheme.colorScheme.onErrorContainer
-    }
 
     Surface(
         modifier = modifier,
-        shape = RoundedCornerShape(spacing.cornerLarge - spacing.extraSmall),
+        shape = RoundedCornerShape(spacing.cornerSmall),
         color = backgroundColor
     ) {
         Column(
@@ -909,6 +889,18 @@ private fun MetricChip(
             )
         }
     }
+}
+
+/** Time chip filled with its zone: fast tends sour, slow tends bitter. */
+@Composable
+private fun TimeChip(seconds: Int, formatted: String) {
+    val zones = MaterialTheme.zoneColors
+    MetricChip(
+        label = stringResource(R.string.label_time),
+        value = formatted,
+        backgroundColor = zones.container(extractionZone(seconds)),
+        contentColor = MaterialTheme.colorScheme.onSurface
+    )
 }
 
 @Composable

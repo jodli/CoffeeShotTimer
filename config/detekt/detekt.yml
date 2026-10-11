@@ -352,7 +352,8 @@ style:
     active: false
   MagicNumber:
     active: true
-    excludes: ["**/test/**", "**/androidTest/**"]
+    # theme files are where colour, type and shape values are defined
+    excludes: ["**/test/**", "**/androidTest/**", "**/ui/theme/**"]
     ignoreNumbers: ["-1", "0", "1", "2"]
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: false

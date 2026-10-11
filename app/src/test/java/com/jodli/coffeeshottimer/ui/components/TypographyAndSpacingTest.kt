@@ -62,11 +62,9 @@ class TypographyAndSpacingTest {
 
         assertEquals("Screen title font size should be 28sp", 28.sp, headlineMedium.fontSize)
         assertEquals("Screen title line height should be 36sp", 36.sp, headlineMedium.lineHeight)
-        assertEquals("Screen title font weight should be SemiBold", FontWeight.SemiBold, headlineMedium.fontWeight)
-        assertEquals("Screen title letter spacing should be 0sp", 0.sp, headlineMedium.letterSpacing)
+        assertEquals("Screen title font weight should be ExtraBold", FontWeight.ExtraBold, headlineMedium.fontWeight)
+        assertTrue("Wide display type is tracked tight, never loose", headlineMedium.letterSpacing.value <= 0f)
 
-        // Note: The requirement mentions FontWeight.Bold, but the actual implementation uses SemiBold
-        // This test validates the current implementation
         assertTrue(
             "Screen title should use bold-style font weight",
             headlineMedium.fontWeight?.weight ?: 0 >= FontWeight.Medium.weight
@@ -80,8 +78,8 @@ class TypographyAndSpacingTest {
 
         assertEquals("Card title font size should be 16sp", 16.sp, titleMedium.fontSize)
         assertEquals("Card title line height should be 24sp", 24.sp, titleMedium.lineHeight)
-        assertEquals("Card title font weight should be Medium", FontWeight.Medium, titleMedium.fontWeight)
-        assertEquals("Card title letter spacing should be 0.15sp", 0.15.sp, titleMedium.letterSpacing)
+        assertEquals("Card title font weight should be Bold", FontWeight.Bold, titleMedium.fontWeight)
+        assertTrue("Card title tracking should not be tight", titleMedium.letterSpacing.value >= 0f)
     }
 
     @Test
@@ -167,7 +165,7 @@ class TypographyAndSpacingTest {
         assertEquals("Extra large spacing should be 32.dp", 32.dp, spacing.extraLarge)
 
         // Accessibility and component-specific spacing
-        assertEquals("Touch target should be 44.dp", 44.dp, spacing.touchTarget)
+        assertEquals("Touch target should be 48.dp", 48.dp, spacing.touchTarget)
         assertEquals("Card padding should be 16.dp", 16.dp, spacing.cardPadding)
         assertEquals("Screen padding should be 16.dp", 16.dp, spacing.screenPadding)
 
@@ -178,13 +176,13 @@ class TypographyAndSpacingTest {
         assertEquals("Empty state icon should be 64.dp", 64.dp, spacing.iconEmptyState)
 
         // Corner radius values
-        assertEquals("Small corner radius should be 4.dp", 4.dp, spacing.cornerSmall)
-        assertEquals("Medium corner radius should be 8.dp", 8.dp, spacing.cornerMedium)
-        assertEquals("Large corner radius should be 16.dp", 16.dp, spacing.cornerLarge)
+        assertEquals("Small corner radius should be 2.dp", 2.dp, spacing.cornerSmall)
+        assertEquals("Medium corner radius should be 2.dp", 2.dp, spacing.cornerMedium)
+        assertEquals("Large corner radius should be 4.dp", 4.dp, spacing.cornerLarge)
 
         // Elevation values
-        assertEquals("Card elevation should be 4.dp", 4.dp, spacing.elevationCard)
-        assertEquals("Dialog elevation should be 8.dp", 8.dp, spacing.elevationDialog)
+        assertEquals("Card elevation should be 0.dp", 0.dp, spacing.elevationCard)
+        assertEquals("Dialog elevation should be 2.dp", 2.dp, spacing.elevationDialog)
     }
 
     @Test
@@ -247,7 +245,7 @@ class TypographyAndSpacingTest {
         assertTrue("iconLarge < iconEmptyState", testSpacing.iconLarge < testSpacing.iconEmptyState)
 
         // Corner radius hierarchy
-        assertTrue("cornerSmall < cornerMedium", testSpacing.cornerSmall < testSpacing.cornerMedium)
+        assertTrue("cornerSmall <= cornerMedium", testSpacing.cornerSmall <= testSpacing.cornerMedium)
         assertTrue("cornerMedium < cornerLarge", testSpacing.cornerMedium < testSpacing.cornerLarge)
 
         // Elevation hierarchy
@@ -256,12 +254,12 @@ class TypographyAndSpacingTest {
 
     @Test
     fun `accessibility requirements are met through spacing`() {
-        // Requirement 4.1: Touch targets meet accessibility minimum (44.dp)
-        assertEquals("Touch target should be 44.dp for accessibility", 44.dp, testSpacing.touchTarget)
+        // Requirement 4.1: Touch targets meet accessibility minimum (48.dp)
+        assertEquals("Touch target should be 48.dp for accessibility", 48.dp, testSpacing.touchTarget)
 
         // Verify touch target meets WCAG guidelines
         assertTrue(
-            "Touch target should meet accessibility minimum (44.dp)",
+            "Touch target should meet accessibility minimum (44dp)",
             testSpacing.touchTarget.value >= 44f
         )
 
@@ -350,15 +348,15 @@ class TypographyAndSpacingTest {
 
         // Headline styles use semi-bold weights
         assertEquals(
-            "Headlines should use SemiBold weight",
-            FontWeight.SemiBold,
+            "Headlines should use ExtraBold weight",
+            FontWeight.ExtraBold,
             testTypography.headlineMedium.fontWeight
         )
 
         // Title styles use medium weights
         assertEquals(
-            "Titles should use Medium weight",
-            FontWeight.Medium,
+            "Titles should use Bold weight",
+            FontWeight.Bold,
             testTypography.titleMedium.fontWeight
         )
 
@@ -371,8 +369,8 @@ class TypographyAndSpacingTest {
 
         // Label styles use medium weights for buttons
         assertEquals(
-            "Labels should use Medium weight",
-            FontWeight.Medium,
+            "Button labels should use Bold weight",
+            FontWeight.Bold,
             testTypography.labelLarge.fontWeight
         )
     }

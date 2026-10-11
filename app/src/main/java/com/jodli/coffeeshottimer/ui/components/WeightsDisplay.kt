@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
@@ -61,7 +60,7 @@ fun WeightsDisplay(
     Surface(
         modifier = modifier,
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(12.dp)
+        shape = MaterialTheme.shapes.medium
     ) {
         Row(
             modifier = Modifier
@@ -82,11 +81,11 @@ fun WeightsDisplay(
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
-                        .clip(RoundedCornerShape(4.dp))
+                        .clip(MaterialTheme.shapes.extraSmall)
                         .clickable(onClick = onCoffeeInClick)
                         .background(
                             MaterialTheme.colorScheme.surface.copy(alpha = 0.5f),
-                            RoundedCornerShape(4.dp)
+                            MaterialTheme.shapes.extraSmall
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 )

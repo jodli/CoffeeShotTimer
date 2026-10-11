@@ -3,13 +3,16 @@ package com.jodli.coffeeshottimer.ui.theme
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -24,7 +27,7 @@ data class Spacing(
     val medium: Dp = 16.dp,
     val large: Dp = 24.dp,
     val extraLarge: Dp = 32.dp,
-    val touchTarget: Dp = 44.dp, // Minimum touch target size for accessibility
+    val touchTarget: Dp = 48.dp, // Material minimum touch target
     val cardPadding: Dp = 16.dp,
     val screenPadding: Dp = 16.dp,
     // Icon sizes
@@ -33,12 +36,14 @@ data class Spacing(
     val iconLarge: Dp = 32.dp,
     val iconEmptyState: Dp = 64.dp,
     // Corner radius values
-    val cornerSmall: Dp = 4.dp,
-    val cornerMedium: Dp = 8.dp,
-    val cornerLarge: Dp = 16.dp,
+    // near-square corners: the app is a printed chart, not a stack of pills
+    val cornerSmall: Dp = 2.dp,
+    val cornerMedium: Dp = 2.dp,
+    val cornerLarge: Dp = 4.dp,
     // Elevation values
-    val elevationCard: Dp = 4.dp,
-    val elevationDialog: Dp = 8.dp,
+    // flat sheet: cards are separated by rules, not shadows
+    val elevationCard: Dp = 0.dp,
+    val elevationDialog: Dp = 2.dp,
     // Component-specific sizes
     val timerSize: Dp = 200.dp,
     val buttonMaxWidth: Dp = 200.dp,
@@ -121,56 +126,108 @@ fun Spacing.landscapeSpacing(): Dp {
     return if (isLandscape) landscapeContentSpacing else medium
 }
 
-// Light theme - warm cream with clementine orange accents
+// Light: ink on graph paper. Primary is the ink itself, so filled buttons read as printed.
 private val LightColorScheme = lightColorScheme(
-    primary = ClementineOrange,
-    onPrimary = Color.White,
-    primaryContainer = SoftSand,
-    onPrimaryContainer = Espresso,
-    secondary = MochaBrown,
+    primary = Ink,
+    onPrimary = Paper,
+    primaryContainer = InkTint,
+    onPrimaryContainer = Ink,
+    inversePrimary = NightInk,
+    secondary = IdealInk,
     onSecondary = Color.White,
-    secondaryContainer = SoftSand.copy(alpha = 0.6f),
-    onSecondaryContainer = Espresso,
-    tertiary = WarmGold,
-    onTertiary = Espresso,
-    background = WarmCream, // Warm cream background
-    onBackground = Espresso, // Deep brown text
-    surface = SoftSand, // Sandy beige cards
-    onSurface = Espresso, // Deep brown text on cards
-    surfaceVariant = SoftSand,
-    onSurfaceVariant = Cinnamon,
-    outline = Cinnamon.copy(alpha = 0.5f), // Medium brown outlines
-    error = ExtractionTooSlow,
-    onError = Color.White
+    // containers stay neutral: green and yellow are reserved for the zones
+    secondaryContainer = InkTint,
+    onSecondaryContainer = Ink,
+    tertiary = Ink2,
+    onTertiary = Paper,
+    tertiaryContainer = PaperHigh,
+    onTertiaryContainer = Ink,
+    background = Paper,
+    onBackground = Ink,
+    surface = Paper,
+    onSurface = Ink,
+    surfaceVariant = Paper2,
+    onSurfaceVariant = Ink2,
+    surfaceTint = Color.Transparent,
+    surfaceBright = Paper,
+    surfaceDim = PaperHighest,
+    surfaceContainerLowest = Color(0xFFFBFBF8),
+    surfaceContainerLow = PaperLow,
+    surfaceContainer = Paper2,
+    surfaceContainerHigh = PaperHigh,
+    surfaceContainerHighest = PaperHighest,
+    inverseSurface = Ink,
+    inverseOnSurface = Paper,
+    outline = RuleLight,
+    outlineVariant = PlotGridLight,
+    error = ErrorLight,
+    onError = Color.White,
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002),
+    scrim = Color.Black
 )
 
-// Dark theme - warm charcoal with soft peach accents
+// Dark: the same sheet at night, ink and paper swapped
 private val DarkColorScheme = darkColorScheme(
-    primary = SoftPeach, // Soft peach for visibility
-    onPrimary = WarmCharcoal,
-    primaryContainer = MochaShadow,
-    onPrimaryContainer = Cream,
-    secondary = WarmGold, // Warm gold accent
-    onSecondary = WarmCharcoal,
-    secondaryContainer = MochaShadow.copy(alpha = 0.8f),
-    onSecondaryContainer = Cream,
-    tertiary = WarmGold,
-    onTertiary = WarmCharcoal,
-    background = WarmCharcoal, // Warm charcoal background
-    onBackground = Cream, // Cream text on dark background
-    surface = MochaShadow, // Mocha shadow cards
-    onSurface = Cream, // Cream text on dark cards
-    surfaceVariant = MochaShadow,
-    onSurfaceVariant = LightLatte,
-    outline = LightLatte.copy(alpha = 0.5f), // Light latte outlines
-    error = ExtractionTooSlow,
-    onError = Color.White
+    primary = NightInk,
+    onPrimary = NightPaper,
+    primaryContainer = NightInkTint,
+    onPrimaryContainer = NightInk,
+    inversePrimary = Ink,
+    secondary = IdealInkNight,
+    onSecondary = Color(0xFF0B2A16),
+    secondaryContainer = NightInkTint,
+    onSecondaryContainer = NightInk,
+    tertiary = NightInk2,
+    onTertiary = NightPaper,
+    tertiaryContainer = NightPaperHigh,
+    onTertiaryContainer = NightInk,
+    background = NightPaper,
+    onBackground = NightInk,
+    surface = NightPaper,
+    onSurface = NightInk,
+    surfaceVariant = NightPaper2,
+    onSurfaceVariant = NightInk2,
+    surfaceTint = Color.Transparent,
+    surfaceBright = NightPaperHighest,
+    surfaceDim = NightPaper,
+    surfaceContainerLowest = NightPaperLowest,
+    surfaceContainerLow = NightPaperLow,
+    surfaceContainer = NightPaper2,
+    surfaceContainerHigh = NightPaperHigh,
+    surfaceContainerHighest = NightPaperHighest,
+    inverseSurface = NightInk,
+    inverseOnSurface = NightPaper,
+    outline = RuleDark,
+    outlineVariant = PlotGridDark,
+    error = ErrorDark,
+    onError = Color(0xFF690005),
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6),
+    scrim = Color.Black
 )
+
+// built from the Spacing corner tokens so there is one source for radii
+private val AppShapes = Spacing().let { s ->
+    Shapes(
+        extraSmall = RoundedCornerShape(s.cornerSmall),
+        small = RoundedCornerShape(s.cornerMedium),
+        medium = RoundedCornerShape(s.cornerLarge),
+        large = RoundedCornerShape(s.cornerLarge),
+        extraLarge = RoundedCornerShape(s.cornerLarge * 2)
+    )
+}
+
+/** Zone and quality colours for the current scheme. */
+val MaterialTheme.zoneColors: ZoneColors
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalZoneColors.current
 
 @Composable
 fun CoffeeShotTimerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color disabled to use custom launcher-inspired colors
+    // Dynamic color stays off: wallpaper colours would erase the zone meanings
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
@@ -189,11 +246,13 @@ fun CoffeeShotTimerTheme(
 
     CompositionLocalProvider(
         LocalSpacing provides Spacing(),
-        LocalIsLandscape provides isLandscape
+        LocalIsLandscape provides isLandscape,
+        LocalZoneColors provides if (darkTheme) DarkZoneColors else LightZoneColors
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = AppShapes,
             content = content
         )
     }

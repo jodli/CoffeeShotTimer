@@ -64,7 +64,9 @@ import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.Spacing
+import com.jodli.coffeeshottimer.ui.theme.ZoneColors
 import com.jodli.coffeeshottimer.ui.theme.adaptiveTimerSize
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -155,13 +157,14 @@ private fun CircularTimerInternal(
     val elapsedSeconds = remember(currentTime) { (currentTime / 1000).toInt() }
 
     // Get color based on extraction time quality and validation state
+    val zones = MaterialTheme.zoneColors
     val timerColor = when {
         // Red when running but below minimum save threshold
-        isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> Color(0xFFF44336)
+        isRunning && elapsedSeconds < ValidationUtils.MIN_EXTRACTION_TIME -> zones.slow
         // Normal color coding when above minimum or not running
-        showColorCoding -> getExtractionTimeColor(elapsedSeconds, isRunning)
+        showColorCoding -> getExtractionTimeColor(elapsedSeconds, isRunning, zones)
         // Fallback colors
-        else -> if (isRunning) Color(0xFF4CAF50) else Color(0xFFFF9800)
+        else -> if (isRunning) zones.ideal else zones.idle
     }
 
     // Animation for the progress indicator
@@ -573,21 +576,13 @@ fun getExtractionQuality(elapsedSeconds: Int, isRunning: Boolean): ExtractionQua
 /**
  * Get timer color based on extraction quality
  */
-fun getExtractionTimeColor(elapsedSeconds: Int, isRunning: Boolean): Color {
+fun getExtractionTimeColor(elapsedSeconds: Int, isRunning: Boolean, zones: ZoneColors): Color {
     return when (getExtractionQuality(elapsedSeconds, isRunning)) {
-        ExtractionQuality.UNDER_EXTRACTED -> Color(0xFFFFC107) // Amber/Yellow
-        ExtractionQuality.OPTIMAL -> Color(0xFF4CAF50) // Green
-        ExtractionQuality.OVER_EXTRACTED -> Color(0xFFF44336) // Red
-        ExtractionQuality.NEUTRAL -> Color.Gray.copy(alpha = 0.3f) // Light Gray
+        ExtractionQuality.UNDER_EXTRACTED -> zones.fast
+        ExtractionQuality.OPTIMAL -> zones.ideal
+        ExtractionQuality.OVER_EXTRACTED -> zones.slow
+        ExtractionQuality.NEUTRAL -> zones.idle.copy(alpha = 0.3f)
     }
-}
-
-/**
- * Get timer color based on elapsed time in milliseconds
- */
-fun getTimerColor(timeMs: Long, isRunning: Boolean): Color {
-    val elapsedSeconds = (timeMs / 1000).toInt()
-    return getExtractionTimeColor(elapsedSeconds, isRunning)
 }
 
 // ========== TASK 5, 6, 7: ENHANCED TIMER BUTTON WITH HAPTIC FEEDBACK AND STATE MANAGEMENT ==========
@@ -614,11 +609,15 @@ fun rememberTimerButtonState(isRunning: Boolean): TimerButtonState {
     val stopDescription = stringResource(R.string.text_stop_timer)
     val startDescription = stringResource(R.string.text_start_timer)
 
-    return remember(isRunning) {
+    // start and stop are the same ink button; the icon carries the state
+    val buttonColor = MaterialTheme.colorScheme.primary
+    val iconColor = MaterialTheme.colorScheme.onPrimary
+
+    return remember(isRunning, buttonColor, iconColor) {
         TimerButtonState(
             isRunning = isRunning,
-            buttonColor = if (isRunning) Color(0xFFF44336) else Color(0xFF4CAF50), // Red for stop, Green for start
-            iconColor = Color.White,
+            buttonColor = buttonColor,
+            iconColor = iconColor,
             icon = if (isRunning) Icons.Default.Stop else Icons.Default.PlayArrow,
             contentDescription = if (isRunning) stopDescription else startDescription,
             lastActionTime = lastActionTime

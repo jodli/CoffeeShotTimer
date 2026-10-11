@@ -29,10 +29,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
-import com.jodli.coffeeshottimer.ui.theme.ExtractionOptimal
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooFast
-import com.jodli.coffeeshottimer.ui.theme.ExtractionTooSlow
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
@@ -95,6 +93,7 @@ fun TrendLineGraph(
         val lineColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
         val tooltipBgColor = MaterialTheme.colorScheme.surfaceVariant
 
+        val zones = MaterialTheme.zoneColors
         Canvas(
             modifier = modifier
                 .fillMaxWidth()
@@ -173,11 +172,7 @@ fun TrendLineGraph(
                 }
 
                 // Draw colored dot
-                val dotColor = when {
-                    point.score >= 85 -> ExtractionOptimal // Green
-                    point.score >= 60 -> ExtractionTooFast // Orange
-                    else -> ExtractionTooSlow // Red
-                }
+                val dotColor = zones.forScore(point.score)
 
                 drawCircle(
                     color = dotColor,

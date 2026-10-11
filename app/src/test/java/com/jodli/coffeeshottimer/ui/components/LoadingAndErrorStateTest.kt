@@ -106,12 +106,12 @@ class LoadingAndErrorStateTest {
         // Requirement 5.3: Standardized retry button styling and positioning
 
         // Verify retry button uses CoffeePrimaryButton styling
-        assertEquals("Retry button should meet touch target height (44.dp)", 44.dp, testSpacing.touchTarget)
-        assertEquals("Retry button should use corner medium radius (8.dp)", 8.dp, testSpacing.cornerMedium)
+        assertEquals("Retry button should meet touch target height (48.dp)", 48.dp, testSpacing.touchTarget)
+        assertEquals("Retry button should use corner medium radius (2.dp)", 2.dp, testSpacing.cornerMedium)
 
         // Verify dismiss button uses CoffeeSecondaryButton styling
-        assertEquals("Dismiss button should meet touch target height (44.dp)", 44.dp, testSpacing.touchTarget)
-        assertEquals("Dismiss button should use corner medium radius (8.dp)", 8.dp, testSpacing.cornerMedium)
+        assertEquals("Dismiss button should meet touch target height (48.dp)", 48.dp, testSpacing.touchTarget)
+        assertEquals("Dismiss button should use corner medium radius (2.dp)", 2.dp, testSpacing.cornerMedium)
 
         // Verify button spacing and layout
         assertEquals("Button spacing should be small (8.dp)", 8.dp, testSpacing.small)
@@ -144,8 +144,8 @@ class LoadingAndErrorStateTest {
 
         // Verify ErrorCard uses CoffeeCard as base
         assertEquals("ErrorCard should use card padding (16.dp)", 16.dp, testSpacing.cardPadding)
-        assertEquals("ErrorCard should use card corner radius (16.dp)", 16.dp, testSpacing.cornerLarge)
-        assertEquals("ErrorCard should use card elevation (4.dp)", 4.dp, testSpacing.elevationCard)
+        assertEquals("ErrorCard should use card corner radius (4.dp)", 4.dp, testSpacing.cornerLarge)
+        assertEquals("ErrorCard should use card elevation (0.dp)", 0.dp, testSpacing.elevationCard)
 
         // Verify ErrorCard uses error container color from theme
         assertTrue("ErrorCard should use errorContainer color from theme", true)
@@ -218,7 +218,7 @@ class LoadingAndErrorStateTest {
         assertTrue("Error icon should handle content description", true)
 
         // Verify retry buttons meet touch target requirements
-        assertEquals("Retry buttons should meet touch target minimum (44.dp)", 44.dp, testSpacing.touchTarget)
+        assertEquals("Retry buttons should meet touch target minimum (48.dp)", 48.dp, testSpacing.touchTarget)
         assertTrue("Touch targets should meet accessibility guidelines", testSpacing.touchTarget.value >= 44f)
 
         // Verify error colors provide sufficient contrast from theme
@@ -248,7 +248,7 @@ class LoadingAndErrorStateTest {
 
         // Verify components use LocalSpacing consistently
         assertEquals("All components should use LocalSpacing values", testSpacing.medium, 16.dp)
-        assertEquals("All components should use consistent touch targets", testSpacing.touchTarget, 44.dp)
+        assertEquals("All components should use consistent touch targets", testSpacing.touchTarget, 48.dp)
 
         // Verify components use Material 3 theme consistently
         assertTrue("All components should use Material 3 color scheme from theme", true)
@@ -311,13 +311,13 @@ class LoadingAndErrorStateTest {
         assertTrue("iconMedium < iconEmptyState", testSpacing.iconMedium < testSpacing.iconEmptyState)
 
         // Verify corner radius consistency
-        assertEquals("Cards should use large corners", testSpacing.cornerLarge, 16.dp)
-        assertEquals("Buttons should use medium corners", testSpacing.cornerMedium, 8.dp)
+        assertEquals("Cards should use large corners", testSpacing.cornerLarge, 4.dp)
+        assertEquals("Buttons should use medium corners", testSpacing.cornerMedium, 2.dp)
 
         // Verify elevation consistency
-        assertEquals("Cards should use consistent elevation", testSpacing.elevationCard, 4.dp)
+        assertEquals("Cards should use consistent elevation", testSpacing.elevationCard, 0.dp)
 
         // Verify touch target consistency
-        assertEquals("All interactive elements should meet touch target minimum", testSpacing.touchTarget, 44.dp)
+        assertEquals("All interactive elements should meet touch target minimum", testSpacing.touchTarget, 48.dp)
     }
 }

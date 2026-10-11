@@ -3,6 +3,9 @@ package com.jodli.coffeeshottimer.ui.components
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.jodli.coffeeshottimer.ui.theme.ArchivoNarrow
+import com.jodli.coffeeshottimer.ui.theme.ArchivoNormal
+import com.jodli.coffeeshottimer.ui.theme.ArchivoWide
 import com.jodli.coffeeshottimer.ui.theme.Spacing
 import com.jodli.coffeeshottimer.ui.theme.Typography
 import org.junit.Assert.*
@@ -78,8 +81,8 @@ class DesignSystemValidationTest {
             typography.headlineMedium.fontWeight?.weight ?: 0 >= FontWeight.Medium.weight
         )
         assertEquals(
-            "Card titles should use medium weight",
-            FontWeight.Medium,
+            "Card titles should use bold weight",
+            FontWeight.Bold,
             typography.titleMedium.fontWeight
         )
         assertEquals(
@@ -258,18 +261,18 @@ class DesignSystemValidationTest {
 
         // Corner radius should create consistent brand feel
         assertTrue(
-            "Corner radius should be modern but not excessive",
-            spacing.cornerLarge.value >= 8f && spacing.cornerLarge.value <= 24f
+            "Corners stay near-square, like the printed chart on the website",
+            spacing.cornerLarge.value <= 4f
         )
         assertTrue(
-            "Button corners should be softer than sharp but not pill-shaped",
-            spacing.cornerMedium.value >= 4f && spacing.cornerMedium.value <= 12f
+            "Button corners should not exceed card corners",
+            spacing.cornerMedium.value <= spacing.cornerLarge.value
         )
 
         // Elevation should be subtle and modern
         assertTrue(
-            "Card elevation should be subtle",
-            spacing.elevationCard.value >= 2f && spacing.elevationCard.value <= 8f
+            "Cards are flat; depth comes from rules and surface tones",
+            spacing.elevationCard.value == 0f
         )
         assertTrue(
             "Dialog elevation should be more prominent than cards",
@@ -279,12 +282,9 @@ class DesignSystemValidationTest {
 
         // Typography should feel cohesive
         assertTrue(
-            "All typography should use consistent font family",
-            typography.headlineMedium.fontFamily == typography.bodyMedium.fontFamily
-        )
-        assertTrue(
-            "All typography should use consistent font family",
-            typography.titleMedium.fontFamily == typography.labelLarge.fontFamily
+            "All typography should use Archivo (wide, normal or narrow cut)",
+            listOf(typography.headlineMedium, typography.bodyMedium, typography.titleMedium, typography.labelSmall)
+                .all { it.fontFamily in setOf(ArchivoWide, ArchivoNormal, ArchivoNarrow) }
         )
     }
 
@@ -397,7 +397,7 @@ class DesignSystemValidationTest {
         assertTrue(
             "Corner radius hierarchy should be complete",
             spacing.cornerLarge > spacing.cornerMedium &&
-                spacing.cornerMedium > spacing.cornerSmall
+                spacing.cornerMedium >= spacing.cornerSmall
         )
 
         // Component size validation

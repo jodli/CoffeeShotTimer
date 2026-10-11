@@ -62,6 +62,8 @@ import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackDisplay
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackEditSheet
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.extractionZone
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotDetailsViewModel
 import java.time.format.DateTimeFormatter
 
@@ -379,11 +381,7 @@ private fun ShotOverviewCard(
                     text = shot.getFormattedBrewRatio(),
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
-                    color = if (shot.isTypicalBrewRatio()) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        MaterialTheme.colorScheme.error
-                    }
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(R.string.label_ratio),
@@ -415,7 +413,7 @@ private fun ShotOverviewCard(
                     color = if (shot.isOptimalExtractionTime()) {
                         MaterialTheme.colorScheme.onSurface
                     } else {
-                        MaterialTheme.colorScheme.error
+                        MaterialTheme.zoneColors.ink(extractionZone(shot.extractionTimeSeconds))
                     }
                 )
                 Text(
