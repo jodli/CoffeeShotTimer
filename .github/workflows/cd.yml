@@ -10,6 +10,7 @@ on:
       - ".github/**"
       - ".kiro/**"
       - ".impeccable/**"
+      - ".claude/**"
   workflow_dispatch:
     inputs:
       version_name:
