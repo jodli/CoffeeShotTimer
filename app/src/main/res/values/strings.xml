@@ -603,20 +603,18 @@
     
     <!-- Weight and ratio format strings -->
     <string name="format_weight_grams">%1$dg</string>
-    <string name="format_ratio">(1:%.1f)</string>
     
     <!-- Content descriptions for weights display -->
     <string name="cd_decrease_coffee_out">Decrease coffee out by 1 gram</string>
     <string name="cd_increase_coffee_out">Increase coffee out by 1 gram</string>
     <string name="cd_adjust_grinder">Adjust grinder setting</string>
     <string name="cd_mode_toggle_disabled">Mode toggle (disabled)</string>
-    <string name="cd_toggle_timer_mode">Toggle between automatic and manual timer</string>
     <string name="cd_manual_timer_slider">Adjust extraction time manually</string>
     <string name="cd_tap_to_edit_time">Tap to edit time</string>
     
     <!-- RecordShotScreen strings -->
-    <string name="text_auto_timer">Auto timer</string>
-    <string name="text_manual_timer">Manual timer</string>
+    <string name="text_mode_timer">Timer</string>
+    <string name="text_mode_manual">Manual</string>
     <string name="button_save_shot">Save Shot</string>
     <string name="dialog_adjust_grinder_setting">Adjust Grinder Setting</string>
     <string name="button_apply_setting">Apply Setting</string>

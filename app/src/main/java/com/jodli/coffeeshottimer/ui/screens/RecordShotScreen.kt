@@ -2,17 +2,22 @@ package com.jodli.coffeeshottimer.ui.screens
 
 import android.content.res.Configuration
 import android.view.HapticFeedbackConstants
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,26 +25,31 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Engineering
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,11 +61,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,13 +83,11 @@ import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
 import com.jodli.coffeeshottimer.ui.components.ManualTimerCircle
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
-import com.jodli.coffeeshottimer.ui.components.WeightsDisplay
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
-// Timer dial sizing: the dial takes most of the card, the numeral scales with it
-private const val TIMER_SHARE_OF_CARD = 0.88f
+// Timer dial sizing: the dial takes most of its area, the numeral scales with it
+private const val TIMER_SHARE_OF_AREA = 0.88f
 private val TIMER_MIN_SIZE = 220.dp
 private val TIMER_MAX_SIZE = 440.dp
 private const val TIMER_NUMERAL_OF_SIZE = 0.17f
@@ -107,6 +120,7 @@ fun RecordShotScreen(
     val selectedBean by viewModel.selectedBean.collectAsState()
     val coffeeWeightIn by viewModel.coffeeWeightIn.collectAsState()
     val coffeeWeightOut by viewModel.coffeeWeightOut.collectAsState()
+    val formattedBrewRatio by viewModel.formattedBrewRatio.collectAsState()
     val grinderSetting by viewModel.grinderSetting.collectAsState()
     val timerState by viewModel.timerState.collectAsState()
     val isFormValid by viewModel.isFormValid.collectAsState()
@@ -123,8 +137,6 @@ fun RecordShotScreen(
     // Basket configuration
     val basketCoffeeInMin by viewModel.basketCoffeeInMin.collectAsState()
     val basketCoffeeInMax by viewModel.basketCoffeeInMax.collectAsState()
-    val basketCoffeeOutMin by viewModel.basketCoffeeOutMin.collectAsState()
-    val basketCoffeeOutMax by viewModel.basketCoffeeOutMax.collectAsState()
 
     // Timer mode state
     val timerMode by viewModel.timerMode.collectAsState()
@@ -144,14 +156,15 @@ fun RecordShotScreen(
     RecordShotScreenContent(
         selectedBean = selectedBean,
         grinderSetting = grinderSetting,
-        persistentRecommendation = persistentRecommendation,
+        suggestedGrindSetting = persistentRecommendation
+            ?.takeIf { it.hasAdjustment() }
+            ?.suggestedGrindSetting,
         timerMode = timerMode,
         timerState = timerState,
         manualTimeSeconds = manualTimeSeconds,
         coffeeWeightIn = coffeeWeightIn,
         coffeeWeightOut = coffeeWeightOut,
-        basketCoffeeOutMin = basketCoffeeOutMin,
-        basketCoffeeOutMax = basketCoffeeOutMax,
+        formattedBrewRatio = formattedBrewRatio,
         isFormValid = isFormValid,
         onNavigateToBeanManagement = onNavigateToBeanManagement,
         onShowGrinderSheet = { showGrinderSheet = true },
@@ -162,7 +175,7 @@ fun RecordShotScreen(
         onPauseTimer = { viewModel.pauseTimer() },
         onStartTimer = { viewModel.startTimer() },
         onResetTimer = { viewModel.resetTimer() },
-        onUpdateCoffeeWeightOut = { value -> viewModel.updateCoffeeWeightOut(value) },
+        onStepCoffeeWeightOut = { grams -> viewModel.stepCoffeeWeightOut(grams) },
         onRecordShot = { viewModel.recordShot() }
     )
 
@@ -240,21 +253,20 @@ fun RecordShotScreen(
 }
 
 /**
- * Main screen content for RecordShotScreen.
- * Adapts layout based on orientation (portrait/landscape).
+ * The screen follows the shot: bean, grind and dose before it, the dial during it,
+ * yield and save after it. Portrait stacks the sections; landscape puts the dial on the left.
  */
 @Composable
 private fun RecordShotScreenContent(
     selectedBean: Bean?,
     grinderSetting: String,
-    persistentRecommendation: PersistentGrindRecommendation?,
+    suggestedGrindSetting: String?,
     timerMode: TimerMode,
     timerState: TimerState,
     manualTimeSeconds: Int,
     coffeeWeightIn: String,
     coffeeWeightOut: String,
-    basketCoffeeOutMin: Float,
-    basketCoffeeOutMax: Float,
+    formattedBrewRatio: String?,
     isFormValid: Boolean,
     onNavigateToBeanManagement: () -> Unit,
     onShowGrinderSheet: () -> Unit,
@@ -265,258 +277,73 @@ private fun RecordShotScreenContent(
     onPauseTimer: () -> Unit,
     onStartTimer: () -> Unit,
     onResetTimer: () -> Unit,
-    onUpdateCoffeeWeightOut: (String) -> Unit,
+    onStepCoffeeWeightOut: (Int) -> Unit,
     onRecordShot: () -> Unit
 ) {
     val view = LocalView.current
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+    fun withHaptic(feedback: Int, action: () -> Unit): () -> Unit = {
+        view.performHapticFeedback(feedback)
+        action()
+    }
+
+    val beanHeader = @Composable {
+        BeanHeader(bean = selectedBean, onClick = onNavigateToBeanManagement)
+    }
+    val recipeRow = @Composable {
+        RecipeRow(
+            grinderSetting = grinderSetting,
+            suggestedGrindSetting = suggestedGrindSetting,
+            coffeeWeightIn = coffeeWeightIn,
+            onGrinderClick = onShowGrinderSheet,
+            onCoffeeInClick = onShowCoffeeInDialog
+        )
+    }
+    val timerSection = @Composable { modifier: Modifier ->
+        TimerSection(
+            timerMode = timerMode,
+            isRunning = timerState.isRunning,
+            elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
+            manualTimeSeconds = manualTimeSeconds,
+            onToggleTimerMode = onToggleTimerMode,
+            onManualTimeChange = onManualTimeChange,
+            onShowManualTimeDialog = onShowManualTimeDialog,
+            onPauseTimer = withHaptic(HapticFeedbackConstants.LONG_PRESS, onPauseTimer),
+            onStartTimer = withHaptic(HapticFeedbackConstants.CONTEXT_CLICK, onStartTimer),
+            onTimerReset = withHaptic(HapticFeedbackConstants.LONG_PRESS, onResetTimer),
+            modifier = modifier
+        )
+    }
+    val yieldRow = @Composable {
+        YieldRow(
+            coffeeWeightOut = coffeeWeightOut,
+            formattedBrewRatio = formattedBrewRatio,
+            onStep = onStepCoffeeWeightOut
+        )
+    }
+    val saveButton = @Composable {
+        SaveShotButton(
+            enabled = isFormValid,
+            onClick = withHaptic(HapticFeedbackConstants.CONFIRM, onRecordShot),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+        )
+    }
 
     if (isLandscape) {
-        RecordShotScreenLandscape(
-            selectedBean = selectedBean,
-            grinderSetting = grinderSetting,
-            persistentRecommendation = persistentRecommendation,
-            timerMode = timerMode,
-            timerState = timerState,
-            manualTimeSeconds = manualTimeSeconds,
-            coffeeWeightIn = coffeeWeightIn,
-            coffeeWeightOut = coffeeWeightOut,
-            basketCoffeeOutMin = basketCoffeeOutMin,
-            basketCoffeeOutMax = basketCoffeeOutMax,
-            isFormValid = isFormValid,
-            onNavigateToBeanManagement = onNavigateToBeanManagement,
-            onShowGrinderSheet = onShowGrinderSheet,
-            onShowCoffeeInDialog = onShowCoffeeInDialog,
-            onToggleTimerMode = onToggleTimerMode,
-            onManualTimeChange = onManualTimeChange,
-            onShowManualTimeDialog = onShowManualTimeDialog,
-            onPauseTimer = onPauseTimer,
-            onStartTimer = onStartTimer,
-            onResetTimer = onResetTimer,
-            onUpdateCoffeeWeightOut = onUpdateCoffeeWeightOut,
-            onRecordShot = onRecordShot,
-            view = view
-        )
-    } else {
-        RecordShotScreenPortrait(
-            selectedBean = selectedBean,
-            grinderSetting = grinderSetting,
-            persistentRecommendation = persistentRecommendation,
-            timerMode = timerMode,
-            timerState = timerState,
-            manualTimeSeconds = manualTimeSeconds,
-            coffeeWeightIn = coffeeWeightIn,
-            coffeeWeightOut = coffeeWeightOut,
-            basketCoffeeOutMin = basketCoffeeOutMin,
-            basketCoffeeOutMax = basketCoffeeOutMax,
-            isFormValid = isFormValid,
-            onNavigateToBeanManagement = onNavigateToBeanManagement,
-            onShowGrinderSheet = onShowGrinderSheet,
-            onShowCoffeeInDialog = onShowCoffeeInDialog,
-            onToggleTimerMode = onToggleTimerMode,
-            onManualTimeChange = onManualTimeChange,
-            onShowManualTimeDialog = onShowManualTimeDialog,
-            onPauseTimer = onPauseTimer,
-            onStartTimer = onStartTimer,
-            onResetTimer = onResetTimer,
-            onUpdateCoffeeWeightOut = onUpdateCoffeeWeightOut,
-            onRecordShot = onRecordShot,
-            view = view
-        )
-    }
-}
-
-/**
- * Portrait layout for RecordShotScreen.
- */
-@Composable
-private fun RecordShotScreenPortrait(
-    selectedBean: Bean?,
-    grinderSetting: String,
-    persistentRecommendation: PersistentGrindRecommendation?,
-    timerMode: TimerMode,
-    timerState: TimerState,
-    manualTimeSeconds: Int,
-    coffeeWeightIn: String,
-    coffeeWeightOut: String,
-    basketCoffeeOutMin: Float,
-    basketCoffeeOutMax: Float,
-    isFormValid: Boolean,
-    onNavigateToBeanManagement: () -> Unit,
-    onShowGrinderSheet: () -> Unit,
-    onShowCoffeeInDialog: () -> Unit,
-    onToggleTimerMode: () -> Unit,
-    onManualTimeChange: (Int) -> Unit,
-    onShowManualTimeDialog: () -> Unit,
-    onPauseTimer: () -> Unit,
-    onStartTimer: () -> Unit,
-    onResetTimer: () -> Unit,
-    onUpdateCoffeeWeightOut: (String) -> Unit,
-    onRecordShot: () -> Unit,
-    view: android.view.View
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .padding(bottom = 80.dp)
-        ) {
-            HeaderSection(
-                bean = selectedBean,
-                grinderSetting = grinderSetting,
-                hasPersistentRecommendation = persistentRecommendation?.hasAdjustment() == true,
-                onBeanClick = onNavigateToBeanManagement,
-                onGrinderClick = onShowGrinderSheet,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(70.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TimerSection(
-                timerMode = timerMode,
-                isRunning = timerState.isRunning,
-                elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
-                manualTimeSeconds = manualTimeSeconds,
-                onToggleTimerMode = onToggleTimerMode,
-                onManualTimeChange = onManualTimeChange,
-                onShowManualTimeDialog = onShowManualTimeDialog,
-                onPauseTimer = {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    onPauseTimer()
-                },
-                onStartTimer = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    onStartTimer()
-                },
-                onTimerReset = {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    onResetTimer()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            WeightsDisplay(
-                coffeeIn = coffeeWeightIn.toDoubleOrNull() ?: 0.0,
-                coffeeOut = coffeeWeightOut.toDoubleOrNull() ?: 0.0,
-                onCoffeeInClick = onShowCoffeeInDialog,
-                onCoffeeOutDecrease = {
-                    val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
-                    val newValue = (current - 1).coerceAtLeast(basketCoffeeOutMin.toDouble())
-                    onUpdateCoffeeWeightOut(newValue.toInt().toString())
-                },
-                onCoffeeOutIncrease = {
-                    val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
-                    val newValue = (current + 1).coerceAtMost(basketCoffeeOutMax.toDouble())
-                    onUpdateCoffeeWeightOut(newValue.toInt().toString())
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            SaveShotButton(
-                enabled = isFormValid,
-                onClick = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                    onRecordShot()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-            )
-        }
-    }
-}
-
-/**
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 3ac2b45 (feat: add landscape mode to new shot screen)
- * Landscape layout for RecordShotScreen.
- * Horizontal layout with timer on the left and controls on the right.
- */
-@Composable
-private fun RecordShotScreenLandscape(
-    selectedBean: Bean?,
-    grinderSetting: String,
-    persistentRecommendation: PersistentGrindRecommendation?,
-    timerMode: TimerMode,
-    timerState: TimerState,
-    manualTimeSeconds: Int,
-    coffeeWeightIn: String,
-    coffeeWeightOut: String,
-    basketCoffeeOutMin: Float,
-    basketCoffeeOutMax: Float,
-    isFormValid: Boolean,
-    onNavigateToBeanManagement: () -> Unit,
-    onShowGrinderSheet: () -> Unit,
-    onShowCoffeeInDialog: () -> Unit,
-    onToggleTimerMode: () -> Unit,
-    onManualTimeChange: (Int) -> Unit,
-    onShowManualTimeDialog: () -> Unit,
-    onPauseTimer: () -> Unit,
-    onStartTimer: () -> Unit,
-    onResetTimer: () -> Unit,
-    onUpdateCoffeeWeightOut: (String) -> Unit,
-    onRecordShot: () -> Unit,
-    view: android.view.View
-) {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .navigationBarsPadding(),
-        color = MaterialTheme.colorScheme.background
-    ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            // Left side: Timer section (takes up ~45% of width)
-            TimerSection(
-                timerMode = timerMode,
-                isRunning = timerState.isRunning,
-                elapsedTimeMs = timerState.elapsedTimeSeconds * 1000L,
-                manualTimeSeconds = manualTimeSeconds,
-                onToggleTimerMode = onToggleTimerMode,
-                onManualTimeChange = onManualTimeChange,
-                onShowManualTimeDialog = onShowManualTimeDialog,
-                onPauseTimer = {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    onPauseTimer()
-                },
-                onStartTimer = {
-                    view.performHapticFeedback(HapticFeedbackConstants.CONTEXT_CLICK)
-                    onStartTimer()
-                },
-                onTimerReset = {
-                    view.performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
-                    onResetTimer()
-                },
-                modifier = Modifier
+            timerSection(
+                Modifier
                     .weight(0.45f)
                     .fillMaxHeight()
             )
-
-            // Right side: Scrollable form controls (takes up ~55% of width)
             Column(
                 modifier = Modifier
                     .weight(0.55f)
@@ -524,165 +351,266 @@ private fun RecordShotScreenLandscape(
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Header with bean and grinder
-                HeaderSection(
-                    bean = selectedBean,
-                    grinderSetting = grinderSetting,
-                    hasPersistentRecommendation = persistentRecommendation?.hasAdjustment() == true,
-                    onBeanClick = onNavigateToBeanManagement,
-                    onGrinderClick = onShowGrinderSheet,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                )
-
-                // Weights display
-                WeightsDisplay(
-                    coffeeIn = coffeeWeightIn.toDoubleOrNull() ?: 0.0,
-                    coffeeOut = coffeeWeightOut.toDoubleOrNull() ?: 0.0,
-                    onCoffeeInClick = onShowCoffeeInDialog,
-                    onCoffeeOutDecrease = {
-                        val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
-                        val newValue = (current - 1).coerceAtLeast(basketCoffeeOutMin.toDouble())
-                        onUpdateCoffeeWeightOut(newValue.toInt().toString())
-                    },
-                    onCoffeeOutIncrease = {
-                        val current = coffeeWeightOut.toDoubleOrNull() ?: 0.0
-                        val newValue = (current + 1).coerceAtMost(basketCoffeeOutMax.toDouble())
-                        onUpdateCoffeeWeightOut(newValue.toInt().toString())
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                )
-
-                // Save button
-                SaveShotButton(
-                    enabled = isFormValid,
-                    onClick = {
-                        view.performHapticFeedback(HapticFeedbackConstants.CONFIRM)
-                        onRecordShot()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                )
+                beanHeader()
+                recipeRow()
+                yieldRow()
+                saveButton()
             }
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 16.dp)
+                .padding(top = 8.dp, bottom = 16.dp)
+        ) {
+            beanHeader()
+            Spacer(modifier = Modifier.height(8.dp))
+            recipeRow()
+            timerSection(
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+            )
+            yieldRow()
+            Spacer(modifier = Modifier.height(16.dp))
+            saveButton()
         }
     }
 }
 
 /**
-<<<<<<< HEAD
->>>>>>> c03d903 (fixup! chore: fix detekt issues)
-=======
->>>>>>> 3ac2b45 (feat: add landscape mode to new shot screen)
- * Header section with bean selector and grinder setting.
+ * The bean in use, with its age. Tapping opens bean management to switch.
  */
 @Composable
-private fun HeaderSection(
+private fun BeanHeader(
     bean: Bean?,
-    grinderSetting: String,
-    hasPersistentRecommendation: Boolean,
-    onBeanClick: () -> Unit,
-    onGrinderClick: () -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium,
-        onClick = onBeanClick
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clip(MaterialTheme.shapes.small)
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = bean?.name ?: stringResource(R.string.text_select_bean),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onBackground,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (bean != null) {
+                val daysSinceRoast = bean.daysSinceRoast().toInt()
+                Text(
+                    text = stringResource(R.string.format_days_since_roast, daysSinceRoast),
+                    modifier = Modifier.padding(top = 2.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+        Icon(
+            imageVector = Icons.Default.KeyboardArrowDown,
+            contentDescription = stringResource(R.string.cd_select_bean),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * Before the shot: grind and dose as two ruled cells. A pending grind suggestion shows
+ * next to the current setting in the ideal-zone ink, the way the website plots the next shot.
+ */
+@Composable
+private fun RecipeRow(
+    grinderSetting: String,
+    suggestedGrindSetting: String?,
+    coffeeWeightIn: String,
+    onGrinderClick: () -> Unit,
+    onCoffeeInClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val inGrams = coffeeWeightIn.toDoubleOrNull()?.toInt() ?: 0
+    RuledRow(modifier = modifier) {
+        RecipeCell(
+            label = stringResource(R.string.label_grinder_setting),
+            onClick = onGrinderClick,
+            clickLabel = stringResource(R.string.cd_adjust_grinder),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = grinderSetting.ifBlank { stringResource(R.string.display_grinder_setting_empty) },
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            if (suggestedGrindSetting != null) {
+                val suggestion = stringResource(R.string.text_suggested_grinder_setting, suggestedGrindSetting)
+                Text(
+                    text = "→ $suggestedGrindSetting",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.zoneColors.idealInk,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .semantics { contentDescription = suggestion }
+                )
+            }
+        }
+        VerticalDivider(
+            modifier = Modifier.padding(vertical = 12.dp),
+            color = MaterialTheme.colorScheme.outlineVariant
+        )
+        RecipeCell(
+            label = stringResource(R.string.label_coffee_in),
+            onClick = onCoffeeInClick,
+            clickLabel = stringResource(R.string.dialog_adjust_coffee_in),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = stringResource(R.string.format_weight_grams, inGrams),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+/**
+ * After the shot: the yield read off the scale, adjusted in 1 g steps, with the ratio it gives.
+ */
+@Composable
+private fun YieldRow(
+    coffeeWeightOut: String,
+    formattedBrewRatio: String?,
+    onStep: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val outGrams = coffeeWeightOut.toDoubleOrNull()?.toInt() ?: 0
+    RuledRow(modifier = modifier) {
+        RecipeCell(
+            label = stringResource(R.string.label_coffee_out),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = stringResource(R.string.format_weight_grams, outGrams),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        RecipeCell(
+            label = stringResource(R.string.label_ratio),
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = formattedBrewRatio ?: stringResource(R.string.display_grinder_setting_empty),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+        StepButton(
+            icon = Icons.Default.Remove,
+            contentDescription = stringResource(R.string.cd_decrease_coffee_out),
+            onClick = { onStep(-1) }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        StepButton(
+            icon = Icons.Default.Add,
+            contentDescription = stringResource(R.string.cd_increase_coffee_out),
+            onClick = { onStep(1) }
+        )
+    }
+}
+
+/** A row ruled top and bottom, like a line of the website's step table. */
+@Composable
+private fun RuledRow(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Left: Bean info
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "☕",
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = bean?.name ?: stringResource(R.string.text_select_bean),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        maxLines = 1,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = stringResource(R.string.cd_select_bean),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically,
+            content = content
+        )
+        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+    }
+}
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Days since roast
-                if (bean != null) {
-                    val daysSinceRoast = ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now()).toInt()
-                    Text(
-                        text = stringResource(R.string.format_days_since_roast, daysSinceRoast),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-
-            // Right: Grinder setting with recommendation indicator
-            Box {
-                Surface(
-                    color = MaterialTheme.colorScheme.secondaryContainer,
-                    shape = MaterialTheme.shapes.small,
-                    onClick = onGrinderClick
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Engineering,
-                            contentDescription = stringResource(R.string.cd_adjust_grinder),
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                        Text(
-                            text = grinderSetting.ifBlank { stringResource(R.string.display_grinder_setting_empty) },
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
-
-                // Recommendation indicator badge
-                if (hasPersistentRecommendation) {
-                    Badge(
-                        modifier = Modifier.align(Alignment.TopEnd)
-                    ) {
-                        Text(stringResource(R.string.badge_recommendation_alert))
-                    }
-                }
+/** A data label over a value. Editable cells get a pencil so they don't read as static figures. */
+@Composable
+private fun RecipeCell(
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
+    clickLabel: String? = null,
+    value: @Composable RowScope.() -> Unit
+) {
+    val clickModifier = if (onClick != null) {
+        Modifier.clickable(onClickLabel = clickLabel, onClick = onClick)
+    } else {
+        Modifier
+    }
+    Column(
+        modifier = modifier
+            .fillMaxHeight()
+            .then(clickModifier)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = label.uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false)
+            )
+            if (onClick != null) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier
+                        .padding(start = 6.dp)
+                        .size(14.dp)
+                )
             }
         }
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(verticalAlignment = Alignment.Bottom, content = value)
+    }
+}
+
+@Composable
+private fun StepButton(
+    icon: ImageVector,
+    contentDescription: String,
+    onClick: () -> Unit
+) {
+    OutlinedIconButton(
+        onClick = onClick,
+        modifier = Modifier.size(52.dp),
+        shape = MaterialTheme.shapes.small,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
+    ) {
+        Icon(imageVector = icon, contentDescription = contentDescription)
     }
 }
 
 /**
- * Timer section with mode toggle and conditional rendering.
- * Supports both automatic timer and manual time input modes.
+ * The dial on bare paper, with the timer/manual switch above it.
+ * The switch hides while the timer runs; its space stays reserved so the dial doesn't jump.
  */
 @Composable
 private fun TimerSection(
@@ -698,91 +626,93 @@ private fun TimerSection(
     onTimerReset: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    Column(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .height(48.dp),
+            contentAlignment = Alignment.Center
         ) {
-            // Mode toggle button - always reserve space to prevent layout shift
-            Box(
-                modifier = Modifier.height(56.dp), // Reserve space for button + spacers (8dp + 40dp + 8dp)
-                contentAlignment = Alignment.Center
-            ) {
-                if (!isRunning) {
-                    FilledTonalButton(
-                        onClick = onToggleTimerMode,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (timerMode == TimerMode.AUTOMATIC) {
-                                Icons.Default.PlayArrow
-                            } else {
-                                Icons.Default.Edit
-                            },
-                            contentDescription = stringResource(R.string.cd_toggle_timer_mode),
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = when (timerMode) {
-                                TimerMode.AUTOMATIC -> stringResource(R.string.text_auto_timer)
-                                TimerMode.MANUAL -> stringResource(R.string.text_manual_timer)
-                            }
-                        )
-                    }
-                }
+            if (!isRunning) {
+                TimerModeSwitch(timerMode = timerMode, onToggleTimerMode = onToggleTimerMode)
             }
+        }
 
-            // Timer display (conditional based on mode)
-            BoxWithConstraints(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                val availableSize = minOf(maxWidth, maxHeight)
-                val timerSize = (availableSize * TIMER_SHARE_OF_CARD).coerceIn(TIMER_MIN_SIZE, TIMER_MAX_SIZE)
-                val fontSize = (timerSize.value * TIMER_NUMERAL_OF_SIZE)
-                    .coerceIn(TIMER_NUMERAL_MIN_SP, TIMER_NUMERAL_MAX_SP).sp
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f),
+            contentAlignment = Alignment.Center
+        ) {
+            val availableSize = minOf(maxWidth, maxHeight)
+            val timerSize = (availableSize * TIMER_SHARE_OF_AREA).coerceIn(TIMER_MIN_SIZE, TIMER_MAX_SIZE)
+            val fontSize = (timerSize.value * TIMER_NUMERAL_OF_SIZE)
+                .coerceIn(TIMER_NUMERAL_MIN_SP, TIMER_NUMERAL_MAX_SP).sp
 
-                when (timerMode) {
-                    TimerMode.AUTOMATIC -> {
-                        AutomaticTimerCircle(
-                            size = timerSize,
-                            fontSize = fontSize,
-                            isRunning = isRunning,
-                            elapsedTimeMs = elapsedTimeMs,
-                            onToggle = {
-                                if (isRunning) {
-                                    onPauseTimer()
-                                } else {
-                                    onStartTimer()
-                                }
-                            },
-                            onReset = onTimerReset
-                        )
-                    }
-                    TimerMode.MANUAL -> {
-                        ManualTimerCircle(
-                            size = timerSize,
-                            fontSize = fontSize,
-                            manualTimeSeconds = manualTimeSeconds,
-                            onTimeChange = onManualTimeChange,
-                            onTapToEdit = onShowManualTimeDialog
-                        )
-                    }
+            when (timerMode) {
+                TimerMode.AUTOMATIC -> {
+                    AutomaticTimerCircle(
+                        size = timerSize,
+                        fontSize = fontSize,
+                        isRunning = isRunning,
+                        elapsedTimeMs = elapsedTimeMs,
+                        onToggle = {
+                            if (isRunning) {
+                                onPauseTimer()
+                            } else {
+                                onStartTimer()
+                            }
+                        },
+                        onReset = onTimerReset
+                    )
+                }
+                TimerMode.MANUAL -> {
+                    ManualTimerCircle(
+                        size = timerSize,
+                        fontSize = fontSize,
+                        manualTimeSeconds = manualTimeSeconds,
+                        onTimeChange = onManualTimeChange,
+                        onTapToEdit = onShowManualTimeDialog
+                    )
                 }
             }
         }
     }
 }
 
+@Composable
+private fun TimerModeSwitch(
+    timerMode: TimerMode,
+    onToggleTimerMode: () -> Unit
+) {
+    val options = listOf(
+        TimerMode.AUTOMATIC to stringResource(R.string.text_mode_timer),
+        TimerMode.MANUAL to stringResource(R.string.text_mode_manual)
+    )
+    SingleChoiceSegmentedButtonRow {
+        options.forEachIndexed { index, (mode, label) ->
+            SegmentedButton(
+                selected = timerMode == mode,
+                onClick = { if (timerMode != mode) onToggleTimerMode() },
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = options.size,
+                    baseShape = MaterialTheme.shapes.small
+                ),
+                border = SegmentedButtonDefaults.borderStroke(MaterialTheme.colorScheme.outline),
+                icon = {}
+            ) {
+                Text(text = label, style = MaterialTheme.typography.labelLarge)
+            }
+        }
+    }
+}
+
 /**
- * Save shot button.
+ * Save shot button: ink when the shot can be saved, a quiet outline until then.
  */
 @Composable
 private fun SaveShotButton(
@@ -790,28 +720,16 @@ private fun SaveShotButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        color = if (enabled) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium,
+    Button(
         onClick = onClick,
-        enabled = enabled
+        enabled = enabled,
+        modifier = modifier,
+        shape = MaterialTheme.shapes.small
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.button_save_shot),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = if (enabled) {
-                    MaterialTheme.colorScheme.onPrimary
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
-                }
-            )
-        }
+        Text(
+            text = stringResource(R.string.button_save_shot),
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 

@@ -829,20 +829,18 @@
     <!-- Timer and Weight Format Strings -->
     <string name="format_timer_seconds">%1$ds</string>
     <string name="format_weight_grams">%1$dg</string>
-    <string name="format_ratio">(1:%.1f)</string>
     
     <!-- Content Descriptions for RecordShotScreen -->
     <string name="cd_decrease_coffee_out">Ausgabe um 1 Gramm verringern</string>
     <string name="cd_increase_coffee_out">Ausgabe um 1 Gramm erhöhen</string>
     <string name="cd_adjust_grinder">Mahlgrad anpassen</string>
     <string name="cd_mode_toggle_disabled">Modus-Umschalter (deaktiviert)</string>
-    <string name="cd_toggle_timer_mode">Zwischen automatischem und manuellem Timer wechseln</string>
     <string name="cd_manual_timer_slider">Extraktionszeit manuell anpassen</string>
     <string name="cd_tap_to_edit_time">Tippen zum Bearbeiten der Zeit</string>
     
     <!-- RecordShotScreen Strings -->
-    <string name="text_auto_timer">Automatischer Timer</string>
-    <string name="text_manual_timer">Manueller Timer</string>
+    <string name="text_mode_timer">Timer</string>
+    <string name="text_mode_manual">Manuell</string>
     <string name="button_save_shot">Shot speichern</string>
     <string name="dialog_adjust_grinder_setting">Mahlgrad anpassen</string>
     <string name="button_apply_setting">Einstellung anwenden</string>

@@ -602,6 +602,20 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
+     * Nudge coffee weight out by whole grams, kept inside the basket's range.
+     * Used by the -/+ buttons when reading the yield off the scale.
+     */
+    fun stepCoffeeWeightOut(deltaGrams: Int) {
+        val current = _coffeeWeightOut.value.replace(',', '.').toDoubleOrNull()
+            ?: _basketCoffeeOutMin.value.toDouble()
+        val next = (current + deltaGrams).coerceIn(
+            _basketCoffeeOutMin.value.toDouble(),
+            _basketCoffeeOutMax.value.toDouble()
+        )
+        updateCoffeeWeightOut(next.toInt().toString())
+    }
+
+    /**
      * Update grinder setting.
      * No validation needed as slider constrains values to grinder configuration ranges.
      */
@@ -973,6 +987,7 @@ class ShotRecordingViewModel @Inject constructor(
                         _coffeeWeightOut.value = draft.coffeeWeightOut
                         _grinderSetting.value = draft.grinderSetting
                         _notes.value = draft.notes
+                        calculateBrewRatio()
 
                         // Restore selected bean if it exists
                         draft.selectedBeanId?.let { beanId ->

@@ -136,14 +136,20 @@ fun AutomaticTimerCircle(
         TimeReadout(seconds = wholeSeconds, text = timeText, fontSize = fontSize)
         // Reserve the reset row's height so the numeral doesn't jump when it appears
         Box(modifier = Modifier.height(48.dp), contentAlignment = Alignment.Center) {
-            if (!isRunning && displayMs > 0) {
-                TextButton(onClick = onReset) {
+            when {
+                !isRunning && displayMs > 0 -> TextButton(onClick = onReset) {
                     Text(
                         text = stringResource(R.string.button_reset),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 }
+                // Nothing else on the dial says it's a button
+                !isRunning -> Text(
+                    text = stringResource(R.string.text_tap_to_start).uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
