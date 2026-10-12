@@ -8,15 +8,10 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Changed
 
-- [*] New look: ink on graph paper, matching the website, in light and dark mode.
-- [*] The shot timer is now a 45 s dial with the 25-30 s target band always visible. It turns green inside the band and rust past 30 s.
-- [*] Record Shot follows the order you pull a shot: bean, grind and dose, timer, then yield and save. A pending grind suggestion shows right next to the current setting.
+- [*] Fresh new look in light and dark mode.
+- [*] New shot timer dial with the 25-30 s target always visible.
+- [*] Record Shot is laid out in brewing order, with grind suggestions next to your current setting.
 - New app icon and splash screen.
-- The timer colour now uses the same 25-30 s window as the recommendations.
-
-### Fixed
-
-- The brew ratio on Record Shot shows the same format as history in every language.
 
 ## [2.2.0]
 

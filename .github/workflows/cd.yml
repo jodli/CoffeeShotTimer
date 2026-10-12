@@ -68,6 +68,99 @@ jobs:
           echo "deploy_target=$DEPLOY_TARGET" >> $GITHUB_OUTPUT
           echo "is_tag_build=$IS_TAG_BUILD" >> $GITHUB_OUTPUT
 
+      # Release notes come first: a missing or empty CHANGELOG section should fail
+      # before the slow build, not after it.
+      - name: Generate GitHub release notes
+        id: gen_release_notes
+        env:
+          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
+          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
+        run: |
+          set -euo pipefail
+          VERSION_NAME="$VERSION_NAME_OUTPUT"
+          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
+          NOTES_FILE="RELEASE_NOTES.md"
+
+          if [[ ! -f CHANGELOG.md ]]; then
+            echo "ERROR: CHANGELOG.md not found."
+            exit 1
+          fi
+
+          # Extract notes for tag builds from the matching version section, otherwise from [Unreleased]
+          if [[ "$IS_TAG_BUILD" == "true" ]]; then
+            awk -v v="$VERSION_NAME" '
+              BEGIN{p=0}
+              /^## \[/{
+                if (p==1) exit
+                if ($0 ~ "^## \\[(" v ")\\]") p=1
+              }
+              p==1{print}
+            ' CHANGELOG.md | sed '1d' | sed '/^## \[/Q' > "$NOTES_FILE"
+          else
+            awk '
+              BEGIN{p=0}
+              /^## \[/{
+                if (p==1) exit
+                if ($0 ~ /^## \[Unreleased\]/) p=1
+              }
+              p==1{print}
+            ' CHANGELOG.md | sed '1d' | sed '/^## \[/Q' > "$NOTES_FILE"
+          fi
+
+          # Fail if notes are empty after extraction
+          if [[ ! -s "$NOTES_FILE" ]]; then
+            echo "ERROR: Release notes are empty. Ensure the appropriate section exists in CHANGELOG.md."
+            exit 1
+          fi
+
+          echo "notes_file=$NOTES_FILE" >> $GITHUB_OUTPUT
+
+      - name: Print extracted release notes
+        env:
+          NOTES_FILE_OUTPUT: ${{ steps.gen_release_notes.outputs.notes_file }}
+        run: |
+          echo "=== Extracted release notes ($NOTES_FILE_OUTPUT) ==="
+          cat "$NOTES_FILE_OUTPUT"
+          echo "=== End of release notes ==="
+
+      - name: Prepare Play Store what's new (en-US)
+        id: play_whatsnew
+        env:
+          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
+          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
+        run: |
+          set -euo pipefail
+          VERSION_NAME="$VERSION_NAME_OUTPUT"
+          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
+          WHATSNEW_DIR="whatsnew"
+          mkdir -p "$WHATSNEW_DIR"
+          
+          # Determine which version to extract from CHANGELOG.md
+          if [[ "$IS_TAG_BUILD" == "true" ]]; then
+            EXTRACT_VERSION="$VERSION_NAME"
+          else
+            EXTRACT_VERSION="unreleased"
+          fi
+          
+          # Use the extract-whatsnew.sh script to get priority items (or all items if no priorities)
+          # This extracts items marked with [*] in CHANGELOG.md for Play Store
+          ./scripts/extract-whatsnew.sh "$EXTRACT_VERSION" 500 > "$WHATSNEW_DIR/whatsnew-en-US"
+          
+          # Verify the extraction worked
+          if [[ ! -s "$WHATSNEW_DIR/whatsnew-en-US" ]]; then
+            echo "ERROR: Failed to extract Play Store release notes from CHANGELOG.md"
+            exit 1
+          fi
+          
+          # Character count is already enforced by the script (max 500)
+          CHAR_COUNT=$(wc -m < "$WHATSNEW_DIR/whatsnew-en-US" | tr -d ' ')
+          echo "Play Store release notes: $CHAR_COUNT characters"
+          echo "=== Play Store What's New (en-US) ==="
+          cat "$WHATSNEW_DIR/whatsnew-en-US"
+          echo "=== End of What's New ==="
+
+          echo "whatsnew_dir=$WHATSNEW_DIR" >> $GITHUB_OUTPUT
+
       - name: Set Version
         uses: chkfung/android-version-actions@fcf89abef1c7afba2083146dcca0c6da4705ba4b
         with:
@@ -127,59 +220,6 @@ jobs:
             ${{ steps.artifacts.outputs.apk_path }}
             ${{ steps.artifacts.outputs.aab_path }}
 
-      - name: Generate GitHub release notes
-        id: gen_release_notes
-        env:
-          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
-          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
-        run: |
-          set -euo pipefail
-          VERSION_NAME="$VERSION_NAME_OUTPUT"
-          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
-          NOTES_FILE="RELEASE_NOTES.md"
-
-          if [[ ! -f CHANGELOG.md ]]; then
-            echo "ERROR: CHANGELOG.md not found."
-            exit 1
-          fi
-
-          # Extract notes for tag builds from the matching version section, otherwise from [Unreleased]
-          if [[ "$IS_TAG_BUILD" == "true" ]]; then
-            awk -v v="$VERSION_NAME" '
-              BEGIN{p=0}
-              /^## \[/{
-                if (p==1) exit
-                if ($0 ~ "^## \\[(" v ")\\]") p=1
-              }
-              p==1{print}
-            ' CHANGELOG.md | sed '1d' | sed '/^## \[/Q' > "$NOTES_FILE"
-          else
-            awk '
-              BEGIN{p=0}
-              /^## \[/{
-                if (p==1) exit
-                if ($0 ~ /^## \[Unreleased\]/) p=1
-              }
-              p==1{print}
-            ' CHANGELOG.md | sed '1d' | sed '/^## \[/Q' > "$NOTES_FILE"
-          fi
-
-          # Fail if notes are empty after extraction
-          if [[ ! -s "$NOTES_FILE" ]]; then
-            echo "ERROR: Release notes are empty. Ensure the appropriate section exists in CHANGELOG.md."
-            exit 1
-          fi
-
-          echo "notes_file=$NOTES_FILE" >> $GITHUB_OUTPUT
-
-      - name: Print extracted release notes
-        env:
-          NOTES_FILE_OUTPUT: ${{ steps.gen_release_notes.outputs.notes_file }}
-        run: |
-          echo "=== Extracted release notes ($NOTES_FILE_OUTPUT) ==="
-          cat "$NOTES_FILE_OUTPUT"
-          echo "=== End of release notes ==="
-
       - name: Create or update GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -232,44 +272,6 @@ jobs:
               
             echo "Created/updated main release: $RELEASE_TITLE"
           fi
-
-      - name: Prepare Play Store what's new (en-US)
-        id: play_whatsnew
-        env:
-          VERSION_NAME_OUTPUT: ${{ steps.version.outputs.version_name }}
-          IS_TAG_BUILD_OUTPUT: ${{ steps.version.outputs.is_tag_build }}
-        run: |
-          set -euo pipefail
-          VERSION_NAME="$VERSION_NAME_OUTPUT"
-          IS_TAG_BUILD="$IS_TAG_BUILD_OUTPUT"
-          WHATSNEW_DIR="whatsnew"
-          mkdir -p "$WHATSNEW_DIR"
-          
-          # Determine which version to extract from CHANGELOG.md
-          if [[ "$IS_TAG_BUILD" == "true" ]]; then
-            EXTRACT_VERSION="$VERSION_NAME"
-          else
-            EXTRACT_VERSION="unreleased"
-          fi
-          
-          # Use the extract-whatsnew.sh script to get priority items (or all items if no priorities)
-          # This extracts items marked with [*] in CHANGELOG.md for Play Store
-          ./scripts/extract-whatsnew.sh "$EXTRACT_VERSION" 500 > "$WHATSNEW_DIR/whatsnew-en-US"
-          
-          # Verify the extraction worked
-          if [[ ! -s "$WHATSNEW_DIR/whatsnew-en-US" ]]; then
-            echo "ERROR: Failed to extract Play Store release notes from CHANGELOG.md"
-            exit 1
-          fi
-          
-          # Character count is already enforced by the script (max 500)
-          CHAR_COUNT=$(wc -m < "$WHATSNEW_DIR/whatsnew-en-US" | tr -d ' ')
-          echo "Play Store release notes: $CHAR_COUNT characters"
-          echo "=== Play Store What's New (en-US) ==="
-          cat "$WHATSNEW_DIR/whatsnew-en-US"
-          echo "=== End of What's New ==="
-
-          echo "whatsnew_dir=$WHATSNEW_DIR" >> $GITHUB_OUTPUT
 
       - name: Deploy to Google Play Console
         uses: r0adkll/upload-google-play@935ef9c68bb393a8e6116b1575626a7f5be3a7fb
