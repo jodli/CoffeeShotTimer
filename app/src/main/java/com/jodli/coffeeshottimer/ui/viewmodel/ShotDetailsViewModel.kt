@@ -37,9 +37,6 @@ class ShotDetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(ShotDetailsUiState())
     val uiState: StateFlow<ShotDetailsUiState> = _uiState.asStateFlow()
 
-    private val _grindAdjustmentRecommendation = MutableStateFlow<GrindAdjustmentRecommendation?>(null)
-    val grindAdjustmentRecommendation: StateFlow<GrindAdjustmentRecommendation?> = _grindAdjustmentRecommendation.asStateFlow()
-
     /**
      * Load shot details by ID
      */
@@ -90,17 +87,13 @@ class ShotDetailsViewModel @Inject constructor(
     fun deleteShot(onDeleted: () -> Unit) {
         val currentShot = _uiState.value.shotDetails?.shot ?: return
 
-        _uiState.value = _uiState.value.copy(isDeletingShot = true)
-
         viewModelScope.launch {
             shotRepository.deleteShot(currentShot).fold(
                 onSuccess = {
-                    _uiState.value = _uiState.value.copy(isDeletingShot = false)
                     onDeleted()
                 },
                 onFailure = { exception ->
                     _uiState.value = _uiState.value.copy(
-                        isDeletingShot = false,
                         error = exception.message ?: stringResourceProvider.getString(R.string.error_failed_to_delete_shot)
                     )
                 }
@@ -142,8 +135,6 @@ class ShotDetailsViewModel @Inject constructor(
     ) {
         val currentShot = _uiState.value.shotDetails?.shot ?: return
 
-        _uiState.value = _uiState.value.copy(isUpdatingTaste = true)
-
         viewModelScope.launch {
             if (tastePrimary != null) {
                 // Record taste feedback
@@ -158,7 +149,6 @@ class ShotDetailsViewModel @Inject constructor(
             }
 
             // Always refresh to show updated taste
-            _uiState.value = _uiState.value.copy(isUpdatingTaste = false)
             refreshShotDetails()
         }
     }
@@ -175,11 +165,11 @@ class ShotDetailsViewModel @Inject constructor(
                 tasteFeedback = shotDetails.shot.tastePrimary
             ).fold(
                 onSuccess = { recommendation ->
-                    _grindAdjustmentRecommendation.value = recommendation
+                    _uiState.value = _uiState.value.copy(recommendation = recommendation)
                 },
                 onFailure = {
                     // Clear recommendation on error (don't block UI)
-                    _grindAdjustmentRecommendation.value = null
+                    _uiState.value = _uiState.value.copy(recommendation = null)
                 }
             )
         }
@@ -193,6 +183,5 @@ data class ShotDetailsUiState(
     val isLoading: Boolean = false,
     val shotDetails: ShotDetails? = null,
     val error: String? = null,
-    val isDeletingShot: Boolean = false,
-    val isUpdatingTaste: Boolean = false
+    val recommendation: GrindAdjustmentRecommendation? = null
 )
