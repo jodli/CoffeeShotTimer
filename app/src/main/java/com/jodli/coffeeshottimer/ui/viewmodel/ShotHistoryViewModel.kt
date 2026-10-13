@@ -64,25 +64,6 @@ class ShotHistoryViewModel @Inject constructor(
         private const val MIN_SHOTS_FOR_TREND = 3
         private const val MAX_RECENT_SHOTS = 5
         private const val MIN_SHOTS_FOR_GRIND_ANALYSIS = 5
-        private const val SCORE_OPTIMAL_TIME_POINTS = 40
-        private const val SCORE_TYPICAL_RATIO_POINTS = 40
-        private const val SCORE_REASONABLE_WEIGHTS_POINTS = 20
-        private const val SCORE_TIME_PENALTY_PER_SECOND = 4
-        private const val SCORE_RATIO_PENALTY_MULTIPLIER = 20.0
-
-        // Shot quality ranges
-        private const val MIN_REASONABLE_WEIGHT_IN = 15.0
-        private const val MAX_REASONABLE_WEIGHT_IN = 25.0
-        private const val MIN_REASONABLE_WEIGHT_OUT = 25.0
-        private const val MAX_REASONABLE_WEIGHT_OUT = 60.0
-
-        // Extraction time boundaries
-        private const val MIN_OPTIMAL_EXTRACTION_TIME = 25
-        private const val MAX_OPTIMAL_EXTRACTION_TIME = 30
-
-        // Brew ratio boundaries
-        private const val MIN_TYPICAL_BREW_RATIO = 1.5
-        private const val MAX_TYPICAL_BREW_RATIO = 3.0
 
         // Consistency milestone thresholds
         private const val CONSISTENCY_MILESTONE_TEN = 10
@@ -93,9 +74,33 @@ class ShotHistoryViewModel @Inject constructor(
         // Load beans for filtering (this doesn't set loading state)
         loadAvailableBeans()
 
+        // Per-shot quality scores computed against each shot's whole bean
+        // history — the same context Shot Details uses.
+        observeQualityScores()
+
         // Schedule memory cleanup
         memoryOptimizer.scheduleMemoryCleanup(COMPONENT_ID) {
             performMemoryCleanup()
+        }
+    }
+
+    private fun observeQualityScores() {
+        viewModelScope.launch {
+            getShotHistoryUseCase.getAllShots()
+                .catch { /* scores stay missing; rows show a spacer */ }
+                .collect { result ->
+                    result.onSuccess { allShots ->
+                        val byBean = allShots.groupBy { it.beanId }
+                        _uiState.value = _uiState.value.copy(
+                            qualityScores = allShots.associate { shot ->
+                                shot.id to getShotQualityAnalysisUseCase.calculateShotQualityScore(
+                                    shot,
+                                    byBean[shot.beanId].orEmpty()
+                                )
+                            }
+                        )
+                    }
+                }
         }
     }
 
@@ -731,14 +736,12 @@ class ShotHistoryViewModel @Inject constructor(
             isFirstPerfectForBean(shot, allShots) -> Achievement(
                 type = AchievementType.FIRST_PERFECT,
                 label = stringResourceProvider.getString(R.string.achievement_first_perfect, beanName),
-                emoji = "🎉",
                 beanId = shot.beanId,
                 beanName = beanName
             )
             isDialInMilestone(shot, allShots) -> Achievement(
                 type = AchievementType.DIALED_IN,
                 label = stringResourceProvider.getString(R.string.achievement_dialed_in, beanName),
-                emoji = "🎯",
                 beanId = shot.beanId,
                 beanName = beanName
             )
@@ -752,25 +755,12 @@ class ShotHistoryViewModel @Inject constructor(
                             it,
                             beanName
                         ),
-                        emoji = "🔥",
                         beanId = shot.beanId,
                         beanName = beanName
                     )
                 }
             }
         }
-    }
-
-    /**
-     * Get the quality score for a specific shot.
-     * Used by UI to display quality trends in enhanced cards.
-     *
-     * @param shot The shot to calculate quality for
-     * @return Quality score (0-100)
-     */
-    fun getShotQualityScore(shot: Shot): Int {
-        val allShots = _uiState.value.shots
-        return getShotQualityAnalysisUseCase.calculateShotQualityScore(shot, allShots)
     }
 
     /**
@@ -893,6 +883,8 @@ data class ShotHistoryUiState(
     val hasMorePages: Boolean = true,
     // Coaching insights
     val coachingInsights: CoachingInsights? = null,
+    // Canonical quality score per shot, computed against the whole bean history
+    val qualityScores: Map<String, Int> = emptyMap(),
     // Aggregate quality analysis (Epic 5)
     val aggregateQualityAnalysis: com.jodli.coffeeshottimer.domain.usecase.AggregateQualityAnalysis? = null
 ) {
@@ -957,7 +949,6 @@ data class GrindCoachingEffectiveness(
 data class Achievement(
     val type: AchievementType,
     val label: String, // Translatable label text
-    val emoji: String, // Visual indicator
     val beanId: String, // Bean this achievement is tied to
     val beanName: String // Bean name for display
 )

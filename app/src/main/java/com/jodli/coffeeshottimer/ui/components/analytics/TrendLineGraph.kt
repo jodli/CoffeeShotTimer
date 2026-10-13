@@ -19,15 +19,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.jodli.coffeeshottimer.R
+import com.jodli.coffeeshottimer.domain.usecase.QualityTier
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
@@ -47,15 +49,9 @@ data class TrendDataPoint(
 )
 
 /**
- * Simple line chart visualizing quality scores over time.
- *
- * Features:
- * - Color-coded dots: Green (>=85), Orange (60-84), Red (<60)
- * - Connected dots with line
- * - Y-axis: 0-100 scale with labels (0, 50, 100)
- * - X-axis: Date labels (MMM dd format)
- * - Touch interaction: Show value on tap
- * - Empty state for less than 5 shots
+ * Simple line chart visualizing quality scores over time, in the app's
+ * control-chart language: one ink line and axes, dashed tier lines at the
+ * 60/85 cut-offs, dots coloured on the single quality scale.
  *
  * @param dataPoints List of trend data points (last 10-30 quality scores)
  * @param modifier Modifier for the graph
@@ -69,7 +65,7 @@ fun TrendLineGraph(
     val spacing = LocalSpacing.current
     var selectedIndex by remember { mutableStateOf<Int?>(null) }
 
-    if (dataPoints.size < 5) {
+    if (dataPoints.size < MIN_POINTS_FOR_TREND) {
         // Empty state
         Box(
             modifier = modifier
@@ -78,19 +74,19 @@ fun TrendLineGraph(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "Record 5+ shots to see trends",
+                text = stringResource(R.string.analytics_trend_insufficient_data, MIN_POINTS_FOR_TREND),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     } else {
         val textMeasurer = rememberTextMeasurer()
-        val textStyle = TextStyle(
-            fontSize = 12.sp,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        val axisColor = MaterialTheme.colorScheme.outline
-        val lineColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+        val textStyle = MaterialTheme.typography.labelSmall
+            .copy(color = MaterialTheme.colorScheme.onSurfaceVariant)
+        val tooltipStyle = MaterialTheme.typography.labelMedium
+            .copy(color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold)
+        val inkColor = MaterialTheme.colorScheme.onSurface
+        val gridColor = MaterialTheme.colorScheme.outlineVariant
         val tooltipBgColor = MaterialTheme.colorScheme.surfaceVariant
 
         val zones = MaterialTheme.zoneColors
@@ -124,12 +120,17 @@ fun TrendLineGraph(
             val graphLeft = yAxisLabelWidth + 20f
             val graphBottom = canvasHeight - 40f
 
-            // Y-axis labels (0, 50, 100)
-            listOf(0, 50, 100).forEach { value ->
+            // Dashed tier gridlines at the shared quality cut-offs
+            listOf(QualityTier.GOOD_MIN_SCORE, QualityTier.EXCELLENT_MIN_SCORE).forEach { value ->
                 val y = graphBottom - (value / 100f) * graphHeight
-                val text = value.toString()
-                val textLayoutResult = textMeasurer.measure(text, textStyle)
-
+                drawLine(
+                    color = gridColor,
+                    start = Offset(graphLeft, y),
+                    end = Offset(canvasWidth - 20f, y),
+                    strokeWidth = 1f,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 6f))
+                )
+                val textLayoutResult = textMeasurer.measure(value.toString(), textStyle)
                 drawText(
                     textLayoutResult = textLayoutResult,
                     topLeft = Offset(
@@ -141,18 +142,18 @@ fun TrendLineGraph(
 
             // Y-axis line
             drawLine(
-                color = axisColor,
+                color = inkColor,
                 start = Offset(graphLeft, graphBottom),
                 end = Offset(graphLeft, graphBottom - graphHeight),
-                strokeWidth = 2f
+                strokeWidth = 1.5.dp.toPx()
             )
 
             // X-axis line
             drawLine(
-                color = axisColor,
+                color = inkColor,
                 start = Offset(graphLeft, graphBottom),
                 end = Offset(canvasWidth - 20f, graphBottom),
-                strokeWidth = 2f
+                strokeWidth = 1.5.dp.toPx()
             )
 
             // Plot data points
@@ -171,13 +172,19 @@ fun TrendLineGraph(
                     path.lineTo(x, y)
                 }
 
-                // Draw colored dot
+                // Draw colored dot with an ink ring
                 val dotColor = zones.forScore(point.score)
 
                 drawCircle(
                     color = dotColor,
-                    radius = 8f,
+                    radius = 4.dp.toPx(),
                     center = Offset(x, y)
+                )
+                drawCircle(
+                    color = inkColor,
+                    radius = 4.dp.toPx(),
+                    center = Offset(x, y),
+                    style = Stroke(width = 1.5.dp.toPx())
                 )
 
                 // Highlight selected point
@@ -209,8 +216,8 @@ fun TrendLineGraph(
             // Draw line path
             drawPath(
                 path = path,
-                color = lineColor,
-                style = Stroke(width = 3f)
+                color = inkColor,
+                style = Stroke(width = 1.5.dp.toPx())
             )
 
             // Draw selected value tooltip
@@ -218,14 +225,8 @@ fun TrendLineGraph(
                 val point = dataPoints[index]
                 val x = graphLeft + (index * pointSpacing)
                 val y = graphBottom - (point.score / 100f) * graphHeight
-                val tooltipText = "Score: ${point.score}"
-                val tooltipLayout = textMeasurer.measure(
-                    tooltipText,
-                    textStyle.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
-                    )
-                )
+                val tooltipText = "${point.score}"
+                val tooltipLayout = textMeasurer.measure(tooltipText, tooltipStyle)
 
                 // Tooltip background
                 drawRoundRect(
@@ -254,6 +255,9 @@ fun TrendLineGraph(
     }
 }
 
+/** Minimum points before the trend graph shows anything. */
+private const val MIN_POINTS_FOR_TREND = 5
+
 @Suppress("UnusedPrivateMember") // Preview function
 @Preview(showBackground = true)
 @Composable
@@ -274,18 +278,6 @@ private fun TrendLineGraphPreview() {
 
         TrendLineGraph(
             dataPoints = sampleData,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
-
-@Suppress("UnusedPrivateMember") // Preview function
-@Preview(showBackground = true)
-@Composable
-private fun TrendLineGraphEmptyPreview() {
-    CoffeeShotTimerTheme {
-        TrendLineGraph(
-            dataPoints = emptyList(),
             modifier = Modifier.fillMaxWidth()
         )
     }

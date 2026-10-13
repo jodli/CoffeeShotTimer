@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -186,7 +187,9 @@ fun ShotHistoryFilterDialog(
                             // Start date
                             OutlinedButton(
                                 onClick = { showStartDatePicker = true },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                shape = MaterialTheme.shapes.small,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
@@ -203,7 +206,9 @@ fun ShotHistoryFilterDialog(
                             // End date
                             OutlinedButton(
                                 onClick = { showEndDatePicker = true },
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                shape = MaterialTheme.shapes.small,
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.DateRange,
