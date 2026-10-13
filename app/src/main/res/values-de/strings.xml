@@ -81,10 +81,6 @@
     <string name="text_start_timer">Timer starten</string>
     <string name="text_fresh">Frisch</string>
     <string name="text_too_fresh">Zu frisch</string>
-    <string name="text_good">Gut</string>
-    <string name="text_excellent">Ausgezeichnet</string>
-    <string name="text_fair">Ordentlich</string>
-    <string name="text_needs_work">Verbesserungsbedarf</string>
     <string name="text_stale">Alt</string>
     <string name="text_ok_freshness">OK</string>
     <string name="text_strong_extraction">Starke Extraktion</string>
@@ -169,10 +165,7 @@
     <string name="text_overall_statistics">Gesamtstatistiken</string>
     <string name="text_extraction_time_analysis">Extraktionszeit-Analyse</string>
     <string name="text_brew_ratio_analysis">Brühverhältnis-Analyse</string>
-    <string name="text_grinder_setting_analysis">Mühleneinstellungs-Analyse</string>
     <string name="text_distribution">Verteilung</string>
-    <string name="text_most_used_setting">Meistverwendete Einstellung</string>
-    <string name="text_best_performing_setting">Beste Einstellung</string>
     <string name="text_active_filters">Aktive Filter</string>
     <string name="format_more_filters">+%1$d weitere</string>
     <string name="text_no_analysis_data">Keine Analysedaten verfügbar</string>
@@ -187,15 +180,10 @@
     <string name="analytics_distribution_format">%1$d ausgezeichnet • %2$d gut • %3$d verbesserungsbedürftig</string>
 
     <!-- Trends -->
-    <string name="analytics_trends_title">Aktuelle Trends</string>
-    <string name="analytics_trend_improving">Verbessernd</string>
-    <string name="analytics_trend_stable">Stabil</string>
-    <string name="analytics_trend_declining">Abnehmend</string>
     <string name="analytics_trend_improving_format">Verbessernd - um %1$d Punkte gestiegen</string>
     <string name="analytics_trend_stable_text">Stabil - gleichbleibende Leistung</string>
     <string name="analytics_trend_declining_format">Abnehmend - um %1$d Punkte gefallen</string>
     <string name="analytics_trend_insufficient_data">Nimm %1$d Shots auf, um Trends zu sehen</string>
-    <string name="analytics_trend_min_shots_format">Nimm %1$d weitere Shots für Trend-Analyse auf</string>
     <string name="analytics_raw_metrics">Rohdaten</string>
     <string name="analytics_label_days_analyzed">Analysierte Tage</string>
 
@@ -227,8 +215,6 @@
     <string name="analytics_label_avg_extraction_time">Ø Extraktionszeit</string>
 
     <!-- Content Descriptions for Analytics -->
-    <string name="cd_quality_score_gauge">Qualitätsbewertung: %1$d von 100, %2$s</string>
-    <string name="cd_zone_indicator">%1$d%% der Shots im optimalen Extraktionsbereich</string>
     <string name="cd_expand">Aufklappen</string>
     <string name="cd_collapse">Zuklappen</string>
 
@@ -534,8 +520,6 @@
     <string name="format_days">%1$d Tage</string>
     <string name="format_weight_in_out">%1$dg → %2$dg</string>
     <string name="format_shots_count">%1$d Shots</string>
-    <string name="format_avg_ratio">Ø Verhältnis: 1:%1$.1f</string>
-    <string name="format_avg_time">Ø Zeit: %1$ds</string>
     <string name="format_bean">Bohne: %1$s</string>
     <string name="format_grinder">Mühle: %1$s</string>
     <string name="format_shot_trends">Shot-Trends (%1$d Tage)</string>
@@ -544,7 +528,6 @@
     <string name="format_brew_ratio_range_long">Brühverhältnis: 1:%1$s – 1:%2$s</string>
     <string name="format_previous_shot">Vorheriger Shot: %1$s (%2$s)</string>
     <string name="format_next_shot">Nächster Shot: %1$s (%2$s)</string>
-    <string name="format_shot_context">Das ist Shot %1$d von %2$d mit %3$s</string>
     <string name="format_delete_bean_confirmation">Bist du sicher, dass du \"%1$s\" löschen möchtest? Dies deaktiviert die Bohne und versteckt sie aus aktiven Listen.</string>
     <string name="format_delete_shot_confirmation">Bist du sicher, dass du diesen Shot löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.</string>
     <string name="format_most_used_grinder_setting">Meistverwendete Mühleneinstellung: %1$s</string>
@@ -566,7 +549,6 @@
     <string name="button_reset">Zurücksetzen</string>
 
     <!-- Remaining UI strings -->
-    <string name="format_settings_different_used">%1$d verschiedene Einstellungen verwendet</string>
     <string name="format_weight_display_g">%1$dg</string>
     <string name="format_days_since_roast_filter">%1$d Tage seit Röstung</string>
     <string name="format_deviation_display">%1$s%2$s</string>
@@ -582,9 +564,7 @@
     <!-- Format strings for statistics -->
     <string name="format_avg_brew_ratio_display">1:%1$.1f</string>
     <string name="format_avg_extraction_time_display">%1$ds</string>
-    <string name="format_optimal_extraction_percentage_long">Optimal: %1$.0f%%</string>
     <string name="format_optimal_extraction_percentage">%1$.0f%%</string>
-    <string name="format_typical_ratio_percentage">%1$.0f%%</string>
     <string name="format_extraction_time_trend_display">%1$.1fs</string>
     <string name="format_time_range_display">%1$ds – %2$ds</string>
     <string name="format_under_extracted_percentage">%1$.0f%%</string>
@@ -871,13 +851,35 @@
 
     <!-- Quality Score Breakdown -->
     <string name="text_quality_score_breakdown">Punkteverteilung</string>
-    <string name="text_total_score">Gesamt</string>
     <string name="tier_excellent">Exzellent</string>
     <string name="tier_good">Gut</string>
     <string name="tier_needs_work">Verbesserungsbedarf</string>
+    <string name="cd_quality_score">Qualitätsbewertung: %1$d von 100, %2$s</string>
+    <string name="cd_shot_chart">Shot-Diagramm: %1$d Shots, %2$d im Ziel</string>
+    <string name="format_grind_inline">Mahlgrad %1$s</string>
+    <string name="label_score">Punkte</string>
+    <string name="label_avg_score">Ø Punkte</string>
+    <string name="label_typical_ratio">Übliches Verhältnis</string>
+    <string name="format_label_in_window">In %1$d–%2$d s</string>
+    <string name="format_percent">%1$.0f %%</string>
+    <string name="label_recent_shots">Letzte Shots</string>
+    <string name="label_coaching">Coaching</string>
+    <string name="label_quality_trend">Qualitätsverlauf</string>
+    <string name="label_grind_settings">Mahlgrade</string>
+    <string name="label_grind_setting_col">Stufe</string>
+    <string name="label_shots">Shots</string>
+    <string name="label_best">Beste</string>
+    <string name="label_most_used">Am häufigsten</string>
+    <string name="label_dial_in_path">Einstellweg</string>
+    <string name="label_next_shot">Nächster Shot</string>
+    <string name="label_compared_to_usual">Im Vergleich zu sonst</string>
+    <string name="format_usual_time">sonst %1$ds</string>
+    <string name="format_usual_ratio">sonst %1$s</string>
+    <string name="format_shot_position">Shot %1$d von %2$d</string>
+    <string name="format_ranking_with_bean">Platz %1$d von %2$d mit dieser Bohne</string>
+    <string name="cd_edit_taste">Geschmack bearbeiten</string>
     <string name="label_taste_feedback">Geschmack</string>
     <string name="label_precision">Präzision</string>
-    <string name="text_to_improve">Verbessern:</string>
     
     <!-- Improvement Actions -->
     <string name="action_grind_finer">Feiner mahlen</string>
@@ -886,16 +888,9 @@
     <string name="action_dial_in_taste">Geschmack einstellen</string>
     
     <!-- Comparison Context -->
-    <string name="text_comparison_context">Rang</string>
-    <string name="text_personal_best">🎉 Persönliche Bestleistung!</string>
-    <string name="format_ranking">%1$d von %2$d</string>
-    <string name="text_with_this_bean">mit dieser Bohne</string>
+    <string name="text_personal_best">Persönliche Bestleistung</string>
     
     <!-- What Happened Card -->
-    <string name="text_what_happened">Was ist passiert</string>
-    <string name="text_your_shot">Dein Shot</string>
-    <string name="text_compared_to_usual">vs. üblich:</string>
-    <string name="text_key_parameters">Parameter</string>
     
     <!-- Shot Interpretation -->
     <string name="interpretation_perfect_taste">Perfekter Geschmack.</string>
@@ -928,13 +923,10 @@
     <string name="coaching_grind_follow_rate">Du bist %1$d%% der Mahlgradempfehlungen gefolgt</string>
     
     <!-- Coaching Insights Card -->
-    <string name="coaching_insights_title">Deine Brüh-Reise</string>
     <string name="coaching_insights_title_with_bean">Reise mit %1$s</string>
     <string name="coaching_insights_section_recent">Aktuelles Muster</string>
     <string name="coaching_insights_section_progress">Fortschritt</string>
     <string name="coaching_insights_section_coaching">Coaching-Einfluss</string>
-    <string name="cd_collapse_insights">Erkenntnisse einklappen</string>
-    <string name="cd_expand_insights">Erkenntnisse ausklappen</string>
     
     <!-- Achievement Badges -->
     <string name="achievement_first_perfect">Erster perfekter Shot mit %1$s!</string>

@@ -79,10 +79,6 @@
     <string name="text_start_timer">Start timer</string>
     <string name="text_fresh">Fresh</string>
     <string name="text_too_fresh">Too Fresh</string>
-    <string name="text_good">Good</string>
-    <string name="text_excellent">Excellent</string>
-    <string name="text_fair">Fair</string>
-    <string name="text_needs_work">Needs Work</string>
     <string name="text_stale">Stale</string>
     <string name="text_ok_freshness">OK</string>
     <string name="text_strong_extraction">Strong Extraction</string>
@@ -184,10 +180,7 @@
     <string name="text_overall_quality">Overall Quality</string>
     <string name="text_extraction_time_analysis">Extraction Time Analysis</string>
     <string name="text_brew_ratio_analysis">Brew Ratio Analysis</string>
-    <string name="text_grinder_setting_analysis">Grinder Setting Analysis</string>
     <string name="text_distribution">Distribution</string>
-    <string name="text_most_used_setting">Most Used Setting</string>
-    <string name="text_best_performing_setting">Best Performing Setting</string>
     <string name="text_active_filters">Active Filters</string>
     <string name="format_more_filters">+%1$d more</string>
     <string name="text_no_analysis_data">No analysis data available</string>
@@ -201,15 +194,10 @@
     <string name="analytics_distribution_format">%1$d excellent • %2$d good • %3$d needs work</string>
 
     <!-- Trends -->
-    <string name="analytics_trends_title">Recent Trends</string>
-    <string name="analytics_trend_improving">Improving</string>
-    <string name="analytics_trend_stable">Stable</string>
-    <string name="analytics_trend_declining">Declining</string>
     <string name="analytics_trend_improving_format">Improving - up %1$d points</string>
     <string name="analytics_trend_stable_text">Stable - consistent performance</string>
     <string name="analytics_trend_declining_format">Declining - down %1$d points</string>
     <string name="analytics_trend_insufficient_data">Record %1$d shots to see trends</string>
-    <string name="analytics_trend_min_shots_format">Record %1$d more shots for trend analysis</string>
     <string name="analytics_raw_metrics">Raw Metrics</string>
     <string name="analytics_label_days_analyzed">Days Analyzed</string>
 
@@ -241,8 +229,6 @@
     <string name="analytics_label_avg_extraction_time">Avg Extraction Time</string>
 
     <!-- Content Descriptions for Analytics -->
-    <string name="cd_quality_score_gauge">Quality score: %1$d out of 100, %2$s</string>
-    <string name="cd_zone_indicator">%1$d%% of shots in optimal extraction zone</string>
     <string name="cd_expand">Expand</string>
     <string name="cd_collapse">Collapse</string>
 
@@ -538,8 +524,6 @@
     <string name="format_days">%1$d days</string>
     <string name="format_weight_in_out">%1$dg → %2$dg</string>
     <string name="format_shots_count">%1$d shots</string>
-    <string name="format_avg_ratio">Avg Ratio: 1:%1$.1f</string>
-    <string name="format_avg_time">Avg Time: %1$ds</string>
     <string name="format_bean">Bean: %1$s</string>
     <string name="format_grinder">Grinder: %1$s</string>
     <string name="format_shot_trends">Shot Trends (%1$d days)</string>
@@ -548,7 +532,6 @@
     <string name="format_brew_ratio_range_long">Brew Ratio: 1:%1$s – 1:%2$s</string>
     <string name="format_previous_shot">Previous shot: %1$s (%2$s)</string>
     <string name="format_next_shot">Next shot: %1$s (%2$s)</string>
-    <string name="format_shot_context">This is shot %1$d of %2$d with %3$s</string>
     <string name="format_delete_bean_confirmation">Are you sure you want to delete \"%1$s\"? This will deactivate the bean and hide it from active lists.</string>
     <string name="format_delete_shot_confirmation">Are you sure you want to delete this shot? This action cannot be undone.</string>
     <string name="format_most_used_grinder_setting">Most used grinder setting: %1$s</string>
@@ -570,7 +553,6 @@
     <string name="button_reset">Reset</string>
 
     <!-- Remaining UI strings -->
-    <string name="format_settings_different_used">%1$d different settings used</string>
     <string name="format_weight_display_g">%1$dg</string>
     <string name="format_days_since_roast_filter">%1$d days since roast</string>
     <string name="format_deviation_display">%1$s%2$s</string>
@@ -586,9 +568,7 @@
     <!-- Format strings for statistics -->
     <string name="format_avg_brew_ratio_display">1:%1$.1f</string>
     <string name="format_avg_extraction_time_display">%1$ds</string>
-    <string name="format_optimal_extraction_percentage_long">Optimal: %1$.0f%%</string>
     <string name="format_optimal_extraction_percentage">%1$.0f%%</string>
-    <string name="format_typical_ratio_percentage">%1$.0f%%</string>
     <string name="format_extraction_time_trend_display">%1$.1fs</string>
     <string name="format_time_range_display">%1$ds – %2$ds</string>
     <string name="format_under_extracted_percentage">%1$.0f%%</string>
@@ -864,13 +844,35 @@
 
     <!-- Quality Score Breakdown -->
     <string name="text_quality_score_breakdown">Score Breakdown</string>
-    <string name="text_total_score">Total</string>
     <string name="tier_excellent">Excellent</string>
     <string name="tier_good">Good</string>
     <string name="tier_needs_work">Needs Work</string>
+    <string name="cd_quality_score">Quality score: %1$d of 100, %2$s</string>
+    <string name="cd_shot_chart">Shot chart: %1$d shots, %2$d in target</string>
+    <string name="format_grind_inline">Grind %1$s</string>
+    <string name="label_score">Score</string>
+    <string name="label_avg_score">Avg score</string>
+    <string name="label_typical_ratio">Typical ratio</string>
+    <string name="format_label_in_window">In %1$d–%2$d s</string>
+    <string name="format_percent">%1$.0f%%</string>
+    <string name="label_recent_shots">Recent shots</string>
+    <string name="label_coaching">Coaching</string>
+    <string name="label_quality_trend">Quality trend</string>
+    <string name="label_grind_settings">Grind settings</string>
+    <string name="label_grind_setting_col">Setting</string>
+    <string name="label_shots">Shots</string>
+    <string name="label_best">Best</string>
+    <string name="label_most_used">Most used</string>
+    <string name="label_dial_in_path">Dial-in path</string>
+    <string name="label_next_shot">Next shot</string>
+    <string name="label_compared_to_usual">Compared to usual</string>
+    <string name="format_usual_time">usual %1$ds</string>
+    <string name="format_usual_ratio">usual %1$s</string>
+    <string name="format_shot_position">shot %1$d of %2$d</string>
+    <string name="format_ranking_with_bean">Ranks %1$d of %2$d with this bean</string>
+    <string name="cd_edit_taste">Edit taste feedback</string>
     <string name="label_taste_feedback">Taste</string>
     <string name="label_precision">Precision</string>
-    <string name="text_to_improve">To improve:</string>
     
     <!-- Improvement Actions -->
     <string name="action_grind_finer">Grind finer</string>
@@ -879,16 +881,9 @@
     <string name="action_dial_in_taste">Dial in taste</string>
     
     <!-- Comparison Context -->
-    <string name="text_comparison_context">Ranking</string>
-    <string name="text_personal_best">🎉 Personal Best!</string>
-    <string name="format_ranking">%1$d of %2$d</string>
-    <string name="text_with_this_bean">with this bean</string>
+    <string name="text_personal_best">Personal best</string>
     
     <!-- What Happened Card -->
-    <string name="text_what_happened">What Happened</string>
-    <string name="text_your_shot">Your Shot</string>
-    <string name="text_compared_to_usual">vs. usual:</string>
-    <string name="text_key_parameters">Parameters</string>
     
     <!-- Shot Interpretation -->
     <string name="interpretation_perfect_taste">Perfect taste.</string>
@@ -921,13 +916,10 @@
     <string name="coaching_grind_follow_rate">You followed %1$d%% of grind suggestions</string>
     
     <!-- Coaching Insights Card -->
-    <string name="coaching_insights_title">Your Brewing Journey</string>
     <string name="coaching_insights_title_with_bean">Journey with %1$s</string>
     <string name="coaching_insights_section_recent">Recent Pattern</string>
     <string name="coaching_insights_section_progress">Progress</string>
     <string name="coaching_insights_section_coaching">Coaching Impact</string>
-    <string name="cd_collapse_insights">Collapse insights</string>
-    <string name="cd_expand_insights">Expand insights</string>
     
     <!-- Achievement Badges -->
     <string name="achievement_first_perfect">First perfect with %1$s!</string>
