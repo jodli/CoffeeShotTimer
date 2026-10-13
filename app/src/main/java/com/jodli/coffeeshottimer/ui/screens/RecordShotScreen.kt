@@ -9,9 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -29,22 +27,17 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -80,8 +73,11 @@ import com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation
 import com.jodli.coffeeshottimer.domain.usecase.TimerMode
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
+import com.jodli.coffeeshottimer.ui.components.DataCell
 import com.jodli.coffeeshottimer.ui.components.ManualTimerCircle
+import com.jodli.coffeeshottimer.ui.components.RuledRow
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
+import com.jodli.coffeeshottimer.ui.components.SquareSegmentedSwitch
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import com.jodli.coffeeshottimer.ui.viewmodel.ShotRecordingViewModel
@@ -439,7 +435,7 @@ private fun RecipeRow(
 ) {
     val inGrams = coffeeWeightIn.toDoubleOrNull()?.toInt() ?: 0
     RuledRow(modifier = modifier) {
-        RecipeCell(
+        DataCell(
             label = stringResource(R.string.label_grinder_setting),
             onClick = onGrinderClick,
             clickLabel = stringResource(R.string.cd_adjust_grinder),
@@ -466,7 +462,7 @@ private fun RecipeRow(
             modifier = Modifier.padding(vertical = 12.dp),
             color = MaterialTheme.colorScheme.outlineVariant
         )
-        RecipeCell(
+        DataCell(
             label = stringResource(R.string.label_coffee_in),
             onClick = onCoffeeInClick,
             clickLabel = stringResource(R.string.dialog_adjust_coffee_in),
@@ -493,7 +489,7 @@ private fun YieldRow(
 ) {
     val outGrams = coffeeWeightOut.toDoubleOrNull()?.toInt() ?: 0
     RuledRow(modifier = modifier) {
-        RecipeCell(
+        DataCell(
             label = stringResource(R.string.label_coffee_out),
             modifier = Modifier.weight(1f)
         ) {
@@ -503,7 +499,7 @@ private fun YieldRow(
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
-        RecipeCell(
+        DataCell(
             label = stringResource(R.string.label_ratio),
             modifier = Modifier.weight(1f)
         ) {
@@ -524,71 +520,6 @@ private fun YieldRow(
             contentDescription = stringResource(R.string.cd_increase_coffee_out),
             onClick = { onStep(1) }
         )
-    }
-}
-
-/** A row ruled top and bottom, like a line of the website's step table. */
-@Composable
-private fun RuledRow(
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
-) {
-    Column(modifier = modifier.fillMaxWidth()) {
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min),
-            verticalAlignment = Alignment.CenterVertically,
-            content = content
-        )
-        HorizontalDivider(color = MaterialTheme.colorScheme.outline)
-    }
-}
-
-/** A data label over a value. Editable cells get a pencil so they don't read as static figures. */
-@Composable
-private fun RecipeCell(
-    label: String,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    clickLabel: String? = null,
-    value: @Composable RowScope.() -> Unit
-) {
-    val clickModifier = if (onClick != null) {
-        Modifier.clickable(onClickLabel = clickLabel, onClick = onClick)
-    } else {
-        Modifier
-    }
-    Column(
-        modifier = modifier
-            .fillMaxHeight()
-            .then(clickModifier)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = label.uppercase(),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false)
-            )
-            if (onClick != null) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier
-                        .padding(start = 6.dp)
-                        .size(14.dp)
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(verticalAlignment = Alignment.Bottom, content = value)
     }
 }
 
@@ -688,27 +619,14 @@ private fun TimerModeSwitch(
     timerMode: TimerMode,
     onToggleTimerMode: () -> Unit
 ) {
-    val options = listOf(
-        TimerMode.AUTOMATIC to stringResource(R.string.text_mode_timer),
-        TimerMode.MANUAL to stringResource(R.string.text_mode_manual)
+    SquareSegmentedSwitch(
+        options = listOf(
+            stringResource(R.string.text_mode_timer),
+            stringResource(R.string.text_mode_manual)
+        ),
+        selectedIndex = if (timerMode == TimerMode.AUTOMATIC) 0 else 1,
+        onSelect = { _ -> onToggleTimerMode() }
     )
-    SingleChoiceSegmentedButtonRow {
-        options.forEachIndexed { index, (mode, label) ->
-            SegmentedButton(
-                selected = timerMode == mode,
-                onClick = { if (timerMode != mode) onToggleTimerMode() },
-                shape = SegmentedButtonDefaults.itemShape(
-                    index = index,
-                    count = options.size,
-                    baseShape = MaterialTheme.shapes.small
-                ),
-                border = SegmentedButtonDefaults.borderStroke(MaterialTheme.colorScheme.outline),
-                icon = {}
-            ) {
-                Text(text = label, style = MaterialTheme.typography.labelLarge)
-            }
-        }
-    }
 }
 
 /**
