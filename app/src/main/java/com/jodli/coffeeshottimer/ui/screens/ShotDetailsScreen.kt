@@ -308,11 +308,14 @@ private fun ShotDetailsTwoColumns(
             .padding(spacing.medium),
         horizontalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            HeaderSection(shotDetails)
-            FigureRows(shotDetails, onEditTaste)
-            DialInPathSection(shotDetails, DIAL_IN_CHART_HEIGHT_LANDSCAPE)
-            NextShotSection(shotDetails, recommendation)
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(bottom = spacing.medium)
+        ) {
+            item { HeaderSection(shotDetails) }
+            item { FigureRows(shotDetails, onEditTaste) }
+            item { DialInPathSection(shotDetails, DIAL_IN_CHART_HEIGHT_LANDSCAPE) }
+            item { NextShotSection(shotDetails, recommendation) }
         }
         LazyColumn(
             modifier = Modifier.weight(1f),

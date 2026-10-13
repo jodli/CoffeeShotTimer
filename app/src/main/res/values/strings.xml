@@ -194,9 +194,9 @@
     <string name="analytics_distribution_format">%1$d excellent • %2$d good • %3$d needs work</string>
 
     <!-- Trends -->
-    <string name="analytics_trend_improving_format">Improving - up %1$d points</string>
+    <string name="analytics_trend_improving_format">Improving · +%1$d</string>
     <string name="analytics_trend_stable_text">Stable - consistent performance</string>
-    <string name="analytics_trend_declining_format">Declining - down %1$d points</string>
+    <string name="analytics_trend_declining_format">Declining · −%1$d</string>
     <string name="analytics_trend_insufficient_data">Record %1$d shots to see trends</string>
     <string name="analytics_raw_metrics">Raw Metrics</string>
     <string name="analytics_label_days_analyzed">Days Analyzed</string>
@@ -859,6 +859,7 @@
     <string name="label_coaching">Coaching</string>
     <string name="label_quality_trend">Quality trend</string>
     <string name="label_grind_settings">Grind settings</string>
+    <string name="analytics_grinder_requires_bean">Filter to a bean to compare grind settings.</string>
     <string name="label_grind_setting_col">Setting</string>
     <string name="label_shots">Shots</string>
     <string name="label_best">Best</string>
@@ -916,7 +917,7 @@
     <string name="coaching_grind_follow_rate">You followed %1$d%% of grind suggestions</string>
     
     <!-- Coaching Insights Card -->
-    <string name="coaching_insights_title_with_bean">Journey with %1$s</string>
+    <string name="coaching_insights_title_with_bean">Coaching · %1$s</string>
     <string name="coaching_insights_section_recent">Recent Pattern</string>
     <string name="coaching_insights_section_progress">Progress</string>
     <string name="coaching_insights_section_coaching">Coaching Impact</string>

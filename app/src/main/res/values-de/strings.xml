@@ -180,9 +180,9 @@
     <string name="analytics_distribution_format">%1$d ausgezeichnet • %2$d gut • %3$d verbesserungsbedürftig</string>
 
     <!-- Trends -->
-    <string name="analytics_trend_improving_format">Verbessernd - um %1$d Punkte gestiegen</string>
+    <string name="analytics_trend_improving_format">Verbessernd · +%1$d</string>
     <string name="analytics_trend_stable_text">Stabil - gleichbleibende Leistung</string>
-    <string name="analytics_trend_declining_format">Abnehmend - um %1$d Punkte gefallen</string>
+    <string name="analytics_trend_declining_format">Abnehmend · −%1$d</string>
     <string name="analytics_trend_insufficient_data">Nimm %1$d Shots auf, um Trends zu sehen</string>
     <string name="analytics_raw_metrics">Rohdaten</string>
     <string name="analytics_label_days_analyzed">Analysierte Tage</string>
@@ -866,6 +866,7 @@
     <string name="label_coaching">Coaching</string>
     <string name="label_quality_trend">Qualitätsverlauf</string>
     <string name="label_grind_settings">Mahlgrade</string>
+    <string name="analytics_grinder_requires_bean">Auf eine Bohne filtern, um Mahlgrade zu vergleichen.</string>
     <string name="label_grind_setting_col">Stufe</string>
     <string name="label_shots">Shots</string>
     <string name="label_best">Beste</string>
@@ -923,7 +924,7 @@
     <string name="coaching_grind_follow_rate">Du bist %1$d%% der Mahlgradempfehlungen gefolgt</string>
     
     <!-- Coaching Insights Card -->
-    <string name="coaching_insights_title_with_bean">Reise mit %1$s</string>
+    <string name="coaching_insights_title_with_bean">Coaching · %1$s</string>
     <string name="coaching_insights_section_recent">Aktuelles Muster</string>
     <string name="coaching_insights_section_progress">Fortschritt</string>
     <string name="coaching_insights_section_coaching">Coaching-Einfluss</string>

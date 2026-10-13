@@ -255,9 +255,16 @@ fun GrinderSettingsTable(
     analysis: GrinderSettingAnalysis?,
     modifier: Modifier = Modifier
 ) {
-    if (analysis == null || analysis.settingStats.isEmpty()) return
     Column(modifier = modifier.fillMaxWidth()) {
         SectionLabel(text = stringResource(R.string.label_grind_settings))
+        if (analysis == null || analysis.settingStats.isEmpty()) {
+            Text(
+                text = stringResource(R.string.analytics_grinder_requires_bean),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            return
+        }
         GrinderTableRow(
             cells = listOf(
                 stringResource(R.string.label_grind_setting_col),

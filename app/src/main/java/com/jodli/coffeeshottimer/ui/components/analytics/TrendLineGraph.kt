@@ -160,6 +160,7 @@ fun TrendLineGraph(
             val pointSpacing = graphWidth / (dataPoints.size - 1).coerceAtLeast(1)
             val path = Path()
             val dateFormatter = DateTimeFormatter.ofPattern("MMM dd")
+            var lastLabelledDate: LocalDate? = null
 
             dataPoints.forEachIndexed { index, point ->
                 val x = graphLeft + (index * pointSpacing)
@@ -199,7 +200,9 @@ fun TrendLineGraph(
 
                 // X-axis date labels (show every nth label to avoid crowding)
                 val labelInterval = (dataPoints.size / 5).coerceAtLeast(1)
-                if (index % labelInterval == 0 || index == dataPoints.size - 1) {
+                val isNewDay = point.date != lastLabelledDate
+                if (isNewDay && (index % labelInterval == 0 || index == dataPoints.size - 1)) {
+                    lastLabelledDate = point.date
                     val dateText = point.date.format(dateFormatter)
                     val dateTextLayout = textMeasurer.measure(dateText, textStyle)
 
