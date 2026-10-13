@@ -90,6 +90,46 @@ class ShotHistoryViewModelTest {
     }
 
     @Test
+    fun `qualityScores are computed per bean from all shots`() = runTest {
+        val beanA = "bean-a"
+        val beanB = "bean-b"
+        val shotA1 = com.jodli.coffeeshottimer.data.model.Shot(
+            id = "a1",
+            beanId = beanA,
+            coffeeWeightIn = 18.0,
+            coffeeWeightOut = 36.0,
+            extractionTimeSeconds = 27,
+            grinderSetting = "2.5",
+            timestamp = LocalDateTime.now().minusMinutes(2)
+        )
+        val shotA2 = shotA1.copy(id = "a2", timestamp = LocalDateTime.now())
+        val shotB1 = shotA1.copy(id = "b1", beanId = beanB, timestamp = LocalDateTime.now())
+
+        every { getShotHistoryUseCase.getAllShots() } returns flowOf(
+            Result.success(listOf(shotA1, shotA2, shotB1))
+        )
+        every {
+            getShotQualityAnalysisUseCase.calculateShotQualityScore(shotA1, listOf(shotA1, shotA2))
+        } returns 72
+        every {
+            getShotQualityAnalysisUseCase.calculateShotQualityScore(shotA2, listOf(shotA1, shotA2))
+        } returns 90
+        every {
+            getShotQualityAnalysisUseCase.calculateShotQualityScore(shotB1, listOf(shotB1))
+        } returns 55
+
+        viewModel = ShotHistoryViewModel(
+            getShotHistoryUseCase, getActiveBeansUseCase, getShotStatisticsUseCase,
+            getShotQualityAnalysisUseCase, memoryOptimizer, stringResourceProvider, domainErrorTranslator
+        )
+
+        assertEquals(
+            mapOf("a1" to 72, "a2" to 90, "b1" to 55),
+            viewModel.uiState.value.qualityScores
+        )
+    }
+
+    @Test
     fun `initial state is correct`() {
         val uiState = viewModel.uiState.value
 
