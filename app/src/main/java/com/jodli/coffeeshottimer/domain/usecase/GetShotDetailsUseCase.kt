@@ -44,10 +44,7 @@ class GetShotDetailsUseCase @Inject constructor(
 
         private const val DEVIATION_BONUS_POINTS = 5
 
-        // Quality thresholds
         private const val MIN_SHOTS_FOR_RANKING = 3
-        private const val EXCELLENT_SCORE_THRESHOLD = 85
-        private const val GOOD_SCORE_THRESHOLD = 60
 
         // Extraction time ranges
         private const val MIN_OPTIMAL_EXTRACTION = 25
@@ -140,7 +137,8 @@ class GetShotDetailsUseCase @Inject constructor(
                 analysis = analysis,
                 relatedShotsCount = relatedShots.size,
                 rankingForBean = rankingForBean,
-                isPersonalBest = isPersonalBest
+                isPersonalBest = isPersonalBest,
+                beanShots = sortedShots
             )
 
             Result.success(shotDetails)
@@ -452,7 +450,7 @@ class GetShotDetailsUseCase @Inject constructor(
         shot: Shot
     ): ImprovementPath? {
         // Already excellent
-        if (currentScore >= EXCELLENT_SCORE_THRESHOLD) return null
+        if (currentScore >= QualityTier.EXCELLENT_MIN_SCORE) return null
 
         val action = determineImprovementAction(
             extractionTimePoints,
@@ -461,8 +459,8 @@ class GetShotDetailsUseCase @Inject constructor(
             shot
         ) ?: return null
 
-        val pointsNeeded = EXCELLENT_SCORE_THRESHOLD - currentScore
-        val targetTier = if (currentScore >= GOOD_SCORE_THRESHOLD) {
+        val pointsNeeded = QualityTier.EXCELLENT_MIN_SCORE - currentScore
+        val targetTier = if (currentScore >= QualityTier.GOOD_MIN_SCORE) {
             QualityTier.EXCELLENT
         } else {
             QualityTier.GOOD
@@ -524,7 +522,8 @@ data class ShotDetails(
     val analysis: ShotAnalysis,
     val relatedShotsCount: Int,
     val rankingForBean: Int? = null, // Position ranked by quality score (1 = best)
-    val isPersonalBest: Boolean = false
+    val isPersonalBest: Boolean = false,
+    val beanShots: List<Shot> = emptyList() // All shots of this bean, ascending by timestamp
 )
 
 /**
@@ -578,7 +577,18 @@ enum class ImprovementAction {
 enum class QualityTier {
     NEEDS_WORK, // < 60
     GOOD, // 60-84
-    EXCELLENT // 85+
+    EXCELLENT; // 85+
+
+    companion object {
+        const val GOOD_MIN_SCORE = 60
+        const val EXCELLENT_MIN_SCORE = 85
+
+        fun forScore(score: Int): QualityTier = when {
+            score >= EXCELLENT_MIN_SCORE -> EXCELLENT
+            score >= GOOD_MIN_SCORE -> GOOD
+            else -> NEEDS_WORK
+        }
+    }
 }
 
 /**

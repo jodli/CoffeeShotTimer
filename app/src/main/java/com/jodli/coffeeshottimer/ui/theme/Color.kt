@@ -3,6 +3,7 @@ package com.jodli.coffeeshottimer.ui.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import com.jodli.coffeeshottimer.domain.usecase.QualityTier
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 
 // ============================================================================
@@ -63,10 +64,6 @@ fun extractionZone(seconds: Int): ExtractionZone = when {
     else -> ExtractionZone.SLOW
 }
 
-// quality score tiers, same cut-offs as the score labels
-private const val SCORE_GOOD = 85
-private const val SCORE_FAIR = 60
-
 /**
  * Meaningful colours outside Material's roles: the three extraction zones,
  * and a single-hue scale for quality scores so a "fair" score never borrows
@@ -109,10 +106,10 @@ data class ZoneColors(
         ExtractionZone.SLOW -> slowContainer
     }
 
-    fun forScore(score: Int): Color = when {
-        score >= SCORE_GOOD -> qualityGood
-        score >= SCORE_FAIR -> qualityFair
-        else -> qualityPoor
+    fun forScore(score: Int): Color = when (QualityTier.forScore(score)) {
+        QualityTier.EXCELLENT -> qualityGood
+        QualityTier.GOOD -> qualityFair
+        QualityTier.NEEDS_WORK -> qualityPoor
     }
 }
 

@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase
+import com.jodli.coffeeshottimer.domain.usecase.QualityTier
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 
 /**
@@ -27,7 +28,7 @@ object BeanStatusConstants {
     const val NEEDS_WORK_THRESHOLD = 40
     const val MIN_SHOTS_FOR_DIAL_IN = 3
     const val SCORE_PERFECT_THRESHOLD = 80
-    const val SCORE_GOOD_THRESHOLD = 60
+    const val SCORE_GOOD_THRESHOLD = QualityTier.GOOD_MIN_SCORE
 }
 
 /**

@@ -38,10 +38,6 @@ class GetShotQualityAnalysisUseCase @Inject constructor(
 
         private const val DEVIATION_BONUS_POINTS = 5
 
-        // Quality thresholds
-        private const val EXCELLENT_SCORE_THRESHOLD = 85
-        private const val GOOD_SCORE_THRESHOLD = 60
-
         // Extraction time ranges
         private const val MIN_OPTIMAL_EXTRACTION = 25
         private const val MAX_OPTIMAL_EXTRACTION = 30
@@ -137,9 +133,9 @@ class GetShotQualityAnalysisUseCase @Inject constructor(
         val scores = scoresWithShots.map { it.second }
 
         // Distribution
-        val excellentCount = scores.count { it >= EXCELLENT_SCORE_THRESHOLD }
-        val goodCount = scores.count { it in GOOD_SCORE_THRESHOLD until EXCELLENT_SCORE_THRESHOLD }
-        val needsWorkCount = scores.count { it < GOOD_SCORE_THRESHOLD }
+        val excellentCount = scores.count { it >= QualityTier.EXCELLENT_MIN_SCORE }
+        val goodCount = scores.count { it in QualityTier.GOOD_MIN_SCORE until QualityTier.EXCELLENT_MIN_SCORE }
+        val needsWorkCount = scores.count { it < QualityTier.GOOD_MIN_SCORE }
 
         // Overall average
         val overallAverage = scores.average().toInt()
@@ -180,11 +176,7 @@ class GetShotQualityAnalysisUseCase @Inject constructor(
         }
 
         // Determine tier based on recent performance
-        val qualityTier = when {
-            recentAverage >= EXCELLENT_SCORE_THRESHOLD -> QualityTier.EXCELLENT
-            recentAverage >= GOOD_SCORE_THRESHOLD -> QualityTier.GOOD
-            else -> QualityTier.NEEDS_WORK
-        }
+        val qualityTier = QualityTier.forScore(recentAverage)
 
         return AggregateQualityAnalysis(
             totalShots = shots.size,

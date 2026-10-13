@@ -100,6 +100,11 @@ class GetShotDetailsUseCaseTest {
         assertEquals(nextShot, shotDetails.nextShot)
         assertEquals(3, shotDetails.relatedShotsCount)
         assertNotNull(shotDetails.analysis)
+        // All bean shots, ascending by timestamp
+        assertEquals(
+            relatedShots.sortedBy { it.timestamp }.map { it.id },
+            shotDetails.beanShots.map { it.id }
+        )
     }
 
     @Test
