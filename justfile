@@ -1,7 +1,9 @@
 # CoffeeShotTimer build commands
 # Run `just --list` to see available recipes
 
-export JAVA_HOME := "/usr/lib/jvm/java-21-openjdk"
+# Respect env-provided paths; fall back to Homebrew toolchains.
+export JAVA_HOME := env_var_or_default("JAVA_HOME", "/opt/homebrew/opt/openjdk@17")
+export ANDROID_HOME := env_var_or_default("ANDROID_HOME", "/opt/homebrew/share/android-commandlinetools")
 
 # Default recipe - show available commands
 default:
