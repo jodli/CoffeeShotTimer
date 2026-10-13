@@ -8,10 +8,18 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Changed
 
-- [*] Fresh new look in light and dark mode.
-- [*] New shot timer dial with the 25-30 s target always visible.
-- [*] Record Shot is laid out in brewing order, with grind suggestions next to your current setting.
+- [*] Shot History rebuilt as a clean ledger: every shot on one line with time, ratio and quality score; off-target times are colour-coded by extraction zone instead of flagged red.
+- [*] New Analysis view led by a shot chart: your recent shots plotted against the 25-30 s target with sour and bitter zones, followed by coaching insights, quality trend and grind settings.
+- [*] Shot Details leads with the verdict — key figures, the bean's dial-in chart, and a concrete "Next shot" grind suggestion.
+- Fresh new look in light and dark mode.
+- New shot timer dial with the 25-30 s target always visible.
+- Record Shot is laid out in brewing order, with grind suggestions next to your current setting.
 - New app icon and splash screen.
+
+### Fixed
+
+- Shot History and Shot Details now show the same quality score for a shot.
+- Shot position ("shot N of M") in Shot Details was wrong; ranking and neighbouring shots are now correct and tappable.
 
 ## [2.2.0]
 
