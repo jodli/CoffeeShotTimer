@@ -40,10 +40,10 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.usecase.QualityTier
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 
-/** Fixed widths of the ledger's right-aligned figure columns. */
-val LEDGER_TIME_COLUMN_WIDTH: Dp = 52.dp
-val LEDGER_RATIO_COLUMN_WIDTH: Dp = 60.dp
-val LEDGER_SCORE_COLUMN_WIDTH: Dp = 60.dp
+/** Fixed widths of the ledger's right-aligned figure columns; sized for "Verhältnis". */
+val LEDGER_TIME_COLUMN_WIDTH: Dp = 60.dp
+val LEDGER_RATIO_COLUMN_WIDTH: Dp = 88.dp
+val LEDGER_SCORE_COLUMN_WIDTH: Dp = 68.dp
 
 /** The tier's display word. */
 @StringRes
