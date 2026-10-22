@@ -8,6 +8,9 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Changed
 
+- [*] Beans list rebuilt as a ledger: one ruled line per bag tells you which is in use, its dial-in status and roast age; a single tap selects it for the next shot.
+- [*] Unified bean freshness behind a single 4–21 day window, showing roast age as a colour-coded figure (resting gold, fresh green, past-peak ink).
+- [*] Add and Edit Bean forms restructured around ruled sections (details, photo, status) with a live roast freshness verdict and non-destructive delete.
 - [*] Shot History rebuilt as a clean ledger: every shot on one line with time, ratio and quality score; off-target times are colour-coded by extraction zone instead of flagged red.
 - [*] New Analysis view led by a shot chart: your recent shots plotted against the 25-30 s target with sour and bitter zones, followed by coaching insights, quality trend and grind settings.
 - [*] Shot Details leads with the verdict — key figures, the bean's dial-in chart, and a concrete "Next shot" grind suggestion.
