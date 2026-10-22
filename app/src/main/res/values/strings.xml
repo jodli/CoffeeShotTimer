@@ -78,12 +78,14 @@
     <string name="text_stop_timer">Stop timer</string>
     <string name="text_start_timer">Start timer</string>
     <string name="text_fresh">Fresh</string>
-    <string name="text_too_fresh">Too Fresh</string>
-    <string name="text_stale">Stale</string>
-    <string name="text_ok_freshness">OK</string>
     <string name="freshness_resting">Resting</string>
     <string name="freshness_past">Past peak</string>
     <string name="label_bean_finished">Finished</string>
+    <string name="label_brewing">Brewing</string>
+    <string name="format_roast_age_days">%1$d d</string>
+    <string name="label_roast">Roast</string>
+    <string name="label_bean_details">Details</string>
+    <string name="cd_roast_age">%1$d days since roast, %2$s</string>
     <string name="text_strong_extraction">Strong Extraction</string>
     <string name="text_weak_extraction">Weak Extraction</string>
     <string name="text_typical_extraction">Typical espresso range</string>
@@ -91,11 +93,8 @@
 
     <!-- Bean Management -->
     <string name="bean_select_button">Select</string>
-    <string name="bean_selected_badge">Selected</string>
-    <string name="bean_grinder_not_set">Not set</string>
     <string name="bean_shot_count">%d shots</string>
     <string name="bean_no_shots">No shots yet</string>
-    <string name="bean_view_shots">View %d shots</string>
     
     <!-- Bean Status Tooltips -->
     <string name="bean_status_dialed_in">Dialed In - Consistent results</string>
@@ -420,7 +419,6 @@
     <string name="text_take_photo">Take Photo</string>
     <string name="text_choose_from_gallery">Choose from Gallery</string>
     <string name="text_photo_options">Photo Options</string>
-    <string name="text_no_photo">No photo added</string>
     <string name="text_loading_photo">Loading photo…</string>
     <string name="text_photo_saved">Photo saved successfully</string>
     <string name="text_photo_deleted">Photo deleted successfully</string>
@@ -436,7 +434,6 @@
 
     <!-- Photo Content Descriptions -->
     <string name="cd_bean_photo">Bean photo</string>
-    <string name="cd_add_photo">Add photo</string>
     <string name="cd_close_photo_viewer">Close photo viewer</string>
     <string name="cd_bean_photo_thumbnail">Bean photo thumbnail</string>
     <string name="cd_dismiss_success">Dismiss success message</string>
@@ -521,7 +518,6 @@
 
     <!-- Format Strings -->
     <string name="format_days_since_roast">%1$d days since roast</string>
-    <string name="format_roasted_days_ago">Roasted: %1$d days ago</string>
     <string name="format_last_grind">Last grind: %1$s</string>
     <string name="format_quality_score">%1$d/100</string>
     <string name="format_days">%1$d days</string>
@@ -675,7 +671,6 @@
     <string name="text_suggested_grinder_setting">Suggested: %1$s</string>
     
     <!-- Badge and Display Values -->
-    <string name="badge_recommendation_alert">!</string>
     <string name="display_grinder_setting_empty">--</string>
 
     <!-- Equipment Setup Screen -->

@@ -1,7 +1,6 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import android.net.Uri
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,26 +12,22 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -44,18 +39,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import java.io.File
 
 /**
@@ -82,14 +79,7 @@ fun BeanPhotoSection(
     val spacing = LocalSpacing.current
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.PhotoCamera,
-            title = stringResource(R.string.text_bean_photo)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
+    Column(modifier = modifier) {
         // Success message display
         successMessage?.let { message ->
             PhotoSuccessState(
@@ -160,7 +150,7 @@ private fun PhotoLoadingState(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp),
+            .height(120.dp),
         contentAlignment = Alignment.Center
     ) {
         LoadingIndicator(
@@ -178,40 +168,28 @@ private fun PhotoSuccessState(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalSpacing.current
-
-    Card(
+    Row(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        shape = RoundedCornerShape(spacing.cornerMedium)
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacing.medium),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = message,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.weight(1f)
-            )
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.zoneColors.idealInk,
+            modifier = Modifier.weight(1f)
+        )
 
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.size(spacing.iconSmall)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = stringResource(R.string.cd_dismiss_success),
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(spacing.iconSmall)
-                )
-            }
+        IconButton(
+            onClick = onDismiss,
+            modifier = Modifier.size(48.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.cd_dismiss_success),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }
@@ -230,64 +208,48 @@ private fun PhotoErrorState(
 ) {
     val spacing = LocalSpacing.current
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        ),
-        shape = RoundedCornerShape(spacing.cornerMedium)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacing.medium)
+    Column(modifier = modifier.fillMaxWidth()) {
+        // Error message
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Error message
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Text(
-                    text = error,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onErrorContainer,
-                    modifier = Modifier.weight(1f)
-                )
+            Text(
+                text = error,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error,
+                modifier = Modifier.weight(1f)
+            )
 
-                IconButton(
-                    onClick = onDismiss,
-                    modifier = Modifier.size(spacing.iconSmall)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cd_dismiss_error),
-                        tint = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.size(spacing.iconSmall)
-                    )
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(R.string.cd_dismiss_error),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(spacing.small))
+
+        // Action buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(spacing.small)
+        ) {
+            if (canRetry) {
+                TextButton(onClick = onRetry) {
+                    Text(stringResource(R.string.text_retry))
                 }
             }
 
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Action buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                if (canRetry) {
-                    CoffeeSecondaryButton(
-                        text = stringResource(R.string.text_retry),
-                        onClick = onRetry,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                CoffeePrimaryButton(
-                    text = stringResource(R.string.text_try_again),
-                    onClick = onTryAgain,
-                    modifier = Modifier.weight(1f)
-                )
+            TextButton(onClick = onTryAgain) {
+                Text(stringResource(R.string.text_try_again))
             }
         }
     }
@@ -304,59 +266,13 @@ private fun PhotoDisplaySection(
     onDeletePhoto: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalSpacing.current
-    val context = LocalContext.current
-
-    Column(modifier = modifier) {
-        // Photo display
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .clickable { onViewPhoto() },
-            shape = RoundedCornerShape(spacing.cornerMedium),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(File(photoPath))
-                    .crossfade(true)
-                    .build(),
-                contentDescription = stringResource(R.string.cd_bean_photo),
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Action buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.small)
-        ) {
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.text_view_short),
-                onClick = onViewPhoto,
-                icon = Icons.Default.Image,
-                modifier = Modifier.weight(1f)
-            )
-
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.text_replace_short),
-                onClick = onReplacePhoto,
-                icon = Icons.Default.Edit,
-                modifier = Modifier.weight(1f)
-            )
-
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.text_delete_short),
-                onClick = onDeletePhoto,
-                icon = Icons.Default.Delete,
-                modifier = Modifier.weight(1f)
-            )
-        }
-    }
+    PhotoPreview(
+        model = File(photoPath),
+        onViewPhoto = onViewPhoto,
+        onReplacePhoto = onReplacePhoto,
+        onDeletePhoto = onDeletePhoto,
+        modifier = modifier
+    )
 }
 
 /**
@@ -370,65 +286,78 @@ private fun PendingPhotoDisplaySection(
     onDeletePhoto: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    PhotoPreview(
+        model = pendingPhotoUri,
+        caption = stringResource(R.string.text_photo_will_be_saved),
+        onViewPhoto = onViewPhoto,
+        onReplacePhoto = onReplacePhoto,
+        onDeletePhoto = onDeletePhoto,
+        modifier = modifier
+    )
+}
+
+/**
+ * 16:9 preview, tap to view full-screen, with the three photo actions as text
+ * buttons on the ledger line below.
+ */
+@Composable
+private fun PhotoPreview(
+    model: Any,
+    caption: String? = null,
+    onViewPhoto: () -> Unit,
+    onReplacePhoto: () -> Unit,
+    onDeletePhoto: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
 
     Column(modifier = modifier) {
-        // Photo display
-        Card(
+        AsyncImage(
+            model = ImageRequest.Builder(context)
+                .data(model)
+                .crossfade(true)
+                .build(),
+            contentDescription = stringResource(R.string.cd_bean_photo),
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(16f / 9f)
-                .clickable { onViewPhoto() },
-            shape = RoundedCornerShape(spacing.cornerMedium),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
-        ) {
-            AsyncImage(
-                model = ImageRequest.Builder(context)
-                    .data(pendingPhotoUri)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = stringResource(R.string.cd_bean_photo),
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                .clip(MaterialTheme.shapes.small)
+                .clickable(onClick = onViewPhoto),
+            contentScale = ContentScale.Crop
+        )
+
+        caption?.let {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = spacing.small)
             )
         }
 
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Pending indicator
-        Text(
-            text = stringResource(R.string.text_photo_will_be_saved),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = spacing.small)
-        )
-
-        // Action buttons
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.small)
+            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.text_view_short),
-                onClick = onViewPhoto,
-                icon = Icons.Default.Image,
-                modifier = Modifier.weight(1f)
-            )
-
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.text_replace_short),
-                onClick = onReplacePhoto,
-                icon = Icons.Default.Edit,
-                modifier = Modifier.weight(1f)
-            )
-
-            CoffeeSecondaryButton(
-                text = stringResource(R.string.text_delete_short),
-                onClick = onDeletePhoto,
-                icon = Icons.Default.Delete,
-                modifier = Modifier.weight(1f)
-            )
+            TextButton(onClick = onViewPhoto) {
+                Text(
+                    text = stringResource(R.string.text_view_short),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            TextButton(onClick = onReplacePhoto) {
+                Text(
+                    text = stringResource(R.string.text_replace_short),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            TextButton(onClick = onDeletePhoto) {
+                Text(
+                    text = stringResource(R.string.text_delete_short),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         }
     }
 }
@@ -441,58 +370,18 @@ private fun PhotoEmptyState(
     onAddPhoto: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalSpacing.current
-
-    Column(
+    OutlinedButton(
+        onClick = onAddPhoto,
         modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        shape = MaterialTheme.shapes.small
     ) {
-        // Empty photo placeholder
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .clickable { onAddPhoto() },
-            shape = RoundedCornerShape(spacing.cornerMedium),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.cd_add_photo),
-                        modifier = Modifier.size(spacing.iconLarge),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Spacer(modifier = Modifier.height(spacing.small))
-
-                    Text(
-                        text = stringResource(R.string.text_no_photo),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Add photo button
-        CoffeePrimaryButton(
-            text = stringResource(R.string.text_add_photo),
-            onClick = onAddPhoto,
-            icon = Icons.Default.CameraAlt
+        Icon(
+            imageVector = Icons.Default.PhotoCamera,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
         )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = stringResource(R.string.text_add_photo))
     }
 }
 
@@ -561,6 +450,10 @@ fun PhotoActionSheet(
 
             Spacer(modifier = Modifier.height(spacing.small))
 
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
+            Spacer(modifier = Modifier.height(spacing.small))
+
             // Gallery option
             when {
                 !storagePermissionGranted -> {
@@ -591,7 +484,7 @@ fun PhotoActionSheet(
  */
 @Composable
 private fun PhotoActionItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: String,
     onClick: () -> Unit,
     subtitle: String? = null,
@@ -599,45 +492,37 @@ private fun PhotoActionItem(
 ) {
     val spacing = LocalSpacing.current
 
-    Card(
+    Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(spacing.cornerMedium),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            .heightIn(min = 56.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = spacing.small),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacing.medium),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.size(spacing.iconMedium)
+        )
+
+        Column(
+            modifier = Modifier.weight(1f)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(spacing.iconMedium)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            subtitle?.let { sub ->
                 Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurface
+                    text = sub,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-
-                subtitle?.let { sub ->
-                    Text(
-                        text = sub,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
             }
         }
     }
@@ -648,49 +533,42 @@ private fun PhotoActionItem(
  */
 @Composable
 private fun PhotoActionItemDisabled(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     title: String,
     subtitle: String,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(spacing.cornerMedium),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-        )
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .padding(horizontal = spacing.small),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacing.medium),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(spacing.iconMedium)
+        )
+
+        Column(
+            modifier = Modifier.weight(1f)
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                modifier = Modifier.size(spacing.iconMedium)
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                )
-
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                )
-            }
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
@@ -775,92 +653,34 @@ private fun PhotoDeleteDialog(
 }
 
 /**
- * Renders the photo [Card] wrapping a Coil [AsyncImage] at the given [size],
- * with the shared shape/elevation/click-to-open-viewer wiring. Caller is
- * responsible for the no-photo branch — this helper does not handle null
- * [photoPath] (extracted so [BeanPhotoThumbnail] and [BeanPhotoThumbnailLarge]
- * do not duplicate the Coil/Clickable logic).
+ * Square [AsyncImage] thumbnail, cropped, clipped to the app's square corner,
+ * optionally opening the photo viewer. No card, no elevation, no placeholder —
+ * the caller decides whether a row carries a photo at all.
  */
 @Composable
-private fun BeanPhotoCard(
+fun BeanPhotoThumbnail(
     photoPath: String,
     size: Dp,
-    onPhotoClick: (() -> Unit)? = null,
+    onPhotoClick: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalSpacing.current
     val context = LocalContext.current
-    Card(
+    AsyncImage(
+        model = ImageRequest.Builder(context)
+            .data(File(photoPath))
+            .crossfade(true)
+            .build(),
+        contentDescription = stringResource(R.string.cd_bean_photo_thumbnail),
         modifier = modifier
             .size(size)
+            .clip(MaterialTheme.shapes.small)
             .then(
                 if (onPhotoClick != null) {
-                    Modifier.clickable { onPhotoClick() }
+                    Modifier.clickable(onClick = onPhotoClick)
                 } else {
                     Modifier
                 }
             ),
-        shape = RoundedCornerShape(spacing.cornerSmall),
-        elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard)
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(context)
-                .data(File(photoPath))
-                .crossfade(true)
-                .build(),
-            contentDescription = stringResource(R.string.cd_bean_photo_thumbnail),
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-    }
-}
-
-/**
- * Small photo thumbnail (48dp) for bean list items. Renders a transparent
- * same-sized [Box] when [photoPath] is null so row height stays consistent.
- */
-@Composable
-fun BeanPhotoThumbnail(
-    photoPath: String?,
-    onPhotoClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    if (photoPath != null) {
-        BeanPhotoCard(
-            photoPath = photoPath,
-            size = spacing.thumbnailSize,
-            onPhotoClick = onPhotoClick,
-            modifier = modifier
-        )
-    } else {
-        // Empty placeholder for consistent spacing
-        Box(
-            modifier = modifier.size(spacing.thumbnailSize)
-        )
-    }
-}
-
-/**
- * Hero photo (64dp, `spacing.photoSizeLarge`) for the S1 bean card header.
- * Renders **nothing** when [photoPath] is null — no spacer Box — so the meta
- * column reflows naturally to the card edge (Q5 resolution: no padding
- * arithmetic). The caller decides the no-photo treatment (e.g. an inline
- * bean icon before the name).
- */
-@Composable
-fun BeanPhotoThumbnailLarge(
-    photoPath: String?,
-    onPhotoClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    if (photoPath != null) {
-        BeanPhotoCard(
-            photoPath = photoPath,
-            size = spacing.photoSizeLarge,
-            onPhotoClick = onPhotoClick,
-            modifier = modifier
-        )
-    }
+        contentScale = ContentScale.Crop
+    )
 }

@@ -8,7 +8,6 @@ import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase
-import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.ui.util.BeanStatus
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.calculateBeanStatus
@@ -33,7 +32,6 @@ import javax.inject.Inject
 class BeanManagementViewModel @Inject constructor(
     private val getActiveBeansUseCase: GetActiveBeansUseCase,
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase,
-    private val updateBeanUseCase: UpdateBeanUseCase,
     private val beanRepository: BeanRepository,
     private val shotRepository: ShotRepository,
     private val qualityAnalysisUseCase: GetShotQualityAnalysisUseCase,
@@ -177,40 +175,6 @@ class BeanManagementViewModel @Inject constructor(
         _showInactive.value = !_showInactive.value
     }
 
-    fun deleteBean(beanId: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            val result = updateBeanUseCase.updateActiveStatus(beanId, false)
-            if (result.isSuccess) {
-                // Refresh the bean list
-                loadFilteredBeans(_searchQuery.value, _showInactive.value)
-            } else {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = domainErrorTranslator.translateResultError(result)
-                )
-            }
-        }
-    }
-
-    fun reactivateBean(beanId: String) {
-        viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            val result = updateBeanUseCase.updateActiveStatus(beanId, true)
-            if (result.isSuccess) {
-                // Refresh the bean list
-                loadFilteredBeans(_searchQuery.value, _showInactive.value)
-            } else {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = domainErrorTranslator.translateResultError(result)
-                )
-            }
-        }
-    }
-
     fun clearError() {
         _uiState.value = _uiState.value.copy(error = null)
     }
@@ -284,23 +248,17 @@ class BeanManagementViewModel @Inject constructor(
     /**
      * Set a bean as the current active bean for shot recording.
      * Implements requirement 3.2 for connecting bean selection between screens.
+     * Silent on success: tapping a row just moves the ink bar, no loading state.
      */
     fun setCurrentBean(beanId: String) {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
-
-            // Set the bean as current in the repository
             val result = beanRepository.setCurrentBean(beanId)
 
             if (result.isSuccess) {
                 // Update UI state to reflect the current bean selection
-                _uiState.value = _uiState.value.copy(
-                    currentBeanId = beanId,
-                    isLoading = false
-                )
+                _uiState.value = _uiState.value.copy(currentBeanId = beanId)
             } else {
                 _uiState.value = _uiState.value.copy(
-                    isLoading = false,
                     error = domainErrorTranslator.translateResultError(result)
                 )
             }
@@ -323,13 +281,11 @@ private data class BeanStatistics(
  */
 data class BeanManagementUiState(
     val beans: List<Bean> = emptyList(),
-    val beansWithFreshness: List<com.jodli.coffeeshottimer.domain.usecase.BeanWithFreshness> = emptyList(),
     val beanStatuses: Map<String, BeanStatus> = emptyMap(),
     val beanShotCounts: Map<String, Int> = emptyMap(),
     val beanLastUsed: Map<String, LocalDateTime?> = emptyMap(),
     val beanGrinderSettings: Map<String, String?> = emptyMap(),
     val currentBeanId: String? = null,
-    val hasActiveBeans: Boolean = true,
     val isLoading: Boolean = false,
     val error: String? = null
 )

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,26 +19,22 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Badge
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -47,40 +44,49 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
-import com.jodli.coffeeshottimer.ui.components.BeanPhotoThumbnailLarge
-import com.jodli.coffeeshottimer.ui.components.CoffeeCard
-import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.BeanPhotoThumbnail
+import com.jodli.coffeeshottimer.ui.components.BeanStatusMark
 import com.jodli.coffeeshottimer.ui.components.CoffeeTextField
 import com.jodli.coffeeshottimer.ui.components.EmptyState
 import com.jodli.coffeeshottimer.ui.components.ErrorState
-import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.components.PhotoViewer
+import com.jodli.coffeeshottimer.ui.components.SquareSegmentedSwitch
+import com.jodli.coffeeshottimer.ui.components.ink
+import com.jodli.coffeeshottimer.ui.components.labelRes
+import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
+import com.jodli.coffeeshottimer.ui.util.BeanStatus
 import com.jodli.coffeeshottimer.ui.util.formatLastUsed
+import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementUiState
 import com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementViewModel
+import java.time.LocalDateTime
 
-/**
- * Freshness badge tier thresholds (in days since roast) — see [BeanBadgesRow].
- * Mirrors the S1 spec: <4 = Too Fresh (warning), ≤45 = Fresh, ≤90 = OK, else Stale.
- */
-private const val FRESHNESS_TOO_FRESH_MAX_DAYS = 4
-private const val FRESHNESS_FRESH_MAX_DAYS = 45
-private const val FRESHNESS_OK_MAX_DAYS = 90
+private val RowMinHeight = 72.dp
+private val RowInset = 12.dp
+private val RowVerticalPadding = 12.dp
+private val RowThumbSize = 56.dp
+private val CurrentBeanBarWidth = 3.dp
+private val EditTargetSize = 48.dp
+private val LinkArrowSize = 16.dp
+private val GridColumnSpacing = 24.dp
+private val ListBottomPadding = 88.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -93,57 +99,27 @@ fun BeanManagementScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
     val showInactive by viewModel.showInactive.collectAsStateWithLifecycle()
-    val spacing = LocalSpacing.current
 
     var showPhotoViewer by remember { mutableStateOf<String?>(null) }
 
-    LandscapeContainer(
-        modifier = Modifier.fillMaxSize(),
-        portraitContent = {
-            BeanManagementContent(
-                uiState = uiState,
-                searchQuery = searchQuery,
-                showInactive = showInactive,
-                onAddBeanClick = onAddBeanClick,
-                onSearchQueryChange = viewModel::updateSearchQuery,
-                onToggleShowInactive = viewModel::toggleShowInactive,
-                onEditBeanClick = onEditBeanClick,
-                onSelectBean = { bean ->
-                    if (bean.isActive) {
-                        viewModel.setCurrentBean(bean.id)
-                    }
-                },
-                onPhotoClick = { showPhotoViewer = it },
-                onNavigateToShotHistory = onNavigateToShotHistory,
-                onRetry = {
-                    viewModel.clearError()
-                    viewModel.refresh()
-                },
-                spacing = spacing
-            )
+    BeanManagementContent(
+        uiState = uiState,
+        searchQuery = searchQuery,
+        showInactive = showInactive,
+        onAddBeanClick = onAddBeanClick,
+        onSearchQueryChange = viewModel::updateSearchQuery,
+        onToggleShowInactive = viewModel::toggleShowInactive,
+        onEditBeanClick = onEditBeanClick,
+        onSelectBean = { bean ->
+            if (bean.isActive) {
+                viewModel.setCurrentBean(bean.id)
+            }
         },
-        landscapeContent = {
-            BeanManagementContent(
-                uiState = uiState,
-                searchQuery = searchQuery,
-                showInactive = showInactive,
-                onAddBeanClick = onAddBeanClick,
-                onSearchQueryChange = viewModel::updateSearchQuery,
-                onToggleShowInactive = viewModel::toggleShowInactive,
-                onEditBeanClick = onEditBeanClick,
-                onSelectBean = { bean ->
-                    if (bean.isActive) {
-                        viewModel.setCurrentBean(bean.id)
-                    }
-                },
-                onPhotoClick = { showPhotoViewer = it },
-                onNavigateToShotHistory = onNavigateToShotHistory,
-                onRetry = {
-                    viewModel.clearError()
-                    viewModel.refresh()
-                },
-                spacing = spacing
-            )
+        onPhotoClick = { showPhotoViewer = it },
+        onNavigateToShotHistory = onNavigateToShotHistory,
+        onRetry = {
+            viewModel.clearError()
+            viewModel.refresh()
         }
     )
 
@@ -157,9 +133,15 @@ fun BeanManagementScreen(
     }
 }
 
+/**
+ * The beans ledger: one ruled row per bean, the bag in use marked with an ink
+ * bar and a "Brewing" note, roast age as a figure, edit at the row end.
+ * Portrait and landscape share this single content pass; only the list
+ * container and the outer padding differ.
+ */
 @Composable
 private fun BeanManagementContent(
-    uiState: com.jodli.coffeeshottimer.ui.viewmodel.BeanManagementUiState,
+    uiState: BeanManagementUiState,
     searchQuery: String,
     showInactive: Boolean,
     onAddBeanClick: () -> Unit,
@@ -169,17 +151,24 @@ private fun BeanManagementContent(
     onSelectBean: (Bean) -> Unit,
     onPhotoClick: (String) -> Unit,
     onNavigateToShotHistory: (String) -> Unit,
-    onRetry: () -> Unit,
-    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing
+    onRetry: () -> Unit
 ) {
+    val spacing = LocalSpacing.current
     var showSearchDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onAddBeanClick,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                shape = MaterialTheme.shapes.small,
+                elevation = FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 0.dp,
+                    hoveredElevation = 0.dp,
+                    focusedElevation = 0.dp,
+                    pressedElevation = 0.dp
+                )
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -198,22 +187,19 @@ private fun BeanManagementContent(
                     bottom = paddingValues.calculateBottomPadding() + spacing.medium
                 )
         ) {
-            // Integrated Search and Filter Bar
             IntegratedSearchAndFilterBar(
                 searchQuery = searchQuery,
                 showInactive = showInactive,
                 onShowSearchDialog = { showSearchDialog = true },
                 onToggleShowInactive = onToggleShowInactive,
-                onClearFilters = {
-                    onSearchQueryChange("")
-                    if (showInactive) onToggleShowInactive()
-                },
-                spacing = spacing
+                onClearFilters = { onSearchQueryChange("") }
             )
 
-            Spacer(modifier = Modifier.height(spacing.medium))
+            HorizontalDivider(
+                modifier = Modifier.padding(top = spacing.small),
+                color = MaterialTheme.colorScheme.outline
+            )
 
-            // Content
             when {
                 uiState.isLoading -> {
                     Box(
@@ -227,7 +213,7 @@ private fun BeanManagementContent(
                 uiState.error != null -> {
                     ErrorState(
                         title = stringResource(R.string.error_loading_beans),
-                        message = uiState.error ?: "Unknown error occurred",
+                        message = uiState.error ?: stringResource(R.string.text_unknown_error),
                         onRetry = onRetry,
                         modifier = Modifier.fillMaxSize()
                     )
@@ -242,7 +228,11 @@ private fun BeanManagementContent(
                         } else {
                             stringResource(R.string.text_add_first_bean)
                         },
-                        actionText = if (searchQuery.isEmpty()) stringResource(R.string.text_add_bean) else null
+                        actionText = if (searchQuery.isEmpty()) {
+                            stringResource(R.string.text_add_bean)
+                        } else {
+                            null
+                        }
                     )
                 }
 
@@ -257,13 +247,11 @@ private fun BeanManagementContent(
                         onEditBeanClick = onEditBeanClick,
                         onSelectBean = onSelectBean,
                         onNavigateToShotHistory = onNavigateToShotHistory,
-                        onPhotoClick = onPhotoClick,
-                        spacing = spacing
+                        onPhotoClick = onPhotoClick
                     )
                 }
             }
 
-            // Search Dialog
             if (showSearchDialog) {
                 BeanSearchDialog(
                     currentQuery = searchQuery,
@@ -276,8 +264,8 @@ private fun BeanManagementContent(
 }
 
 /**
- * Integrated search and filter bar following ShotHistoryScreen pattern.
- * Displays search chip, Active/All segmented button, and clear button.
+ * Active|All switch left, search chip and (while searching) a clear button
+ * right — the same bar pattern as the shot history screen.
  */
 @Composable
 private fun IntegratedSearchAndFilterBar(
@@ -285,20 +273,27 @@ private fun IntegratedSearchAndFilterBar(
     showInactive: Boolean,
     onShowSearchDialog: () -> Unit,
     onToggleShowInactive: () -> Unit,
-    onClearFilters: () -> Unit,
-    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing,
-    modifier: Modifier = Modifier
+    onClearFilters: () -> Unit
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left: Search chip with badge indicator
-        Box {
+        SquareSegmentedSwitch(
+            options = listOf(
+                stringResource(R.string.text_active),
+                stringResource(R.string.text_all)
+            ),
+            selectedIndex = if (showInactive) 1 else 0,
+            onSelect = { onToggleShowInactive() }
+        )
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
             FilterChip(
                 selected = searchQuery.isNotEmpty(),
                 onClick = onShowSearchDialog,
+                shape = MaterialTheme.shapes.small,
                 label = { Text(stringResource(R.string.label_search)) },
                 leadingIcon = {
                     Icon(
@@ -309,57 +304,20 @@ private fun IntegratedSearchAndFilterBar(
                 }
             )
 
-            // Active search indicator badge
             if (searchQuery.isNotEmpty()) {
-                Badge(
-                    modifier = Modifier.align(Alignment.TopEnd)
+                IconButton(
+                    onClick = onClearFilters,
+                    modifier = Modifier.size(EditTargetSize)
                 ) {
-                    Text(stringResource(R.string.badge_recommendation_alert))
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = stringResource(R.string.button_clear_all),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
+            } else {
+                Spacer(modifier = Modifier.size(EditTargetSize))
             }
-        }
-
-        // Center: Segmented button for Active/All toggle
-        SingleChoiceSegmentedButtonRow(
-            modifier = Modifier.padding(horizontal = spacing.small)
-        ) {
-            SegmentedButton(
-                selected = !showInactive,
-                onClick = { if (showInactive) onToggleShowInactive() },
-                shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
-            ) {
-                Text(
-                    text = stringResource(R.string.text_active),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-            SegmentedButton(
-                selected = showInactive,
-                onClick = { if (!showInactive) onToggleShowInactive() },
-                shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
-            ) {
-                Text(
-                    text = stringResource(R.string.text_all),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-        }
-
-        // Right: Clear filters button (when active)
-        if (searchQuery.isNotEmpty() || showInactive) {
-            IconButton(
-                onClick = onClearFilters,
-                modifier = Modifier.size(40.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Clear,
-                    contentDescription = stringResource(R.string.button_clear_all),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-        } else {
-            // Spacer to maintain layout consistency
-            Spacer(modifier = Modifier.size(40.dp))
         }
     }
 }
@@ -424,476 +382,279 @@ private fun BeanSearchDialog(
     )
 }
 
+/** Portrait: one column. Landscape: two. Every row closes with a hairline rule. */
 @Composable
 private fun BeanList(
     beans: List<Bean>,
-    beanStatuses: Map<String, com.jodli.coffeeshottimer.ui.util.BeanStatus>,
+    beanStatuses: Map<String, BeanStatus>,
     beanShotCounts: Map<String, Int>,
-    beanLastUsed: Map<String, java.time.LocalDateTime?>,
+    beanLastUsed: Map<String, LocalDateTime?>,
     beanGrinderSettings: Map<String, String?>,
     currentBeanId: String?,
     onEditBeanClick: (String) -> Unit,
     onSelectBean: (Bean) -> Unit,
     onNavigateToShotHistory: (String) -> Unit,
-    onPhotoClick: (String) -> Unit,
-    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing
+    onPhotoClick: (String) -> Unit
 ) {
-    LandscapeContainer(
-        portraitContent = {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(spacing.small),
-                contentPadding = PaddingValues(bottom = spacing.large)
-            ) {
-                items(
-                    items = beans,
-                    key = { bean -> bean.id }
-                ) { bean ->
-                    BeanListItem(
-                        bean = bean,
-                        beanStatus = beanStatuses[bean.id]
-                            ?: com.jodli.coffeeshottimer.ui.util.BeanStatus.FRESH_START,
-                        shotCount = beanShotCounts[bean.id] ?: 0,
-                        lastUsedDate = beanLastUsed[bean.id],
-                        grinderSetting = beanGrinderSettings[bean.id],
-                        isCurrentBean = bean.id == currentBeanId,
-                        onEdit = { onEditBeanClick(bean.id) },
-                        onSelect = { onSelectBean(bean) },
-                        onViewHistory = { onNavigateToShotHistory(bean.id) },
-                        onPhotoClick = { photoPath ->
-                            onPhotoClick(photoPath)
-                        }
-                    )
-                }
-            }
-        },
-        landscapeContent = {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(spacing.small),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                contentPadding = PaddingValues(bottom = spacing.large)
-            ) {
-                items(
-                    items = beans,
-                    key = { bean -> bean.id }
-                ) { bean ->
-                    BeanListItem(
-                        bean = bean,
-                        beanStatus = beanStatuses[bean.id]
-                            ?: com.jodli.coffeeshottimer.ui.util.BeanStatus.FRESH_START,
-                        shotCount = beanShotCounts[bean.id] ?: 0,
-                        lastUsedDate = beanLastUsed[bean.id],
-                        grinderSetting = beanGrinderSettings[bean.id],
-                        isCurrentBean = bean.id == currentBeanId,
-                        onEdit = { onEditBeanClick(bean.id) },
-                        onSelect = { onSelectBean(bean) },
-                        onViewHistory = { onNavigateToShotHistory(bean.id) },
-                        onPhotoClick = { photoPath ->
-                            onPhotoClick(photoPath)
-                        }
-                    )
-                }
+    val rowFor: @Composable (Bean) -> Unit = { bean ->
+        BeanLedgerItem(
+            bean = bean,
+            beanStatus = beanStatuses[bean.id] ?: BeanStatus.FRESH_START,
+            shotCount = beanShotCounts[bean.id] ?: 0,
+            lastUsedDate = beanLastUsed[bean.id],
+            grinderSetting = beanGrinderSettings[bean.id],
+            isCurrentBean = bean.id == currentBeanId && bean.isActive,
+            onEdit = { onEditBeanClick(bean.id) },
+            onSelect = { onSelectBean(bean) },
+            onViewHistory = { onNavigateToShotHistory(bean.id) },
+            onPhotoClick = onPhotoClick
+        )
+    }
+    if (LocalIsLandscape.current) {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(GridColumnSpacing),
+            contentPadding = PaddingValues(bottom = ListBottomPadding)
+        ) {
+            items(items = beans, key = { bean -> bean.id }) { bean ->
+                rowFor(bean)
             }
         }
-    )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = ListBottomPadding)
+        ) {
+            items(items = beans, key = { bean -> bean.id }) { bean ->
+                rowFor(bean)
+            }
+        }
+    }
 }
 
-/**
- * Displays a bean item card as a photo-prominent profile.
- *
- * Layout (S1):
- *   header Row → (leading 64dp photo, or inline bean icon when no photo)
- *                 + meta Column[name, roast date, BeanBadgesRow, BeanStatsRow]
- *                 + trailing selection control
- *   ViewShotsLink (align End, gated on shotCount > 0)
- *
- * Destructive actions (delete/reactivate) live in the edit screen — the card
- * body opens it via tap.
- *
- * @param bean The bean to display
- * @param beanStatus Calculated quality status (DIALED_IN, EXPERIMENTING, etc.)
- * @param shotCount Number of shots recorded with this bean
- * @param lastUsedDate Last date the bean was used for a shot
- * @param grinderSetting Most-recent grinder setting for the bean (null/blank → "Not set")
- * @param isCurrentBean Whether this is the currently selected/active bean
- * @param onEdit Callback when user wants to edit the bean
- * @param onSelect Callback when user selects this bean for shots
- * @param onViewHistory Callback to navigate to shot history filtered by this bean
- * @param onPhotoClick Callback when user clicks the bean photo
- */
+/** Row plus its closing hairline rule. */
 @Composable
-private fun BeanListItem(
+private fun BeanLedgerItem(
     bean: Bean,
-    beanStatus: com.jodli.coffeeshottimer.ui.util.BeanStatus,
+    beanStatus: BeanStatus,
     shotCount: Int,
-    lastUsedDate: java.time.LocalDateTime?,
+    lastUsedDate: LocalDateTime?,
     grinderSetting: String?,
     isCurrentBean: Boolean,
     onEdit: () -> Unit,
     onSelect: () -> Unit,
     onViewHistory: () -> Unit,
-    onPhotoClick: ((String) -> Unit)? = null,
-    modifier: Modifier = Modifier
+    onPhotoClick: ((String) -> Unit)?
 ) {
-    val spacing = LocalSpacing.current
-    val daysSinceRoast = bean.daysSinceRoast().toInt()
-    val isFresh = bean.isFresh()
-
-    CoffeeCard(
-        modifier = modifier,
-        onClick = onEdit
-    ) {
-        // Header Row: leading photo (omitted when no photo — Q5: the meta Column
-        // then reflows to the card edge naturally, no padding arithmetic) +
-        // weighted meta Column + trailing selection control.
-        Row(
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            // Leading 64dp hero photo — only when a photo exists. Renders nothing
-            // (no spacer Box) when photoPath is null, so the Row collapses.
-            if (bean.hasPhoto()) {
-                BeanPhotoThumbnailLarge(
-                    photoPath = bean.photoPath,
-                    onPhotoClick = if (onPhotoClick != null) {
-                        { onPhotoClick(bean.photoPath!!) }
-                    } else {
-                        null
-                    }
-                )
-            }
-
-            // Meta Column: name (+ inline bean icon when no photo) → roast date →
-            // BeanBadgesRow → BeanStatsRow. All content inherits the same start
-            // indent from the photo's presence/absence (Q5 — no padding arithmetic).
-            Column(modifier = Modifier.weight(1f)) {
-                if (bean.hasPhoto()) {
-                    Text(
-                        text = bean.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                } else {
-                    // No photo → small bean icon inline before the name.
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(spacing.iconSmall)
-                        )
-                        Text(
-                            text = bean.name,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                // Roast date text (formerly the leading text of RoastFreshnessIndicator).
-                // The freshness *pill* is now a text badge inside BeanBadgesRow below.
-                Text(
-                    text = stringResource(R.string.format_roasted_days_ago, daysSinceRoast),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (isFresh) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                BeanBadgesRow(bean = bean, beanStatus = beanStatus)
-
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                BeanStatsRow(
-                    grinderSetting = grinderSetting,
-                    shotCount = shotCount,
-                    lastUsedDate = lastUsedDate
-                )
-            }
-
-            // Trailing selection control (header slot)
-            when {
-                bean.isActive && isCurrentBean -> SelectedBadge()
-                bean.isActive && !isCurrentBean -> CoffeeSecondaryButton(
-                    text = stringResource(R.string.bean_select_button),
-                    onClick = onSelect,
-                    fillMaxWidth = false
-                )
-            }
-        }
-
-        // View shots link — gated on shotCount > 0, re-aligned to the card end
-        // (Q5: under the meta column, right-aligned). Kept as its own clickable
-        // target with cd_view_shot_history semantics.
-        if (shotCount > 0) {
-            Spacer(modifier = Modifier.height(spacing.small))
-            ViewShotsLink(
-                shotCount = shotCount,
-                onViewHistory = onViewHistory,
-                spacing = spacing,
-                modifier = Modifier.align(Alignment.End)
-            )
-        }
+    Column {
+        BeanLedgerRow(
+            bean = bean,
+            beanStatus = beanStatus,
+            shotCount = shotCount,
+            lastUsedDate = lastUsedDate,
+            grinderSetting = grinderSetting,
+            isCurrentBean = isCurrentBean,
+            onEdit = onEdit,
+            onSelect = onSelect,
+            onViewHistory = onViewHistory,
+            onPhotoClick = onPhotoClick
+        )
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 
 /**
- * Compact "Selected" badge for the header slot of the currently-selected bean.
- * Surface(primaryContainer) + Check + label, content colored onPrimaryContainer
- * (fixes the prior primary-content inconsistency flagged in research §4).
+ * One bean as a ledger line. Tapping the row selects the bean for Record Shot
+ * (inactive beans open the edit form instead); the photo thumbnail and the
+ * "N shots" link keep their own click targets. The currently-brewing bean is
+ * marked with a 3dp ink bar on the leading edge and a note in the status line.
  */
 @Composable
-private fun SelectedBadge(modifier: Modifier = Modifier) {
+private fun BeanLedgerRow(
+    bean: Bean,
+    beanStatus: BeanStatus,
+    shotCount: Int,
+    lastUsedDate: LocalDateTime?,
+    grinderSetting: String?,
+    isCurrentBean: Boolean,
+    onEdit: () -> Unit,
+    onSelect: () -> Unit,
+    onViewHistory: () -> Unit,
+    onPhotoClick: ((String) -> Unit)?,
+    modifier: Modifier = Modifier
+) {
     val spacing = LocalSpacing.current
-    Surface(
-        color = MaterialTheme.colorScheme.primaryContainer,
-        shape = RoundedCornerShape(spacing.cornerSmall),
+    val daysSinceRoast = bean.daysSinceRoast()
+    val freshness = bean.roastFreshness()
+    val roastAgeDescription = stringResource(
+        R.string.cd_roast_age,
+        daysSinceRoast,
+        stringResource(freshness.labelRes())
+    )
+    val barColor = MaterialTheme.colorScheme.onSurface
+
+    Row(
         modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier.padding(
-                horizontal = spacing.small,
-                vertical = spacing.extraSmall
+            .heightIn(min = RowMinHeight)
+            .fillMaxWidth()
+            .drawBehind {
+                if (isCurrentBean) {
+                    drawRect(
+                        color = barColor,
+                        topLeft = Offset.Zero,
+                        size = Size(CurrentBeanBarWidth.toPx(), size.height)
+                    )
+                }
+            }
+            .clickable(
+                onClickLabel = stringResource(
+                    if (bean.isActive) R.string.bean_select_button else R.string.cd_edit_bean
+                ),
+                onClick = { if (bean.isActive) onSelect() else onEdit() }
+            )
+            .padding(
+                start = RowInset,
+                top = RowVerticalPadding,
+                bottom = RowVerticalPadding
             ),
-            horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall),
-            verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        bean.photoPath?.takeIf { it.isNotBlank() }?.let { photoPath ->
+            BeanPhotoThumbnail(
+                photoPath = photoPath,
+                size = RowThumbSize,
+                onPhotoClick = onPhotoClick?.let { callback -> { callback(photoPath) } }
+            )
+            Spacer(modifier = Modifier.width(RowInset))
+        }
+
+        Column(modifier = Modifier.weight(1f)) {
+            BeanRowDetails(
+                bean = bean,
+                beanStatus = beanStatus,
+                shotCount = shotCount,
+                lastUsedDate = lastUsedDate,
+                grinderSetting = grinderSetting,
+                isCurrentBean = isCurrentBean,
+                onViewHistory = onViewHistory
+            )
+        }
+
+        Column(
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier
+                .semantics { contentDescription = roastAgeDescription }
         ) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(spacing.iconSmall)
+            Text(
+                text = stringResource(R.string.format_roast_age_days, daysSinceRoast),
+                style = MaterialTheme.typography.titleMedium,
+                color = freshness.ink(),
+                maxLines = 1
             )
             Text(
-                text = stringResource(R.string.bean_selected_badge),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                text = stringResource(R.string.label_roast),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        IconButton(onClick = onEdit, modifier = Modifier.size(EditTargetSize)) {
+            Icon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = stringResource(R.string.cd_edit_bean),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
 }
 
 /**
- * Reusable small-label badge following the prevailing pill recipe (research §4):
- * Surface(container, cornerSmall) wrapping a labelSmall Text with tight vertical
- * padding (extraSmall/2) and horizontal small padding.
+ * The row's middle column: name, grind/last-used line, then the status mark
+ * with the "Brewing" note for the bean in use and the shots link at the end.
  */
 @Composable
-private fun StatusBadge(
-    text: String,
-    containerColor: Color,
-    contentColor: Color,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    Surface(
-        color = containerColor,
-        shape = RoundedCornerShape(spacing.cornerSmall),
-        modifier = modifier
-    ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = contentColor,
-            modifier = Modifier.padding(
-                horizontal = spacing.small,
-                vertical = spacing.extraSmall / 2
-            )
-        )
-    }
-}
-
-/**
- * Freshness + bean-status text badges. Replaces the old colored status dot
- * (GrinderSettingWithStatus) and the roast-freshness pill (RoastFreshnessIndicator)
- * with self-describing text badges. Container/content colors come from colorScheme
- * pairs so the label stays readable; the 1:1 semantic mapping follows getStatusColor.
- *
- * Freshness tiers (by daysSinceRoast):
- *   <4   → text_too_fresh  / errorContainer    (warning — beans too green)
- *   ≤45  → text_fresh      / primaryContainer  (peak window)
- *   ≤90  → text_ok_freshness / secondaryContainer (still usable)
- *   else → text_stale      / surfaceVariant    (past peak)
- *
- * Status mapping:
- *   DIALED_IN     → primaryContainer
- *   EXPERIMENTING → tertiaryContainer
- *   NEEDS_WORK    → errorContainer
- *   FRESH_START   → surfaceVariant
- */
-@Composable
-private fun BeanBadgesRow(
+private fun BeanRowDetails(
     bean: Bean,
-    beanStatus: com.jodli.coffeeshottimer.ui.util.BeanStatus,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val colorScheme = MaterialTheme.colorScheme
-    val daysSinceRoast = bean.daysSinceRoast().toInt()
-
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(spacing.small),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Freshness badge — always rendered (Bean.roastDate is non-nullable).
-        val freshnessLabel = when {
-            daysSinceRoast < FRESHNESS_TOO_FRESH_MAX_DAYS -> stringResource(R.string.text_too_fresh)
-            daysSinceRoast <= FRESHNESS_FRESH_MAX_DAYS -> stringResource(R.string.text_fresh)
-            daysSinceRoast <= FRESHNESS_OK_MAX_DAYS -> stringResource(R.string.text_ok_freshness)
-            else -> stringResource(R.string.text_stale)
-        }
-        val (freshnessContainer, freshnessContent) = when {
-            daysSinceRoast < FRESHNESS_TOO_FRESH_MAX_DAYS ->
-                colorScheme.errorContainer to colorScheme.onErrorContainer
-            daysSinceRoast <= FRESHNESS_FRESH_MAX_DAYS ->
-                colorScheme.primaryContainer to colorScheme.onPrimaryContainer
-            daysSinceRoast <= FRESHNESS_OK_MAX_DAYS ->
-                colorScheme.secondaryContainer to colorScheme.onSecondaryContainer
-            else ->
-                colorScheme.surfaceVariant to colorScheme.onSurfaceVariant
-        }
-        StatusBadge(
-            text = freshnessLabel,
-            containerColor = freshnessContainer,
-            contentColor = freshnessContent
-        )
-
-        // Status badge — always rendered.
-        val statusLabel = when (beanStatus) {
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.DIALED_IN ->
-                stringResource(R.string.bean_status_dialed_in_short)
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.EXPERIMENTING ->
-                stringResource(R.string.bean_status_experimenting_short)
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.NEEDS_WORK ->
-                stringResource(R.string.bean_status_needs_work_short)
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.FRESH_START ->
-                stringResource(R.string.bean_status_fresh_start_short)
-        }
-        val (statusContainer, statusContent) = when (beanStatus) {
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.DIALED_IN ->
-                colorScheme.primaryContainer to colorScheme.onPrimaryContainer
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.EXPERIMENTING ->
-                colorScheme.tertiaryContainer to colorScheme.onTertiaryContainer
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.NEEDS_WORK ->
-                colorScheme.errorContainer to colorScheme.onErrorContainer
-            com.jodli.coffeeshottimer.ui.util.BeanStatus.FRESH_START ->
-                colorScheme.surfaceVariant to colorScheme.onSurfaceVariant
-        }
-        StatusBadge(
-            text = statusLabel,
-            containerColor = statusContainer,
-            contentColor = statusContent
-        )
-    }
-}
-
-/**
- * Compact one-row stats: `grinder · shots · last used`.
- * Replaces the old GrinderSettingWithStatus + BeanStatistics pair with a single
- * bodySmall/onSurfaceVariant row aligned with the rest of the meta Column
- * (Q5 — lives inside the header Row's weighted Column, so it inherits the
- * same start indent as name/badges without padding arithmetic).
- *
- * Grinder falls back to `bean_grinder_not_set` when null/blank; shot count
- * switches `bean_shot_count` ↔ `bean_no_shots` at zero; last-used goes through
- * `formatLastUsed` (which itself falls back to `bean_last_used_never`).
- */
-@Composable
-private fun BeanStatsRow(
+    beanStatus: BeanStatus,
+    shotCount: Int,
+    lastUsedDate: LocalDateTime?,
     grinderSetting: String?,
-    shotCount: Int,
-    lastUsedDate: java.time.LocalDateTime?,
-    modifier: Modifier = Modifier
+    isCurrentBean: Boolean,
+    onViewHistory: () -> Unit
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
-    val statsStyle = MaterialTheme.typography.bodySmall
-    val statsColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val grindText = grinderSetting?.takeIf { it.isNotBlank() }
+        ?.let { stringResource(R.string.format_grind_inline, it) }
+    val metaLine = listOfNotNull(
+        grindText,
+        formatLastUsed(lastUsedDate, context)
+    ).joinToString(" · ")
 
-    Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(spacing.small),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
     ) {
         Text(
-            text = grinderSetting?.takeIf { it.isNotBlank() }
-                ?: stringResource(R.string.bean_grinder_not_set),
-            style = statsStyle,
-            color = statsColor
-        )
-        Text(
-            text = "·",
-            style = statsStyle,
-            color = statsColor
-        )
-        Text(
-            text = if (shotCount > 0) {
-                stringResource(R.string.bean_shot_count, shotCount)
+            text = bean.name,
+            style = MaterialTheme.typography.titleMedium,
+            color = if (bean.isActive) {
+                MaterialTheme.colorScheme.onSurface
             } else {
-                stringResource(R.string.bean_no_shots)
+                MaterialTheme.colorScheme.onSurfaceVariant
             },
-            style = statsStyle,
-            color = statsColor
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Text(
-            text = "·",
-            style = statsStyle,
-            color = statsColor
+            text = metaLine,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
-        Text(
-            text = formatLastUsed(lastUsedDate, context),
-            style = statsStyle,
-            color = statsColor
-        )
-    }
-}
-
-@Composable
-private fun ViewShotsLink(
-    shotCount: Int,
-    onViewHistory: () -> Unit,
-    spacing: com.jodli.coffeeshottimer.ui.theme.Spacing,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .clickable(onClick = onViewHistory)
-            .semantics {
-                contentDescription = context.getString(R.string.cd_view_shot_history)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            BeanStatusMark(status = beanStatus, isActive = bean.isActive)
+            if (isCurrentBean) {
+                Text(
+                    text = " · " + stringResource(R.string.label_brewing),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.zoneColors.idealInk
+                )
             }
-    ) {
-        Text(
-            text = stringResource(R.string.bean_view_shots, shotCount),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.Medium
-            ),
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.width(spacing.extraSmall))
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = null,
-            modifier = Modifier.size(16.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
+            Spacer(modifier = Modifier.weight(1f))
+            if (shotCount > 0) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .heightIn(min = EditTargetSize)
+                        .clickable(onClick = onViewHistory)
+                        .semantics {
+                            contentDescription =
+                                context.getString(R.string.cd_view_shot_history)
+                        }
+                ) {
+                    Text(
+                        text = stringResource(R.string.bean_shot_count, shotCount),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.width(spacing.extraSmall))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier.size(LinkArrowSize),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                Text(
+                    text = stringResource(R.string.bean_no_shots),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
     }
 }

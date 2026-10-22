@@ -5,8 +5,8 @@ import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.GetActiveBeansUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetBeanHistoryUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase
-import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +33,6 @@ class BeanManagementViewModelTest {
 
     private val getActiveBeansUseCase: GetActiveBeansUseCase = mockk()
     private val getBeanHistoryUseCase: GetBeanHistoryUseCase = mockk()
-    private val updateBeanUseCase: UpdateBeanUseCase = mockk(relaxed = true)
     private val beanRepository: BeanRepository = mockk(relaxed = true)
     private val shotRepository: ShotRepository = mockk(relaxed = true)
     private val qualityAnalysisUseCase: GetShotQualityAnalysisUseCase = mockk(relaxed = true)
@@ -55,7 +54,6 @@ class BeanManagementViewModelTest {
         viewModel = BeanManagementViewModel(
             getActiveBeansUseCase,
             getBeanHistoryUseCase,
-            updateBeanUseCase,
             beanRepository,
             shotRepository,
             qualityAnalysisUseCase,
@@ -75,7 +73,6 @@ class BeanManagementViewModelTest {
         assertTrue(initialState.beans.isEmpty())
         assertFalse(initialState.isLoading)
         assertEquals(null, initialState.error)
-        assertTrue(initialState.hasActiveBeans)
     }
 
     @Test
@@ -98,6 +95,17 @@ class BeanManagementViewModelTest {
         viewModel.toggleShowInactive()
 
         assertFalse(viewModel.showInactive.value)
+    }
+
+    @Test
+    fun `setCurrentBean selects the bean without a loading state`() = runTest(testDispatcher) {
+        val beanId = "bean-1"
+        coEvery { beanRepository.setCurrentBean(beanId) } returns Result.success(Unit)
+
+        viewModel.setCurrentBean(beanId)
+
+        assertEquals(beanId, viewModel.uiState.value.currentBeanId)
+        assertFalse(viewModel.uiState.value.isLoading)
     }
 
     @Test

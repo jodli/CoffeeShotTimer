@@ -80,12 +80,14 @@
     <string name="text_stop_timer">Timer stoppen</string>
     <string name="text_start_timer">Timer starten</string>
     <string name="text_fresh">Frisch</string>
-    <string name="text_too_fresh">Zu frisch</string>
-    <string name="text_stale">Alt</string>
-    <string name="text_ok_freshness">OK</string>
     <string name="freshness_resting">Ruht noch</string>
     <string name="freshness_past">Nach dem Optimum</string>
     <string name="label_bean_finished">Aufgebraucht</string>
+    <string name="label_brewing">Im Einsatz</string>
+    <string name="format_roast_age_days">%1$d T</string>
+    <string name="label_roast">Röstung</string>
+    <string name="label_bean_details">Details</string>
+    <string name="cd_roast_age">%1$d Tage seit Röstung, %2$s</string>
     <string name="text_strong_extraction">Starke Extraktion</string>
     <string name="text_weak_extraction">Schwache Extraktion</string>
     <string name="text_typical_extraction">Typischer Espresso-Bereich</string>
@@ -93,11 +95,8 @@
 
     <!-- Bean Management -->
     <string name="bean_select_button">Auswählen</string>
-    <string name="bean_selected_badge">Ausgewählt</string>
-    <string name="bean_grinder_not_set">Nicht gesetzt</string>
     <string name="bean_shot_count">%d Shots</string>
     <string name="bean_no_shots">Noch keine Shots</string>
-    <string name="bean_view_shots">%d Shots ansehen</string>
     
     <!-- Bean Status Tooltips -->
     <string name="bean_status_dialed_in">Eingestellt - Konsistente Ergebnisse</string>
@@ -427,7 +426,6 @@
     <string name="text_take_photo">Foto aufnehmen</string>
     <string name="text_choose_from_gallery">Aus Galerie wählen</string>
     <string name="text_photo_options">Foto-Optionen</string>
-    <string name="text_no_photo">Kein Foto hinzugefügt</string>
     <string name="text_loading_photo">Lade Foto…</string>
     <string name="text_photo_saved">Foto erfolgreich gespeichert</string>
     <string name="text_photo_deleted">Foto erfolgreich gelöscht</string>
@@ -443,7 +441,6 @@
 
     <!-- Photo Content Descriptions -->
     <string name="cd_bean_photo">Bohnenfoto</string>
-    <string name="cd_add_photo">Foto hinzufügen</string>
     <string name="cd_close_photo_viewer">Foto-Betrachter schließen</string>
     <string name="cd_bean_photo_thumbnail">Bohnen Foto</string>
     <string name="cd_dismiss_success">Erfolgsmeldung schließen</string>
@@ -517,7 +514,6 @@
 
     <!-- Format Strings -->
     <string name="format_days_since_roast">%1$d Tage seit Röstung</string>
-    <string name="format_roasted_days_ago">Geröstet: vor %1$d Tagen</string>
     <string name="format_last_grind">Letzter Mahlgrad: %1$s</string>
     <string name="format_quality_score">%1$d/100</string>
     <string name="format_days">%1$d Tage</string>
@@ -849,7 +845,6 @@
     <string name="text_suggested_grinder_setting">Vorschlag: %1$s</string>
     
     <!-- Badge and Display Values -->
-    <string name="badge_recommendation_alert">!</string>
     <string name="display_grinder_setting_empty">--</string>
 
     <!-- Quality Score Breakdown -->
