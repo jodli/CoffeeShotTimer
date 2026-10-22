@@ -187,8 +187,6 @@ fun AddEditBeanScreen(
     onSubmit: ((Bean) -> Unit)? = null
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val spacing = LocalSpacing.current
-    val context = LocalContext.current
     val launchers = rememberBeanPhotoLaunchers(viewModel)
     val dialogs = rememberBeanEditorDialogs()
 

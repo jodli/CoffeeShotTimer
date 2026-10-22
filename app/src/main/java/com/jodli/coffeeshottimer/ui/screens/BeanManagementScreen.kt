@@ -484,7 +484,6 @@ private fun BeanLedgerRow(
     onPhotoClick: ((String) -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalSpacing.current
     val daysSinceRoast = bean.daysSinceRoast()
     val freshness = bean.roastFreshness()
     val roastAgeDescription = stringResource(
@@ -529,17 +528,16 @@ private fun BeanLedgerRow(
             Spacer(modifier = Modifier.width(RowInset))
         }
 
-        Column(modifier = Modifier.weight(1f)) {
-            BeanRowDetails(
-                bean = bean,
-                beanStatus = beanStatus,
-                shotCount = shotCount,
-                lastUsedDate = lastUsedDate,
-                grinderSetting = grinderSetting,
-                isCurrentBean = isCurrentBean,
-                onViewHistory = onViewHistory
-            )
-        }
+        BeanRowDetails(
+            bean = bean,
+            beanStatus = beanStatus,
+            shotCount = shotCount,
+            lastUsedDate = lastUsedDate,
+            grinderSetting = grinderSetting,
+            isCurrentBean = isCurrentBean,
+            onViewHistory = onViewHistory,
+            modifier = Modifier.weight(1f)
+        )
 
         Column(
             horizontalAlignment = Alignment.End,
@@ -581,7 +579,8 @@ private fun BeanRowDetails(
     lastUsedDate: LocalDateTime?,
     grinderSetting: String?,
     isCurrentBean: Boolean,
-    onViewHistory: () -> Unit
+    onViewHistory: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
     val context = LocalContext.current
@@ -593,7 +592,7 @@ private fun BeanRowDetails(
     ).joinToString(" · ")
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
     ) {
         Text(
