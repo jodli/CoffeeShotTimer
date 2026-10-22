@@ -6,6 +6,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
+/** Where a bean sits relative to the fresh window (4-21 days after roast). */
+enum class RoastFreshness { RESTING, FRESH, PAST }
+
 /**
  * Bean entity representing a coffee bean profile in the database.
  * Stores information about coffee beans including name, roast date, and grinder settings.
@@ -35,6 +38,18 @@ data class Bean(
     val photoPath: String? = null,
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) {
+    companion object {
+        const val FRESH_MIN_DAYS = 4L
+        const val FRESH_MAX_DAYS = 21L
+
+        /** Classifies a day count against the fresh window. */
+        fun freshnessForDays(days: Long): RoastFreshness = when {
+            days < FRESH_MIN_DAYS -> RoastFreshness.RESTING
+            days <= FRESH_MAX_DAYS -> RoastFreshness.FRESH
+            else -> RoastFreshness.PAST
+        }
+    }
+
     /**
      * Validates the bean data according to business rules.
      * @return ValidationResult indicating if the bean is valid and any error messages
@@ -85,14 +100,17 @@ data class Bean(
     }
 
     /**
+     * Classifies the bean relative to the fresh window.
+     * @return RESTING before the window, FRESH inside it, PAST after
+     */
+    fun roastFreshness(): RoastFreshness = freshnessForDays(daysSinceRoast())
+
+    /**
      * Checks if the bean is considered fresh (within optimal brewing window).
      * Generally, espresso beans are considered optimal 4-21 days after roasting.
      * @return true if the bean is within the fresh window
      */
-    fun isFresh(): Boolean {
-        val daysSinceRoast = daysSinceRoast()
-        return daysSinceRoast in 4..21
-    }
+    fun isFresh(): Boolean = roastFreshness() == RoastFreshness.FRESH
 
     /**
      * Checks if the bean has a photo associated with it.

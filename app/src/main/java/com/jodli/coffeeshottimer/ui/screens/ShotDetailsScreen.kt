@@ -64,6 +64,7 @@ import com.jodli.coffeeshottimer.ui.components.ShotChart
 import com.jodli.coffeeshottimer.ui.components.TasteFeedbackEditSheet
 import com.jodli.coffeeshottimer.ui.components.TasteMark
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
+import com.jodli.coffeeshottimer.ui.components.ink
 import com.jodli.coffeeshottimer.ui.components.labelRes
 import com.jodli.coffeeshottimer.ui.theme.LocalIsLandscape
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -671,11 +672,7 @@ private fun BeanSection(shotDetails: ShotDetails) {
                 Text(
                     text = stringResource(R.string.format_days, shotDetails.daysSinceRoast),
                     style = MaterialTheme.typography.titleMedium,
-                    color = if (bean.isFresh()) {
-                        MaterialTheme.zoneColors.idealInk
-                    } else {
-                        MaterialTheme.colorScheme.onSurface
-                    },
+                    color = bean.roastFreshness().ink(),
                     maxLines = 1
                 )
             }

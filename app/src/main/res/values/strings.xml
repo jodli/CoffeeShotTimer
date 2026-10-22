@@ -81,6 +81,9 @@
     <string name="text_too_fresh">Too Fresh</string>
     <string name="text_stale">Stale</string>
     <string name="text_ok_freshness">OK</string>
+    <string name="freshness_resting">Resting</string>
+    <string name="freshness_past">Past peak</string>
+    <string name="label_bean_finished">Finished</string>
     <string name="text_strong_extraction">Strong Extraction</string>
     <string name="text_weak_extraction">Weak Extraction</string>
     <string name="text_typical_extraction">Typical espresso range</string>

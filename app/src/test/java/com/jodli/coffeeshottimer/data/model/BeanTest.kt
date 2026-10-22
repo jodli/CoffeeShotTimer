@@ -333,6 +333,26 @@ class BeanTest {
     }
 
     @Test
+    fun `roastFreshness classifies resting, fresh and past at the boundaries`() {
+        assertEquals(
+            RoastFreshness.RESTING,
+            Bean(name = "B", roastDate = LocalDate.now().minusDays(3)).roastFreshness()
+        )
+        assertEquals(
+            RoastFreshness.FRESH,
+            Bean(name = "B", roastDate = LocalDate.now().minusDays(4)).roastFreshness()
+        )
+        assertEquals(
+            RoastFreshness.FRESH,
+            Bean(name = "B", roastDate = LocalDate.now().minusDays(21)).roastFreshness()
+        )
+        assertEquals(
+            RoastFreshness.PAST,
+            Bean(name = "B", roastDate = LocalDate.now().minusDays(22)).roastFreshness()
+        )
+    }
+
+    @Test
     fun `bean has default values for optional fields`() {
         // Given
         val bean = Bean(

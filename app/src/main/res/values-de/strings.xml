@@ -83,6 +83,9 @@
     <string name="text_too_fresh">Zu frisch</string>
     <string name="text_stale">Alt</string>
     <string name="text_ok_freshness">OK</string>
+    <string name="freshness_resting">Ruht noch</string>
+    <string name="freshness_past">Nach dem Optimum</string>
+    <string name="label_bean_finished">Aufgebraucht</string>
     <string name="text_strong_extraction">Starke Extraktion</string>
     <string name="text_weak_extraction">Schwache Extraktion</string>
     <string name="text_typical_extraction">Typischer Espresso-Bereich</string>

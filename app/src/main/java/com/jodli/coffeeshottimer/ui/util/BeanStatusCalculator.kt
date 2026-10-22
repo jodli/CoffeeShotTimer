@@ -3,6 +3,7 @@ package com.jodli.coffeeshottimer.ui.util
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.usecase.GetShotQualityAnalysisUseCase
 import com.jodli.coffeeshottimer.domain.usecase.QualityTier
@@ -16,6 +17,13 @@ enum class BeanStatus {
     EXPERIMENTING, // Early stage or inconsistent - mixed results or not enough data
     NEEDS_WORK, // Poor recent results - avg quality < 40
     FRESH_START // No shots recorded yet
+}
+
+fun BeanStatus.labelRes(): Int = when (this) {
+    BeanStatus.DIALED_IN -> R.string.bean_status_dialed_in_short
+    BeanStatus.EXPERIMENTING -> R.string.bean_status_experimenting_short
+    BeanStatus.NEEDS_WORK -> R.string.bean_status_needs_work_short
+    BeanStatus.FRESH_START -> R.string.bean_status_fresh_start_short
 }
 
 /**
