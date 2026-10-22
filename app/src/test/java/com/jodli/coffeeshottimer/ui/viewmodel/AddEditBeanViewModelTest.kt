@@ -103,7 +103,6 @@ class AddEditBeanViewModelTest {
         assertNull(initialState.nameError)
         assertNull(initialState.roastDateError)
         assertNull(initialState.notesError)
-        assertNull(initialState.grinderSettingError)
         assertFalse(initialState.isLoading)
         assertFalse(initialState.isSaving)
         assertFalse(initialState.saveSuccess)

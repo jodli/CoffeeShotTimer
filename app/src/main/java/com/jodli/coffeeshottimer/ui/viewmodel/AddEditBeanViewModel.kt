@@ -572,7 +572,6 @@ data class AddEditBeanUiState(
     val nameError: String? = null,
     val roastDateError: String? = null,
     val notesError: String? = null,
-    val grinderSettingError: String? = null,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val saveSuccess: Boolean = false,
