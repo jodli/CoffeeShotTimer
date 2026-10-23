@@ -90,9 +90,7 @@ fun GrinderSetupStepScreen(
             stepSizeError = stepSizeError,
             generalError = generalError,
             validationSuggestion = GrinderValidationHelpers.getValidationSuggestion(generalError),
-            showDescription = false, // Already shown above
-            showPresets = true,
-            showStepSize = true
+            showDescription = false // Already shown above
         )
 
         Spacer(modifier = Modifier.weight(1f))

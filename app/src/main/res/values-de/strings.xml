@@ -645,7 +645,6 @@
     <!-- Equipment Settings (non-onboarding) -->
     <string name="title_equipment_settings">Mühleneinstellungen</string>
     <string name="title_basket_settings">Sieb-Einstellungen</string>
-    <string name="text_equipment_settings_description">Stelle die minimalen und maximalen Werte ein, die die Skala deiner Mühle unterstützt. Dies wird in der App zur Validierung und als Leitfaden verwendet.</string>
     <string name="title_more">Mehr</string>
     <string name="label_equipment">Ausrüstung</string>
     <string name="label_app">App</string>
@@ -653,15 +652,12 @@
     <string name="format_basket_summary">%1$d–%2$d g rein · %3$d–%4$d g raus</string>
     <string name="text_grinder_scale_range">Mühlen-Skalenbereich</string>
     <string name="text_grinder_scale_description">Stelle die Minimal- und Maximalwerte auf der Skala deiner Mühle ein. Dies hilft der App, relevante Anleitungen für deine spezifische Ausrüstung zu geben.</string>
-    <string name="text_common_presets">Häufige Voreinstellungen</string>
-    <string name="text_custom_range">Benutzerdefinierter Bereich</string>
     <string name="label_grinder_minimum">Minimum</string>
     <string name="label_grinder_maximum">Maximum</string>
     <string name="placeholder_grinder_min">z.B. 1</string>
     <string name="placeholder_grinder_max">z.B. 10</string>
     <string name="text_step_size">Schrittgröße</string>
     <string name="text_step_size_description">Wie präzise sind die Einstellungen an deiner Mühle? Dies bestimmt die Schrittweite zwischen jeder Mahlgradeinstellung.</string>
-    <string name="text_common_step_sizes">Gängige Schrittgrößen</string>
     <string name="label_custom_step_size">Benutzerdefinierte Schrittgröße</string>
     <string name="placeholder_step_size">z.B. 0.5</string>
     <string name="text_step_size_info">Deine Mühle hat %1$d Schritte von %2$d (Schrittweite: %3$s) bis %4$d</string>
@@ -747,7 +743,6 @@
     <string name="suggestion_enter_whole_numbers_only">Bitte gib nur ganze Zahlen ein (z.B. 1, 10, 50).</string>
 
     <!-- Basket Configuration -->
-    <string name="text_basket_configuration">Siebträger-Konfiguration</string>
     <string name="text_basket_description">Gewichtsbereiche basierend auf deiner Siebgröße einstellen</string>
     <string name="text_basket_presets">Gängige Siebe</string>
     <string name="button_single_basket">Einzeln</string>
@@ -761,9 +756,9 @@
     <string name="placeholder_coffee_in_max">z.B. 22</string>
     <string name="placeholder_coffee_out_min">z.B. 28</string>
     <string name="placeholder_coffee_out_max">z.B. 55</string>
-    <string name="text_basket_validation_success">✓ Gewichtsbereiche konfiguriert! Perfekt für %1$s Shots.</string>
+    <string name="text_basket_validation_success_single">Gewichtsbereiche für einfache Shots eingestellt.</string>
+    <string name="text_basket_validation_success_double">Gewichtsbereiche für doppelte Shots eingestellt.</string>
     <string name="text_basket_settings">Siebeinstellungen</string>
-    <string name="text_basket_settings_description">Konfiguriere die Gewichtsbereichsregler basierend auf deiner Siebgröße. Dies hilft dir, innerhalb optimaler Parameter für konsistente Extraktion zu bleiben.</string>
 
     <!-- Grind Adjustment Errors -->
     <string name="error_grinder_config_not_found">Mühlenkonfiguration nicht gefunden. Bitte konfiguriere zuerst deine Mühle.</string>

@@ -2,7 +2,6 @@ package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -179,59 +178,36 @@ class ValidationUtils(
 fun GentleValidationMessage(
     message: String,
     suggestion: String,
-    onFixClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier,
-    extraContentPadding: androidx.compose.foundation.layout.PaddingValues = androidx.compose.foundation.layout.PaddingValues(
-        0.dp
-    )
+    modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
-    CoffeeCard(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
-        )
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.Top
     ) {
-        Column(
-            modifier = Modifier.padding(extraContentPadding),
-            verticalArrangement = Arrangement.spacedBy(spacing.small)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalAlignment = Alignment.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Warning,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
-                )
+        Icon(
+            imageVector = Icons.Default.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .size(16.dp)
+        )
 
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-                ) {
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
+        Column(verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)) {
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.error
+            )
 
-                    if (suggestion.isNotBlank()) {
-                        Text(
-                            text = suggestion,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
-
-            if (onFixClick != null) {
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.text_try_again),
-                    onClick = onFixClick,
-                    modifier = Modifier.fillMaxWidth()
+            if (suggestion.isNotBlank()) {
+                Text(
+                    text = suggestion,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

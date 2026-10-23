@@ -95,8 +95,7 @@ fun BasketSetupStepScreen(
             coffeeOutMaxError = coffeeOutMaxError,
             generalError = generalError,
             validationSuggestion = BasketValidationHelpers.getValidationSuggestion(generalError),
-            showDescription = false, // Already shown above
-            showPresets = true
+            showDescription = false // Already shown above
         )
 
         Spacer(modifier = Modifier.weight(1f))

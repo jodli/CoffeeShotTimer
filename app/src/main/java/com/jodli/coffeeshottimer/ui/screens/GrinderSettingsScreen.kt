@@ -1,9 +1,10 @@
 package com.jodli.coffeeshottimer.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -22,11 +23,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
+import com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.validation.GrinderValidationHelpers
@@ -61,8 +62,7 @@ fun GrinderSettingsScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.title_equipment_settings),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
@@ -81,8 +81,7 @@ fun GrinderSettingsScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = spacing.screenPadding, vertical = spacing.medium),
-            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+                .padding(horizontal = spacing.screenPadding)
         ) {
             if (uiState.isLoading) {
                 LoadingIndicator(
@@ -90,15 +89,7 @@ fun GrinderSettingsScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
             } else {
-                Text(
-                    text = stringResource(R.string.text_equipment_settings_description),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Start,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                com.jodli.coffeeshottimer.ui.components.GrinderScaleSetup(
+                GrinderScaleSetup(
                     scaleMin = uiState.scaleMin,
                     scaleMax = uiState.scaleMax,
                     stepSize = uiState.stepSize,
@@ -112,10 +103,10 @@ fun GrinderSettingsScreen(
                     stepSizeError = uiState.stepSizeError,
                     generalError = uiState.generalError,
                     validationSuggestion = GrinderValidationHelpers.getValidationSuggestion(uiState.generalError),
-                    showDescription = true,
-                    showPresets = true,
-                    showStepSize = true
+                    showDescription = true
                 )
+
+                Spacer(modifier = Modifier.height(24.dp))
 
                 CoffeePrimaryButton(
                     text = stringResource(id = R.string.button_save),
@@ -133,6 +124,8 @@ fun GrinderSettingsScreen(
                     },
                     enabled = uiState.isFormValid && !uiState.isLoading,
                 )
+
+                Spacer(modifier = Modifier.height(spacing.large))
             }
         }
     }

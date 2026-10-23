@@ -1,24 +1,42 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Scale
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.BasketPreset
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
+
+private fun BasketPreset.matches(
+    inMin: String,
+    inMax: String,
+    outMin: String,
+    outMax: String
+): Boolean {
+    return inMin.toFloatOrNull() == coffeeInMin &&
+        inMax.toFloatOrNull() == coffeeInMax &&
+        outMin.toFloatOrNull() == coffeeOutMin &&
+        outMax.toFloatOrNull() == coffeeOutMax
+}
 
 @Composable
 fun BasketSetup(
@@ -38,70 +56,35 @@ fun BasketSetup(
     generalError: String? = null,
     validationSuggestion: String? = null,
     modifier: Modifier = Modifier,
-    showDescription: Boolean = true,
-    showPresets: Boolean = true
+    showDescription: Boolean = true
 ) {
     val spacing = LocalSpacing.current
 
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.Scale,
-            title = stringResource(R.string.text_basket_configuration)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.small))
+    Column(modifier = modifier) {
+        SectionLabel(text = stringResource(R.string.text_basket_presets))
 
         if (showDescription) {
             Text(
                 text = stringResource(R.string.text_basket_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 12.dp)
             )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
 
-        // Preset buttons - Single and Double
-        if (showPresets) {
-            Text(
-                text = stringResource(R.string.text_basket_presets),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.button_single_basket),
-                    onClick = { onPresetSelected(BasketPreset.SINGLE) },
-                    modifier = Modifier.weight(1f),
-                    fillMaxWidth = false
-                )
-
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.button_double_basket),
-                    onClick = { onPresetSelected(BasketPreset.DOUBLE) },
-                    modifier = Modifier.weight(1f),
-                    fillMaxWidth = false
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-        }
-
-        // Manual range inputs
-        Text(
-            text = stringResource(R.string.text_manual_basket_range),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+        SquareSegmentedSwitch(
+            options = listOf(
+                stringResource(R.string.button_single_basket),
+                stringResource(R.string.button_double_basket)
+            ),
+            selectedIndex = BasketPreset.entries.indexOfFirst {
+                it.matches(coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax)
+            },
+            onSelect = { onPresetSelected(BasketPreset.entries[it]) },
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(spacing.small))
+        SectionLabel(text = stringResource(R.string.text_manual_basket_range))
 
         // Coffee In range inputs
         Row(
@@ -161,46 +144,91 @@ fun BasketSetup(
             )
         }
 
-        // Validation messages
         if (generalError != null) {
-            Spacer(modifier = Modifier.height(spacing.medium))
             GentleValidationMessage(
                 message = generalError,
-                suggestion = validationSuggestion ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                extraContentPadding = PaddingValues(
-                    horizontal = spacing.medium,
-                    vertical = spacing.small
-                )
+                suggestion = validationSuggestion.orEmpty(),
+                modifier = Modifier.padding(top = spacing.medium)
             )
-            Spacer(modifier = Modifier.height(spacing.small))
-        } else if (coffeeInMin.isNotBlank() && coffeeInMax.isNotBlank() &&
-            coffeeOutMin.isNotBlank() && coffeeOutMax.isNotBlank()
-        ) {
-            // Check if all values are valid numbers and within reasonable ranges
-            val inMinVal = coffeeInMin.toFloatOrNull()
-            val inMaxVal = coffeeInMax.toFloatOrNull()
-            val outMinVal = coffeeOutMin.toFloatOrNull()
-            val outMaxVal = coffeeOutMax.toFloatOrNull()
-
-            if (inMinVal != null && inMaxVal != null && outMinVal != null && outMaxVal != null &&
-                inMinVal < inMaxVal && outMinVal < outMaxVal &&
-                coffeeInMinError == null && coffeeInMaxError == null &&
-                coffeeOutMinError == null && coffeeOutMaxError == null
-            ) {
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                // Determine shot type based on average coffee in value
-                val avgIn = (inMinVal + inMaxVal) / 2
-                val shotType = if (avgIn < 13f) "single" else "double"
-
-                Text(
-                    text = stringResource(R.string.text_basket_validation_success, shotType),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
+        } else {
+            BasketRangeConfirmation(
+                coffeeInMin = coffeeInMin,
+                coffeeInMax = coffeeInMax,
+                coffeeOutMin = coffeeOutMin,
+                coffeeOutMax = coffeeOutMax,
+                hasFieldError = listOf(
+                    coffeeInMinError,
+                    coffeeInMaxError,
+                    coffeeOutMinError,
+                    coffeeOutMaxError
+                ).any { it != null }
+            )
         }
+    }
+}
+
+/** The confirmation line under a complete, valid basket range: check mark plus shot type. */
+@Composable
+private fun BasketRangeConfirmation(
+    coffeeInMin: String,
+    coffeeInMax: String,
+    coffeeOutMin: String,
+    coffeeOutMax: String,
+    hasFieldError: Boolean
+) {
+    val spacing = LocalSpacing.current
+    val avgIn = basketAvgIn(coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax)
+
+    if (avgIn != null && !hasFieldError) {
+        val shotTypeRes = if (avgIn < 13f) {
+            R.string.text_basket_validation_success_single
+        } else {
+            R.string.text_basket_validation_success_double
+        }
+
+        Row(
+            modifier = Modifier.padding(top = spacing.small),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Check,
+                contentDescription = null,
+                tint = MaterialTheme.zoneColors.idealInk,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = stringResource(shotTypeRes),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+/** Average coffee-in weight when all four fields parse and are ordered; null otherwise. */
+private fun basketAvgIn(
+    coffeeInMin: String,
+    coffeeInMax: String,
+    coffeeOutMin: String,
+    coffeeOutMax: String
+): Float? {
+    val inRange = orderedPair(coffeeInMin, coffeeInMax)
+    val outRange = orderedPair(coffeeOutMin, coffeeOutMax)
+    return if (inRange != null && outRange != null) {
+        (inRange.first + inRange.second) / 2
+    } else {
+        null
+    }
+}
+
+/** The parsed (min, max) pair when both parse and min < max; null otherwise. */
+private fun orderedPair(min: String, max: String): Pair<Float, Float>? {
+    val minVal = min.toFloatOrNull()
+    val maxVal = max.toFloatOrNull()
+    return if (minVal != null && maxVal != null && minVal < maxVal) {
+        minVal to maxVal
+    } else {
+        null
     }
 }

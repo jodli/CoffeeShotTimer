@@ -1,23 +1,24 @@
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
+
+private val GRINDER_SCALE_PRESETS = listOf(1 to 10, 30 to 80, 50 to 60, 0 to 100)
 
 @Composable
 fun GrinderScaleSetup(
@@ -35,89 +36,35 @@ fun GrinderScaleSetup(
     generalError: String?,
     validationSuggestion: String?,
     modifier: Modifier = Modifier,
-    showDescription: Boolean = true,
-    showPresets: Boolean = true,
-    showStepSize: Boolean = true
+    showDescription: Boolean = true
 ) {
     val spacing = LocalSpacing.current
 
-    CoffeeCard(modifier = modifier) {
-        CardHeader(
-            icon = Icons.Default.Settings,
-            title = stringResource(R.string.text_grinder_scale_range)
-        )
-
-        Spacer(modifier = Modifier.height(spacing.small))
+    Column(modifier = modifier) {
+        SectionLabel(text = stringResource(R.string.text_grinder_scale_range))
 
         if (showDescription) {
             Text(
                 text = stringResource(R.string.text_grinder_scale_description),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 12.dp)
             )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
 
-        // Common presets
-        if (showPresets) {
-            Text(
-                text = stringResource(R.string.text_common_presets),
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            val presets = listOf(
-                1 to 10,
-                30 to 80,
-                50 to 60,
-                0 to 100
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                presets.take(2).forEach { (min, max) ->
-                    CoffeeSecondaryButton(
-                        text = "$min-$max",
-                        onClick = { onPresetSelected(min, max) },
-                        modifier = Modifier.weight(1f),
-                        fillMaxWidth = false
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                presets.drop(2).forEach { (min, max) ->
-                    CoffeeSecondaryButton(
-                        text = "$min-$max",
-                        onClick = { onPresetSelected(min, max) },
-                        modifier = Modifier.weight(1f),
-                        fillMaxWidth = false
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-        }
-
-        // Custom range inputs
-        Text(
-            text = stringResource(R.string.text_custom_range),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
+        SquareSegmentedSwitch(
+            options = GRINDER_SCALE_PRESETS.map { (min, max) -> "$min–$max" },
+            selectedIndex = GRINDER_SCALE_PRESETS.indexOfFirst {
+                it.first == scaleMin.toIntOrNull() && it.second == scaleMax.toIntOrNull()
+            },
+            onSelect = { index ->
+                val (min, max) = GRINDER_SCALE_PRESETS[index]
+                onPresetSelected(min, max)
+            },
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(spacing.small))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -146,33 +93,22 @@ fun GrinderScaleSetup(
             )
         }
 
-        // Step size selector
-        if (showStepSize) {
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            StepSizeSelector(
-                stepSize = stepSize,
-                onStepSizeChange = onStepSizeChange,
-                onPresetSelected = onStepSizePresetSelected,
-                stepSizeError = stepSizeError,
-                scaleMin = scaleMin.toIntOrNull(),
-                scaleMax = scaleMax.toIntOrNull(),
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        StepSizeSelector(
+            stepSize = stepSize,
+            onStepSizeChange = onStepSizeChange,
+            onPresetSelected = onStepSizePresetSelected,
+            stepSizeError = stepSizeError,
+            scaleMin = scaleMin.toIntOrNull(),
+            scaleMax = scaleMax.toIntOrNull(),
+            modifier = Modifier.fillMaxWidth()
+        )
 
         if (generalError != null) {
-            Spacer(modifier = Modifier.height(spacing.medium))
             GentleValidationMessage(
                 message = generalError,
-                suggestion = validationSuggestion ?: "",
-                modifier = Modifier.fillMaxWidth(),
-                extraContentPadding = PaddingValues(
-                    horizontal = spacing.medium,
-                    vertical = spacing.small
-                )
+                suggestion = validationSuggestion.orEmpty(),
+                modifier = Modifier.padding(top = spacing.medium)
             )
-            Spacer(modifier = Modifier.height(spacing.small))
         }
     }
 }

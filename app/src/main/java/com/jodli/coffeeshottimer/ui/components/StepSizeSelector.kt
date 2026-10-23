@@ -1,27 +1,21 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
@@ -30,7 +24,6 @@ import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
  * Component for selecting grinder step size with preset options and custom input.
  * Allows users to choose from common step sizes or enter a custom value.
  */
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun StepSizeSelector(
     stepSize: String,
@@ -49,76 +42,34 @@ fun StepSizeSelector(
     }
 
     Column(modifier = modifier) {
-        // Title
-        Text(
-            text = stringResource(R.string.text_step_size),
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        SectionLabel(text = stringResource(R.string.text_step_size))
 
-        Spacer(modifier = Modifier.height(spacing.small))
-
-        // Description
         Text(
             text = stringResource(R.string.text_step_size_description),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 12.dp)
         )
 
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Preset chips
-        Text(
-            text = stringResource(R.string.text_common_step_sizes),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+        SquareSegmentedSwitch(
+            options = GrinderConfiguration.STEP_SIZE_PRESETS.map(::formatStepSize),
+            selectedIndex = GrinderConfiguration.STEP_SIZE_PRESETS.indexOfFirst { it == currentStepSize },
+            onSelect = { onPresetSelected(GrinderConfiguration.STEP_SIZE_PRESETS[it]) },
+            modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(spacing.small))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(spacing.small),
-            verticalArrangement = Arrangement.spacedBy(spacing.small)
-        ) {
-            GrinderConfiguration.STEP_SIZE_PRESETS.forEach { preset ->
-                FilterChip(
-                    selected = currentStepSize == preset,
-                    onClick = { onPresetSelected(preset) },
-                    label = {
-                        Text(
-                            text = formatStepSize(preset),
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        // Custom input
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(spacing.small)
-        ) {
-            CoffeeTextField(
-                value = stepSize,
-                onValueChange = onStepSizeChange,
-                label = stringResource(R.string.label_custom_step_size),
-                placeholder = stringResource(R.string.placeholder_step_size),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                isError = stepSizeError != null,
-                errorMessage = stepSizeError,
-                modifier = Modifier.weight(1f)
-            )
-        }
+        CoffeeTextField(
+            value = stepSize,
+            onValueChange = onStepSizeChange,
+            label = stringResource(R.string.label_custom_step_size),
+            placeholder = stringResource(R.string.placeholder_step_size),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            isError = stepSizeError != null,
+            errorMessage = stepSizeError,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         // Show validation info if range is provided
         if (scaleMin != null && scaleMax != null && stepSize.isNotBlank()) {
@@ -141,7 +92,7 @@ fun StepSizeSelector(
                     color = if (stepSizeError != null) {
                         MaterialTheme.colorScheme.error
                     } else {
-                        MaterialTheme.colorScheme.primary
+                        MaterialTheme.colorScheme.onSurfaceVariant
                     }
                 )
             }
