@@ -147,65 +147,48 @@ fun BasketSetup(
             )
         }
 
+        val avgCoffeeIn = basketAvgIn(coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax)
+        val hasFieldError = listOf(coffeeInMinError, coffeeInMaxError, coffeeOutMinError, coffeeOutMaxError)
+            .any { it != null }
+
         if (generalError != null) {
             GentleValidationMessage(
                 message = generalError,
                 suggestion = validationSuggestion.orEmpty(),
                 modifier = Modifier.padding(top = spacing.medium)
             )
-        } else {
-            BasketRangeConfirmation(
-                coffeeInMin = coffeeInMin,
-                coffeeInMax = coffeeInMax,
-                coffeeOutMin = coffeeOutMin,
-                coffeeOutMax = coffeeOutMax,
-                hasFieldError = listOf(
-                    coffeeInMinError,
-                    coffeeInMaxError,
-                    coffeeOutMinError,
-                    coffeeOutMaxError
-                ).any { it != null }
-            )
+        } else if (avgCoffeeIn != null && !hasFieldError) {
+            BasketRangeConfirmation(avgCoffeeIn = avgCoffeeIn)
         }
     }
 }
 
 /** The confirmation line under a complete, valid basket range: check mark plus shot type. */
 @Composable
-private fun BasketRangeConfirmation(
-    coffeeInMin: String,
-    coffeeInMax: String,
-    coffeeOutMin: String,
-    coffeeOutMax: String,
-    hasFieldError: Boolean
-) {
+private fun BasketRangeConfirmation(avgCoffeeIn: Float) {
     val spacing = LocalSpacing.current
-    val avgIn = basketAvgIn(coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax)
+    val shotTypeRes = if (avgCoffeeIn < SINGLE_BASKET_MAX_AVG_COFFEE_IN) {
+        R.string.text_basket_validation_success_single
+    } else {
+        R.string.text_basket_validation_success_double
+    }
 
-    if (avgIn != null && !hasFieldError) {
-        val shotTypeRes = if (avgIn < SINGLE_BASKET_MAX_AVG_COFFEE_IN) {
-            R.string.text_basket_validation_success_single
-        } else {
-            R.string.text_basket_validation_success_double
-        }
-
-        Row(
-            modifier = Modifier.padding(top = spacing.small),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Check,
-                contentDescription = null,
-                tint = MaterialTheme.zoneColors.idealInk,
-                modifier = Modifier.size(16.dp)
-            )
-            Spacer(modifier = Modifier.width(6.dp))
-            Text(
-                text = stringResource(shotTypeRes),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
+    Row(
+        modifier = Modifier.padding(top = spacing.small),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Check,
+            contentDescription = null,
+            tint = MaterialTheme.zoneColors.idealInk,
+            modifier = Modifier.size(16.dp)
+        )
+        Spacer(modifier = Modifier.width(6.dp))
+        Text(
+            text = stringResource(shotTypeRes),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

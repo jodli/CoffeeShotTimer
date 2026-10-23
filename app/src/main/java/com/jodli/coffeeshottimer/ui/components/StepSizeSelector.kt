@@ -9,9 +9,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,10 +33,7 @@ fun StepSizeSelector(
 ) {
     val spacing = LocalSpacing.current
 
-    // Parse current step size for comparison with presets
-    val currentStepSize by remember(stepSize) {
-        derivedStateOf { stepSize.toDoubleOrNull() }
-    }
+    val currentStepSize = stepSize.toDoubleOrNull()
 
     Column(modifier = modifier) {
         SectionLabel(text = stringResource(R.string.text_step_size))
@@ -72,11 +66,10 @@ fun StepSizeSelector(
         )
 
         // Show validation info if range is provided
-        if (scaleMin != null && scaleMax != null && stepSize.isNotBlank()) {
-            val stepValue = stepSize.toDoubleOrNull()
-            if (stepValue != null && stepValue > 0) {
+        if (scaleMin != null && scaleMax != null && currentStepSize != null) {
+            if (currentStepSize > 0) {
                 val rangeSize = scaleMax - scaleMin
-                val numberOfSteps = (rangeSize / stepValue).toInt()
+                val numberOfSteps = (rangeSize / currentStepSize).toInt()
 
                 Spacer(modifier = Modifier.height(spacing.small))
 
@@ -85,7 +78,7 @@ fun StepSizeSelector(
                         R.string.text_step_size_info,
                         numberOfSteps,
                         scaleMin,
-                        formatStepSize(stepValue),
+                        formatStepSize(currentStepSize),
                         scaleMax
                     ),
                     style = MaterialTheme.typography.bodySmall,
