@@ -8,12 +8,12 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ### Changed
 
-- [*] Beans list rebuilt as a ledger: one ruled line per bag tells you which is in use, its dial-in status and roast age; a single tap selects it for the next shot.
-- [*] Unified bean freshness behind a single 4–21 day window, showing roast age as a colour-coded figure (resting gold, fresh green, past-peak ink).
-- [*] Add and Edit Bean forms restructured around ruled sections (details, photo, status) with a live roast freshness verdict and non-destructive delete.
-- [*] Shot History rebuilt as a clean ledger: every shot on one line with time, ratio and quality score; off-target times are colour-coded by extraction zone instead of flagged red.
-- [*] New Analysis view led by a shot chart: your recent shots plotted against the 25-30 s target with sour and bitter zones, followed by coaching insights, quality trend and grind settings.
-- [*] Shot Details leads with the verdict — key figures, the bean's dial-in chart, and a concrete "Next shot" grind suggestion.
+- [*] Shot History, Analysis and Shot Details rebuilt around the shot chart: every shot on one ruled line, recent shots plotted against the 25–30 s target, and a verdict that names the next grind step.
+- [*] Beans list rebuilt as a ledger: which bag is in use, its dial-in status and roast age at a glance; a single tap selects it for the next shot.
+- [*] More is now an equipment ledger: grinder range and basket weights on the rows, one tap to edit; About is a clean colophon.
+- Unified bean freshness behind a single 4–21 day window, showing roast age as a colour-coded figure (resting gold, fresh green, past-peak ink).
+- Add and Edit Bean forms restructured around ruled sections (details, photo, status) with a live roast freshness verdict and non-destructive delete.
+- Grinder and Basket settings rebuilt as ruled sections: presets as a square segmented switch with a true selected state, validation as a plain line instead of a tinted card; the onboarding equipment steps inherit the new forms.
 - Fresh new look in light and dark mode.
 - New shot timer dial with the 25-30 s target always visible.
 - Record Shot is laid out in brewing order, with grind suggestions next to your current setting.
