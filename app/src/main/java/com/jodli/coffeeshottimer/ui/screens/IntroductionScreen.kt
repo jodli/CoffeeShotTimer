@@ -1,5 +1,6 @@
 package com.jodli.coffeeshottimer.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,18 +12,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.AltRoute
 import androidx.compose.material.icons.filled.Coffee
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,34 +30,30 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
-import com.jodli.coffeeshottimer.ui.components.CoffeeCard
+import com.jodli.coffeeshottimer.ui.components.ChartShot
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.IconTextRow
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
-import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
+import com.jodli.coffeeshottimer.ui.components.ShotChart
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
 
 /**
  * Data model for introduction slides
  */
-data class IntroSlide(
+private data class IntroSlide(
     val title: String,
     val description: String,
-    val illustration: ImageVector,
     val highlights: List<FeatureHighlight> = emptyList()
 )
 
 /**
  * Data model for feature highlights within slides
  */
-data class FeatureHighlight(
+private data class FeatureHighlight(
     val title: String,
     val description: String,
     val icon: ImageVector
@@ -77,15 +68,13 @@ private fun createIntroSlides(): List<IntroSlide> {
         // Welcome slide
         IntroSlide(
             title = stringResource(R.string.intro_welcome_title),
-            description = stringResource(R.string.intro_welcome_description),
-            illustration = Icons.Default.Coffee
+            description = stringResource(R.string.intro_welcome_description)
         ),
 
         // Main screens overview slide
         IntroSlide(
             title = stringResource(R.string.intro_main_screens_title),
             description = stringResource(R.string.intro_main_screens_description),
-            illustration = Icons.Default.Timeline,
             highlights = listOf(
                 FeatureHighlight(
                     title = stringResource(R.string.intro_record_shot_title),
@@ -108,29 +97,26 @@ private fun createIntroSlides(): List<IntroSlide> {
         // Flexible workflow slide
         IntroSlide(
             title = stringResource(R.string.intro_flexible_workflow_title),
-            description = stringResource(R.string.intro_flexible_workflow_description),
-            illustration = Icons.AutoMirrored.Filled.AltRoute
+            description = stringResource(R.string.intro_flexible_workflow_description)
         ),
 
         // Timer usage slide
         IntroSlide(
             title = stringResource(R.string.intro_timer_usage_title),
-            description = stringResource(R.string.intro_timer_usage_description),
-            illustration = Icons.Default.Schedule
+            description = stringResource(R.string.intro_timer_usage_description)
         ),
 
         // Get started slide
         IntroSlide(
             title = stringResource(R.string.intro_get_started_title),
-            description = stringResource(R.string.intro_get_started_description),
-            illustration = ImageVector.vectorResource(R.drawable.coffee_bean_icon)
+            description = stringResource(R.string.intro_get_started_description)
         )
     )
 }
 
 /**
  * Main introduction screen composable that provides onboarding information.
- * Uses LandscapeContainer for responsive design like GuidedBeanCreationScreen.
+ * Uses LandscapeContainer for responsive design.
  */
 @Composable
 fun IntroductionScreen(
@@ -173,11 +159,8 @@ fun IntroductionScreen(
     }
 }
 
-/**
- * Portrait layout for IntroductionScreen - simplified to match GuidedBeanCreationScreen style
- */
 @Composable
-fun IntroductionPortraitLayout(
+private fun IntroductionPortraitLayout(
     slides: List<IntroSlide>,
     currentPage: Int,
     onNext: () -> Unit,
@@ -191,109 +174,77 @@ fun IntroductionPortraitLayout(
         modifier = Modifier
             .fillMaxSize()
             .statusBarsPadding()
-            .padding(spacing.screenPadding)
     ) {
-        // Main content area - scrollable (removed separate skip button)
+        // Scrollable slide content
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = spacing.screenPadding)
         ) {
-            Spacer(modifier = Modifier.height(spacing.large))
+            if (currentPage == 0) {
+                IntroDialChart(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 24.dp)
+                )
+                Text(
+                    text = stringResource(R.string.intro_chart_caption),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
 
-            // Icon with background circle
-            Box(
-                modifier = Modifier.size(140.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    modifier = Modifier.size(120.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                    tonalElevation = 2.dp
-                ) {}
+            Text(
+                text = currentSlide.title,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 24.dp)
+            )
 
-                Icon(
-                    imageVector = currentSlide.illustration,
-                    contentDescription = currentSlide.title,
-                    modifier = Modifier.size(70.dp),
-                    tint = MaterialTheme.colorScheme.primary
+            Text(
+                text = currentSlide.description,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            currentSlide.highlights.forEachIndexed { index, highlight ->
+                IconTextRow(
+                    icon = highlight.icon,
+                    title = highlight.title,
+                    description = highlight.description,
+                    modifier = if (index == 0) {
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    } else {
+                        Modifier.fillMaxWidth()
+                    }
                 )
             }
 
             Spacer(modifier = Modifier.height(spacing.large))
-
-            // Title
-            Text(
-                text = currentSlide.title,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Description
-            Text(
-                text = currentSlide.description,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                lineHeight = MaterialTheme.typography.bodyLarge.lineHeight * 1.4f
-            )
-
-            // Feature highlights if available
-            if (currentSlide.highlights.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(spacing.large))
-
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(spacing.medium),
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    currentSlide.highlights.forEach { highlight ->
-                        FeatureHighlightItem(
-                            highlight = highlight,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(spacing.extraLarge))
         }
 
         // Page indicators
+        PageIndicatorRow(currentPage = currentPage, pageCount = slides.size)
+
+        // Navigation buttons - Skip and Next/Get Started
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = spacing.medium),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            slides.forEachIndexed { index, _ ->
-                PageIndicator(
-                    isActive = index == currentPage,
-                    modifier = Modifier.padding(horizontal = spacing.extraSmall)
-                )
-            }
-        }
-
-        // Navigation buttons - Skip and Next/Get Started (like GuidedBeanCreationScreen)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
+                .padding(horizontal = spacing.screenPadding)
+                .padding(bottom = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(spacing.medium)
         ) {
-            // Skip button (replaces Previous button)
             CoffeeSecondaryButton(
                 text = stringResource(R.string.button_skip),
                 onClick = onSkip,
                 modifier = Modifier.weight(1f)
             )
 
-            // Next/Complete button
             CoffeePrimaryButton(
                 text = if (currentPage == slides.size - 1) {
                     stringResource(R.string.button_get_started)
@@ -311,11 +262,8 @@ fun IntroductionPortraitLayout(
     }
 }
 
-/**
- * Landscape layout for IntroductionScreen - matches GuidedBeanCreationScreen's 30%/70% pattern
- */
 @Composable
-fun IntroductionLandscapeLayout(
+private fun IntroductionLandscapeLayout(
     slides: List<IntroSlide>,
     currentPage: Int,
     onNext: () -> Unit,
@@ -329,7 +277,6 @@ fun IntroductionLandscapeLayout(
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
-        // Main content with proper padding
         Row(
             modifier = Modifier
                 .fillMaxSize()
@@ -338,103 +285,64 @@ fun IntroductionLandscapeLayout(
             horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side: Icon and title (30% width) - matches GuidedBeanCreationScreen
+            // Left side: chart or title (30% width)
             Column(
                 modifier = Modifier.weight(0.3f),
-                horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Icon with background circle
-                Box(
-                    modifier = Modifier.size(100.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Surface(
-                        modifier = Modifier.size(80.dp),
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                        tonalElevation = 2.dp
-                    ) {}
+                if (currentPage == 0) {
+                    IntroDialChart(modifier = Modifier.fillMaxWidth())
+                } else {
+                    Text(
+                        text = currentSlide.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
 
-                    Icon(
-                        imageVector = currentSlide.illustration,
-                        contentDescription = currentSlide.title,
-                        modifier = Modifier.size(50.dp),
-                        tint = MaterialTheme.colorScheme.primary
+            // Right side: Content and actions (70% width)
+            Column(
+                modifier = Modifier.weight(0.7f),
+                verticalArrangement = Arrangement.spacedBy(landscapeSpacing)
+            ) {
+                if (currentPage == 0) {
+                    Text(
+                        text = currentSlide.title,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
-                Spacer(modifier = Modifier.height(landscapeSpacing))
-
-                Text(
-                    text = currentSlide.title,
-                    style = MaterialTheme.typography.headlineSmall,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-
-            // Right side: Content and actions (70% width) - matches GuidedBeanCreationScreen
-            Column(
-                modifier = Modifier.weight(0.7f),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.spacedBy(landscapeSpacing)
-            ) {
-                // Description (no separate skip button needed)
                 Text(
                     text = currentSlide.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.3f
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                // Feature highlights if available using CoffeeCard for consistency
-                if (currentSlide.highlights.isNotEmpty()) {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(landscapeSpacing),
+                currentSlide.highlights.forEach { highlight ->
+                    IconTextRow(
+                        icon = highlight.icon,
+                        title = highlight.title,
+                        description = highlight.description,
                         modifier = Modifier.fillMaxWidth()
-                    ) {
-                        currentSlide.highlights.forEach { highlight ->
-                            FeatureHighlightItemLandscape(
-                                highlight = highlight,
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
+                    )
                 }
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Page indicators - horizontal layout for landscape
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    slides.forEachIndexed { index, _ ->
-                        PageIndicator(
-                            isActive = index == currentPage,
-                            modifier = Modifier.padding(horizontal = spacing.extraSmall)
-                        )
-                    }
-                }
+                PageIndicatorRow(currentPage = currentPage, pageCount = slides.size)
 
-                Spacer(modifier = Modifier.height(landscapeSpacing))
-
-                // Navigation buttons - Skip and Next/Get Started (like GuidedBeanCreationScreen)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(landscapeSpacing)
                 ) {
-                    // Skip button (replaces Previous button)
                     CoffeeSecondaryButton(
                         text = stringResource(R.string.button_skip),
                         onClick = onSkip,
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Next/Complete button
                     CoffeePrimaryButton(
                         text = if (currentPage == slides.size - 1) {
                             stringResource(R.string.button_get_started)
@@ -454,160 +362,42 @@ fun IntroductionLandscapeLayout(
     }
 }
 
-/**
- * Feature highlight item component for portrait mode
- */
+/** Sample chart for the welcome slide: three shots drifting onto the dial. */
 @Composable
-fun FeatureHighlightItem(
-    highlight: FeatureHighlight,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier.padding(spacing.medium),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            // Icon with background circle
-            Box(
-                modifier = Modifier.size(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    modifier = Modifier.size(28.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
-                ) {}
-
-                Icon(
-                    imageVector = highlight.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = highlight.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-
-                Text(
-                    text = highlight.description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = MaterialTheme.typography.bodyMedium.lineHeight * 1.2f
-                )
-            }
-        }
-    }
-}
-
-/**
- * Feature highlight item component for landscape mode - more compact
- */
-@Composable
-fun FeatureHighlightItemLandscape(
-    highlight: FeatureHighlight,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val landscapeSpacing = spacing.landscapeSpacing()
-
-    CoffeeCard(
-        modifier = modifier
-    ) {
-        Row(
-            modifier = Modifier.padding(landscapeSpacing),
-            verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.spacedBy(landscapeSpacing)
-        ) {
-            // Icon with background circle - smaller for landscape
-            Box(
-                modifier = Modifier.size(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    modifier = Modifier.size(20.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
-                ) {}
-
-                Icon(
-                    imageVector = highlight.icon,
-                    contentDescription = null,
-                    modifier = Modifier.size(12.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = highlight.title,
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                Text(
-                    text = highlight.description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = MaterialTheme.typography.bodySmall.lineHeight * 1.2f,
-                    modifier = Modifier.padding(top = spacing.extraSmall / 2)
-                )
-            }
-        }
-    }
-}
-
-/**
- * Enhanced page indicator component for the pager
- */
-@Composable
-fun PageIndicator(
-    isActive: Boolean,
-    modifier: Modifier = Modifier
-) {
-    val width = if (isActive) 24.dp else 8.dp
-    val color = if (isActive) {
-        MaterialTheme.colorScheme.primary
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-    }
-
-    Surface(
-        modifier = modifier
-            .width(width)
-            .height(8.dp),
-        shape = CircleShape,
-        color = color
-    ) {}
-}
-
-/**
- * Preview for the introduction screen
- */
-@Preview(showBackground = true)
-@Composable
-fun IntroductionScreenPreview() {
-    CoffeeShotTimerTheme {
-        IntroductionScreen(
-            onComplete = {},
-            onSkip = {}
+private fun IntroDialChart(modifier: Modifier = Modifier) {
+    val shots = remember {
+        listOf(
+            ChartShot(seconds = 19, ratio = 1.6, number = 1),
+            ChartShot(seconds = 23, ratio = 1.9, number = 2),
+            ChartShot(seconds = 27, ratio = 2.2, number = 3)
         )
+    }
+    ShotChart(shots = shots, connect = true, modifier = modifier.height(220.dp))
+}
+
+@Composable
+private fun PageIndicatorRow(currentPage: Int, pageCount: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(pageCount) { index ->
+            if (index == currentPage) {
+                Box(
+                    modifier = Modifier
+                        .size(width = 16.dp, height = 4.dp)
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .size(4.dp)
+                        .background(MaterialTheme.colorScheme.outlineVariant)
+                )
+            }
+        }
     }
 }

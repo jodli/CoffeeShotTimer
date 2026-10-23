@@ -8,28 +8,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
-import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.DataCell
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
+import com.jodli.coffeeshottimer.ui.components.LedgerSection
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
@@ -64,25 +56,11 @@ fun EquipmentSetupSummaryScreen(
     ) {
         Spacer(modifier = Modifier.height(spacing.medium))
 
-        // Success icon
-        Icon(
-            imageVector = Icons.Default.CheckCircle,
-            contentDescription = null,
-            modifier = Modifier
-                .size(64.dp)
-                .align(Alignment.CenterHorizontally),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(spacing.small))
-
         // Title
         Text(
             text = stringResource(R.string.equipment_setup_summary_title),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         // Description
@@ -90,11 +68,59 @@ fun EquipmentSetupSummaryScreen(
             text = stringResource(R.string.equipment_setup_summary_description),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(top = 8.dp)
         )
 
-        Spacer(modifier = Modifier.height(spacing.medium))
+        LedgerSection(
+            title = stringResource(R.string.title_equipment_settings),
+            modifier = Modifier.padding(top = 24.dp)
+        ) {
+            DataCell(label = stringResource(R.string.summary_scale_range_label)) {
+                Text(
+                    text = "$grinderMin – $grinderMax",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            DataCell(label = stringResource(R.string.summary_step_size_label)) {
+                Text(
+                    text = grinderStepSize,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            DataCell(label = stringResource(R.string.summary_steps_label)) {
+                Text(
+                    text = calculateGrinderSteps(grinderMin, grinderMax, grinderStepSize).toString(),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        LedgerSection(title = stringResource(R.string.title_basket_settings)) {
+            DataCell(label = stringResource(R.string.summary_coffee_in_label)) {
+                Text(
+                    text = "$coffeeInMin – $coffeeInMax g",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            DataCell(label = stringResource(R.string.summary_coffee_out_label)) {
+                Text(
+                    text = "$coffeeOutMin – $coffeeOutMax g",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+            DataCell(label = stringResource(R.string.summary_basket_type_label)) {
+                Text(
+                    text = determineBasketType(coffeeInMin, coffeeInMax),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
 
         // Error card if present
         error?.let { errorMessage ->
@@ -104,7 +130,6 @@ fun EquipmentSetupSummaryScreen(
                 onRetry = onConfirm,
                 onDismiss = onClearError
             )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
 
         // Loading indicator
@@ -113,33 +138,7 @@ fun EquipmentSetupSummaryScreen(
                 message = stringResource(R.string.text_saving_configuration),
                 modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
-
-        // Grinder configuration summary
-        ConfigurationSummaryCard(
-            icon = Icons.Default.Settings,
-            title = stringResource(R.string.equipment_setup_grinder_title),
-            items = listOf(
-                stringResource(R.string.summary_grinder_range_format, grinderMin, grinderMax),
-                stringResource(R.string.summary_grinder_step_size_format, grinderStepSize),
-                stringResource(
-                    R.string.summary_grinder_steps_format,
-                    calculateGrinderSteps(grinderMin, grinderMax, grinderStepSize)
-                )
-            )
-        )
-
-        // Basket configuration summary
-        ConfigurationSummaryCard(
-            icon = Icons.Default.FilterAlt,
-            title = stringResource(R.string.equipment_setup_basket_title),
-            items = listOf(
-                stringResource(R.string.summary_coffee_in_format, coffeeInMin, coffeeInMax),
-                stringResource(R.string.summary_coffee_out_format, coffeeOutMin, coffeeOutMax),
-                stringResource(R.string.summary_basket_type_format, determineBasketType(coffeeInMin, coffeeInMax))
-            )
-        )
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -161,53 +160,6 @@ fun EquipmentSetupSummaryScreen(
                 enabled = !isLoading,
                 modifier = Modifier.weight(1f)
             )
-        }
-    }
-}
-
-/**
- * Card showing configuration summary
- */
-@Composable
-fun ConfigurationSummaryCard(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    items: List<String>,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium),
-            verticalAlignment = Alignment.Top
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-            ) {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                items.forEach { item ->
-                    Text(
-                        text = "• $item",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
         }
     }
 }

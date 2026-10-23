@@ -296,7 +296,6 @@
     <string name="button_back">Zurück</string>
 
     <!-- Content Descriptions -->
-    <string name="cd_bean_education_freshness">Kaffeebohnen-Frische Illustration</string>
     <string name="cd_bean_creation_success">Bohne-Erstellung Erfolgs-Animation</string>
     <string name="cd_onboarding_progress">Onboarding-Fortschrittsanzeige</string>
     <string name="button_clear_all">Alle löschen</string>
@@ -683,6 +682,23 @@
     <string name="equipment_setup_step_grinder">Mühle einrichten</string>
     <string name="equipment_setup_step_basket">Siebträger einrichten</string>
     <string name="equipment_setup_step_summary">Einstellungen überprüfen</string>
+    <string name="error_title">Fehler</string>
+    <string name="text_preparing">Wird vorbereitet…</string>
+    <string name="text_finalizing">Wird abgeschlossen…</string>
+    <string name="intro_chart_caption">Eine Kalibrierung, geplottet: von sauer bis auf Ziel in drei Shots.</string>
+    <string name="format_roasted_today">Heute geröstet</string>
+    <string name="format_roasted_yesterday">Gestern geröstet</string>
+    <string name="format_roasted_days_ago">Vor %1$d Tagen geröstet</string>
+    <string name="bean_creation_success_freshness_new">Noch zu frisch zum Bewerten – ein paar Tage ruhen lassen.</string>
+    <string name="summary_scale_range_label">Skalenbereich</string>
+    <string name="summary_step_size_label">Schrittgröße</string>
+    <string name="summary_steps_label">Mahlstufen</string>
+    <string name="summary_coffee_in_label">Kaffee rein</string>
+    <string name="summary_coffee_out_label">Kaffee raus</string>
+    <string name="summary_basket_type_label">Siebgröße</string>
+    <string name="bean_summary_roast_date_label">Röstdatum</string>
+    <string name="bean_summary_freshness_label">Frische</string>
+    <string name="bean_summary_notes_label">Notizen</string>
     
     <!-- Equipment Setup Welcome Screen -->
     <string name="equipment_setup_welcome_title">Richten Sie Ihre Ausrüstung ein</string>

@@ -15,7 +15,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.BasketPreset
 import com.jodli.coffeeshottimer.ui.components.BasketSetup
@@ -63,8 +62,8 @@ fun BasketSetupStepScreen(
         // Title
         Text(
             text = stringResource(R.string.equipment_setup_basket_step_title),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.fillMaxWidth()
         )
 

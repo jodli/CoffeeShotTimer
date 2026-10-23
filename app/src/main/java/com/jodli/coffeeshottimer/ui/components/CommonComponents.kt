@@ -22,6 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -431,7 +432,8 @@ fun ErrorState(
 }
 
 /**
- * Error card component for inline error displays with consistent styling
+ * Error panel for inline error displays: warning icon, title and message
+ * between hairline rules, with optional dismiss/retry actions.
  */
 @Composable
 fun ErrorCard(
@@ -443,52 +445,69 @@ fun ErrorCard(
 ) {
     val spacing = LocalSpacing.current
 
-    CoffeeCard(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer
-        )
-    ) {
-        CardHeader(
-            icon = Icons.Default.Error,
-            title = title,
-            actions = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-                ) {
-                    if (onDismiss != null) {
-                        TextButton(
-                            onClick = onDismiss
-                        ) {
-                            Text(
-                                text = stringResource(R.string.text_dialog_dismiss),
-                                color = MaterialTheme.colorScheme.onErrorContainer
-                            )
-                        }
-                    }
+    Column(modifier = modifier.fillMaxWidth()) {
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
-                    if (onRetry != null) {
-                        TextButton(
-                            onClick = onRetry
-                        ) {
-                            Text(
-                                text = stringResource(R.string.text_dialog_retry),
-                                color = MaterialTheme.colorScheme.onErrorContainer,
-                                fontWeight = FontWeight.Medium
-                            )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = spacing.small),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Icon(
+                imageVector = Icons.Default.Error,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .size(16.dp)
+            )
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title.uppercase(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.error
+                )
+
+                Spacer(modifier = Modifier.height(spacing.extraSmall))
+
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                if (onRetry != null || onDismiss != null) {
+                    Row(
+                        modifier = Modifier.padding(top = spacing.small),
+                        horizontalArrangement = Arrangement.spacedBy(spacing.extraSmall)
+                    ) {
+                        if (onRetry != null) {
+                            TextButton(onClick = onRetry) {
+                                Text(
+                                    text = stringResource(R.string.text_dialog_retry),
+                                    color = MaterialTheme.colorScheme.error,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+
+                        if (onDismiss != null) {
+                            TextButton(onClick = onDismiss) {
+                                Text(
+                                    text = stringResource(R.string.text_dialog_dismiss),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     }
                 }
             }
-        )
+        }
 
-        Spacer(modifier = Modifier.height(spacing.small))
-
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onErrorContainer
-        )
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 

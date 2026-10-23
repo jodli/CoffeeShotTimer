@@ -12,16 +12,15 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,25 +33,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.onboarding.BeanCreationPhase
-import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
+import com.jodli.coffeeshottimer.ui.components.DataCell
 import com.jodli.coffeeshottimer.ui.components.ErrorCard
+import com.jodli.coffeeshottimer.ui.components.IconTextRow
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
+import com.jodli.coffeeshottimer.ui.components.LedgerSection
 import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import com.jodli.coffeeshottimer.ui.viewmodel.GuidedBeanCreationViewModel
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /**
  * Main screen for the guided bean creation flow during onboarding.
@@ -205,7 +206,6 @@ fun GuidedBeanCreationLandscapeLayout(
 
 /**
  * Content for the education phase of guided bean creation.
- * Explains the importance of bean tracking with coffee-themed education cards.
  */
 @Composable
 fun BeanEducationContent(
@@ -221,87 +221,54 @@ fun BeanEducationContent(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = Modifier.height(spacing.large))
-
-        // Coffee bean icon using existing resources with background circle
-        Box(
-            modifier = Modifier.size(140.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Surface(
-                modifier = Modifier.size(120.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                tonalElevation = 2.dp
-            ) {}
-
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                contentDescription = stringResource(R.string.cd_bean_education_freshness),
-                modifier = Modifier.size(70.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.large))
-
         Text(
             text = stringResource(R.string.bean_education_title),
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = 24.dp)
         )
 
-        Spacer(modifier = Modifier.height(spacing.large))
-
-        // Education cards using existing CoffeeCard
-        BeanEducationCard(
+        IconTextRow(
             icon = Icons.Default.Schedule,
             title = stringResource(R.string.bean_education_freshness_title),
-            description = stringResource(R.string.bean_education_freshness_description)
+            description = stringResource(R.string.bean_education_freshness_description),
+            modifier = Modifier.padding(top = 16.dp)
         )
 
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        BeanEducationCard(
+        IconTextRow(
             icon = Icons.AutoMirrored.Default.TrendingUp,
             title = stringResource(R.string.bean_education_history_title),
             description = stringResource(R.string.bean_education_history_description)
         )
 
-        Spacer(modifier = Modifier.height(spacing.medium))
-
-        BeanEducationCard(
+        IconTextRow(
             icon = Icons.Default.PhotoCamera,
             title = stringResource(R.string.bean_education_visual_title),
             description = stringResource(R.string.bean_education_visual_description)
         )
 
-        Spacer(modifier = Modifier.height(spacing.large))
-
-        // Error display
         if (error != null) {
             ErrorCard(
-                title = "Error",
+                title = stringResource(R.string.error_title),
                 message = error,
                 onDismiss = onClearError,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = spacing.medium)
             )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
 
-        // Loading indicator
         if (isLoading) {
             LoadingIndicator(
-                message = "Preparing..."
+                message = stringResource(R.string.text_preparing),
+                modifier = Modifier.padding(top = spacing.medium)
             )
-            Spacer(modifier = Modifier.height(spacing.medium))
         }
 
-        // Action buttons
+        Spacer(modifier = Modifier.height(spacing.large))
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(spacing.medium)
@@ -324,7 +291,6 @@ fun BeanEducationContent(
 
 /**
  * Landscape-optimized content for the education phase of guided bean creation.
- * Uses horizontal layout to better utilize landscape space.
  */
 @Composable
 fun BeanEducationContentLandscape(
@@ -343,92 +309,54 @@ fun BeanEducationContentLandscape(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = landscapeSpacing, vertical = landscapeSpacing),
-        horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2)
     ) {
-        // Left side: Icon and title (30% width)
         Column(
-            modifier = Modifier.weight(0.3f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier.weight(0.3f)
         ) {
-            // Coffee bean icon with background circle
-            Box(
-                modifier = Modifier.size(100.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    modifier = Modifier.size(80.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                    tonalElevation = 2.dp
-                ) {}
-
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                    contentDescription = stringResource(R.string.cd_bean_education_freshness),
-                    modifier = Modifier.size(50.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(landscapeSpacing))
-
             Text(
                 text = stringResource(R.string.bean_education_title),
-                style = MaterialTheme.typography.headlineSmall, // Smaller for landscape
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 24.dp)
             )
         }
 
-        // Right side: Content and actions (70% width)
         Column(
             modifier = Modifier.weight(0.7f),
-            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(landscapeSpacing)
         ) {
-            // Education cards in compact layout
-            BeanEducationCardLandscape(
+            IconTextRow(
                 icon = Icons.Default.Schedule,
                 title = stringResource(R.string.bean_education_freshness_title),
                 description = stringResource(R.string.bean_education_freshness_description)
             )
 
-            BeanEducationCardLandscape(
+            IconTextRow(
                 icon = Icons.AutoMirrored.Default.TrendingUp,
                 title = stringResource(R.string.bean_education_history_title),
                 description = stringResource(R.string.bean_education_history_description)
             )
 
-            BeanEducationCardLandscape(
+            IconTextRow(
                 icon = Icons.Default.PhotoCamera,
                 title = stringResource(R.string.bean_education_visual_title),
                 description = stringResource(R.string.bean_education_visual_description)
             )
 
-            Spacer(modifier = Modifier.height(landscapeSpacing))
-
-            // Error display
             if (error != null) {
                 ErrorCard(
-                    title = "Error",
+                    title = stringResource(R.string.error_title),
                     message = error,
                     onDismiss = onClearError,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(landscapeSpacing))
             }
 
-            // Loading indicator
             if (isLoading) {
-                LoadingIndicator(
-                    message = "Preparing..."
-                )
-                Spacer(modifier = Modifier.height(landscapeSpacing))
+                LoadingIndicator(message = stringResource(R.string.text_preparing))
             }
 
-            // Action buttons - horizontal layout for landscape
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(landscapeSpacing)
@@ -451,100 +379,7 @@ fun BeanEducationContentLandscape(
 }
 
 /**
- * Individual education card component using existing CoffeeCard
- */
-@Composable
-fun BeanEducationCard(
-    icon: ImageVector,
-    title: String,
-    description: String,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(spacing.medium),
-            verticalAlignment = Alignment.Top
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-/**
- * Individual education card component optimized for landscape - more compact
- */
-@Composable
-fun BeanEducationCardLandscape(
-    icon: ImageVector,
-    title: String,
-    description: String,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-    val landscapeSpacing = spacing.landscapeSpacing()
-
-    CoffeeCard(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(landscapeSpacing),
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.padding(landscapeSpacing)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(20.dp), // Smaller for landscape
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            Column {
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.titleSmall, // Smaller for landscape
-                    fontWeight = FontWeight.Medium
-                )
-
-                Spacer(modifier = Modifier.height(spacing.extraSmall))
-
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.bodySmall, // Smaller for landscape
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-/**
  * Success screen shown after bean creation is completed.
- * Displays the created bean information and celebration message.
  */
 @Composable
 fun BeanCreationSuccess(
@@ -559,69 +394,46 @@ fun BeanCreationSuccess(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .verticalScroll(rememberScrollState())
     ) {
-        Spacer(modifier = Modifier.height(spacing.large))
-
-        // Success icon using existing coffee bean icon with background circle
-        Box(
-            modifier = Modifier.size(140.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Surface(
-                modifier = Modifier.size(120.dp),
-                shape = CircleShape,
-                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                tonalElevation = 2.dp
-            ) {}
-
-            Icon(
-                imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                contentDescription = stringResource(R.string.cd_bean_creation_success),
-                modifier = Modifier.size(70.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-        }
-
-        Spacer(modifier = Modifier.height(spacing.large))
+        Icon(
+            imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+            contentDescription = stringResource(R.string.cd_bean_creation_success),
+            modifier = Modifier
+                .padding(top = 24.dp)
+                .size(48.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
 
         Text(
             text = stringResource(R.string.bean_creation_success_title),
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = 24.dp)
         )
-
-        Spacer(modifier = Modifier.height(spacing.medium))
 
         Text(
             text = stringResource(R.string.bean_creation_success_message, createdBean.name),
             style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(top = 8.dp)
         )
 
-        Spacer(modifier = Modifier.height(spacing.large))
-
-        // Bean summary card
-        BeanSummaryCard(
+        BeanSummaryLedger(
             bean = createdBean,
             freshnessMessage = freshnessMessage,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.padding(top = 16.dp)
         )
+
+        if (isLoading) {
+            LoadingIndicator(
+                message = stringResource(R.string.text_finalizing),
+                modifier = Modifier.padding(top = spacing.medium)
+            )
+        }
 
         Spacer(modifier = Modifier.height(spacing.large))
 
-        // Loading indicator
-        if (isLoading) {
-            LoadingIndicator(
-                message = "Finalizing..."
-            )
-            Spacer(modifier = Modifier.height(spacing.medium))
-        }
-
-        // Continue button
         CoffeePrimaryButton(
             text = stringResource(R.string.button_continue_to_shot),
             onClick = onContinue,
@@ -633,100 +445,61 @@ fun BeanCreationSuccess(
     }
 }
 
+/** Roast date as a relative figure: today, yesterday, or N days ago. */
+private fun daysSinceRoast(bean: Bean): Long =
+    ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now())
+
 /**
- * Bean summary card displayed in the success screen
+ * Bean summary as ruled ledger cells: roast date, freshness, notes.
  */
 @Composable
-fun BeanSummaryCard(
+private fun BeanSummaryLedger(
     bean: Bean,
     freshnessMessage: String,
     modifier: Modifier = Modifier
 ) {
-    val spacing = LocalSpacing.current
+    val days = daysSinceRoast(bean)
+    val roastDateText = when {
+        days == 0L -> stringResource(R.string.format_roasted_today)
+        days == 1L -> stringResource(R.string.format_roasted_yesterday)
+        else -> stringResource(R.string.format_roasted_days_ago, days)
+    }
 
-    CoffeeCard(
-        modifier = modifier
-    ) {
-        Column {
-            // Bean name and details
+    LedgerSection(title = bean.name, modifier = modifier) {
+        DataCell(label = stringResource(R.string.bean_summary_roast_date_label)) {
             Text(
-                text = bean.name,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Medium
+                text = roastDateText,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
-
-            Spacer(modifier = Modifier.height(spacing.small))
-
-            // Roast date information
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        }
+        DataCell(label = stringResource(R.string.bean_summary_freshness_label)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = Icons.Default.DateRange,
+                    imageVector = if (days == 0L) Icons.Outlined.Schedule else Icons.Filled.Check,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = if (days == 0L) {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    } else {
+                        MaterialTheme.zoneColors.idealInk
+                    },
+                    modifier = Modifier.size(14.dp)
                 )
-
-                val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now())
-                val dateText = if (daysSinceRoast == 0L) {
-                    "Roasted today"
-                } else {
-                    "Roasted $daysSinceRoast day${if (daysSinceRoast != 1L) "s" else ""} ago"
-                }
-
-                Text(
-                    text = dateText,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            Spacer(modifier = Modifier.height(spacing.medium))
-
-            // Freshness message with highlight
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalAlignment = Alignment.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CheckCircle,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = freshnessMessage,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
-
-            // Notes if available
-            if (bean.notes.isNotBlank()) {
-                Spacer(modifier = Modifier.height(spacing.medium))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                    verticalAlignment = Alignment.Top
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-
-                    Text(
-                        text = bean.notes,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
-                }
+        }
+        if (bean.notes.isNotBlank()) {
+            DataCell(label = stringResource(R.string.bean_summary_notes_label)) {
+                Text(
+                    text = bean.notes,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
         }
     }
@@ -734,7 +507,6 @@ fun BeanSummaryCard(
 
 /**
  * Landscape-optimized success screen shown after bean creation is completed.
- * Uses horizontal layout to better utilize landscape space.
  */
 @Composable
 fun BeanCreationSuccessLandscape(
@@ -752,78 +524,48 @@ fun BeanCreationSuccessLandscape(
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = landscapeSpacing, vertical = landscapeSpacing),
-        horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2),
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(landscapeSpacing * 2)
     ) {
-        // Left side: Icon and success message (40% width)
         Column(
-            modifier = Modifier.weight(0.4f),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            modifier = Modifier.weight(0.4f)
         ) {
-            // Success icon using existing coffee bean icon with background circle
-            Box(
-                modifier = Modifier.size(100.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Surface(
-                    modifier = Modifier.size(80.dp),
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                    tonalElevation = 2.dp
-                ) {}
-
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
-                    contentDescription = stringResource(R.string.cd_bean_creation_success),
-                    modifier = Modifier.size(50.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            Spacer(modifier = Modifier.height(landscapeSpacing))
+            Icon(
+                imageVector = ImageVector.vectorResource(R.drawable.coffee_bean_icon),
+                contentDescription = stringResource(R.string.cd_bean_creation_success),
+                modifier = Modifier
+                    .padding(top = 24.dp)
+                    .size(48.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
 
             Text(
                 text = stringResource(R.string.bean_creation_success_title),
-                style = MaterialTheme.typography.headlineSmall, // Smaller for landscape
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 24.dp)
             )
-
-            Spacer(modifier = Modifier.height(landscapeSpacing))
 
             Text(
                 text = stringResource(R.string.bean_creation_success_message, createdBean.name),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 8.dp)
             )
         }
 
-        // Right side: Bean summary and actions (60% width)
         Column(
             modifier = Modifier.weight(0.6f),
-            horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(landscapeSpacing)
         ) {
-            // Bean summary card
-            BeanSummaryCard(
+            BeanSummaryLedger(
                 bean = createdBean,
-                freshnessMessage = freshnessMessage,
-                modifier = Modifier.fillMaxWidth()
+                freshnessMessage = freshnessMessage
             )
 
-            Spacer(modifier = Modifier.height(landscapeSpacing))
-
-            // Loading indicator
             if (isLoading) {
-                LoadingIndicator(
-                    message = "Finalizing..."
-                )
-                Spacer(modifier = Modifier.height(landscapeSpacing))
+                LoadingIndicator(message = stringResource(R.string.text_finalizing))
             }
 
-            // Continue button
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_continue_to_shot),
                 onClick = onContinue,
@@ -842,17 +584,6 @@ fun BeanCreationSuccessLandscape(
 fun GuidedBeanCreationScreenEducationPreview() {
     CoffeeShotTimerTheme {
         GuidedBeanCreationScreenPreview(BeanCreationPhase.EDUCATION)
-    }
-}
-
-/**
- * Preview for the guided bean creation screen in form phase
- */
-@Preview(showBackground = true)
-@Composable
-fun GuidedBeanCreationScreenFormPreview() {
-    CoffeeShotTimerTheme {
-        GuidedBeanCreationScreenPreview(BeanCreationPhase.FORM)
     }
 }
 
@@ -916,8 +647,7 @@ fun GuidedBeanCreationScreenPreview(
                     Text(
                         text = "Bean Creation Form",
                         style = MaterialTheme.typography.headlineMedium,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 

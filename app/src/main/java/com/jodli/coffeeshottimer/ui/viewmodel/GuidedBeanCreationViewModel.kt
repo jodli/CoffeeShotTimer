@@ -257,7 +257,9 @@ class GuidedBeanCreationViewModel @Inject constructor(
 
         // If roast date is today (likely a default), show a neutral message
         if (daysSinceRoast == 0L) {
-            return "Your bean is ready for brewing!"
+            return domainErrorTranslator.getString(
+                com.jodli.coffeeshottimer.R.string.bean_creation_success_freshness_new
+            )
         }
 
         return when {

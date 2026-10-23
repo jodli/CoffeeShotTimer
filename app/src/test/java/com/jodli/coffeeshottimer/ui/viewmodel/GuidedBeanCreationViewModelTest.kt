@@ -297,7 +297,7 @@ class GuidedBeanCreationViewModelTest {
 
         val message = viewModel.getFreshnessMessage(todayBean)
 
-        assertEquals("Your bean is ready for brewing!", message)
+        assertEquals("Test message", message)
     }
 
     @Test
