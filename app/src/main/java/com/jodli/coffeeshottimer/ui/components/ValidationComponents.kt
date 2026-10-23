@@ -11,7 +11,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Warning
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -208,83 +207,6 @@ fun GentleValidationMessage(
                     text = suggestion,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-    }
-}
-
-/**
- * Onboarding error card with retry and skip options for setup failures.
- * Provides graceful error recovery during the onboarding process.
- */
-@Composable
-fun OnboardingErrorCard(
-    title: String,
-    message: String,
-    onRetry: () -> Unit,
-    onSkip: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    CoffeeCard(
-        modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f)
-        )
-    ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalAlignment = Alignment.Top
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Error,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(24.dp)
-                )
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(spacing.extraSmall)
-                ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-
-                    Text(
-                        text = message,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = if (onSkip != null) {
-                    Arrangement.spacedBy(spacing.medium)
-                } else {
-                    Arrangement.End
-                }
-            ) {
-                if (onSkip != null) {
-                    CoffeeSecondaryButton(
-                        text = stringResource(R.string.button_skip),
-                        onClick = onSkip,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                CoffeePrimaryButton(
-                    text = stringResource(R.string.text_retry),
-                    onClick = onRetry,
-                    modifier = if (onSkip != null) Modifier.weight(1f) else Modifier
                 )
             }
         }

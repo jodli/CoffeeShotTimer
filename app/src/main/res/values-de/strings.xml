@@ -683,8 +683,6 @@
     <string name="equipment_setup_step_basket">Siebträger einrichten</string>
     <string name="equipment_setup_step_summary">Einstellungen überprüfen</string>
     <string name="error_title">Fehler</string>
-    <string name="text_preparing">Wird vorbereitet…</string>
-    <string name="text_finalizing">Wird abgeschlossen…</string>
     <string name="intro_chart_caption">Eine Kalibrierung, geplottet: von sauer bis auf Ziel in drei Shots.</string>
     <string name="format_roasted_today">Heute geröstet</string>
     <string name="format_roasted_yesterday">Gestern geröstet</string>

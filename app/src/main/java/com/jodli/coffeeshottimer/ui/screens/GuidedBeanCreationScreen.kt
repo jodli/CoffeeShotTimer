@@ -42,11 +42,9 @@ import com.jodli.coffeeshottimer.data.onboarding.BeanCreationPhase
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.CoffeeSecondaryButton
 import com.jodli.coffeeshottimer.ui.components.DataCell
-import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.IconTextRow
 import com.jodli.coffeeshottimer.ui.components.LandscapeContainer
 import com.jodli.coffeeshottimer.ui.components.LedgerSection
-import com.jodli.coffeeshottimer.ui.components.LoadingIndicator
 import com.jodli.coffeeshottimer.ui.theme.CoffeeShotTimerTheme
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
@@ -116,10 +114,7 @@ fun GuidedBeanCreationPortraitLayout(
             BeanCreationPhase.EDUCATION -> {
                 BeanEducationContent(
                     onContinue = viewModel::proceedToForm,
-                    onSkip = onSkip,
-                    isLoading = uiState.isLoading,
-                    error = uiState.error,
-                    onClearError = viewModel::clearError
+                    onSkip = onSkip
                 )
             }
 
@@ -139,8 +134,7 @@ fun GuidedBeanCreationPortraitLayout(
                 BeanCreationSuccess(
                     createdBean = uiState.createdBean!!,
                     freshnessMessage = viewModel.getFreshnessMessage(uiState.createdBean!!),
-                    onContinue = { onComplete(uiState.createdBean!!) },
-                    isLoading = uiState.isLoading
+                    onContinue = { onComplete(uiState.createdBean!!) }
                 )
             }
         }
@@ -171,9 +165,6 @@ fun GuidedBeanCreationLandscapeLayout(
                 BeanEducationContentLandscape(
                     onContinue = viewModel::proceedToForm,
                     onSkip = onSkip,
-                    isLoading = uiState.isLoading,
-                    error = uiState.error,
-                    onClearError = viewModel::clearError,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -196,7 +187,6 @@ fun GuidedBeanCreationLandscapeLayout(
                     createdBean = uiState.createdBean!!,
                     freshnessMessage = viewModel.getFreshnessMessage(uiState.createdBean!!),
                     onContinue = { onComplete(uiState.createdBean!!) },
-                    isLoading = uiState.isLoading,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -211,9 +201,6 @@ fun GuidedBeanCreationLandscapeLayout(
 fun BeanEducationContent(
     onContinue: () -> Unit,
     onSkip: () -> Unit,
-    isLoading: Boolean,
-    error: String?,
-    onClearError: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -249,24 +236,6 @@ fun BeanEducationContent(
             description = stringResource(R.string.bean_education_visual_description)
         )
 
-        if (error != null) {
-            ErrorCard(
-                title = stringResource(R.string.error_title),
-                message = error,
-                onDismiss = onClearError,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = spacing.medium)
-            )
-        }
-
-        if (isLoading) {
-            LoadingIndicator(
-                message = stringResource(R.string.text_preparing),
-                modifier = Modifier.padding(top = spacing.medium)
-            )
-        }
-
         Spacer(modifier = Modifier.height(spacing.large))
 
         Row(
@@ -276,13 +245,11 @@ fun BeanEducationContent(
             CoffeeSecondaryButton(
                 text = stringResource(R.string.button_skip_for_now),
                 onClick = onSkip,
-                enabled = !isLoading,
                 modifier = Modifier.weight(1f)
             )
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_add_my_first_bean),
                 onClick = onContinue,
-                enabled = !isLoading,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -296,9 +263,6 @@ fun BeanEducationContent(
 fun BeanEducationContentLandscape(
     onContinue: () -> Unit,
     onSkip: () -> Unit,
-    isLoading: Boolean,
-    error: String?,
-    onClearError: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -344,19 +308,6 @@ fun BeanEducationContentLandscape(
                 description = stringResource(R.string.bean_education_visual_description)
             )
 
-            if (error != null) {
-                ErrorCard(
-                    title = stringResource(R.string.error_title),
-                    message = error,
-                    onDismiss = onClearError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            if (isLoading) {
-                LoadingIndicator(message = stringResource(R.string.text_preparing))
-            }
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(landscapeSpacing)
@@ -364,13 +315,11 @@ fun BeanEducationContentLandscape(
                 CoffeeSecondaryButton(
                     text = stringResource(R.string.button_skip_for_now),
                     onClick = onSkip,
-                    enabled = !isLoading,
                     modifier = Modifier.weight(1f)
                 )
                 CoffeePrimaryButton(
                     text = stringResource(R.string.button_add_my_first_bean),
                     onClick = onContinue,
-                    enabled = !isLoading,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -386,7 +335,6 @@ fun BeanCreationSuccess(
     createdBean: Bean,
     freshnessMessage: String,
     onContinue: () -> Unit,
-    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -425,19 +373,11 @@ fun BeanCreationSuccess(
             modifier = Modifier.padding(top = 16.dp)
         )
 
-        if (isLoading) {
-            LoadingIndicator(
-                message = stringResource(R.string.text_finalizing),
-                modifier = Modifier.padding(top = spacing.medium)
-            )
-        }
-
         Spacer(modifier = Modifier.height(spacing.large))
 
         CoffeePrimaryButton(
             text = stringResource(R.string.button_continue_to_shot),
             onClick = onContinue,
-            enabled = !isLoading,
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -513,7 +453,6 @@ fun BeanCreationSuccessLandscape(
     createdBean: Bean,
     freshnessMessage: String,
     onContinue: () -> Unit,
-    isLoading: Boolean,
     modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
@@ -562,14 +501,9 @@ fun BeanCreationSuccessLandscape(
                 freshnessMessage = freshnessMessage
             )
 
-            if (isLoading) {
-                LoadingIndicator(message = stringResource(R.string.text_finalizing))
-            }
-
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_continue_to_shot),
                 onClick = onContinue,
-                enabled = !isLoading,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -635,10 +569,7 @@ fun GuidedBeanCreationScreenPreview(
                 BeanCreationPhase.EDUCATION -> {
                     BeanEducationContent(
                         onContinue = {},
-                        onSkip = {},
-                        isLoading = false,
-                        error = null,
-                        onClearError = {}
+                        onSkip = {}
                     )
                 }
 
@@ -655,8 +586,7 @@ fun GuidedBeanCreationScreenPreview(
                     BeanCreationSuccess(
                         createdBean = GuidedBeanCreationPreviewData.mockBean,
                         freshnessMessage = "Perfect timing – these beans are in their optimal freshness window!",
-                        onContinue = {},
-                        isLoading = false
+                        onContinue = {}
                     )
                 }
             }

@@ -718,8 +718,6 @@
     <string name="equipment_setup_step_basket">Basket Setup</string>
     <string name="equipment_setup_step_summary">Review Settings</string>
     <string name="error_title">Error</string>
-    <string name="text_preparing">Preparing…</string>
-    <string name="text_finalizing">Wrapping up…</string>
     <string name="intro_chart_caption">One dial-in, plotted: sour to on-target in three shots.</string>
     <string name="format_roasted_today">Roasted today</string>
     <string name="format_roasted_yesterday">Roasted yesterday</string>
