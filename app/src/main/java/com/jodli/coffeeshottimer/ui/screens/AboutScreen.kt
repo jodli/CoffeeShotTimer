@@ -2,25 +2,20 @@ package com.jodli.coffeeshottimer.ui.screens
 
 import android.content.Intent
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Public
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,15 +28,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
-import com.jodli.coffeeshottimer.ui.components.CoffeeCard
 import com.jodli.coffeeshottimer.ui.components.DebugDialog
 import com.jodli.coffeeshottimer.ui.components.DebugTapDetector
+import com.jodli.coffeeshottimer.ui.components.LedgerLinkRow
+import com.jodli.coffeeshottimer.ui.components.LedgerSection
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.viewmodel.DebugViewModel
 
@@ -56,6 +52,10 @@ fun AboutScreen(
     val context = LocalContext.current
     val debugUiState by debugViewModel.uiState.collectAsState()
 
+    val openUrl: (String) -> Unit = { url ->
+        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -63,8 +63,7 @@ fun AboutScreen(
                 title = {
                     Text(
                         text = stringResource(id = R.string.title_about),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.titleLarge
                     )
                 },
                 navigationIcon = {
@@ -82,40 +81,26 @@ fun AboutScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .padding(spacing.screenPadding)
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(spacing.medium)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = spacing.screenPadding)
         ) {
-            // App info card with hero content
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+            // The app's dial mark, name and version
+            Row(
+                modifier = Modifier.padding(top = 24.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(spacing.large),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(spacing.medium)
-                ) {
-                    // App icon placeholder (using Info icon as stand-in)
-                    Icon(
-                        imageVector = Icons.Filled.Info,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.padding(spacing.small)
-                    )
-
+                Image(
+                    painter = painterResource(R.drawable.splash_icon),
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
                     Text(
                         text = stringResource(id = R.string.app_name_prod),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        textAlign = TextAlign.Center
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-
                     DebugTapDetector(
                         onDebugActivated = { debugViewModel.showDialog() }
                     ) {
@@ -126,142 +111,46 @@ fun AboutScreen(
                                 BuildConfig.VERSION_CODE
                             ),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            textAlign = TextAlign.Center
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
             }
 
-            // App description card
-            Card(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(spacing.large),
-                    verticalArrangement = Arrangement.spacedBy(spacing.medium)
-                ) {
-                    Text(
-                        text = stringResource(id = R.string.text_about_app),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        textAlign = TextAlign.Center
-                    )
-
-                    Text(
-                        text = stringResource(id = R.string.text_about_philosophy),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-            }
-
-            // Links section title
             Text(
-                text = stringResource(id = R.string.text_links),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(horizontal = spacing.small)
+                text = stringResource(id = R.string.text_about_app),
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(top = 16.dp)
             )
 
-            // GitHub repository link
-            CoffeeCard(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jodli/CoffeeShotTimer"))
-                    context.startActivity(intent)
-                }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = spacing.cardPadding, vertical = spacing.small)
-                        .height(spacing.touchTarget),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-                    ) {
-                        Icon(Icons.Filled.Public, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Column {
-                            Text(
-                                text = stringResource(id = R.string.link_github_repo),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(id = R.string.link_github_repo_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            Text(
+                text = stringResource(id = R.string.text_about_philosophy),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+
+            LedgerSection(title = stringResource(id = R.string.text_links)) {
+                LedgerLinkRow(
+                    label = stringResource(id = R.string.link_github_repo),
+                    detail = stringResource(id = R.string.link_github_repo_description),
+                    opensExternally = true,
+                    onClick = { openUrl("https://github.com/jodli/CoffeeShotTimer") }
+                )
+                LedgerLinkRow(
+                    label = stringResource(id = R.string.link_privacy_policy),
+                    detail = stringResource(id = R.string.link_privacy_policy_description),
+                    opensExternally = true,
+                    onClick = { openUrl("https://jodli.github.io/CoffeeShotTimer/") }
+                )
             }
 
-            // Privacy Policy link
-            CoffeeCard(
-                modifier = Modifier.fillMaxWidth(),
-                onClick = {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://jodli.github.io/CoffeeShotTimer/"))
-                    context.startActivity(intent)
-                }
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = spacing.cardPadding, vertical = spacing.small)
-                        .height(spacing.touchTarget),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(spacing.medium)
-                    ) {
-                        Icon(Icons.Filled.Info, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-                        Column {
-                            Text(
-                                text = stringResource(id = R.string.link_privacy_policy),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Text(
-                                text = stringResource(id = R.string.link_privacy_policy_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-
-            // Footer divider and tagline
-            HorizontalDivider(modifier = Modifier.padding(top = spacing.large))
             Text(
                 text = stringResource(id = R.string.text_made_with_love),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = spacing.medium)
+                modifier = Modifier.padding(top = 24.dp)
             )
             Spacer(modifier = Modifier.height(spacing.large))
         }
