@@ -26,6 +26,9 @@ import com.jodli.coffeeshottimer.data.model.BasketPreset
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 
+/** Average coffee-in weight (g) below which the ranges read as a single-shot setup. */
+private const val SINGLE_BASKET_MAX_AVG_COFFEE_IN = 13f
+
 private fun BasketPreset.matches(
     inMin: String,
     inMax: String,
@@ -180,7 +183,7 @@ private fun BasketRangeConfirmation(
     val avgIn = basketAvgIn(coffeeInMin, coffeeInMax, coffeeOutMin, coffeeOutMax)
 
     if (avgIn != null && !hasFieldError) {
-        val shotTypeRes = if (avgIn < 13f) {
+        val shotTypeRes = if (avgIn < SINGLE_BASKET_MAX_AVG_COFFEE_IN) {
             R.string.text_basket_validation_success_single
         } else {
             R.string.text_basket_validation_success_double

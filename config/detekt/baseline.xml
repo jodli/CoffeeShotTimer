@@ -4,14 +4,11 @@
   <CurrentIssues>
     <ID>ComplexCondition:BasketSettingsViewModel.kt$BasketSettingsViewModel$coffeeInMin == null || coffeeInMax == null || coffeeOutMin == null || coffeeOutMax == null</ID>
     <ID>ComplexCondition:BasketSettingsViewModel.kt$BasketSettingsViewModel$inMin != null &amp;&amp; inMax != null &amp;&amp; outMin != null &amp;&amp; outMax != null</ID>
-    <ID>ComplexCondition:BasketSetup.kt$coffeeInMin.isNotBlank() &amp;&amp; coffeeInMax.isNotBlank() &amp;&amp; coffeeOutMin.isNotBlank() &amp;&amp; coffeeOutMax.isNotBlank()</ID>
-    <ID>ComplexCondition:BasketSetup.kt$inMinVal != null &amp;&amp; inMaxVal != null &amp;&amp; outMinVal != null &amp;&amp; outMaxVal != null &amp;&amp; inMinVal &lt; inMaxVal &amp;&amp; outMinVal &lt; outMaxVal &amp;&amp; coffeeInMinError == null &amp;&amp; coffeeInMaxError == null &amp;&amp; coffeeOutMinError == null &amp;&amp; coffeeOutMaxError == null</ID>
     <ID>ComplexCondition:EquipmentSettingsViewModel.kt$EquipmentSettingsViewModel$!current.isFormValid || minVal == null || maxVal == null || stepSizeVal == null</ID>
     <ID>ComplexCondition:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$grinderMin == null || grinderMax == null || grinderStepSize == null || coffeeInMin == null || coffeeInMax == null || coffeeOutMin == null || coffeeOutMax == null</ID>
     <ID>ComplexCondition:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$inMin != null &amp;&amp; inMax != null &amp;&amp; outMin != null &amp;&amp; outMax != null</ID>
     <ID>ComplexCondition:ShotRecordingViewModel.kt$ShotRecordingViewModel$bean == null || weightIn == null || weightOut == null || grinder.isBlank()</ID>
     <ID>ComplexInterface:ShotDao.kt$ShotDao</ID>
-    <ID>CyclomaticComplexMethod:BasketSetup.kt$@Composable fun BasketSetup( coffeeInMin: String, coffeeInMax: String, coffeeOutMin: String, coffeeOutMax: String, onCoffeeInMinChange: (String) -&gt; Unit, onCoffeeInMaxChange: (String) -&gt; Unit, onCoffeeOutMinChange: (String) -&gt; Unit, onCoffeeOutMaxChange: (String) -&gt; Unit, onPresetSelected: (BasketPreset) -&gt; Unit, coffeeInMinError: String? = null, coffeeInMaxError: String? = null, coffeeOutMinError: String? = null, coffeeOutMaxError: String? = null, generalError: String? = null, validationSuggestion: String? = null, modifier: Modifier = Modifier, showDescription: Boolean = true, showPresets: Boolean = true )</ID>
     <ID>CyclomaticComplexMethod:DomainErrorTranslator.kt$DomainErrorTranslator$fun translate(errorCode: DomainErrorCode, details: String? = null): String</ID>
     <ID>CyclomaticComplexMethod:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$override suspend fun compressImage(imageUri: Uri): Result&lt;Uri&gt;</ID>
     <ID>CyclomaticComplexMethod:ShotHistoryScreen.kt$private fun getActiveFilterTexts( filter: ShotHistoryFilter, availableBeans: List&lt;com.jodli.coffeeshottimer.data.model.Bean&gt; ): List&lt;String&gt;</ID>
@@ -22,12 +19,9 @@
     <ID>LargeClass:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
     <ID>LargeClass:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest</ID>
     <ID>LargeClass:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
-    <ID>LongMethod:AboutScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun AboutScreen( onNavigateBack: () -&gt; Unit, modifier: Modifier = Modifier, debugViewModel: DebugViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:AppNavigation.kt$@Composable fun AppNavigation( navController: NavHostController, modifier: Modifier = Modifier, startDestination: String = NavigationDestinations.RecordShot.route )</ID>
-    <ID>LongMethod:BasketSetup.kt$@Composable fun BasketSetup( coffeeInMin: String, coffeeInMax: String, coffeeOutMin: String, coffeeOutMax: String, onCoffeeInMinChange: (String) -&gt; Unit, onCoffeeInMaxChange: (String) -&gt; Unit, onCoffeeOutMinChange: (String) -&gt; Unit, onCoffeeOutMaxChange: (String) -&gt; Unit, onPresetSelected: (BasketPreset) -&gt; Unit, coffeeInMinError: String? = null, coffeeInMaxError: String? = null, coffeeOutMinError: String? = null, coffeeOutMaxError: String? = null, generalError: String? = null, validationSuggestion: String? = null, modifier: Modifier = Modifier, showDescription: Boolean = true, showPresets: Boolean = true )</ID>
     <ID>LongMethod:DebugDialog.kt$@Composable fun DebugDialog( isVisible: Boolean, onDismiss: () -&gt; Unit, onFillDatabase: () -&gt; Unit, onClearDatabase: () -&gt; Unit, onResetToNewUser: () -&gt; Unit, onResetToExistingUserNoBeans: () -&gt; Unit, onForceEquipmentSetup: () -&gt; Unit, isLoading: Boolean, operationResult: String?, showConfirmation: Boolean, onShowConfirmation: () -&gt; Unit, onHideConfirmation: () -&gt; Unit )</ID>
     <ID>LongMethod:GrindAdjustmentCard.kt$@Composable fun GrindAdjustmentCard( recommendation: GrindAdjustmentRecommendation, onApply: (() -&gt; Unit)? = null, onDismiss: (() -&gt; Unit)? = null, modifier: Modifier = Modifier, isCompact: Boolean = false )</ID>
-    <ID>LongMethod:MoreScreen.kt$@Composable private fun MoreScreenContent( onNavigateToGrinderSettings: () -&gt; Unit, onNavigateToBasketSettings: () -&gt; Unit, onNavigateToAbout: () -&gt; Unit, spacing: com.jodli.coffeeshottimer.ui.theme.Spacing, context: android.content.Context )</ID>
     <ID>LongMethod:ShotDetailsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ShotDetailsScreen( shotId: String, onNavigateBack: () -&gt; Unit = {}, onNavigateToShot: (String) -&gt; Unit = {}, viewModel: ShotDetailsViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:ShotHistoryFilterDialog.kt$@Composable fun ShotHistoryFilterDialog( currentFilter: ShotHistoryFilter, availableBeans: List&lt;Bean&gt;, onApplyFilter: (ShotHistoryFilter) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
     <ID>LongMethod:ShotRecordedDialog.kt$@Composable fun ShotRecordedDialog( brewRatio: String, extractionTime: String, suggestedTaste: TastePrimary? = null, grindAdjustment: GrindAdjustmentRecommendation? = null, onTasteSelected: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Reactive UI updates onSubmit: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Save to database onDismiss: () -&gt; Unit, onViewDetails: (() -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
@@ -49,7 +43,6 @@
     <ID>MagicNumber:BasketConfiguration.kt$BasketConfiguration$3f</ID>
     <ID>MagicNumber:BasketConfiguration.kt$BasketConfiguration$5f</ID>
     <ID>MagicNumber:BasketConfiguration.kt$BasketConfiguration$80f</ID>
-    <ID>MagicNumber:BasketSetup.kt$13f</ID>
     <ID>MagicNumber:Bean.kt$Bean$100</ID>
     <ID>MagicNumber:Bean.kt$Bean$21</ID>
     <ID>MagicNumber:Bean.kt$Bean$365</ID>
@@ -150,12 +143,6 @@
     <ID>MagicNumber:GrinderConfiguration.kt$GrinderConfiguration$1000</ID>
     <ID>MagicNumber:GrinderConfiguration.kt$GrinderConfiguration$1e-6</ID>
     <ID>MagicNumber:GrinderConfiguration.kt$GrinderConfiguration$3</ID>
-    <ID>MagicNumber:GrinderScaleSetup.kt$10</ID>
-    <ID>MagicNumber:GrinderScaleSetup.kt$100</ID>
-    <ID>MagicNumber:GrinderScaleSetup.kt$30</ID>
-    <ID>MagicNumber:GrinderScaleSetup.kt$50</ID>
-    <ID>MagicNumber:GrinderScaleSetup.kt$60</ID>
-    <ID>MagicNumber:GrinderScaleSetup.kt$80</ID>
     <ID>MagicNumber:GuidedBeanCreationScreen.kt$0.3f</ID>
     <ID>MagicNumber:GuidedBeanCreationScreen.kt$0.4f</ID>
     <ID>MagicNumber:GuidedBeanCreationScreen.kt$0.6f</ID>
@@ -303,8 +290,8 @@
     <ID>MatchingDeclarationName:ValidationComponents.kt$ValidationUtils</ID>
     <ID>MaximumLineLength:AddEditBeanViewModel.kt$AddEditBeanViewModel$ </ID>
     <ID>MaximumLineLength:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$ </ID>
-    <ID>MaximumLineLength:BasketSettingsScreen.kt$ </ID>
     <ID>MaximumLineLength:BasketSettingsViewModel.kt$BasketSettingsViewModel$ </ID>
+    <ID>MaximumLineLength:BasketSettingsScreen.kt$ </ID>
     <ID>MaximumLineLength:BeanManagementViewModelTest.kt$BeanManagementViewModelTest$ </ID>
     <ID>MaximumLineLength:BeanRepositoryTest.kt$BeanRepositoryTest$ </ID>
     <ID>MaximumLineLength:CommonComponents.kt$ </ID>
@@ -315,9 +302,9 @@
     <ID>MaximumLineLength:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$ </ID>
     <ID>MaximumLineLength:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$ </ID>
     <ID>MaximumLineLength:GetShotHistoryUseCaseTest.kt$GetShotHistoryUseCaseTest$ </ID>
+    <ID>MaximumLineLength:GrinderSettingsScreen.kt$ </ID>
     <ID>MaximumLineLength:GrindAdjustmentFormatterTest.kt$GrindAdjustmentFormatterTest$ </ID>
     <ID>MaximumLineLength:GrinderConfigRepository.kt$GrinderConfigRepository$ </ID>
-    <ID>MaximumLineLength:GrinderSettingsScreen.kt$ </ID>
     <ID>MaximumLineLength:ManageGrindRecommendationUseCaseTest.kt$ManageGrindRecommendationUseCaseTest$ </ID>
     <ID>MaximumLineLength:OnboardingManager.kt$OnboardingProgress$ </ID>
     <ID>MaximumLineLength:OnboardingRoutingIntegrationTest.kt$OnboardingRoutingIntegrationTest$ </ID>

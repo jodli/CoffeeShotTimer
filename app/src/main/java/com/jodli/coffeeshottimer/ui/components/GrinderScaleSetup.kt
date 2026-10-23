@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
