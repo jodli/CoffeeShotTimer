@@ -229,7 +229,11 @@ private fun IntroductionPortraitLayout(
         }
 
         // Page indicators
-        PageIndicatorRow(currentPage = currentPage, pageCount = slides.size)
+        PageIndicatorRow(
+            currentPage = currentPage,
+            pageCount = slides.size,
+            modifier = Modifier.padding(horizontal = spacing.screenPadding)
+        )
 
         // Navigation buttons - Skip and Next/Get Started
         Row(
@@ -292,6 +296,12 @@ private fun IntroductionLandscapeLayout(
             ) {
                 if (currentPage == 0) {
                     IntroDialChart(modifier = Modifier.fillMaxWidth())
+                    Text(
+                        text = stringResource(R.string.intro_chart_caption),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 } else {
                     Text(
                         text = currentSlide.title,
@@ -376,9 +386,13 @@ private fun IntroDialChart(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PageIndicatorRow(currentPage: Int, pageCount: Int) {
+private fun PageIndicatorRow(
+    currentPage: Int,
+    pageCount: Int,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
