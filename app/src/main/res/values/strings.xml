@@ -682,6 +682,10 @@
     <string name="title_basket_settings">Basket Settings</string>
     <string name="text_equipment_settings_description">Set the minimum and maximum values that your grinder\'s scale supports. This is used across the app to validate and guide grinder inputs.</string>
     <string name="title_more">More</string>
+    <string name="label_equipment">Equipment</string>
+    <string name="label_app">App</string>
+    <string name="format_grinder_summary">%1$d–%2$d · step %3$s</string>
+    <string name="format_basket_summary">%1$d–%2$d g in · %3$d–%4$d g out</string>
     <string name="text_grinder_scale_range">Grinder Scale Range</string>
     <string name="text_grinder_scale_description">Set the minimum and maximum values on your grinder\'s scale. This helps the app provide relevant guidance for your specific equipment.</string>
     <string name="text_common_presets">Common Presets</string>

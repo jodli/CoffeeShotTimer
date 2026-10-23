@@ -152,7 +152,7 @@ fun StepSizeSelector(
 /**
  * Format step size for display, showing appropriate decimal places.
  */
-private fun formatStepSize(stepSize: Double): String {
+internal fun formatStepSize(stepSize: Double): String {
     return when {
         stepSize >= 1.0 && stepSize % 1.0 == 0.0 -> stepSize.toInt().toString()
         else -> String.format(java.util.Locale.ROOT, "%.2f", stepSize).trimEnd('0').trimEnd('.')

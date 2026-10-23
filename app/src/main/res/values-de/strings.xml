@@ -647,6 +647,10 @@
     <string name="title_basket_settings">Sieb-Einstellungen</string>
     <string name="text_equipment_settings_description">Stelle die minimalen und maximalen Werte ein, die die Skala deiner Mühle unterstützt. Dies wird in der App zur Validierung und als Leitfaden verwendet.</string>
     <string name="title_more">Mehr</string>
+    <string name="label_equipment">Ausrüstung</string>
+    <string name="label_app">App</string>
+    <string name="format_grinder_summary">%1$d–%2$d · Schritt %3$s</string>
+    <string name="format_basket_summary">%1$d–%2$d g rein · %3$d–%4$d g raus</string>
     <string name="text_grinder_scale_range">Mühlen-Skalenbereich</string>
     <string name="text_grinder_scale_description">Stelle die Minimal- und Maximalwerte auf der Skala deiner Mühle ein. Dies hilft der App, relevante Anleitungen für deine spezifische Ausrüstung zu geben.</string>
     <string name="text_common_presets">Häufige Voreinstellungen</string>
