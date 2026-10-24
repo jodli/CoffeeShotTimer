@@ -691,7 +691,8 @@ private fun GrinderRecommendationCard(
 
             CoffeePrimaryButton(
                 text = stringResource(R.string.button_apply),
-                onClick = onApply
+                onClick = onApply,
+                fillMaxWidth = false
             )
         }
 

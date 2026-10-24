@@ -3,6 +3,7 @@ package com.jodli.coffeeshottimer.ui.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +23,15 @@ fun AppNavigation(
 ) {
     // Root-scoped view model to update onboarding state when skipping
     val mainActivityViewModel: com.jodli.coffeeshottimer.ui.viewmodel.MainActivityViewModel = hiltViewModel()
+
+    // Leave onboarding for Record Shot. Onboarding can start on the introduction,
+    // equipment setup or guided bean creation, so pop the graph's start destination
+    // rather than a fixed route.
+    val exitOnboarding: () -> Unit = {
+        navController.navigate(NavigationDestinations.RecordShot.route) {
+            popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -83,10 +93,7 @@ fun AppNavigation(
                 onSkip = {
                     // Mark onboarding as complete when skipping from introduction
                     mainActivityViewModel.completeOnboarding()
-                    navController.navigate(NavigationDestinations.RecordShot.route) {
-                        // Clear onboarding from back stack when skipping
-                        popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
-                    }
+                    exitOnboarding()
                 }
             )
         }
@@ -98,9 +105,7 @@ fun AppNavigation(
                     mainActivityViewModel.handleEquipmentSetupComplete { shouldSkipBeanCreation ->
                         if (shouldSkipBeanCreation) {
                             // User has beans - go directly to main app
-                            navController.navigate(NavigationDestinations.RecordShot.route) {
-                                popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
-                            }
+                            exitOnboarding()
                         } else {
                             // User needs beans - continue to bean creation
                             navController.navigate(NavigationDestinations.OnboardingGuidedBeanCreation.route)
@@ -112,18 +117,8 @@ fun AppNavigation(
 
         composable(NavigationDestinations.OnboardingGuidedBeanCreation.route) {
             com.jodli.coffeeshottimer.ui.screens.GuidedBeanCreationScreen(
-                onComplete = { bean ->
-                    navController.navigate(NavigationDestinations.RecordShot.route) {
-                        // Clear all onboarding screens from back stack after completion
-                        popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
-                    }
-                },
-                onSkip = {
-                    navController.navigate(NavigationDestinations.RecordShot.route) {
-                        // Clear all onboarding screens from back stack when skipping
-                        popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
-                    }
-                }
+                onComplete = { exitOnboarding() },
+                onSkip = { exitOnboarding() }
             )
         }
 
