@@ -433,26 +433,8 @@
     <string name="intro_get_started_description">Bereit, deinen ersten verfolgten Shot zu ziehen? Wir helfen dir beim Einrichten deiner Ausrüstung und beim Start deiner Reise zu besserem Espresso!</string>
 
     <!-- Shot Recommendations -->
-    <string name="recommendation_grind_finer">Erwäge feiner zu mahlen, um die Extraktion zu verlangsamen (aktuell: %1$ss)</string>
-    <string name="recommendation_grind_coarser">Erwäge gröber zu mahlen, um die Extraktion zu beschleunigen (aktuell: %1$ss)</string>
-    <string name="recommendation_increase_yield">Erwäge mehr Flüssigkeit zu extrahieren für höhere Ausbeute (aktuelles Verhältnis: 1:%1$s)</string>
-    <string name="recommendation_decrease_yield">Erwäge die Extraktion früher zu stoppen für niedrigere Ausbeute (aktuelles Verhältnis: 1:%1$s)</string>
-    <string name="recommendation_ratio_inconsistency">Das Verhältnis dieses Shots weicht deutlich von deinem Durchschnitt ab (Abweichung: %1$s, Durchschnitt: 1:%2$s)</string>
-    <string name="recommendation_dose_adjustment">Erwäge deine Kaffeemenge für bessere Konsistenz anzupassen</string>
-    <string name="recommendation_timing_consistency">Konzentriere dich auf konsistentes Timing für vorhersagbarere Ergebnisse</string>
 
     <!-- Grind Adjustment Recommendations -->
-    <string name="recommendation_taste_sour">Unterextrahiert (Sauer)</string>
-    <string name="recommendation_taste_bitter">Überextrahiert (Bitter)</string>
-    <string name="recommendation_taste_perfect">Gute Extraktion</string>
-    <string name="recommendation_timing_issue">Zeitproblem</string>
-    <string name="recommendation_time_too_fast">Der Shot lief %1$ds zu schnell</string>
-    <string name="recommendation_time_too_slow">Der Shot lief %1$ds zu langsam</string>
-    <string name="recommendation_time_good">Gute Zeit (%1$ss)</string>
-    <string name="recommendation_action_finer">Versuche, feiner zu mahlen</string>
-    <string name="recommendation_action_coarser">Versuche, gröber zu mahlen</string>
-    <string name="recommendation_action_no_change">Behalte die aktuelle Einstellung</string>
-    <string name="recommendation_explanation_format">%1$s - %2$s. %3$s.</string>
 
     <!-- Shot Recorded Dialog -->
     <string name="dialog_shot_recorded_title">Shot aufgenommen!</string>
@@ -593,11 +575,6 @@
     <string name="error_calculation_failed">Berechnung der Mahlgradanpassung fehlgeschlagen. Bitte versuche es erneut.</string>
 
     <!-- Grind Adjustment UI Strings -->
-    <string name="grind_adjustment_finer_single">1 Schritt feiner mahlen</string>
-    <string name="grind_adjustment_finer_multiple">%1$d Schritte feiner mahlen</string>
-    <string name="grind_adjustment_coarser_single">1 Schritt gröber mahlen</string>
-    <string name="grind_adjustment_coarser_multiple">%1$d Schritte gröber mahlen</string>
-    <string name="grind_adjustment_no_change">Keine Anpassung erforderlich</string>
     <string name="grind_adjustment_summary_finer_single">1 Schritt feiner → %1$s</string>
     <string name="grind_adjustment_summary_finer_multiple">%1$d Schritte feiner → %2$s</string>
     <string name="grind_adjustment_summary_coarser_single">1 Schritt gröber → %1$s</string>

@@ -263,36 +263,6 @@ class BasketConfigRepository @Inject constructor(
     }
 
     /**
-     * Set a specific configuration as active.
-     * @param configId The ID of the configuration to activate
-     * @return Result indicating success or failure
-     */
-    suspend fun setActiveConfig(configId: String): Result<Unit> {
-        return try {
-            if (configId.isBlank()) {
-                return Result.failure(RepositoryException.ValidationError("Configuration ID cannot be empty"))
-            }
-
-            // Check if configuration exists
-            val existingConfig = basketConfigDao.getConfigById(configId)
-                ?: return Result.failure(RepositoryException.NotFoundError("Basket configuration not found"))
-
-            executeWithRetry(
-                operation = {
-                    // Deactivate all configurations first
-                    basketConfigDao.deactivateAllConfigs()
-                    // Activate the specified configuration
-                    basketConfigDao.activateConfig(configId)
-                    Unit
-                },
-                errorMessage = "Failed to set active basket configuration"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to set active basket configuration", exception))
-        }
-    }
-
-    /**
      * Validate basket configuration data without saving.
      * @param config The configuration to validate
      * @return ValidationResult with validation status and errors

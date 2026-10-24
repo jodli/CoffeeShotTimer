@@ -260,14 +260,12 @@
     <ID>MaximumLineLength:BeanManagementViewModelTest.kt$BeanManagementViewModelTest$ </ID>
     <ID>MaximumLineLength:BeanRepositoryTest.kt$BeanRepositoryTest$ </ID>
     <ID>MaximumLineLength:CommonComponents.kt$ </ID>
-    <ID>MaximumLineLength:ConditionalCompilationTest.kt$ConditionalCompilationTest$ </ID>
     <ID>MaximumLineLength:DebugViewModel.kt$DebugViewModel$ </ID>
     <ID>MaximumLineLength:EquipmentSettingsViewModel.kt$EquipmentSettingsViewModel$ </ID>
     <ID>MaximumLineLength:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$ </ID>
     <ID>MaximumLineLength:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$ </ID>
     <ID>MaximumLineLength:GetShotHistoryUseCaseTest.kt$GetShotHistoryUseCaseTest$ </ID>
     <ID>MaximumLineLength:GrinderSettingsScreen.kt$ </ID>
-    <ID>MaximumLineLength:GrindAdjustmentFormatterTest.kt$GrindAdjustmentFormatterTest$ </ID>
     <ID>MaximumLineLength:GrinderConfigRepository.kt$GrinderConfigRepository$ </ID>
     <ID>MaximumLineLength:ManageGrindRecommendationUseCaseTest.kt$ManageGrindRecommendationUseCaseTest$ </ID>
     <ID>MaximumLineLength:OnboardingManager.kt$OnboardingProgress$ </ID>
@@ -333,7 +331,6 @@
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:UpdateBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ValidationExtensionsTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:WeightSliderComponentsTest.kt$import org.junit.Assert.*</ID>
     <ID>ReturnCount:AddPhotoToBeanUseCase.kt$AddPhotoToBeanUseCase$suspend fun execute(beanId: String, imageUri: Uri): Result&lt;String&gt;</ID>
     <ID>ReturnCount:BasketConfigRepository.kt$BasketConfigRepository$suspend fun saveConfig(config: BasketConfiguration): Result&lt;Unit&gt;</ID>
     <ID>ReturnCount:BasketConfigRepository.kt$BasketConfigRepository$suspend fun setActiveConfig(configId: String): Result&lt;Unit&gt;</ID>
