@@ -8,9 +8,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
@@ -50,18 +50,19 @@ fun TasteFeedbackEditSheet(
         ) {
             // Title
             Row(
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.small)
             ) {
                 Icon(
                     imageVector = Icons.Default.Coffee,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = stringResource(R.string.text_taste_feedback),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -139,12 +140,17 @@ private fun TasteSuggestionHint(
     val spacing = LocalSpacing.current
 
     if (suggestedTaste != null && extractionTimeSeconds != null) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
-            ),
-            modifier = modifier.fillMaxWidth()
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = spacing.small),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.Top
         ) {
+            TasteMark(
+                taste = suggestedTaste,
+                modifier = Modifier.padding(top = 2.dp)
+            )
             Text(
                 text = when (suggestedTaste) {
                     TastePrimary.SOUR -> stringResource(
@@ -161,9 +167,7 @@ private fun TasteSuggestionHint(
                     )
                 },
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.padding(spacing.small),
-                textAlign = TextAlign.Center
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
