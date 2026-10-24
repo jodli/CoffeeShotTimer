@@ -22,8 +22,6 @@ data class Spacing(
     val cornerSmall: Dp = 2.dp,
     val cornerMedium: Dp = 2.dp,
     val cornerLarge: Dp = 4.dp,
-    // Elevation values
-    // flat sheet: cards are separated by rules, not shadows
     // Component-specific sizes
     val timerSize: Dp = 200.dp,
     val buttonMaxWidth: Dp = 200.dp,
