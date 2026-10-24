@@ -99,7 +99,7 @@ fun AppNavigation(
                         if (shouldSkipBeanCreation) {
                             // User has beans - go directly to main app
                             navController.navigate(NavigationDestinations.RecordShot.route) {
-                                popUpTo(NavigationDestinations.OnboardingEquipmentSetup.route) { inclusive = true }
+                                popUpTo(NavigationDestinations.OnboardingIntroduction.route) { inclusive = true }
                             }
                         } else {
                             // User needs beans - continue to bean creation
