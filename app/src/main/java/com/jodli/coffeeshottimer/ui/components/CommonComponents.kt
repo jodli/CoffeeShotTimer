@@ -1,9 +1,7 @@
 package com.jodli.coffeeshottimer.ui.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,9 +16,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -40,52 +35,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
-
-/**
- * Reusable card component with consistent styling
- */
-@Composable
-fun CoffeeCard(
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-    colors: androidx.compose.material3.CardColors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-    ),
-    content: @Composable ColumnScope.() -> Unit
-) {
-    val spacing = LocalSpacing.current
-    // flat card: a hairline rule instead of a shadow
-    val border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-
-    if (onClick != null) {
-        Card(
-            onClick = onClick,
-            modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(spacing.cornerLarge),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard),
-            border = border,
-            colors = colors
-        ) {
-            Column(
-                modifier = Modifier.padding(spacing.cardPadding),
-                content = content
-            )
-        }
-    } else {
-        Card(
-            modifier = modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(spacing.cornerLarge),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationCard),
-            border = border,
-            colors = colors
-        ) {
-            Column(
-                modifier = Modifier.padding(spacing.cardPadding),
-                content = content
-            )
-        }
-    }
-}
 
 /**
  * Primary button with consistent styling
