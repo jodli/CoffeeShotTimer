@@ -73,6 +73,7 @@ import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
 import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.DataCell
+import com.jodli.coffeeshottimer.ui.components.ErrorCard
 import com.jodli.coffeeshottimer.ui.components.ManualTimerCircle
 import com.jodli.coffeeshottimer.ui.components.RuledRow
 import com.jodli.coffeeshottimer.ui.components.ShotRecordedDialog
@@ -119,6 +120,7 @@ fun RecordShotScreen(
     val grinderSetting by viewModel.grinderSetting.collectAsState()
     val timerState by viewModel.timerState.collectAsState()
     val isFormValid by viewModel.isFormValid.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
     val showShotRecordedDialog by viewModel.showShotRecordedDialog.collectAsState()
     val recordedShotData by viewModel.recordedShotData.collectAsState()
     val grindAdjustment by viewModel.grindAdjustmentRecommendation.collectAsState()
@@ -161,6 +163,8 @@ fun RecordShotScreen(
         coffeeWeightOut = coffeeWeightOut,
         formattedBrewRatio = formattedBrewRatio,
         isFormValid = isFormValid,
+        errorMessage = errorMessage,
+        onDismissError = { viewModel.clearErrorMessage() },
         onNavigateToBeanManagement = onNavigateToBeanManagement,
         onShowGrinderSheet = { showGrinderSheet = true },
         onShowCoffeeInDialog = { showCoffeeInDialog = true },
@@ -263,6 +267,8 @@ private fun RecordShotScreenContent(
     coffeeWeightOut: String,
     formattedBrewRatio: String?,
     isFormValid: Boolean,
+    errorMessage: String?,
+    onDismissError: () -> Unit,
     onNavigateToBeanManagement: () -> Unit,
     onShowGrinderSheet: () -> Unit,
     onShowCoffeeInDialog: () -> Unit,
@@ -317,6 +323,15 @@ private fun RecordShotScreenContent(
         )
     }
     val saveButton = @Composable {
+        // A failed save leaves the form filled in; say why instead of doing nothing.
+        errorMessage?.let { message ->
+            ErrorCard(
+                title = stringResource(R.string.error_operation_failed),
+                message = message,
+                onDismiss = onDismissError
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+        }
         SaveShotButton(
             enabled = isFormValid,
             onClick = withHaptic(HapticFeedbackConstants.CONFIRM, onRecordShot),
