@@ -17,9 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -41,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.jodli.coffeeshottimer.R
@@ -92,8 +89,7 @@ fun ShotHistoryFilterDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 600.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationDialog)
+                .heightIn(max = 600.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -101,18 +97,23 @@ fun ShotHistoryFilterDialog(
                     .padding(spacing.large)
             ) {
                 // Header
-                CardHeader(
-                    icon = Icons.Default.FilterList,
-                    title = stringResource(R.string.title_filter_shots),
-                    actions = {
-                        IconButton(onClick = onDismiss) {
-                            Icon(
-                                imageVector = Icons.Default.Clear,
-                                contentDescription = stringResource(R.string.cd_close)
-                            )
-                        }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.title_filter_shots),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = onDismiss) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.cd_close)
+                        )
                     }
-                )
+                }
 
                 Spacer(modifier = Modifier.height(spacing.medium))
 
@@ -439,13 +440,7 @@ private fun FilterSection(
     val spacing = LocalSpacing.current
 
     Column {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(spacing.small))
+        SectionLabel(title)
         content()
     }
 }
