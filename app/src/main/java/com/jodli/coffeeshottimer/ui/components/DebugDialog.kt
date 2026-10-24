@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
@@ -35,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.window.Dialog
 import com.jodli.coffeeshottimer.BuildConfig
 import com.jodli.coffeeshottimer.R
@@ -91,8 +89,6 @@ fun DebugDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight(0.8f),
-            shape = RoundedCornerShape(spacing.cornerLarge),
-            elevation = CardDefaults.cardElevation(defaultElevation = spacing.elevationDialog),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             )
@@ -116,13 +112,12 @@ fun DebugDialog(
                             imageVector = Icons.Default.BugReport,
                             contentDescription = null,
                             modifier = Modifier.size(spacing.iconMedium),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.width(spacing.small))
                         Text(
                             text = stringResource(R.string.title_debug_tools),
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge,
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     }
@@ -159,22 +154,12 @@ fun DebugDialog(
                             modifier = Modifier.fillMaxWidth()
                         )
                     } else {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.primaryContainer
-                            )
-                        ) {
-                            Text(
-                                text = result,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(spacing.medium)
-                            )
-                        }
+                        Text(
+                            text = result,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(spacing.medium))
@@ -198,14 +183,7 @@ fun DebugDialog(
                         verticalArrangement = Arrangement.spacedBy(spacing.medium)
                     ) {
                         // Database Operations Section
-                        Text(
-                            text = "Database Operations",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(modifier = Modifier.height(spacing.small))
+                        SectionLabel(stringResource(R.string.debug_section_database))
 
                         // Fill Database button
                         CoffeePrimaryButton(
@@ -242,25 +220,18 @@ fun DebugDialog(
                         Spacer(modifier = Modifier.height(spacing.large))
 
                         // Onboarding Testing Section
-                        Text(
-                            text = "Onboarding Testing",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        Spacer(modifier = Modifier.height(spacing.small))
+                        SectionLabel(stringResource(R.string.debug_section_onboarding))
 
                         // Reset to New User button
                         CoffeeSecondaryButton(
-                            text = "New User",
+                            text = stringResource(R.string.debug_button_new_user),
                             onClick = onResetToNewUser,
                             icon = Icons.Default.PersonAdd,
                             enabled = !isLoading
                         )
 
                         Text(
-                            text = "Show full onboarding flow",
+                            text = stringResource(R.string.debug_hint_new_user),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)
@@ -270,14 +241,14 @@ fun DebugDialog(
 
                         // Reset to Existing User without Beans button
                         CoffeeSecondaryButton(
-                            text = "User - No Beans",
+                            text = stringResource(R.string.debug_button_user_no_beans),
                             onClick = onResetToExistingUserNoBeans,
                             icon = Icons.Default.PersonOutline,
                             enabled = !isLoading
                         )
 
                         Text(
-                            text = "Trigger guided bean creation",
+                            text = stringResource(R.string.debug_hint_user_no_beans),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)
@@ -287,14 +258,14 @@ fun DebugDialog(
 
                         // Force Equipment Setup button
                         CoffeeSecondaryButton(
-                            text = "Equipment Setup",
+                            text = stringResource(R.string.debug_button_equipment_setup),
                             onClick = onForceEquipmentSetup,
                             icon = Icons.Default.Settings,
                             enabled = !isLoading
                         )
 
                         Text(
-                            text = "Force equipment setup flow",
+                            text = stringResource(R.string.debug_hint_equipment_setup),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = spacing.small)
