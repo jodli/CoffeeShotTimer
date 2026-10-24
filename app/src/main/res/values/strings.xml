@@ -49,9 +49,6 @@
     <string name="text_database_filled">Database filled with test data successfully!</string>
     <string name="text_bean_name_required">Bean name is required</string>
     <string name="text_tap_to_start">Tap to start</string>
-    <string name="text_tap_to_stop">Tap to stop</string>
-    <string name="text_stop_timer">Stop timer</string>
-    <string name="text_start_timer">Start timer</string>
     <string name="text_fresh">Fresh</string>
     <string name="freshness_resting">Resting</string>
     <string name="freshness_past">Past peak</string>
@@ -112,14 +109,11 @@
     <string name="label_search">Search</string>
     <string name="label_extraction_time">Extraction Time</string>
     <string name="label_avg_time">Avg Time</string>
-    <string name="label_optimal_time">Optimal Time</string>
     <string name="label_brew_ratio">Brew Ratio</string>
     <string name="label_consistency">Consistency</string>
     <string name="label_grinder_setting">Grinder Setting</string>
     <string name="label_notes">Notes</string>
     <string name="label_time">Time</string>
-    <string name="label_under_extracted">Under-extracted</string>
-    <string name="label_over_extracted">Over-extracted</string>
 
     <!-- Analysis and Statistics -->
     <string name="text_no_analysis_data">No analysis data available</string>
@@ -223,10 +217,8 @@
     <string name="cd_saving">Saving…</string>
     <string name="button_save">Save</string>
     <string name="cd_close">Close</string>
-    <string name="cd_start">Start</string>
     <string name="cd_back">Back</string>
     <string name="cd_close_debug_dialog">Close debug dialog</string>
-    <string name="cd_reset_timer">Reset timer</string>
     <string name="cd_select_bean">Select bean</string>
     <string name="cd_previous_shot">Previous shot</string>
     <string name="cd_next_shot">Next shot</string>
@@ -261,7 +253,6 @@
     <string name="error_loading_shot_details">Error loading shot details</string>
     <string name="error_recording_error">Recording Error</string>
     <string name="error_operation_failed">Operation Failed</string>
-    <string name="error_minimum_time_required">Minimum 5s required</string>
     <string name="error_extraction_time_minimum">Extraction time must be at least %1$d seconds</string>
     <string name="error_unknown_error_occurred">Unknown error occurred</string>
     <string name="error_loading_data">Error loading %1$s</string>
@@ -320,8 +311,6 @@
     <string name="cd_dismiss_error">Dismiss error message</string>
 
     <!-- Validation Messages -->
-    <string name="validation_required_field"> *</string>
-    <string name="validation_character_count">%1$d/%2$d</string>
     <string name="validation_valid_number">Please enter a valid number</string>
     <string name="validation_empty_id">ID cannot be empty</string>
     <string name="validation_fill_required">Please fill in all required fields</string>
@@ -406,12 +395,10 @@
     <string name="format_days_since_roast_filter">%1$d days since roast</string>
 
     <!-- Additional format strings for UI display -->
-    <string name="format_extraction_time_with_target">/ %1$s</string>
 
     <!-- Format strings for statistics -->
 
     <!-- Timer display suffixes -->
-    <string name="timer_seconds_suffix">s</string>
     <string name="format_timer_seconds">%1$ds</string>
     
     <!-- Weight and ratio format strings -->

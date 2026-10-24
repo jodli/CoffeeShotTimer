@@ -262,7 +262,6 @@
     <ID>MaximumLineLength:CommonComponents.kt$ </ID>
     <ID>MaximumLineLength:ConditionalCompilationTest.kt$ConditionalCompilationTest$ </ID>
     <ID>MaximumLineLength:DebugViewModel.kt$DebugViewModel$ </ID>
-    <ID>MaximumLineLength:DesignSystemValidationTest.kt$DesignSystemValidationTest$ </ID>
     <ID>MaximumLineLength:EquipmentSettingsViewModel.kt$EquipmentSettingsViewModel$ </ID>
     <ID>MaximumLineLength:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$ </ID>
     <ID>MaximumLineLength:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$ </ID>
@@ -280,7 +279,6 @@
     <ID>MaximumLineLength:ShotHistoryViewModel.kt$ShotHistoryViewModel$ </ID>
     <ID>MaximumLineLength:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest$ </ID>
     <ID>MaximumLineLength:ShotRecordingViewModel.kt$ShotRecordingViewModel$ </ID>
-    <ID>MaximumLineLength:TypographyAndSpacingTest.kt$TypographyAndSpacingTest$ </ID>
     <ID>MaximumLineLength:ValidationComponents.kt$ </ID>
     <ID>NestedBlockDepth:UpdateBeanUseCase.kt$UpdateBeanUseCase$suspend fun getBeanForEditing(beanId: String): Result&lt;Bean&gt;</ID>
     <ID>NoWildcardImports:AddBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
@@ -294,8 +292,6 @@
     <ID>NoWildcardImports:CalculateGrindAdjustmentUseCase.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
     <ID>NoWildcardImports:CalculateGrindAdjustmentUseCaseTest.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
     <ID>NoWildcardImports:CalculateGrindAdjustmentUseCaseTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:ComponentTypographyUsageTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:DesignSystemValidationTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetActiveBeansUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetBeanHistoryUseCaseTest.kt$import org.junit.Assert.*</ID>
@@ -308,7 +304,6 @@
     <ID>NoWildcardImports:GrinderConfigRepositoryTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GrinderConfigurationTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GuidedBeanCreationViewModelTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:LoadingAndErrorStateTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ManageGrindRecommendationUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:NavigationTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:OnboardingPreferencesTest.kt$import org.junit.Assert.*</ID>
@@ -331,13 +326,11 @@
     <ID>NoWildcardImports:ShotRepositoryTasteTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ShotRepositoryTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ShotTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:StandardizedComponentsTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.runtime.*</ID>
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.material3.*</ID>
-    <ID>NoWildcardImports:TypographyAndSpacingTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:UpdateBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ValidationExtensionsTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:WeightSliderComponentsTest.kt$import org.junit.Assert.*</ID>

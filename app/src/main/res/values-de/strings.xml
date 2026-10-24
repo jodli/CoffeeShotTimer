@@ -51,9 +51,6 @@
     <string name="text_database_filled">Datenbank erfolgreich mit Testdaten gefüllt!</string>
     <string name="text_bean_name_required">Bohnenname ist erforderlich</string>
     <string name="text_tap_to_start">Tippen zum Starten</string>
-    <string name="text_tap_to_stop">Tippen zum Stoppen</string>
-    <string name="text_stop_timer">Timer stoppen</string>
-    <string name="text_start_timer">Timer starten</string>
     <string name="text_fresh">Frisch</string>
     <string name="freshness_resting">Ruht noch</string>
     <string name="freshness_past">Nach dem Optimum</string>
@@ -101,14 +98,11 @@
     <string name="label_search">Suche</string>
     <string name="label_extraction_time">Extraktionszeit</string>
     <string name="label_avg_time">Ø Zeit</string>
-    <string name="label_optimal_time">Optimale Zeit</string>
     <string name="label_brew_ratio">Brühverhältnis</string>
     <string name="label_consistency">Konsistenz</string>
     <string name="label_grinder_setting">Mühleneinstellung</string>
     <string name="label_notes">Notizen</string>
     <string name="label_time">Zeit</string>
-    <string name="label_under_extracted">Unterextrahiert</string>
-    <string name="label_over_extracted">Überextrahiert</string>
 
     <!-- Analysis and Statistics -->
     <string name="text_no_analysis_data">Keine Analysedaten verfügbar</string>
@@ -229,10 +223,8 @@
     <string name="cd_saving">Speichere…</string>
     <string name="button_save">Speichern</string>
     <string name="cd_close">Schließen</string>
-    <string name="cd_start">Starten</string>
     <string name="cd_back">Zurück</string>
     <string name="cd_close_debug_dialog">Debug-Dialog schließen</string>
-    <string name="cd_reset_timer">Timer zurücksetzen</string>
     <string name="cd_select_bean">Bohne auswählen</string>
     <string name="cd_previous_shot">Vorheriger Shot</string>
     <string name="cd_next_shot">Nächster Shot</string>
@@ -268,7 +260,6 @@
     <string name="error_loading_shot_details">Fehler beim Laden der Shot-Details</string>
     <string name="error_recording_error">Aufnahmefehler</string>
     <string name="error_operation_failed">Vorgang fehlgeschlagen</string>
-    <string name="error_minimum_time_required">Mindestens 5s erforderlich</string>
     <string name="error_extraction_time_minimum">Extraktionszeit muss mindestens %1$d Sekunden betragen</string>
     <string name="error_unknown_error_occurred">Unbekannter Fehler aufgetreten</string>
     <string name="error_loading_data">Fehler beim Laden von %1$s</string>
@@ -327,8 +318,6 @@
     <string name="cd_dismiss_error">Fehlermeldung schließen</string>
 
     <!-- Validation Messages -->
-    <string name="validation_required_field"> *</string>
-    <string name="validation_character_count">%1$d/%2$d</string>
     <string name="validation_valid_number">Bitte gib eine gültige Zahl ein</string>
     <string name="validation_empty_id">ID darf nicht leer sein</string>
     <string name="validation_fill_required">Bitte fülle alle Pflichtfelder aus</string>
@@ -408,12 +397,10 @@
     <string name="format_days_since_roast_filter">%1$d Tage seit Röstung</string>
 
     <!-- Additional format strings for UI display -->
-    <string name="format_extraction_time_with_target">/ %1$s</string>
 
     <!-- Format strings for statistics -->
 
     <!-- Timer display suffixes -->
-    <string name="timer_seconds_suffix">s</string>
 
     <!-- Text that appears multiple times -->
     <string name="text_unknown_error">Unbekannter Fehler aufgetreten</string>
