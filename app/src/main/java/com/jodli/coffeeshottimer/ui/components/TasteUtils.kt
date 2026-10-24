@@ -59,13 +59,15 @@ fun TastePrimaryButton(
     height: Int = 80 // dp
 ) {
     val borderColor by animateColorAsState(
-        targetValue = when {
-            isSelected -> MaterialTheme.colorScheme.primary
-            isRecommended -> MaterialTheme.colorScheme.primary
-            else -> MaterialTheme.colorScheme.outline
+        targetValue = if (isSelected || isRecommended) {
+            MaterialTheme.colorScheme.primary
+        } else {
+            MaterialTheme.colorScheme.outline
         },
         label = "border_color"
     )
+    // Selected reads as a heavy ink outline; recommended as a thin accent
+    val borderWidth = if (isSelected) 2.dp else 1.dp
 
     // Compute content description using string resources
     val contentDesc = when {
@@ -83,7 +85,7 @@ fun TastePrimaryButton(
             },
         shape = MaterialTheme.shapes.small,
         border = BorderStroke(
-            width = if (isSelected || isRecommended) 2.dp else 1.dp,
+            width = borderWidth,
             color = borderColor
         ),
         colors = ButtonDefaults.outlinedButtonColors(

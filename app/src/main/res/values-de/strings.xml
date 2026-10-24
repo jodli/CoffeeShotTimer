@@ -727,7 +727,7 @@
     <string name="coaching_recent_trend_exploring">Noch am Erkunden - jeder Shot lehrt etwas Neues.</string>
     
     <!-- Coaching Insights - Dial-In Status -->
-    <string name="coaching_dial_in_achieved">%1$s in %2$d Shots eingestellt! ☕</string>
+    <string name="coaching_dial_in_achieved">%1$s in %2$d Shots eingestellt!</string>
     <string name="coaching_dial_in_exploring">Erkunde %1$s - %2$d Shots bisher</string>
     
     <!-- Coaching Insights - Grind Coaching Effectiveness -->
