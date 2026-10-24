@@ -29,9 +29,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -39,7 +38,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
@@ -73,6 +71,7 @@ import com.jodli.coffeeshottimer.domain.model.PersistentGrindRecommendation
 import com.jodli.coffeeshottimer.domain.usecase.TimerMode
 import com.jodli.coffeeshottimer.domain.usecase.TimerState
 import com.jodli.coffeeshottimer.ui.components.AutomaticTimerCircle
+import com.jodli.coffeeshottimer.ui.components.CoffeePrimaryButton
 import com.jodli.coffeeshottimer.ui.components.DataCell
 import com.jodli.coffeeshottimer.ui.components.ManualTimerCircle
 import com.jodli.coffeeshottimer.ui.components.RuledRow
@@ -652,7 +651,8 @@ private fun SaveShotButton(
 }
 
 /**
- * Recommendation card for grinder adjustment.
+ * Recommendation band for grinder adjustment: reason, suggested setting and
+ * apply, between hairline rules.
  */
 @Composable
 private fun GrinderRecommendationCard(
@@ -660,26 +660,24 @@ private fun GrinderRecommendationCard(
     onApply: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier,
-        color = MaterialTheme.colorScheme.primaryContainer,
-        shape = MaterialTheme.shapes.medium
-    ) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 Text(
                     text = recommendation.reason,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = stringResource(
@@ -687,22 +685,17 @@ private fun GrinderRecommendationCard(
                         recommendation.suggestedGrindSetting
                     ),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            FilledTonalButton(
-                onClick = onApply,
-                shape = MaterialTheme.shapes.small,
-                colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text(stringResource(R.string.button_apply))
-            }
+            CoffeePrimaryButton(
+                text = stringResource(R.string.button_apply),
+                onClick = onApply
+            )
         }
+
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
     }
 }
 
@@ -742,8 +735,7 @@ private fun GrinderAdjustmentBottomSheet(
             ) {
                 Text(
                     text = stringResource(R.string.dialog_adjust_grinder_setting),
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.headlineSmall
                 )
                 IconButton(onClick = onDismiss) {
                     Icon(
@@ -825,8 +817,7 @@ private fun GrinderAdjustmentBottomSheet(
             ) {
                 Text(
                     text = stringResource(R.string.button_apply_setting),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }
@@ -852,8 +843,7 @@ private fun CoffeeInDialog(
         title = {
             Text(
                 text = stringResource(R.string.dialog_adjust_coffee_in),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.headlineSmall
             )
         },
         text = {
@@ -942,8 +932,7 @@ private fun ManualTimeDialog(
         title = {
             Text(
                 text = stringResource(R.string.dialog_adjust_extraction_time),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.headlineSmall
             )
         },
         text = {
