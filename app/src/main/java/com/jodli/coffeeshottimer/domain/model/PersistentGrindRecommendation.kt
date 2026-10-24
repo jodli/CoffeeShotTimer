@@ -49,69 +49,11 @@ data class PersistentGrindRecommendation(
     fun hasAdjustment(): Boolean = adjustmentDirection != AdjustmentDirection.NO_CHANGE
 
     /**
-     * Get a short description of the adjustment for UI display.
-     * @return String like "Grind finer" or "No change needed"
-     */
-    fun getAdjustmentDescription(): String {
-        return when (adjustmentDirection) {
-            AdjustmentDirection.FINER -> "Grind finer"
-            AdjustmentDirection.COARSER -> "Grind coarser"
-            AdjustmentDirection.NO_CHANGE -> "No change needed"
-        }
-    }
-
-    /**
-     * Get the target extraction time as a formatted string.
-     * @return String like "25-30s"
-     */
-    fun getFormattedTargetTime(): String {
-        return "${targetExtractionTime.first}-${targetExtractionTime.last}s"
-    }
-
-    /**
-     * Get a confidence description for UI display.
-     * @return String like "High confidence" or "Low confidence"
-     */
-    fun getConfidenceDescription(): String {
-        return when (confidence) {
-            ConfidenceLevel.HIGH -> "High confidence"
-            ConfidenceLevel.MEDIUM -> "Medium confidence"
-            ConfidenceLevel.LOW -> "Low confidence"
-        }
-    }
-
-    /**
-     * Check if this recommendation is recent (within the last 7 days).
-     * @return true if recommendation is recent, false if it's old
-     */
-    fun isRecent(): Boolean {
-        return timestamp.isAfter(LocalDateTime.now().minusDays(7))
-    }
-
-    /**
      * Create a new recommendation marked as followed.
      * @return A copy of this recommendation with wasFollowed = true
      */
     fun markAsFollowed(): PersistentGrindRecommendation {
         return copy(wasFollowed = true)
-    }
-
-    /**
-     * Get a detailed summary for logging or debugging.
-     * @return Detailed string representation of this recommendation
-     */
-    fun getDetailedSummary(): String {
-        return buildString {
-            append("PersistentGrindRecommendation(")
-            append("bean=$beanId, ")
-            append("grind=$suggestedGrindSetting, ")
-            append("direction=$adjustmentDirection, ")
-            append("dose=${recommendedDose}g, ")
-            append("basedOnTaste=$basedOnTaste, ")
-            append("confidence=$confidence, ")
-            append("followed=$wasFollowed")
-            append(")")
-        }
     }
 
     companion object {

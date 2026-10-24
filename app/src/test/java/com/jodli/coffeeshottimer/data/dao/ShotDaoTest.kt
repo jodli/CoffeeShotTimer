@@ -187,31 +187,6 @@ class ShotDaoTest {
     }
 
     @Test
-    fun getRecentShots_returnsLimitedNumberOfShots() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-
-        // Create 5 shots
-        for (i in 1..5) {
-            val shot = createTestShot(
-                beanId = testBean1.id,
-                grinderSetting = i.toString(),
-                timestamp = LocalDateTime.now().minusHours(i.toLong())
-            )
-            shotDao.insertShot(shot)
-        }
-
-        // When
-        val recentShots = shotDao.getRecentShots(3).first()
-
-        // Then
-        assertEquals("Should return only 3 recent shots", 3, recentShots.size)
-        assertEquals("Should return newest shot first", "1", recentShots[0].grinderSetting)
-        assertEquals("Should return second newest shot", "2", recentShots[1].grinderSetting)
-        assertEquals("Should return third newest shot", "3", recentShots[2].grinderSetting)
-    }
-
-    @Test
     fun getShotsByDateRange_returnsOnlyShotsInRange() = runTest {
         // Given
         beanDao.insertBean(testBean1)
@@ -281,50 +256,6 @@ class ShotDaoTest {
     }
 
     @Test
-    fun getShotsByGrinderSetting_returnsCorrectShots() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-        val shot1 = createTestShot(beanId = testBean1.id, grinderSetting = "15")
-        val shot2 = createTestShot(beanId = testBean1.id, grinderSetting = "15")
-        val shot3 = createTestShot(beanId = testBean1.id, grinderSetting = "16")
-
-        shotDao.insertShot(shot1)
-        shotDao.insertShot(shot2)
-        shotDao.insertShot(shot3)
-
-        // When
-        val shotsWithSetting15 = shotDao.getShotsByGrinderSetting("15").first()
-
-        // Then
-        assertEquals("Should return shots with grinder setting 15", 2, shotsWithSetting15.size)
-        assertTrue(
-            "All shots should have grinder setting 15",
-            shotsWithSetting15.all { it.grinderSetting == "15" }
-        )
-    }
-
-    @Test
-    fun updateShot_updatesSuccessfully() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-        val originalShot = createTestShot(beanId = testBean1.id, grinderSetting = "15")
-        shotDao.insertShot(originalShot)
-
-        val updatedShot = originalShot.copy(
-            grinderSetting = "16",
-            notes = "Updated notes"
-        )
-
-        // When
-        shotDao.updateShot(updatedShot)
-
-        // Then
-        val retrievedShot = shotDao.getShotById(originalShot.id)
-        assertEquals("Grinder setting should be updated", "16", retrievedShot?.grinderSetting)
-        assertEquals("Notes should be updated", "Updated notes", retrievedShot?.notes)
-    }
-
-    @Test
     fun deleteShot_deletesSuccessfully() = runTest {
         // Given
         beanDao.insertBean(testBean1)
@@ -339,62 +270,6 @@ class ShotDaoTest {
 
         // Then
         assertNull("Shot should be deleted", shotDao.getShotById(shot.id))
-    }
-
-    @Test
-    fun deleteShotsByBean_deletesAllShotsForBean() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-        beanDao.insertBean(testBean2)
-
-        val shot1Bean1 = createTestShot(beanId = testBean1.id, grinderSetting = "15")
-        val shot2Bean1 = createTestShot(beanId = testBean1.id, grinderSetting = "16")
-        val shot1Bean2 = createTestShot(beanId = testBean2.id, grinderSetting = "20")
-
-        shotDao.insertShot(shot1Bean1)
-        shotDao.insertShot(shot2Bean1)
-        shotDao.insertShot(shot1Bean2)
-
-        // When
-        shotDao.deleteShotsByBean(testBean1.id)
-
-        // Then
-        val remainingShots = shotDao.getAllShots().first()
-        assertEquals("Should have only 1 shot remaining", 1, remainingShots.size)
-        assertEquals("Remaining shot should be from bean2", testBean2.id, remainingShots[0].beanId)
-    }
-
-    @Test
-    fun getShotStatistics_calculatesCorrectly() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-
-        val shot1 = createTestShot(
-            beanId = testBean1.id,
-            coffeeWeightIn = 18.0,
-            coffeeWeightOut = 36.0,
-            extractionTimeSeconds = 25
-        )
-        val shot2 = createTestShot(
-            beanId = testBean1.id,
-            coffeeWeightIn = 20.0,
-            coffeeWeightOut = 40.0,
-            extractionTimeSeconds = 30
-        )
-
-        shotDao.insertShot(shot1)
-        shotDao.insertShot(shot2)
-
-        // When
-        val statistics = shotDao.getShotStatistics(testBean1.id)
-
-        // Then
-        assertNotNull("Statistics should be calculated", statistics)
-        assertEquals("Total shots should be 2", 2, statistics?.totalShots)
-        assertEquals("Average weight in should be 19.0", 19.0, statistics?.avgWeightIn ?: 0.0, 0.01)
-        assertEquals("Average weight out should be 38.0", 38.0, statistics?.avgWeightOut ?: 0.0, 0.01)
-        assertEquals("Average extraction time should be 27.5", 27.5, statistics?.avgExtractionTime ?: 0.0, 0.01)
-        assertEquals("Average brew ratio should be 2.0", 2.0, statistics?.avgBrewRatio ?: 0.0, 0.01)
     }
 
     @Test
@@ -443,48 +318,6 @@ class ShotDaoTest {
 
         // Then
         assertEquals("Should return total shot count", 3, count)
-    }
-
-    @Test
-    fun getShotsByBrewRatioRange_filtersCorrectly() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-
-        val shot1 = createTestShot(beanId = testBean1.id, coffeeWeightIn = 18.0, coffeeWeightOut = 27.0) // 1:1.5
-        val shot2 = createTestShot(beanId = testBean1.id, coffeeWeightIn = 18.0, coffeeWeightOut = 36.0) // 1:2.0
-        val shot3 = createTestShot(beanId = testBean1.id, coffeeWeightIn = 18.0, coffeeWeightOut = 54.0) // 1:3.0
-
-        shotDao.insertShot(shot1)
-        shotDao.insertShot(shot2)
-        shotDao.insertShot(shot3)
-
-        // When - get shots with brew ratio between 1.8 and 2.2
-        val shotsInRange = shotDao.getShotsByBrewRatioRange(1.8, 2.2).first()
-
-        // Then
-        assertEquals("Should return shots in brew ratio range", 1, shotsInRange.size)
-        assertEquals("Should return shot with 1:2 ratio", 36.0, shotsInRange[0].coffeeWeightOut, 0.01)
-    }
-
-    @Test
-    fun getShotsByExtractionTimeRange_filtersCorrectly() = runTest {
-        // Given
-        beanDao.insertBean(testBean1)
-
-        val shot1 = createTestShot(beanId = testBean1.id, extractionTimeSeconds = 20)
-        val shot2 = createTestShot(beanId = testBean1.id, extractionTimeSeconds = 25)
-        val shot3 = createTestShot(beanId = testBean1.id, extractionTimeSeconds = 35)
-
-        shotDao.insertShot(shot1)
-        shotDao.insertShot(shot2)
-        shotDao.insertShot(shot3)
-
-        // When - get shots with extraction time between 22 and 30 seconds
-        val shotsInRange = shotDao.getShotsByExtractionTimeRange(22, 30).first()
-
-        // Then
-        assertEquals("Should return shots in extraction time range", 1, shotsInRange.size)
-        assertEquals("Should return shot with 25 second extraction", 25, shotsInRange[0].extractionTimeSeconds)
     }
 
     /**

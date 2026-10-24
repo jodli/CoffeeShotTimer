@@ -112,12 +112,12 @@ object DatabaseModule {
      * This utility is used for populating the database with test data
      * and clearing database content during development and testing.
      *
-     * The provider is conditionally compiled - it only exists in debug builds
-     * to ensure no debug code is included in release builds.
+     * Returns null in release builds so debug tooling cannot touch production data.
      *
      * @param beanDao The BeanDao instance for database operations
      * @param shotDao The ShotDao instance for database operations
-     * @return DatabasePopulator instance (debug builds only)
+     * @param grinderConfigDao The GrinderConfigDao instance for database operations
+     * @return DatabasePopulator instance (null in release builds)
      */
     @Provides
     @Singleton

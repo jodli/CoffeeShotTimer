@@ -227,11 +227,6 @@ private fun BeanManagementContent(
                             stringResource(R.string.text_search_beans_hint)
                         } else {
                             stringResource(R.string.text_add_first_bean)
-                        },
-                        actionText = if (searchQuery.isEmpty()) {
-                            stringResource(R.string.text_add_bean)
-                        } else {
-                            null
                         }
                     )
                 }

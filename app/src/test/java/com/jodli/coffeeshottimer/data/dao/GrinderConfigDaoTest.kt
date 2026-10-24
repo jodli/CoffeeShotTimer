@@ -260,50 +260,6 @@ class GrinderConfigDaoTest {
     }
 
     @Test
-    fun deleteOldConfigs_keepsOnlyRecentConfigs() = runTest {
-        // Given - Insert 5 configs with different creation times
-        val configs = listOf(
-            createTestConfig(1, 10, LocalDateTime.now().minusHours(5)),
-            createTestConfig(11, 20, LocalDateTime.now().minusHours(4)),
-            createTestConfig(21, 30, LocalDateTime.now().minusHours(3)),
-            createTestConfig(31, 40, LocalDateTime.now().minusHours(2)),
-            createTestConfig(41, 50, LocalDateTime.now().minusHours(1))
-        )
-
-        configs.forEach { grinderConfigDao.insertConfig(it) }
-
-        // Verify all exist
-        assertEquals("Should have 5 configs", 5, grinderConfigDao.getConfigCount())
-
-        // When - Keep only 3 most recent
-        grinderConfigDao.deleteOldConfigs(3)
-
-        // Then
-        assertEquals("Should have 3 configs remaining", 3, grinderConfigDao.getConfigCount())
-
-        val remainingConfigs = grinderConfigDao.getAllConfigs().first()
-        assertEquals("Should keep most recent config", configs[4].id, remainingConfigs[0].id)
-        assertEquals("Should keep second most recent config", configs[3].id, remainingConfigs[1].id)
-        assertEquals("Should keep third most recent config", configs[2].id, remainingConfigs[2].id)
-    }
-
-    @Test
-    fun deleteOldConfigs_doesNothingWhenFewerConfigsThanKeepCount() = runTest {
-        // Given
-        val config1 = createTestConfig(1, 10)
-        val config2 = createTestConfig(30, 80)
-
-        grinderConfigDao.insertConfig(config1)
-        grinderConfigDao.insertConfig(config2)
-
-        // When - Try to keep 5 configs when only 2 exist
-        grinderConfigDao.deleteOldConfigs(5)
-
-        // Then
-        assertEquals("Should still have 2 configs", 2, grinderConfigDao.getConfigCount())
-    }
-
-    @Test
     fun insertConfig_withReplaceStrategy_replacesExistingConfig() = runTest {
         // Given
         val originalConfig = createTestConfig(1, 10)

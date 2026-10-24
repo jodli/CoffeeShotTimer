@@ -34,26 +34,6 @@ interface OnboardingManager {
      */
     suspend fun updateOnboardingProgress(progress: OnboardingProgress)
 
-    /**
-     * Resets all onboarding state (useful for testing or user-requested reset).
-     */
-    suspend fun resetOnboardingState()
-
-    /**
-     * Backs up the current onboarding state to a string format.
-     *
-     * @return JSON string representation of the onboarding state
-     */
-    suspend fun backupOnboardingState(): String
-
-    /**
-     * Restores onboarding state from a backup string.
-     *
-     * @param backupData JSON string containing the onboarding state
-     * @return true if restore was successful, false otherwise
-     */
-    suspend fun restoreOnboardingState(backupData: String): Boolean
-
     // DEBUG METHODS FOR TESTING ONBOARDING FLOWS
 
     /**
@@ -61,12 +41,6 @@ interface OnboardingManager {
      * Clears all progress so the user will see the full onboarding flow.
      */
     suspend fun resetToNewUser()
-
-    /**
-     * Configures onboarding state to simulate an existing user who has created beans.
-     * Sets appropriate flags to skip introduction and bean creation.
-     */
-    suspend fun resetToExistingUserWithBeans()
 
     /**
      * Configures onboarding state to simulate an existing user who hasn't created beans.

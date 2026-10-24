@@ -398,52 +398,6 @@ class BasketConfigDaoTest {
     }
 
     @Test
-    fun deleteOldConfigs_keepsOnlyRecentConfigs() = runTest {
-        // Given - Insert 5 configs with different creation times
-        val configs = (1..5).map { index ->
-            createTestConfig(
-                coffeeInMin = (6 + index).toFloat(),
-                coffeeInMax = (12 + index).toFloat(),
-                createdAt = LocalDateTime.now().minusHours((6 - index).toLong())
-            )
-        }
-
-        configs.forEach { basketConfigDao.insertConfig(it) }
-
-        // When - Keep only 3 most recent
-        basketConfigDao.deleteOldConfigs(keepCount = 3)
-
-        // Then
-        val remainingConfigs = basketConfigDao.getAllConfigs().first()
-        assertEquals("Should have 3 configs remaining", 3, remainingConfigs.size)
-
-        // The 3 most recent configs (indices 2, 3, 4) should remain
-        assertTrue("Config 3 should remain", remainingConfigs.any { it.id == configs[2].id })
-        assertTrue("Config 4 should remain", remainingConfigs.any { it.id == configs[3].id })
-        assertTrue("Config 5 should remain", remainingConfigs.any { it.id == configs[4].id })
-
-        // The 2 oldest configs should be deleted
-        assertFalse("Config 1 should be deleted", remainingConfigs.any { it.id == configs[0].id })
-        assertFalse("Config 2 should be deleted", remainingConfigs.any { it.id == configs[1].id })
-    }
-
-    @Test
-    fun deleteOldConfigs_handlesFewerConfigsThanKeepCount() = runTest {
-        // Given - Only 2 configs
-        val config1 = createTestConfig()
-        val config2 = createTestConfig(coffeeInMin = 7f, coffeeInMax = 12f)
-
-        basketConfigDao.insertConfig(config1)
-        basketConfigDao.insertConfig(config2)
-
-        // When - Try to keep 5 (more than exist)
-        basketConfigDao.deleteOldConfigs(keepCount = 5)
-
-        // Then - All configs should remain
-        assertEquals("Should still have 2 configs", 2, basketConfigDao.getConfigCount())
-    }
-
-    @Test
     fun insertConfig_replacesOnConflict() = runTest {
         // Given
         val config = createTestConfig(

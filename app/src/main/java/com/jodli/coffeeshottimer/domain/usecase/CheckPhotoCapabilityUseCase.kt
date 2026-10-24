@@ -77,33 +77,5 @@ class CheckPhotoCapabilityUseCase @Inject constructor(
         }
     }
 
-    /**
-     * Checks specifically for camera capability.
-     *
-     * @return Result indicating if camera can be used
-     */
-    suspend fun canUseCamera(): Result<Boolean> {
-        return try {
-            val available = photoCaptureManager.isCameraAvailable(context)
-            val permitted = photoCaptureManager.isCameraPermissionGranted(context)
-
-            if (!available) {
-                Result.failure(DomainException(DomainErrorCode.CAMERA_UNAVAILABLE))
-            } else if (!permitted) {
-                Result.failure(DomainException(DomainErrorCode.CAMERA_PERMISSION_DENIED))
-            } else {
-                Result.success(true)
-            }
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.UNKNOWN_ERROR,
-                    "Error checking camera capability",
-                    exception
-                )
-            )
-        }
-    }
-
     // Gallery (Photo Picker) requires no storage permission; no explicit check needed.
 }

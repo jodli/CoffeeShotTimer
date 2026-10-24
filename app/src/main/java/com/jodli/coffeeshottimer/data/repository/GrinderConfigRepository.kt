@@ -3,7 +3,6 @@ package com.jodli.coffeeshottimer.data.repository
 import android.util.Log
 import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
 import com.jodli.coffeeshottimer.data.model.GrinderConfiguration
-import com.jodli.coffeeshottimer.data.model.ValidationResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -45,25 +44,6 @@ class GrinderConfigRepository @Inject constructor(
             Result.failure(
                 RepositoryException.DatabaseError(
                     "Failed to get current grinder configuration flow",
-                    exception
-                )
-            )
-        )
-    }
-
-    /**
-     * Get all grinder configurations ordered by creation date.
-     * @return Flow of list of configurations with error handling
-     */
-    fun getAllConfigs(): Flow<Result<List<GrinderConfiguration>>> = flow {
-        grinderConfigDao.getAllConfigs().collect { configs ->
-            emit(Result.success(configs))
-        }
-    }.catch { exception ->
-        emit(
-            Result.failure(
-                RepositoryException.DatabaseError(
-                    "Failed to get all grinder configurations",
                     exception
                 )
             )
@@ -115,37 +95,6 @@ class GrinderConfigRepository @Inject constructor(
                 )
             }
 
-            // Check for duplicate range and step size configuration
-            Log.d(TAG, "saveConfig: Checking for existing config with same range and step size")
-            val existingConfig = try {
-                grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
-            } catch (e: Exception) {
-                Log.e(TAG, "saveConfig: Error checking for existing config", e)
-                throw e
-            }
-            Log.d(TAG, "saveConfig: Existing config found: $existingConfig")
-
-            if (existingConfig != null && existingConfig.stepSize == config.stepSize) {
-                // If exact duplicate exists (same range and step size), insert a new one with current timestamp to make it "current"
-                // This ensures the Flow emits a new value and UI updates
-                Log.d(
-                    TAG,
-                    "saveConfig: Duplicate config found (same range and step size), inserting new one with current timestamp"
-                )
-                val result = executeWithRetry(
-                    operation = {
-                        Log.d(TAG, "saveConfig: Inserting new config with current timestamp")
-                        grinderConfigDao.insertConfig(config)
-                        Log.d(TAG, "saveConfig: New config inserted successfully")
-                        Unit
-                    },
-                    errorMessage = "Failed to save grinder configuration"
-                )
-                Log.d(TAG, "saveConfig: executeWithRetry result - isSuccess=${result.isSuccess}")
-                return result
-            }
-
-            Log.d(TAG, "saveConfig: No duplicate found, proceeding with save")
             val result = executeWithRetry(
                 operation = {
                     Log.d(TAG, "saveConfig: Inserting new config")
@@ -161,152 +110,6 @@ class GrinderConfigRepository @Inject constructor(
             Log.e(TAG, "saveConfig: Exception caught", exception)
             Result.failure(RepositoryException.DatabaseError("Failed to save grinder configuration", exception))
         }
-    }
-
-    /**
-     * Update an existing grinder configuration with validation.
-     * @param config The configuration to update
-     * @return Result indicating success or failure with validation errors
-     */
-    suspend fun updateConfig(config: GrinderConfiguration): Result<Unit> {
-        return try {
-            // Validate configuration data
-            val validationResult = config.validate()
-            if (!validationResult.isValid) {
-                return Result.failure(
-                    RepositoryException.ValidationError(
-                        "Grinder configuration validation failed: ${validationResult.errors.joinToString(", ")}"
-                    )
-                )
-            }
-
-            // Check if configuration exists
-            val existingConfig = grinderConfigDao.getConfigById(config.id)
-                ?: return Result.failure(RepositoryException.NotFoundError("Grinder configuration not found"))
-
-            // Check for duplicate range configuration (excluding current config)
-            val configWithSameRange = grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
-            if (configWithSameRange != null && configWithSameRange.id != config.id) {
-                return Result.failure(
-                    RepositoryException.ValidationError(
-                        "A configuration with range ${config.scaleMin}-${config.scaleMax} already exists"
-                    )
-                )
-            }
-
-            executeWithRetry(
-                operation = {
-                    grinderConfigDao.updateConfig(config)
-                    Unit
-                },
-                errorMessage = "Failed to update grinder configuration"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to update grinder configuration", exception))
-        }
-    }
-
-    /**
-     * Delete a grinder configuration.
-     * @param config The configuration to delete
-     * @return Result indicating success or failure
-     */
-    suspend fun deleteConfig(config: GrinderConfiguration): Result<Unit> {
-        return try {
-            // Check if configuration exists
-            val existingConfig = grinderConfigDao.getConfigById(config.id)
-                ?: return Result.failure(RepositoryException.NotFoundError("Grinder configuration not found"))
-
-            executeWithRetry(
-                operation = {
-                    grinderConfigDao.deleteConfig(config)
-                    Unit
-                },
-                errorMessage = "Failed to delete grinder configuration"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to delete grinder configuration", exception))
-        }
-    }
-
-    /**
-     * Delete all grinder configurations.
-     * @return Result indicating success or failure
-     */
-    suspend fun deleteAllConfigs(): Result<Unit> {
-        return executeWithRetry(
-            operation = {
-                grinderConfigDao.deleteAllConfigs()
-                Unit
-            },
-            errorMessage = "Failed to delete all grinder configurations"
-        )
-    }
-
-    /**
-     * Get count of grinder configurations.
-     * @return Result containing the count of configurations
-     */
-    suspend fun getConfigCount(): Result<Int> {
-        return executeWithRetry(
-            operation = { grinderConfigDao.getConfigCount() },
-            errorMessage = "Failed to get grinder configuration count"
-        )
-    }
-
-    /**
-     * Check if a configuration with the same range already exists.
-     * @param scaleMin The minimum scale value
-     * @param scaleMax The maximum scale value
-     * @return Result containing the existing configuration or null
-     */
-    suspend fun getConfigByRange(scaleMin: Int, scaleMax: Int): Result<GrinderConfiguration?> {
-        return try {
-            if (scaleMin >= scaleMax) {
-                return Result.failure(
-                    RepositoryException.ValidationError("Minimum scale must be less than maximum scale")
-                )
-            }
-
-            executeWithRetry(
-                operation = { grinderConfigDao.getConfigByRange(scaleMin, scaleMax) },
-                errorMessage = "Failed to get grinder configuration by range"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get grinder configuration by range", exception))
-        }
-    }
-
-    /**
-     * Validate grinder configuration data without saving.
-     * @param config The configuration to validate
-     * @return ValidationResult with validation status and errors
-     */
-    suspend fun validateConfig(config: GrinderConfiguration): ValidationResult {
-        val validationResult = config.validate()
-
-        // Additional repository-level validation
-        if (validationResult.isValid) {
-            try {
-                // Check for duplicate range configuration
-                val existingConfig = grinderConfigDao.getConfigByRange(config.scaleMin, config.scaleMax)
-                if (existingConfig != null && existingConfig.id != config.id) {
-                    return ValidationResult(
-                        isValid = false,
-                        errors = listOf(
-                            "A configuration with range ${config.scaleMin}-${config.scaleMax} already exists"
-                        )
-                    )
-                }
-            } catch (exception: Exception) {
-                return ValidationResult(
-                    isValid = false,
-                    errors = listOf("Failed to validate configuration uniqueness")
-                )
-            }
-        }
-
-        return validationResult
     }
 
     /**
@@ -341,63 +144,6 @@ class GrinderConfigRepository @Inject constructor(
             Result.failure(
                 RepositoryException.DatabaseError("Failed to get or create default configuration", exception)
             )
-        }
-    }
-
-    /**
-     * Save a preset configuration from the common presets.
-     * @param presetIndex The index of the preset in COMMON_PRESETS
-     * @return Result indicating success or failure
-     */
-    suspend fun savePresetConfig(presetIndex: Int): Result<Unit> {
-        return try {
-            if (presetIndex < 0 || presetIndex >= GrinderConfiguration.COMMON_PRESETS.size) {
-                return Result.failure(RepositoryException.ValidationError("Invalid preset index"))
-            }
-
-            val presetConfig = GrinderConfiguration.COMMON_PRESETS[presetIndex]
-            saveConfig(presetConfig)
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to save preset configuration", exception))
-        }
-    }
-
-    /**
-     * Clean up old configurations, keeping only the most recent ones.
-     * @param keepCount Number of configurations to keep (default: 5)
-     * @return Result indicating success or failure
-     */
-    suspend fun cleanupOldConfigs(keepCount: Int = 5): Result<Unit> {
-        return try {
-            if (keepCount < 1) {
-                return Result.failure(RepositoryException.ValidationError("Keep count must be at least 1"))
-            }
-
-            executeWithRetry(
-                operation = {
-                    grinderConfigDao.deleteOldConfigs(keepCount)
-                    Unit
-                },
-                errorMessage = "Failed to cleanup old grinder configurations"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to cleanup old grinder configurations", exception))
-        }
-    }
-
-    /**
-     * Check if the user has any grinder configuration set up.
-     * @return Result containing true if any configuration exists
-     */
-    suspend fun hasAnyConfig(): Result<Boolean> {
-        return try {
-            val countResult = getConfigCount()
-            countResult.fold(
-                onSuccess = { count -> Result.success(count > 0) },
-                onFailure = { Result.failure(it) }
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to check if any configuration exists", exception))
         }
     }
 

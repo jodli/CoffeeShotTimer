@@ -1,7 +1,6 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
 import com.jodli.coffeeshottimer.data.model.Bean
-import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
@@ -76,34 +75,6 @@ class AddBeanUseCase @Inject constructor(
     }
 
     /**
-     * Validate bean parameters without saving.
-     * @param name Bean name to validate
-     * @param roastDate Roast date to validate
-     * @param notes Notes to validate
-     * @return ValidationResult with validation status and errors
-     */
-    suspend fun validateBeanParameters(
-        name: String,
-        roastDate: LocalDate,
-        notes: String = ""
-    ): ValidationResult {
-        return try {
-            val bean = Bean(
-                name = name.trim(),
-                roastDate = roastDate,
-                notes = notes.trim()
-            )
-
-            beanRepository.validateBean(bean)
-        } catch (exception: Exception) {
-            ValidationResult(
-                isValid = false,
-                errors = listOf("Failed to validate bean parameters: ${exception.message}")
-            )
-        }
-    }
-
-    /**
      * Check if a bean name is available (not already used).
      * @param name Bean name to check
      * @return Result indicating if name is available
@@ -132,36 +103,5 @@ class AddBeanUseCase @Inject constructor(
                 )
             )
         }
-    }
-
-    /**
-     * Create a bean with default values for quick setup.
-     * @param name Bean name (required)
-     * @param roastDate Roast date (defaults to today if not provided)
-     * @return Result containing the created bean
-     */
-    suspend fun createQuickBean(
-        name: String,
-        roastDate: LocalDate = LocalDate.now()
-    ): Result<Bean> {
-        return execute(
-            name = name,
-            roastDate = roastDate,
-            notes = "",
-            isActive = true
-        )
-    }
-
-    /**
-     * Get validation rules for bean creation (for UI display).
-     * @return Map of field names to validation rules
-     */
-    fun getValidationRules(): Map<String, String> {
-        return mapOf(
-            "name" to "Required, unique, max 100 characters",
-            "roastDate" to "Cannot be future date, max 365 days ago",
-            "notes" to "Optional, max 500 characters",
-            "grinderSetting" to "Optional, max 50 characters"
-        )
     }
 }

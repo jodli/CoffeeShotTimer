@@ -3,7 +3,6 @@ package com.jodli.coffeeshottimer.domain.usecase
 import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
-import com.jodli.coffeeshottimer.data.repository.RepositoryException
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import io.mockk.coEvery
@@ -209,28 +208,6 @@ class UpdateBeanUseCaseTest {
     }
 
     @Test
-    fun `validateUpdateParameters should return validation result`() = runTest {
-        // Given
-        val beanId = "test-id"
-        val name = "Ethiopian Yirgacheffe"
-        val roastDate = LocalDate.now().minusDays(7)
-        val notes = "Updated notes"
-
-        coEvery { beanRepository.getBeanById(beanId) } returns Result.success(testBean)
-
-        val expectedResult = ValidationResult(isValid = true, errors = emptyList())
-        coEvery { beanRepository.validateBean(any()) } returns expectedResult
-
-        // When
-        val result = updateBeanUseCase.validateUpdateParameters(beanId, name, roastDate, notes)
-
-        // Then
-        assertEquals(expectedResult, result)
-        coVerify { beanRepository.getBeanById(beanId) }
-        coVerify { beanRepository.validateBean(any()) }
-    }
-
-    @Test
     fun `isBeanNameAvailableForUpdate should return true when name is available`() = runTest {
         // Given
         val beanId = "test-id"
@@ -309,49 +286,5 @@ class UpdateBeanUseCaseTest {
         val exception = result.exceptionOrNull()
         assertTrue(exception is DomainException)
         assertEquals((exception as DomainException).errorCode, DomainErrorCode.BEAN_NOT_FOUND)
-    }
-
-    @Test
-    fun `bulkUpdateActiveStatus should update all beans successfully`() = runTest {
-        // Given
-        val beanIds = listOf("bean1", "bean2", "bean3")
-        val isActive = false
-
-        coEvery { beanRepository.updateBeanActiveStatus("bean1", isActive) } returns Result.success(Unit)
-        coEvery { beanRepository.updateBeanActiveStatus("bean2", isActive) } returns Result.success(Unit)
-        coEvery { beanRepository.updateBeanActiveStatus("bean3", isActive) } returns Result.success(Unit)
-
-        // When
-        val result = updateBeanUseCase.bulkUpdateActiveStatus(beanIds, isActive)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(3, result.getOrNull())
-
-        coVerify { beanRepository.updateBeanActiveStatus("bean1", isActive) }
-        coVerify { beanRepository.updateBeanActiveStatus("bean2", isActive) }
-        coVerify { beanRepository.updateBeanActiveStatus("bean3", isActive) }
-    }
-
-    @Test
-    fun `bulkUpdateActiveStatus should handle partial failures`() = runTest {
-        // Given
-        val beanIds = listOf("bean1", "bean2", "bean3")
-        val isActive = false
-
-        coEvery { beanRepository.updateBeanActiveStatus("bean1", isActive) } returns Result.success(Unit)
-        coEvery { beanRepository.updateBeanActiveStatus("bean2", isActive) } returns Result.failure(
-            RepositoryException.DatabaseError("Database error")
-        )
-        coEvery { beanRepository.updateBeanActiveStatus("bean3", isActive) } returns Result.success(Unit)
-
-        // When
-        val result = updateBeanUseCase.bulkUpdateActiveStatus(beanIds, isActive)
-
-        // Then
-        assertTrue(result.isFailure)
-        val exception = result.exceptionOrNull()
-        assertTrue(exception is DomainException)
-        assertTrue(exception?.message?.contains("Some beans failed to update") == true)
     }
 }

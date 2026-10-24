@@ -100,11 +100,6 @@ class PhotoStorageManagerImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPhotoFile(photoPath: String): File? = withContext(Dispatchers.IO) {
-        val file = File(photoPath)
-        if (file.exists() && file.isFile) file else null
-    }
-
     override suspend fun compressImage(imageUri: Uri): Result<Uri> = withContext(Dispatchers.IO) {
         var inputStream: java.io.InputStream? = null
         var originalBitmap: Bitmap? = null
@@ -229,41 +224,6 @@ class PhotoStorageManagerImpl @Inject constructor(
                 scaledBitmap?.recycle()
             }
         }
-    }
-
-    override suspend fun cleanupOrphanedFiles(referencedPhotoPaths: Set<String>): Result<Int> = withContext(
-        Dispatchers.IO
-    ) {
-        try {
-            if (!photosDir.exists()) {
-                return@withContext Result.success(0)
-            }
-
-            val referencedFilenames = referencedPhotoPaths.map { path ->
-                File(path).name
-            }.toSet()
-
-            var deletedCount = 0
-            photosDir.listFiles()?.forEach { file ->
-                if (file.isFile && file.name !in referencedFilenames) {
-                    if (file.delete()) {
-                        deletedCount++
-                    }
-                }
-            }
-
-            Result.success(deletedCount)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    override suspend fun getTotalStorageSize(): Long = withContext(Dispatchers.IO) {
-        if (!photosDir.exists()) return@withContext 0L
-
-        photosDir.listFiles()?.sumOf { file ->
-            if (file.isFile) file.length() else 0L
-        } ?: 0L
     }
 
     private fun handleImageRotation(imageUri: Uri, bitmap: Bitmap): Bitmap {

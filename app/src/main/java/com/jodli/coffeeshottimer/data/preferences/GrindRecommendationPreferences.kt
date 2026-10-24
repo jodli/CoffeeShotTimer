@@ -94,32 +94,6 @@ class GrindRecommendationPreferences @Inject constructor(
         }
     }
 
-    /**
-     * Get all bean IDs that have stored recommendations.
-     * Useful for cleanup or analytics.
-     *
-     * @return List of bean IDs with stored recommendations
-     */
-    suspend fun getAllRecommendationBeanIds(): List<String> = withContext(Dispatchers.IO) {
-        sharedPreferences.all.keys
-            .filter { it.startsWith(RECOMMENDATION_KEY_PREFIX) }
-            .map { it.removePrefix(RECOMMENDATION_KEY_PREFIX) }
-    }
-
-    /**
-     * Clear all stored recommendations.
-     * Useful for testing or user data reset.
-     */
-    suspend fun clearAllRecommendations() = withContext(Dispatchers.IO) {
-        val editor = sharedPreferences.edit()
-        sharedPreferences.all.keys
-            .filter { it.startsWith(RECOMMENDATION_KEY_PREFIX) }
-            .forEach { key ->
-                editor.remove(key)
-            }
-        editor.apply()
-    }
-
     private fun createRecommendationKey(beanId: String): String {
         return "$RECOMMENDATION_KEY_PREFIX$beanId"
     }

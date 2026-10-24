@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
-import java.text.DecimalFormat
 import java.time.LocalDate
 
 /**
@@ -50,43 +49,6 @@ class ValidationUtils(
         const val MAX_TYPICAL_BREW_RATIO = 3.0
         const val OPTIMAL_BREW_RATIO_MIN = 2.0
         const val OPTIMAL_BREW_RATIO_MAX = 2.5
-    }
-
-    // Time validation constants
-    // NOTE: These are duplicated from companion object for instance access
-    val MIN_EXTRACTION_TIME = Companion.MIN_EXTRACTION_TIME
-    val MAX_EXTRACTION_TIME = Companion.MAX_EXTRACTION_TIME
-    val OPTIMAL_EXTRACTION_TIME_MIN = Companion.OPTIMAL_EXTRACTION_TIME_MIN
-    val OPTIMAL_EXTRACTION_TIME_MAX = Companion.OPTIMAL_EXTRACTION_TIME_MAX
-
-    // Text validation constants
-    private val MIN_BEAN_NAME_LENGTH = 2
-    private val MAX_BEAN_NAME_LENGTH = 100
-    val MAX_NOTES_LENGTH = Companion.MAX_NOTES_LENGTH
-
-    // Brew ratio constants
-    val MIN_TYPICAL_BREW_RATIO = Companion.MIN_TYPICAL_BREW_RATIO
-    val MAX_TYPICAL_BREW_RATIO = Companion.MAX_TYPICAL_BREW_RATIO
-    val OPTIMAL_BREW_RATIO_MIN = Companion.OPTIMAL_BREW_RATIO_MIN
-    val OPTIMAL_BREW_RATIO_MAX = Companion.OPTIMAL_BREW_RATIO_MAX
-
-    private val decimalFormat = DecimalFormat("#.#")
-
-    /**
-     * Validates extraction time with range checking.
-     */
-    fun validateExtractionTime(timeSeconds: Int): ValidationResult {
-        val errors = mutableListOf<String>()
-
-        when {
-            timeSeconds < MIN_EXTRACTION_TIME ->
-                errors.add(stringProvider.getExtractionTimeMinimumError(MIN_EXTRACTION_TIME))
-
-            timeSeconds > MAX_EXTRACTION_TIME ->
-                errors.add(stringProvider.getExtractionTimeMaximumError(MAX_EXTRACTION_TIME))
-        }
-
-        return ValidationResult(errors.isEmpty(), errors)
     }
 
     /**
@@ -144,17 +106,6 @@ class ValidationUtils(
         }
 
         return ValidationResult(errors.isEmpty(), errors)
-    }
-
-    /**
-     * Formats a decimal number for display with appropriate precision.
-     */
-    fun formatDecimal(value: Double, maxDecimalPlaces: Int = 1): String {
-        return when (maxDecimalPlaces) {
-            0 -> "%.0f".format(value)
-            1 -> decimalFormat.format(value)
-            else -> "%.${maxDecimalPlaces}f".format(value)
-        }
     }
 }
 

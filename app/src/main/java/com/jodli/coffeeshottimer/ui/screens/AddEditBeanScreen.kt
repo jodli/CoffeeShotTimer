@@ -431,13 +431,9 @@ private fun BeanEditorDialogHost(
             onDismiss = { dialogs.photoActionSheet = false },
             cameraAvailable = viewModel.isCameraAvailable(context),
             cameraPermissionGranted = launchers.isCameraPermissionGranted(),
-            storagePermissionGranted = true,
             onRequestCameraPermission = {
                 dialogs.photoActionSheet = false
                 launchers.requestCameraPermission()
-            },
-            onRequestStoragePermission = {
-                // No storage permission needed for Photo Picker
             }
         )
     }

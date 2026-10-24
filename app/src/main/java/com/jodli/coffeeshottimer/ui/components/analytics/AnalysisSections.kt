@@ -51,7 +51,7 @@ private const val ANALYSIS_CHART_SHOT_LIMIT = 30
 /** Swatch size of the chart legend. */
 private val LEGEND_SWATCH_SIZE = 10.dp
 
-/** Coaching as ruled rows: recent pattern, progress, coaching impact. */
+/** Coaching as ruled rows: recent pattern, progress. */
 @Composable
 fun CoachingSection(insights: CoachingInsights?, modifier: Modifier = Modifier) {
     if (insights == null) return
@@ -67,10 +67,6 @@ fun CoachingSection(insights: CoachingInsights?, modifier: Modifier = Modifier) 
         CoachingRuledRow(
             label = stringResource(R.string.coaching_insights_section_progress),
             message = insights.dialInStatus?.statusMessage
-        )
-        CoachingRuledRow(
-            label = stringResource(R.string.coaching_insights_section_coaching),
-            message = insights.grindCoachingEffectiveness?.effectivenessMessage
         )
     }
 }

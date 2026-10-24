@@ -49,13 +49,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        // Handle configuration changes (orientation, screen size, etc.)
-        // Compose will automatically recompose when configuration changes
-        // No additional handling needed as ViewModels preserve state
-    }
 }
 
 @Composable
@@ -74,115 +67,61 @@ fun EspressoShotTrackerApp(mainActivityViewModel: MainActivityViewModel) {
                 )
             }
         }
-        is RoutingState.Success -> {
-            // Create a fresh NavController keyed by the start destination to avoid unwanted transitions
-            androidx.compose.runtime.key(state.route) {
-                val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
-                val configuration = LocalConfiguration.current
-                val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+        is RoutingState.Success -> AppShell(state.route)
+        is RoutingState.Error -> AppShell(state.fallbackRoute)
+    }
+}
 
-                // Determine if navigation should be shown
-                // Strip query parameters for route matching
-                val currentRouteBase = currentRoute?.substringBefore('?')
-                val showNavigation = when (currentRouteBase) {
-                    NavigationDestinations.RecordShot.baseRoute,
-                    NavigationDestinations.ShotHistory.baseRoute,
-                    NavigationDestinations.BeanManagement.baseRoute,
-                    NavigationDestinations.More.baseRoute -> true
-                    // Hide navigation during onboarding
-                    NavigationDestinations.OnboardingIntroduction.baseRoute,
-                    NavigationDestinations.OnboardingEquipmentSetup.baseRoute -> false
-                    else -> false
-                }
+@Composable
+private fun AppShell(startDestination: String) {
+    // Create a fresh NavController keyed by the start destination to avoid unwanted transitions
+    androidx.compose.runtime.key(startDestination) {
+        val navController = rememberNavController()
+        val navBackStackEntry by navController.currentBackStackEntryAsState()
+        val currentRoute = navBackStackEntry?.destination?.route
+        val configuration = LocalConfiguration.current
+        val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-                if (isLandscape && showNavigation) {
-                    // Landscape layout with navigation rail on the left
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background)
-                    ) {
-                        AppNavigationRail(navController = navController)
-                        AppNavigation(
-                            navController = navController,
-                            modifier = Modifier.weight(1f),
-                            startDestination = state.route
-                        )
-                    }
-                } else {
-                    // Portrait layout or no navigation - use Scaffold with bottom navigation
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        bottomBar = {
-                            if (showNavigation) {
-                                BottomNavigationBar(navController = navController)
-                            }
-                        }
-                    ) { innerPadding ->
-                        AppNavigation(
-                            navController = navController,
-                            modifier = Modifier.padding(innerPadding),
-                            startDestination = state.route
-                        )
-                    }
-                }
-            }
+        // Determine if navigation should be shown
+        // Strip query parameters for route matching
+        val currentRouteBase = currentRoute?.substringBefore('?')
+        val showNavigation = when (currentRouteBase) {
+            NavigationDestinations.RecordShot.baseRoute,
+            NavigationDestinations.ShotHistory.baseRoute,
+            NavigationDestinations.BeanManagement.baseRoute,
+            NavigationDestinations.More.baseRoute -> true
+            else -> false
         }
-        is RoutingState.Error -> {
-            // On error, show app with fallback route without transitions
-            val fallback = state.fallbackRoute
-            androidx.compose.runtime.key(fallback) {
-                val navController = rememberNavController()
-                val navBackStackEntry by navController.currentBackStackEntryAsState()
-                val currentRoute = navBackStackEntry?.destination?.route
-                val configuration = LocalConfiguration.current
-                val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
 
-                // Strip query parameters for route matching
-                val currentRouteBase = currentRoute?.substringBefore('?')
-                val showNavigation = when (currentRouteBase) {
-                    NavigationDestinations.RecordShot.baseRoute,
-                    NavigationDestinations.ShotHistory.baseRoute,
-                    NavigationDestinations.BeanManagement.baseRoute,
-                    NavigationDestinations.More.baseRoute -> true
-                    NavigationDestinations.OnboardingIntroduction.baseRoute,
-                    NavigationDestinations.OnboardingEquipmentSetup.baseRoute -> false
-                    else -> false
-                }
-
-                if (isLandscape && showNavigation) {
-                    // Landscape layout with navigation rail on the left
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background)
-                    ) {
-                        AppNavigationRail(navController = navController)
-                        AppNavigation(
-                            navController = navController,
-                            modifier = Modifier.weight(1f),
-                            startDestination = fallback
-                        )
-                    }
-                } else {
-                    // Portrait layout or no navigation - use Scaffold with bottom navigation
-                    Scaffold(
-                        modifier = Modifier.fillMaxSize(),
-                        bottomBar = {
-                            if (showNavigation) {
-                                BottomNavigationBar(navController = navController)
-                            }
-                        }
-                    ) { innerPadding ->
-                        AppNavigation(
-                            navController = navController,
-                            modifier = Modifier.padding(innerPadding),
-                            startDestination = fallback
-                        )
+        if (isLandscape && showNavigation) {
+            // Landscape layout with navigation rail on the left
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            ) {
+                AppNavigationRail(navController = navController)
+                AppNavigation(
+                    navController = navController,
+                    modifier = Modifier.weight(1f),
+                    startDestination = startDestination
+                )
+            }
+        } else {
+            // Portrait layout or no navigation - use Scaffold with bottom navigation
+            Scaffold(
+                modifier = Modifier.fillMaxSize(),
+                bottomBar = {
+                    if (showNavigation) {
+                        BottomNavigationBar(navController = navController)
                     }
                 }
+            ) { innerPadding ->
+                AppNavigation(
+                    navController = navController,
+                    modifier = Modifier.padding(innerPadding),
+                    startDestination = startDestination
+                )
             }
         }
     }

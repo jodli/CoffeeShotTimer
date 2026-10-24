@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 /**
  * Utility class for populating and clearing database with realistic test data.
- * This class is only available in debug builds to prevent accidental use in production.
+ * This class is only provided in debug builds (returns null in release builds) to prevent accidental use in production.
  */
 @Singleton
 class DatabasePopulator @Inject constructor(
@@ -65,39 +65,6 @@ class DatabasePopulator @Inject constructor(
             }
         } catch (e: Exception) {
             throw Exception("Failed to populate database: ${e.message}", e)
-        }
-    }
-
-    /**
-     * Adds additional shots to existing beans for testing purposes.
-     *
-     * @param count Number of additional shots to create (default: 10)
-     * @throws IllegalStateException if called in a release build
-     * @throws Exception if database operations fail
-     */
-    suspend fun addMoreShots(count: Int = 10) = withContext(Dispatchers.IO) {
-        if (!BuildConfig.DEBUG) {
-            throw IllegalStateException("DatabasePopulator can only be used in debug builds")
-        }
-
-        try {
-            // Get existing active beans
-            val existingBeans = beanDao.getActiveBeans()
-
-            // If no beans exist, create some first
-            if (existingBeans.first().isEmpty()) {
-                populateForScreenshots()
-                return@withContext
-            }
-
-            val beans = existingBeans.first()
-            repeat(count) {
-                val randomBean = beans.random()
-                val shot = createRandomShotForBean(randomBean)
-                shotDao.insertShot(shot)
-            }
-        } catch (e: Exception) {
-            throw Exception("Failed to add more shots: ${e.message}", e)
         }
     }
 
@@ -223,15 +190,6 @@ class DatabasePopulator @Inject constructor(
         }
 
         return shots
-    }
-
-    /**
-     * Creates a single realistic shot for a given bean with random skill level.
-     */
-    private fun createRandomShotForBean(bean: Bean, dayOffset: Int = 0): Shot {
-        val skillLevels = BaristaSkillLevel.values()
-        val randomSkillLevel = skillLevels.random()
-        return createShotForSkillLevel(bean, randomSkillLevel, dayOffset)
     }
 
     /**

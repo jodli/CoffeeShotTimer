@@ -9,9 +9,6 @@ import java.time.LocalDate
  * These extensions work with ValidationUtils that require a ValidationStringProvider.
  */
 
-// Weight validation functions removed - sliders now handle all weight validation by constraining values to basket configuration ranges
-// Grinder validation function removed - GrinderSettingSlider constrains values to grinder configuration ranges
-
 /**
  * Validates bean name with enhanced error messages and suggestions.
  */

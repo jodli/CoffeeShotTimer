@@ -108,23 +108,4 @@ class PhotoCaptureManagerImpl @Inject constructor(
             // In a real app, you might want to log this
         }
     }
-
-    /**
-     * Cleans up all temporary photo files older than a specified time.
-     * This can be called periodically to prevent temp files from accumulating.
-     */
-    suspend fun cleanupOldTempFiles(maxAgeMillis: Long = 24 * 60 * 60 * 1000) = withContext(Dispatchers.IO) {
-        try {
-            if (!tempPhotosDir.exists()) return@withContext
-
-            val currentTime = System.currentTimeMillis()
-            tempPhotosDir.listFiles()?.forEach { file ->
-                if (file.isFile && (currentTime - file.lastModified()) > maxAgeMillis) {
-                    file.delete()
-                }
-            }
-        } catch (e: Exception) {
-            // Log error but don't throw - cleanup is best effort
-        }
-    }
 }

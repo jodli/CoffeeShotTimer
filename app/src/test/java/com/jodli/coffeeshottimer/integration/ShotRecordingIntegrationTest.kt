@@ -12,7 +12,6 @@ import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
-import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
@@ -49,7 +48,6 @@ class ShotRecordingIntegrationTest {
 
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
-    private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
     private lateinit var manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase
@@ -72,7 +70,6 @@ class ShotRecordingIntegrationTest {
         // Create mock dependencies
         recordShotUseCase = mockk(relaxed = true)
         getShotDetailsUseCase = mockk(relaxed = true)
-        getTastePreselectionUseCase = mockk(relaxed = true)
         recordTasteFeedbackUseCase = mockk(relaxed = true)
         calculateGrindAdjustmentUseCase = mockk(relaxed = true)
         manageGrindRecommendationUseCase = mockk(relaxed = true)
@@ -131,7 +128,6 @@ class ShotRecordingIntegrationTest {
 
         // Mock timer update method
         coEvery { recordShotUseCase.updateTimer() } just Runs
-        every { recordShotUseCase.clearError() } just Runs
 
         val testShot = Shot(
             id = "test-shot-1",
@@ -142,8 +138,6 @@ class ShotRecordingIntegrationTest {
             grinderSetting = "15",
             notes = "Test shot"
         )
-        coEvery { recordShotUseCase.recordShotWithCurrentTimer(any(), any(), any(), any(), any()) } returns
-            Result.success(testShot)
 
         // Create ViewModel
         viewModel = ShotRecordingViewModel(

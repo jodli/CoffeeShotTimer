@@ -316,28 +316,20 @@
     <string name="validation_fill_required">Please fill in all required fields</string>
 
     <!-- Validation Error Messages -->
-    <string name="validation_field_required">%1$s is required</string>
-    <string name="validation_extraction_time_minimum">Extraction time must be at least %1$d seconds</string>
-    <string name="validation_extraction_time_maximum">Extraction time cannot exceed %1$d seconds</string>
     <string name="validation_bean_name_minimum_length">Bean name must be at least %1$d characters</string>
     <string name="validation_bean_name_maximum_length">Bean name cannot exceed %1$d characters</string>
     <string name="validation_bean_name_invalid_characters">Bean name contains invalid characters</string>
     <string name="validation_roast_date_future">Roast date cannot be in the future</string>
     <string name="validation_roast_date_too_old">Roast date cannot be more than 365 days ago</string>
     <string name="validation_notes_maximum_length">Notes cannot exceed %1$d characters</string>
-    <string name="validation_output_weight_less_than_input">Output weight cannot be less than input weight</string>
 
     <!-- Validation Tips and Warnings -->
-    <string name="validation_tip_grinder_setting">Tip: Record your grinder setting to remember what worked well</string>
     <string name="validation_tip_descriptive_name">Tip: Try a more descriptive name like \'Ethiopian Yirgacheffe\'</string>
     <string name="validation_tip_basic_punctuation">Tip: Use letters, numbers, spaces, and basic punctuation only</string>
     <string name="validation_tip_unique_name">Tip: Try adding the roaster name or roast level to make it unique</string>
     <string name="validation_tip_roast_date_today">Tip: Use today\'s date if you\'re not sure of the exact roast date</string>
     <string name="validation_note_old_beans">Note: Beans older than 30 days may have lost some flavor</string>
-    <string name="validation_tip_notes_helpful">Tip: Notes help you remember what you liked about this bean</string>
     <string name="validation_note_character_limit">Note: You\'re approaching the character limit</string>
-    <string name="validation_tip_short_extraction_sour">Tip: Very short extractions often taste sour</string>
-    <string name="validation_tip_long_extraction_bitter">Tip: Very long extractions often taste bitter</string>
 
     <!-- Brew Ratio Warnings -->
     <string name="validation_warning_ratio_concentrated">This ratio is quite concentrated – it might taste very strong</string>
@@ -345,20 +337,8 @@
     <string name="validation_warning_ratio_higher">Consider a slightly higher ratio for better balance</string>
     <string name="validation_warning_ratio_lower">Consider a slightly lower ratio for more intensity</string>
 
-    <!-- Extraction Time Warnings -->
-    <string name="validation_warning_grind_finer">Consider grinding finer or using more coffee for longer extraction</string>
-    <string name="validation_warning_grind_coarser">Consider grinding coarser or using less coffee for shorter extraction</string>
-    <string name="validation_success_optimal_time">Great extraction time! This is in the optimal range for espresso</string>
 
-    <!-- Bean Age Warnings -->
-    <string name="validation_warning_very_fresh_beans">Very fresh beans – consider waiting 2–4 days for optimal flavor</string>
-    <string name="validation_success_fresh_beans">Fresh beans – perfect timing for espresso!</string>
-    <string name="validation_warning_aging_beans">Beans are getting older but still good for espresso</string>
-    <string name="validation_warning_old_beans">Older beans - flavor may be diminished</string>
 
-    <!-- Content Descriptions for Validation -->
-    <string name="validation_cd_error">Error</string>
-    <string name="validation_cd_warning">Warning</string>
 
     <!-- Placeholders -->
     <string name="placeholder_grinder_setting">e.g., 15, Fine, Medium-Fine</string>
@@ -386,7 +366,6 @@
 
     <!-- Special Characters and Symbols -->
 
-    <!-- Weight Slider -->
 
     <!-- Additional format strings -->
     <string name="button_reset">Reset</string>
@@ -686,13 +665,10 @@
     <string name="coaching_dial_in_achieved">Dialed in %1$s in %2$d shots!</string>
     <string name="coaching_dial_in_exploring">Exploring %1$s - %2$d shots so far</string>
     
-    <!-- Coaching Insights - Grind Coaching Effectiveness -->
-    
     <!-- Coaching Insights Card -->
     <string name="coaching_insights_title_with_bean">Coaching · %1$s</string>
     <string name="coaching_insights_section_recent">Recent Pattern</string>
     <string name="coaching_insights_section_progress">Progress</string>
-    <string name="coaching_insights_section_coaching">Coaching Impact</string>
     
     <!-- Achievement Badges -->
     <string name="achievement_first_perfect">First perfect with %1$s!</string>

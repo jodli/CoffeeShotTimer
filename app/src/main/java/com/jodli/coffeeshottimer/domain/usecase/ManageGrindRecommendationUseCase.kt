@@ -258,48 +258,6 @@ class ManageGrindRecommendationUseCase @Inject constructor(
     }
 
     /**
-     * Get all bean IDs that have stored recommendations.
-     * Useful for cleanup operations or analytics.
-     *
-     * @return Result containing list of bean IDs with recommendations
-     */
-    suspend fun getAllRecommendationBeanIds(): Result<List<String>> {
-        return try {
-            val beanIds = grindRecommendationPreferences.getAllRecommendationBeanIds()
-            Result.success(beanIds)
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.STORAGE_ERROR,
-                    "Failed to get all recommendation bean IDs",
-                    exception
-                )
-            )
-        }
-    }
-
-    /**
-     * Clear all stored recommendations.
-     * Primarily used for testing or user data reset.
-     *
-     * @return Result indicating success or failure
-     */
-    suspend fun clearAllRecommendations(): Result<Unit> {
-        return try {
-            grindRecommendationPreferences.clearAllRecommendations()
-            Result.success(Unit)
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.STORAGE_ERROR,
-                    "Failed to clear all recommendations",
-                    exception
-                )
-            )
-        }
-    }
-
-    /**
      * Convert SerializableGrindRecommendation to PersistentGrindRecommendation.
      * Handles enum conversion and data validation.
      */

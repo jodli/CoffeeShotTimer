@@ -267,33 +267,6 @@ class ManageGrindRecommendationUseCaseTest {
     }
 
     @Test
-    fun `getAllRecommendationBeanIds returns list from preferences`() = runTest {
-        // Given
-        val expectedBeanIds = listOf("bean1", "bean2", "bean3")
-        coEvery { mockGrindRecommendationPreferences.getAllRecommendationBeanIds() } returns expectedBeanIds
-
-        // When
-        val result = useCase.getAllRecommendationBeanIds()
-
-        // Then
-        assertTrue("Should succeed", result.isSuccess)
-        assertEquals(expectedBeanIds, result.getOrNull())
-    }
-
-    @Test
-    fun `clearAllRecommendations calls preferences correctly`() = runTest {
-        // Given
-        coEvery { mockGrindRecommendationPreferences.clearAllRecommendations() } just Runs
-
-        // When
-        val result = useCase.clearAllRecommendations()
-
-        // Then
-        assertTrue("Should succeed", result.isSuccess)
-        coVerify { mockGrindRecommendationPreferences.clearAllRecommendations() }
-    }
-
-    @Test
     fun `saveRecommendation handles storage exception`() = runTest {
         // Given
         val beanId = "bean123"

@@ -77,46 +77,13 @@ class RecordShotUseCaseTest {
     }
 
     @Test
-    fun `stopTimer should stop running timer and return elapsed time`() {
-        // Given
-        var mockTime = 3000L
-        every { SystemClock.elapsedRealtime() } answers { mockTime }
-
-        recordShotUseCase.startTimer()
-
-        // Advance time by 2 seconds
-        mockTime += 2000L
-
-        // When
-        val elapsedTime = recordShotUseCase.stopTimer()
-
-        // Then
-        val timerState = recordShotUseCase.timerState.value
-        assertFalse("Timer should not be running", timerState.isRunning)
-        assertEquals("Elapsed time should be 2 seconds", 2, elapsedTime)
-        assertEquals("Elapsed time should match state", elapsedTime, timerState.elapsedTimeSeconds)
-    }
-
-    @Test
-    fun `stopTimer should return current elapsed time if not running`() {
-        // Given - timer not started
-        val initialElapsedTime = recordShotUseCase.timerState.value.elapsedTimeSeconds
-
-        // When
-        val elapsedTime = recordShotUseCase.stopTimer()
-
-        // Then
-        assertEquals("Should return current elapsed time", initialElapsedTime, elapsedTime)
-    }
-
-    @Test
     fun `resetTimer should reset timer to initial state`() {
         // Given
         val mockTime = 1000L
         every { SystemClock.elapsedRealtime() } returns mockTime
 
         recordShotUseCase.startTimer()
-        recordShotUseCase.stopTimer()
+        recordShotUseCase.pauseTimer()
 
         // When
         recordShotUseCase.resetTimer()
@@ -327,59 +294,6 @@ class RecordShotUseCaseTest {
         assertEquals("Start time should be reset", 0L, timerState.startTime)
     }
 
-    @Test
-    fun `recordShotWithCurrentTimer should use current timer elapsed time`() = runTest {
-        // Given
-        var mockTime = 3000L
-        every { SystemClock.elapsedRealtime() } answers { mockTime }
-
-        coEvery { shotRepository.recordShot(any()) } returns Result.success(Unit)
-        recordShotUseCase.startTimer()
-
-        // Simulate time passing - advance time by 2 seconds
-        mockTime += 2000L
-        recordShotUseCase.updateTimer()
-
-        // When
-        val result = recordShotUseCase.recordShotWithCurrentTimer(
-            beanId = "bean-1",
-            coffeeWeightIn = 18.0,
-            coffeeWeightOut = 36.0,
-            grinderSetting = "15"
-        )
-
-        // Then
-        assertTrue("Recording should succeed", result.isSuccess)
-        val shot = result.getOrNull()
-        assertNotNull("Should return shot", shot)
-        // The extraction time should be 2 seconds based on our mock time advancement
-        assertEquals("Extraction time should match elapsed time", 2, shot!!.extractionTimeSeconds)
-
-        coVerify { shotRepository.recordShot(any()) }
-    }
-
-    @Test
-    fun `recordShotWithCurrentTimer should stop running timer`() = runTest {
-        // Given
-        val mockTime = 4000L
-        every { SystemClock.elapsedRealtime() } returns mockTime
-
-        coEvery { shotRepository.recordShot(any()) } returns Result.success(Unit)
-        recordShotUseCase.startTimer()
-
-        // When
-        recordShotUseCase.recordShotWithCurrentTimer(
-            beanId = "bean-1",
-            coffeeWeightIn = 18.0,
-            coffeeWeightOut = 36.0,
-            grinderSetting = "15"
-        )
-
-        // Then
-        val timerState = recordShotUseCase.timerState.value
-        assertFalse("Timer should be stopped", timerState.isRunning)
-    }
-
     // Grinder setting suggestion tests
 
     @Test
@@ -415,36 +329,6 @@ class RecordShotUseCaseTest {
     // Utility method tests
 
     @Test
-    fun `clearError should clear recording error`() {
-        // Given - simulate error state
-        recordShotUseCase.recordingState.value.copy(error = "Some error")
-
-        // When
-        recordShotUseCase.clearError()
-
-        // Then
-        val recordingState = recordShotUseCase.recordingState.value
-        assertNull("Error should be cleared", recordingState.error)
-    }
-
-    @Test
-    fun `isOptimalExtractionTime should return true for optimal range`() {
-        // Test cases for optimal range (25-30 seconds)
-        assertTrue("25 seconds should be optimal", recordShotUseCase.isOptimalExtractionTime(25))
-        assertTrue("28 seconds should be optimal", recordShotUseCase.isOptimalExtractionTime(28))
-        assertTrue("30 seconds should be optimal", recordShotUseCase.isOptimalExtractionTime(30))
-    }
-
-    @Test
-    fun `isOptimalExtractionTime should return false for non-optimal range`() {
-        // Test cases outside optimal range
-        assertFalse("24 seconds should not be optimal", recordShotUseCase.isOptimalExtractionTime(24))
-        assertFalse("31 seconds should not be optimal", recordShotUseCase.isOptimalExtractionTime(31))
-        assertFalse("15 seconds should not be optimal", recordShotUseCase.isOptimalExtractionTime(15))
-        assertFalse("45 seconds should not be optimal", recordShotUseCase.isOptimalExtractionTime(45))
-    }
-
-    @Test
     fun `isTypicalBrewRatio should return true for typical range`() {
         // Test cases for typical range (1.5-3.0)
         assertTrue("1.5 should be typical", recordShotUseCase.isTypicalBrewRatio(1.5))
@@ -467,13 +351,5 @@ class RecordShotUseCaseTest {
         assertEquals("Should format 2.0", "1:2.0", recordShotUseCase.formatBrewRatio(2.0))
         assertEquals("Should format 2.5", "1:2.5", recordShotUseCase.formatBrewRatio(2.5))
         assertEquals("Should format 1.75", "1:1.8", recordShotUseCase.formatBrewRatio(1.75))
-    }
-
-    @Test
-    fun `formatExtractionTime should format correctly`() {
-        assertEquals("Should format 25 seconds", "00:25", recordShotUseCase.formatExtractionTime(25))
-        assertEquals("Should format 90 seconds", "01:30", recordShotUseCase.formatExtractionTime(90))
-        assertEquals("Should format 125 seconds", "02:05", recordShotUseCase.formatExtractionTime(125))
-        assertEquals("Should format 5 seconds", "00:05", recordShotUseCase.formatExtractionTime(5))
     }
 }

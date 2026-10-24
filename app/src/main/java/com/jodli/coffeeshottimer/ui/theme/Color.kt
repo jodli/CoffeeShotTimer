@@ -100,12 +100,6 @@ data class ZoneColors(
         ExtractionZone.SLOW -> slowInk
     }
 
-    fun container(zone: ExtractionZone): Color = when (zone) {
-        ExtractionZone.FAST -> fastContainer
-        ExtractionZone.IDEAL -> idealContainer
-        ExtractionZone.SLOW -> slowContainer
-    }
-
     fun forScore(score: Int): Color = when (QualityTier.forScore(score)) {
         QualityTier.EXCELLENT -> qualityGood
         QualityTier.GOOD -> qualityFair

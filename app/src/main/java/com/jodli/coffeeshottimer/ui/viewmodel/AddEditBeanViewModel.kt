@@ -10,7 +10,6 @@ import com.jodli.coffeeshottimer.data.model.Bean
 import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
 import com.jodli.coffeeshottimer.domain.usecase.AddBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.AddPhotoToBeanUseCase
-import com.jodli.coffeeshottimer.domain.usecase.CheckPhotoCapabilityUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RemovePhotoFromBeanUseCase
 import com.jodli.coffeeshottimer.domain.usecase.UpdateBeanUseCase
 import com.jodli.coffeeshottimer.ui.components.ValidationUtils
@@ -47,7 +46,6 @@ class AddEditBeanViewModel @Inject constructor(
     private val updateBeanUseCase: UpdateBeanUseCase,
     private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase,
     private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase,
-    private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase,
     private val photoCaptureManager: PhotoCaptureManager,
     private val stringResourceProvider: StringResourceProvider,
     private val validationStringProvider: ValidationStringProvider,
@@ -456,22 +454,6 @@ class AddEditBeanViewModel @Inject constructor(
             }
             PhotoOperation.DELETE_PHOTO -> {
                 removePhoto()
-            }
-        }
-    }
-
-    /**
-     * Checks photo capabilities before showing photo options
-     */
-    fun checkPhotoCapabilities() {
-        viewModelScope.launch {
-            val result = checkPhotoCapabilityUseCase.execute()
-            if (result.isFailure) {
-                _uiState.value = _uiState.value.copy(
-                    photoError = domainErrorTranslator.translateResultError(result),
-                    canRetryPhotoOperation = true,
-                    lastFailedPhotoOperation = PhotoOperation.ADD_PHOTO
-                )
             }
         }
     }

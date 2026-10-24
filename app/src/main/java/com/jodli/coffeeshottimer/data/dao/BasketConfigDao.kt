@@ -108,20 +108,4 @@ interface BasketConfigDao {
         coffeeOutMin: Float,
         coffeeOutMax: Float
     ): BasketConfiguration?
-
-    /**
-     * Delete old configurations, keeping only the most recent N configurations.
-     * Useful for cleanup to prevent unlimited configuration history.
-     */
-    @Query(
-        """
-        DELETE FROM basket_configuration 
-        WHERE id NOT IN (
-            SELECT id FROM basket_configuration 
-            ORDER BY createdAt DESC 
-            LIMIT :keepCount
-        )
-    """
-    )
-    suspend fun deleteOldConfigs(keepCount: Int = 10)
 }

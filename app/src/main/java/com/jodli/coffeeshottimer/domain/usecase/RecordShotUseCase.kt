@@ -62,14 +62,6 @@ class RecordShotUseCase @Inject constructor(
     }
 
     /**
-     * Stop the extraction timer and return the elapsed time.
-     * @return Elapsed time in seconds
-     */
-    fun stopTimer(): Int {
-        return pauseTimer() // Stop is the same as pause for now
-    }
-
-    /**
      * Reset the timer to initial state.
      */
     fun resetTimer() {
@@ -227,61 +219,12 @@ class RecordShotUseCase @Inject constructor(
     }
 
     /**
-     * Record a shot using the current timer state.
-     * Convenience method that uses the current timer's elapsed time.
-     * @param beanId Selected bean ID
-     * @param coffeeWeightIn Input coffee weight in grams
-     * @param coffeeWeightOut Output coffee weight in grams
-     * @param grinderSetting Grinder setting
-     * @param notes Optional notes
-     * @return Result indicating success or failure
-     */
-    suspend fun recordShotWithCurrentTimer(
-        beanId: String,
-        coffeeWeightIn: Double,
-        coffeeWeightOut: Double,
-        grinderSetting: String,
-        notes: String = ""
-    ): Result<Shot> {
-        val extractionTime = if (_timerState.value.isRunning) {
-            stopTimer()
-        } else {
-            _timerState.value.elapsedTimeSeconds
-        }
-
-        return recordShot(
-            beanId = beanId,
-            coffeeWeightIn = coffeeWeightIn,
-            coffeeWeightOut = coffeeWeightOut,
-            extractionTimeSeconds = extractionTime,
-            grinderSetting = grinderSetting,
-            notes = notes
-        )
-    }
-
-    /**
      * Get suggested grinder setting for a bean.
      * @param beanId Bean ID to get suggestion for
      * @return Result containing suggested grinder setting or null
      */
     suspend fun getSuggestedGrinderSetting(beanId: String): Result<String?> {
         return shotRepository.getSuggestedGrinderSetting(beanId)
-    }
-
-    /**
-     * Clear any recording errors.
-     */
-    fun clearError() {
-        _recordingState.value = _recordingState.value.copy(error = null)
-    }
-
-    /**
-     * Check if extraction time is within optimal range (25-30 seconds).
-     * @param extractionTimeSeconds Extraction time to check
-     * @return true if within optimal range
-     */
-    fun isOptimalExtractionTime(extractionTimeSeconds: Int): Boolean {
-        return extractionTimeSeconds in 25..30
     }
 
     /**
@@ -300,17 +243,6 @@ class RecordShotUseCase @Inject constructor(
      */
     fun formatBrewRatio(brewRatio: Double): String {
         return "1:${String.format(java.util.Locale.ROOT, "%.1f", brewRatio)}"
-    }
-
-    /**
-     * Format extraction time as MM:SS.
-     * @param extractionTimeSeconds Extraction time in seconds
-     * @return Formatted time string
-     */
-    fun formatExtractionTime(extractionTimeSeconds: Int): String {
-        val minutes = extractionTimeSeconds / 60
-        val seconds = extractionTimeSeconds % 60
-        return String.format(java.util.Locale.ROOT, "%02d:%02d", minutes, seconds)
     }
 }
 

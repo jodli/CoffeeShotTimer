@@ -82,69 +82,6 @@ class DatabasePopulatorTest {
         }
     }
 
-    @Test
-    fun `addMoreShots should add shots to existing beans`() = runTest {
-        // Given
-        val existingBeans = listOf(
-            Bean(
-                id = "bean1",
-                name = "Test Bean",
-                roastDate = LocalDate.now().minusDays(7),
-                notes = "Test notes",
-                lastGrinderSetting = "3.0"
-            )
-        )
-        coEvery { beanDao.getActiveBeans() } returns flowOf(existingBeans)
-        coEvery { shotDao.insertShot(any()) } returns Unit
-
-        // When
-        databasePopulator.addMoreShots(5)
-
-        // Then
-        coVerify(exactly = 5) { shotDao.insertShot(any()) }
-    }
-
-    @Test
-    fun `addMoreShots should populate database if no beans exist`() = runTest {
-        // Given
-        coEvery { beanDao.getActiveBeans() } returns flowOf(emptyList())
-        coEvery { grinderConfigDao.getCurrentConfig() } returns null
-        coEvery { grinderConfigDao.insertConfig(any()) } returns Unit
-        coEvery { beanDao.insertBean(any()) } returns Unit
-        coEvery { shotDao.insertShot(any()) } returns Unit
-
-        // When
-        databasePopulator.addMoreShots(5)
-
-        // Then
-        // Should call populateForScreenshots which inserts beans and shots
-        coVerify(exactly = 1) { grinderConfigDao.insertConfig(any()) }
-        coVerify(exactly = 5) { beanDao.insertBean(any()) }
-        coVerify(atLeast = 25) { shotDao.insertShot(any()) }
-    }
-
-    @Test
-    fun `addMoreShots should handle database errors`() = runTest {
-        // Given
-        val existingBeans = listOf(
-            Bean(
-                id = "bean1",
-                name = "Test Bean",
-                roastDate = LocalDate.now().minusDays(7)
-            )
-        )
-        coEvery { beanDao.getActiveBeans() } returns flowOf(existingBeans)
-        coEvery { shotDao.insertShot(any()) } throws RuntimeException("Insert failed")
-
-        // When & Then
-        try {
-            databasePopulator.addMoreShots(5)
-        } catch (e: Exception) {
-            assertTrue("Should contain error message", e.message?.contains("Failed to add more shots") == true)
-            assertTrue("Should contain original error", e.message?.contains("Insert failed") == true)
-        }
-    }
-
     // Note: BuildConfig.DEBUG conditional compilation tests are in ConditionalCompilationTest.kt
 
     @Test

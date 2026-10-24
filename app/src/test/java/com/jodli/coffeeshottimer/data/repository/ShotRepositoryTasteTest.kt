@@ -2,15 +2,12 @@ package com.jodli.coffeeshottimer.data.repository
 
 import com.jodli.coffeeshottimer.data.dao.BeanDao
 import com.jodli.coffeeshottimer.data.dao.ShotDao
-import com.jodli.coffeeshottimer.data.dao.TasteDistribution
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
 import io.mockk.coEvery
 import io.mockk.coVerify
-import io.mockk.every
 import io.mockk.mockk
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -136,147 +133,6 @@ class ShotRepositoryTasteTest {
         val exception = result.exceptionOrNull() as? RepositoryException.DatabaseError
         assertNotNull(exception)
         assertEquals("Failed to update taste feedback", exception!!.message)
-        assertEquals(databaseException, exception.cause)
-    }
-
-    @Test
-    fun `getShotsByTaste with taste filter calls DAO and returns flow`() = runTest {
-        // Given
-        val tastePrimary = TastePrimary.PERFECT
-        val beanId = "test-bean"
-        val mockShots = listOf(
-            Shot(
-                id = "shot1",
-                beanId = beanId,
-                coffeeWeightIn = 18.0,
-                coffeeWeightOut = 36.0,
-                extractionTimeSeconds = 28,
-                grinderSetting = "15",
-                tastePrimary = TastePrimary.PERFECT
-            )
-        )
-
-        every { shotDao.getShotsByTaste(tastePrimary, beanId) } returns flowOf(mockShots)
-
-        // When
-        var result: Result<List<Shot>>? = null
-        repository.getShotsByTaste(tastePrimary, beanId).collect { result = it }
-
-        // Then
-        assertNotNull(result)
-        assertTrue(result!!.isSuccess)
-        assertEquals(mockShots, result!!.getOrNull())
-    }
-
-    @Test
-    fun `getShotsByTaste with null taste gets all shots`() = runTest {
-        // Given
-        val beanId = "test-bean"
-        val mockShots = listOf(
-            Shot(
-                id = "shot1",
-                beanId = beanId,
-                coffeeWeightIn = 18.0,
-                coffeeWeightOut = 36.0,
-                extractionTimeSeconds = 28,
-                grinderSetting = "15",
-                tastePrimary = TastePrimary.PERFECT
-            ),
-            Shot(
-                id = "shot2",
-                beanId = beanId,
-                coffeeWeightIn = 18.0,
-                coffeeWeightOut = 36.0,
-                extractionTimeSeconds = 22,
-                grinderSetting = "16",
-                tastePrimary = TastePrimary.SOUR
-            )
-        )
-
-        every { shotDao.getShotsByTaste(null, beanId) } returns flowOf(mockShots)
-
-        // When
-        var result: Result<List<Shot>>? = null
-        repository.getShotsByTaste(null, beanId).collect { result = it }
-
-        // Then
-        assertNotNull(result)
-        assertTrue(result!!.isSuccess)
-        assertEquals(mockShots, result!!.getOrNull())
-    }
-
-    @Test
-    fun `getShotsByTaste with database error returns database error`() = runTest {
-        // Given
-        val tastePrimary = TastePrimary.BITTER
-        val beanId = "test-bean"
-        val databaseException = RuntimeException("Database error")
-
-        every { shotDao.getShotsByTaste(tastePrimary, beanId) } throws databaseException
-
-        // When
-        var result: Result<List<Shot>>? = null
-        repository.getShotsByTaste(tastePrimary, beanId).collect { result = it }
-
-        // Then
-        assertNotNull(result)
-        assertTrue(result!!.isFailure)
-        val exception = result!!.exceptionOrNull() as? RepositoryException.DatabaseError
-        assertNotNull(exception)
-        assertEquals("Failed to get shots by taste", exception!!.message)
-    }
-
-    @Test
-    fun `getTasteDistributionForBean with valid bean returns distribution`() = runTest {
-        // Given
-        val beanId = "test-bean"
-        val mockDistribution = listOf(
-            TasteDistribution(TastePrimary.SOUR, 2),
-            TasteDistribution(TastePrimary.PERFECT, 8),
-            TasteDistribution(TastePrimary.BITTER, 1)
-        )
-
-        coEvery { shotDao.getTasteDistributionForBean(beanId) } returns mockDistribution
-
-        // When
-        val result = repository.getTasteDistributionForBean(beanId)
-
-        // Then
-        assertTrue(result.isSuccess)
-        assertEquals(mockDistribution, result.getOrNull())
-    }
-
-    @Test
-    fun `getTasteDistributionForBean with blank beanId returns validation error`() = runTest {
-        // Given
-        val beanId = ""
-
-        // When
-        val result = repository.getTasteDistributionForBean(beanId)
-
-        // Then
-        assertTrue(result.isFailure)
-        val exception = result.exceptionOrNull() as? RepositoryException.ValidationError
-        assertNotNull(exception)
-        assertEquals("Bean ID cannot be empty", exception!!.message)
-    }
-
-    @Test
-    fun `getTasteDistributionForBean with database error returns database error`() = runTest {
-        // Given
-        val beanId = "test-bean"
-        val databaseException = RuntimeException("Database connection failed")
-
-        coEvery { shotDao.getTasteDistributionForBean(beanId) } throws databaseException
-
-        // When
-        val result = repository.getTasteDistributionForBean(beanId)
-
-        // Then
-        assertTrue(result.isFailure)
-        val exception = result.exceptionOrNull() as? RepositoryException.DatabaseError
-        assertNotNull(exception)
-        assertEquals("Failed to get taste distribution", exception!!.message)
         assertEquals(databaseException, exception.cause)
     }
 

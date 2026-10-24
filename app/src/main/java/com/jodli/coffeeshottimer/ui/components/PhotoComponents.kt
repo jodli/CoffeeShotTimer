@@ -396,9 +396,7 @@ fun PhotoActionSheet(
     onDismiss: () -> Unit,
     cameraAvailable: Boolean = true,
     cameraPermissionGranted: Boolean = true,
-    storagePermissionGranted: Boolean = true,
     onRequestCameraPermission: () -> Unit = {},
-    onRequestStoragePermission: () -> Unit = {},
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberModalBottomSheetState()
 ) {
@@ -455,23 +453,11 @@ fun PhotoActionSheet(
             Spacer(modifier = Modifier.height(spacing.small))
 
             // Gallery option
-            when {
-                !storagePermissionGranted -> {
-                    PhotoActionItem(
-                        icon = Icons.Default.PhotoLibrary,
-                        title = stringResource(R.string.text_choose_from_gallery),
-                        subtitle = stringResource(R.string.text_grant_permission),
-                        onClick = onRequestStoragePermission
-                    )
-                }
-                else -> {
-                    PhotoActionItem(
-                        icon = Icons.Default.PhotoLibrary,
-                        title = stringResource(R.string.text_choose_from_gallery),
-                        onClick = onGallerySelect
-                    )
-                }
-            }
+            PhotoActionItem(
+                icon = Icons.Default.PhotoLibrary,
+                title = stringResource(R.string.text_choose_from_gallery),
+                onClick = onGallerySelect
+            )
 
             // Bottom spacing for navigation
             Spacer(modifier = Modifier.height(spacing.large))

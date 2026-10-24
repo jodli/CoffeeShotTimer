@@ -162,40 +162,6 @@ class AddBeanUseCaseTest {
     }
 
     @Test
-    fun `validateBeanParameters should return validation result`() = runTest {
-        // Given
-        val name = "Ethiopian Yirgacheffe"
-        val roastDate = LocalDate.now().minusDays(7)
-        val notes = "Floral and citrusy"
-
-        val expectedResult = ValidationResult(isValid = true, errors = emptyList())
-        coEvery { beanRepository.validateBean(any()) } returns expectedResult
-
-        // When
-        val result = addBeanUseCase.validateBeanParameters(name, roastDate, notes)
-
-        // Then
-        assertEquals(expectedResult, result)
-        coVerify { beanRepository.validateBean(any()) }
-    }
-
-    @Test
-    fun `validateBeanParameters should handle validation exception`() = runTest {
-        // Given
-        val name = "Ethiopian Yirgacheffe"
-        val roastDate = LocalDate.now().minusDays(7)
-
-        coEvery { beanRepository.validateBean(any()) } throws RuntimeException("Validation error")
-
-        // When
-        val result = addBeanUseCase.validateBeanParameters(name, roastDate)
-
-        // Then
-        assertFalse(result.isValid)
-        assertTrue(result.errors.any { it.contains("Failed to validate bean parameters") })
-    }
-
-    @Test
     fun `isBeanNameAvailable should return true when name is available`() = runTest {
         // Given
         val name = "Ethiopian Yirgacheffe"
@@ -257,63 +223,5 @@ class AddBeanUseCaseTest {
         assertTrue(result.isFailure)
         val exception = result.exceptionOrNull()
         assertTrue(exception is RepositoryException.DatabaseError)
-    }
-
-    @Test
-    fun `createQuickBean should create bean with default values`() = runTest {
-        // Given
-        val name = "Ethiopian Yirgacheffe"
-        val roastDate = LocalDate.now()
-
-        val validationResult = ValidationResult(isValid = true, errors = emptyList())
-        coEvery { beanRepository.validateBean(any()) } returns validationResult
-        coEvery { beanRepository.addBean(any()) } returns Result.success(Unit)
-
-        // When
-        val result = addBeanUseCase.createQuickBean(name, roastDate)
-
-        // Then
-        assertTrue(result.isSuccess)
-        val createdBean = result.getOrNull()
-        assertNotNull(createdBean)
-        assertEquals(name, createdBean?.name)
-        assertEquals(roastDate, createdBean?.roastDate)
-        assertEquals("", createdBean?.notes)
-        assertTrue(createdBean?.isActive == true)
-    }
-
-    @Test
-    fun `createQuickBean should use today as default roast date`() = runTest {
-        // Given
-        val name = "Ethiopian Yirgacheffe"
-        val today = LocalDate.now()
-
-        val validationResult = ValidationResult(isValid = true, errors = emptyList())
-        coEvery { beanRepository.validateBean(any()) } returns validationResult
-        coEvery { beanRepository.addBean(any()) } returns Result.success(Unit)
-
-        // When
-        val result = addBeanUseCase.createQuickBean(name)
-
-        // Then
-        assertTrue(result.isSuccess)
-        val createdBean = result.getOrNull()
-        assertEquals(today, createdBean?.roastDate)
-    }
-
-    @Test
-    fun `getValidationRules should return expected rules`() {
-        // When
-        val rules = addBeanUseCase.getValidationRules()
-
-        // Then
-        assertEquals(4, rules.size)
-        assertTrue(rules.containsKey("name"))
-        assertTrue(rules.containsKey("roastDate"))
-        assertTrue(rules.containsKey("notes"))
-
-        assertEquals("Required, unique, max 100 characters", rules["name"])
-        assertEquals("Cannot be future date, max 365 days ago", rules["roastDate"])
-        assertEquals("Optional, max 500 characters", rules["notes"])
     }
 }

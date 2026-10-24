@@ -6,10 +6,11 @@
  * design system with semantic colors, proper spacing, and accessibility support.
  *
  * Components:
- * - [QualityScoreGauge]: Circular arc gauge showing overall quality score (0-100)
- * - [QualityZoneIndicator]: Horizontal bar showing extraction zone distribution
- * - [SimplifiedMetricCard]: Wrapper component for displaying key metrics
  * - [TrendLineGraph]: Line chart visualizing quality scores over time
- * - [ExpandableAnalyticsSection]: Collapsible container for detailed insights
+ * - [CoachingSection]: Dial-in status and coaching observations
+ * - [ShotChartSection]: Extraction time against brew ratio control chart
+ * - [AnalysisFiguresRow]: Top-level figures for quality, extraction, and ratio
+ * - [QualityTrendSection]: Trend analysis with trend line graph
+ * - [GrinderSettingsTable]: Comparison table of grinder settings
  */
 package com.jodli.coffeeshottimer.ui.components.analytics

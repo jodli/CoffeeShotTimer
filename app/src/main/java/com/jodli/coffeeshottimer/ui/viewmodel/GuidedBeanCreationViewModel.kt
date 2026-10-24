@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -70,8 +69,7 @@ class GuidedBeanCreationViewModel @Inject constructor(
      * Get freshness message for the created bean
      */
     fun getFreshnessMessage(bean: Bean): String {
-        val today = LocalDate.now()
-        val daysSinceRoast = java.time.temporal.ChronoUnit.DAYS.between(bean.roastDate, today)
+        val daysSinceRoast = bean.daysSinceRoast()
 
         // If roast date is today (likely a default), show a neutral message
         if (daysSinceRoast == 0L) {
@@ -81,10 +79,10 @@ class GuidedBeanCreationViewModel @Inject constructor(
         }
 
         return when {
-            daysSinceRoast < 4 -> domainErrorTranslator.getString(
+            daysSinceRoast < Bean.FRESH_MIN_DAYS -> domainErrorTranslator.getString(
                 com.jodli.coffeeshottimer.R.string.bean_creation_success_freshness_fresh
             )
-            daysSinceRoast <= 21 -> domainErrorTranslator.getString(
+            daysSinceRoast <= Bean.FRESH_MAX_DAYS -> domainErrorTranslator.getString(
                 com.jodli.coffeeshottimer.R.string.bean_creation_success_freshness_good
             )
             else -> domainErrorTranslator.getString(

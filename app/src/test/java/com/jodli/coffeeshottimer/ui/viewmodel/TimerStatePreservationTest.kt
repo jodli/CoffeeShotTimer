@@ -7,7 +7,6 @@ import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.usecase.CalculateGrindAdjustmentUseCase
 import com.jodli.coffeeshottimer.domain.usecase.GetShotDetailsUseCase
-import com.jodli.coffeeshottimer.domain.usecase.GetTastePreselectionUseCase
 import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordShotUseCase
 import com.jodli.coffeeshottimer.domain.usecase.RecordTasteFeedbackUseCase
@@ -43,7 +42,6 @@ class TimerStatePreservationTest {
 
     private lateinit var recordShotUseCase: RecordShotUseCase
     private lateinit var getShotDetailsUseCase: GetShotDetailsUseCase
-    private lateinit var getTastePreselectionUseCase: GetTastePreselectionUseCase
     private lateinit var recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase
     private lateinit var calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase
     private lateinit var manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase
@@ -71,7 +69,6 @@ class TimerStatePreservationTest {
         shotRepository = mockk(relaxed = true)
         recordShotUseCase = RecordShotUseCase(shotRepository)
         getShotDetailsUseCase = mockk(relaxed = true)
-        getTastePreselectionUseCase = mockk(relaxed = true)
         recordTasteFeedbackUseCase = mockk(relaxed = true)
         calculateGrindAdjustmentUseCase = mockk(relaxed = true)
         manageGrindRecommendationUseCase = mockk(relaxed = true)

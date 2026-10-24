@@ -80,64 +80,6 @@ data class GrinderConfiguration(
     }
 
     /**
-     * Gets the range size (number of steps between min and max).
-     * @return The number of steps in the range
-     */
-    fun getRangeSize(): Int {
-        return scaleMax - scaleMin
-    }
-
-    /**
-     * Gets the middle value of the range.
-     * @return The middle value, useful as a default starting point
-     */
-    fun getMiddleValue(): Int {
-        return (scaleMin + scaleMax) / 2
-    }
-
-    /**
-     * Checks if a given value is within the configured range.
-     * @param value The value to check
-     * @return true if the value is within the range (inclusive)
-     */
-    fun isValueInRange(value: Int): Boolean {
-        return value in scaleMin..scaleMax
-    }
-
-    /**
-     * Clamps a value to the configured range.
-     * @param value The value to clamp
-     * @return The value clamped to the range bounds
-     */
-    fun clampValue(value: Int): Int {
-        return value.coerceIn(scaleMin, scaleMax)
-    }
-
-    /**
-     * Gets valid grind values based on the configured step size.
-     * @return List of valid grind values from min to max
-     */
-    fun getValidGrindValues(): List<Double> {
-        val values = mutableListOf<Double>()
-        var current = scaleMin.toDouble()
-        while (current <= scaleMax) {
-            values.add(current)
-            current += stepSize
-        }
-        return values
-    }
-
-    /**
-     * Rounds a value to the nearest valid step.
-     * @param value The value to round
-     * @return The value rounded to the nearest valid step
-     */
-    fun roundToNearestStep(value: Double): Double {
-        val steps = kotlin.math.round((value - scaleMin) / stepSize)
-        return (scaleMin + (steps * stepSize)).coerceIn(scaleMin.toDouble(), scaleMax.toDouble())
-    }
-
-    /**
      * Formats a grind value according to the step size precision.
      * @param value The grind value to format
      * @return Formatted string representation

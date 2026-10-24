@@ -63,7 +63,6 @@ class ShotHistoryViewModel @Inject constructor(
         // Coaching insights thresholds
         private const val MIN_SHOTS_FOR_TREND = 3
         private const val MAX_RECENT_SHOTS = 5
-        private const val MIN_SHOTS_FOR_GRIND_ANALYSIS = 5
 
         // Consistency milestone thresholds
         private const val CONSISTENCY_MILESTONE_TEN = 10
@@ -528,16 +527,13 @@ class ShotHistoryViewModel @Inject constructor(
         val beanName = beanId?.let { getBeanName(it) }
         val recentTrend = calculateRecentTrend(shots, beanId)
         val dialInStatus = getDialInStatus(shots, beanId)
-        val grindCoaching = analyzeGrindCoachingEffectiveness(shots, beanId)
-
         // Only return insights if we have at least one piece of useful information
-        return if (recentTrend != null || dialInStatus != null || grindCoaching != null) {
+        return if (recentTrend != null || dialInStatus != null) {
             CoachingInsights(
                 beanId = beanId,
                 beanName = beanName,
                 recentTrend = recentTrend,
-                dialInStatus = dialInStatus,
-                grindCoachingEffectiveness = grindCoaching
+                dialInStatus = dialInStatus
             )
         } else {
             null
@@ -699,23 +695,6 @@ class ShotHistoryViewModel @Inject constructor(
             }
         }
 
-        return null
-    }
-
-    /**
-     * Analyze how effective grind coaching has been.
-     * Note: Currently a placeholder as we need to track recommendation follow-through.
-     *
-     * @param shots List of shots
-     * @param beanId Optional bean ID for filtering
-     * @return GrindCoachingEffectiveness or null if no grind coaching data
-     */
-    @Suppress("UnusedParameter")
-    private fun analyzeGrindCoachingEffectiveness(
-        shots: List<Shot>,
-        beanId: String?
-    ): GrindCoachingEffectiveness? {
-        // Placeholder: Will be implemented when recommendation tracking is added to Shot model
         return null
     }
 
@@ -903,8 +882,7 @@ data class CoachingInsights(
     val beanId: String?, // null if showing all beans
     val beanName: String?, // null if showing all beans
     val recentTrend: RecentTrend?,
-    val dialInStatus: DialInStatus?,
-    val grindCoachingEffectiveness: GrindCoachingEffectiveness?
+    val dialInStatus: DialInStatus?
 )
 
 /**
@@ -928,18 +906,6 @@ data class DialInStatus(
     val shotCount: Int, // Total shots with this bean
     val shotsToDialIn: Int?, // How many shots it took to dial in (null if not yet dialed in)
     val statusMessage: String // E.g., "Dialed in Fazenda in 5 shots!"
-)
-
-/**
- * Analysis of how effective grind coaching suggestions have been.
- * Tracks if users followed suggestions and the outcomes.
- */
-data class GrindCoachingEffectiveness(
-    val suggestionFollowRate: Int, // Percentage of suggestions followed (0-100)
-    val successRateWhenFollowed: Int, // Percentage of successful shots when suggestions followed
-    val totalSuggestionsGiven: Int, // Total number of suggestions provided
-    val totalSuggestionsFollowed: Int, // How many were actually followed
-    val effectivenessMessage: String // E.g., "Following grind suggestions helped achieve 80% perfect shots"
 )
 
 /**

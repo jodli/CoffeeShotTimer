@@ -1,7 +1,6 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
 import com.jodli.coffeeshottimer.data.model.Bean
-import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.data.repository.BeanRepository
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
@@ -132,58 +131,6 @@ class UpdateBeanUseCase @Inject constructor(
     }
 
     /**
-     * Validate bean update parameters without saving.
-     * @param beanId ID of the bean being updated
-     * @param name Bean name to validate
-     * @param roastDate Roast date to validate
-     * @param notes Notes to validate
-     * @return ValidationResult with validation status and errors
-     */
-    suspend fun validateUpdateParameters(
-        beanId: String,
-        name: String,
-        roastDate: LocalDate,
-        notes: String = ""
-    ): ValidationResult {
-        return try {
-            if (beanId.trim().isEmpty()) {
-                return ValidationResult(
-                    isValid = false,
-                    errors = listOf("Bean ID cannot be empty")
-                )
-            }
-
-            // Get existing bean to preserve creation timestamp
-            val existingBeanResult = beanRepository.getBeanById(beanId.trim())
-            if (existingBeanResult.isFailure) {
-                return ValidationResult(
-                    isValid = false,
-                    errors = listOf("Bean not found")
-                )
-            }
-
-            val existingBean = existingBeanResult.getOrNull()
-                ?: return ValidationResult(
-                    isValid = false,
-                    errors = listOf("Bean not found")
-                )
-
-            val updatedBean = existingBean.copy(
-                name = name.trim(),
-                roastDate = roastDate,
-                notes = notes.trim()
-            )
-
-            beanRepository.validateBean(updatedBean)
-        } catch (exception: Exception) {
-            ValidationResult(
-                isValid = false,
-                errors = listOf("Failed to validate bean parameters: ${exception.message}")
-            )
-        }
-    }
-
-    /**
      * Check if a bean name is available for update (not used by other beans).
      * @param beanId ID of the bean being updated (excluded from check)
      * @param name Bean name to check
@@ -249,50 +196,6 @@ class UpdateBeanUseCase @Inject constructor(
                 DomainException(
                     DomainErrorCode.UNKNOWN_ERROR,
                     "Unexpected error getting bean",
-                    exception
-                )
-            )
-        }
-    }
-
-    /**
-     * Bulk update active status for multiple beans.
-     * @param beanIds List of bean IDs to update
-     * @param isActive Whether the beans should be active
-     * @return Result with count of successfully updated beans
-     */
-    suspend fun bulkUpdateActiveStatus(
-        beanIds: List<String>,
-        isActive: Boolean
-    ): Result<Int> {
-        return try {
-            var successCount = 0
-            val errors = mutableListOf<String>()
-
-            for (beanId in beanIds) {
-                val result = updateActiveStatus(beanId, isActive)
-                if (result.isSuccess) {
-                    successCount++
-                } else {
-                    errors.add("Failed to update bean $beanId: ${result.exceptionOrNull()?.message}")
-                }
-            }
-
-            if (errors.isEmpty()) {
-                Result.success(successCount)
-            } else {
-                Result.failure(
-                    DomainException(
-                        DomainErrorCode.VALIDATION_FAILED,
-                        "Some beans failed to update: ${errors.joinToString(", ")}"
-                    )
-                )
-            }
-        } catch (exception: Exception) {
-            Result.failure(
-                DomainException(
-                    DomainErrorCode.UNKNOWN_ERROR,
-                    "Unexpected error in bulk update",
                     exception
                 )
             )

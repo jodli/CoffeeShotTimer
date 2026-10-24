@@ -190,9 +190,7 @@ fun EmptyState(
     icon: ImageVector,
     title: String,
     description: String,
-    modifier: Modifier = Modifier,
-    actionText: String? = null,
-    onActionClick: (() -> Unit)? = null
+    modifier: Modifier = Modifier
 ) {
     val spacing = LocalSpacing.current
 
@@ -227,15 +225,6 @@ fun EmptyState(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
-
-        if (actionText != null && onActionClick != null) {
-            Spacer(modifier = Modifier.height(spacing.large))
-            CoffeePrimaryButton(
-                text = actionText,
-                onClick = onActionClick,
-                modifier = Modifier.widthIn(max = spacing.buttonMaxWidth)
-            )
-        }
     }
 }
 
@@ -279,7 +268,6 @@ fun ErrorState(
     message: String,
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
-    onDismiss: (() -> Unit)? = null,
 ) {
     val spacing = LocalSpacing.current
 
@@ -320,31 +308,15 @@ fun ErrorState(
         )
 
         // Action buttons
-        if (onRetry != null || onDismiss != null) {
+        if (onRetry != null) {
             Spacer(modifier = Modifier.height(spacing.medium))
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(spacing.small),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (onDismiss != null) {
-                    CoffeeSecondaryButton(
-                        text = stringResource(R.string.text_dialog_dismiss),
-                        onClick = onDismiss,
-                        modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
-                        fillMaxWidth = false
-                    )
-                }
-
-                if (onRetry != null) {
-                    CoffeePrimaryButton(
-                        text = stringResource(R.string.text_dialog_retry),
-                        onClick = onRetry,
-                        modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
-                        fillMaxWidth = false
-                    )
-                }
-            }
+            CoffeePrimaryButton(
+                text = stringResource(R.string.text_dialog_retry),
+                onClick = onRetry,
+                modifier = Modifier.widthIn(max = spacing.buttonMaxWidth / 2),
+                fillMaxWidth = false
+            )
         }
     }
 }

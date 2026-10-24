@@ -9,7 +9,6 @@ data class Spacing(
     val small: Dp = 8.dp,
     val medium: Dp = 16.dp,
     val large: Dp = 24.dp,
-    val extraLarge: Dp = 32.dp,
     val touchTarget: Dp = 48.dp, // Material minimum touch target
     val screenPadding: Dp = 16.dp,
     // Icon sizes
@@ -23,9 +22,7 @@ data class Spacing(
     val cornerMedium: Dp = 2.dp,
     val cornerLarge: Dp = 4.dp,
     // Component-specific sizes
-    val timerSize: Dp = 200.dp,
     val buttonMaxWidth: Dp = 200.dp,
-    val sliderHeight: Dp = 32.dp,
     // Landscape-specific values
     val landscapeContentSpacing: Dp = 12.dp
 )

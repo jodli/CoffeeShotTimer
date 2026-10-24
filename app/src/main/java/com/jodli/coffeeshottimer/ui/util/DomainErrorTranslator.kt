@@ -151,13 +151,6 @@ class DomainErrorTranslator @Inject constructor(
     }
 
     /**
-     * Get save error message.
-     */
-    fun getSaveError(): String {
-        return context.getString(R.string.error_saving_data)
-    }
-
-    /**
      * Get delete error message.
      */
     fun getDeleteError(): String {

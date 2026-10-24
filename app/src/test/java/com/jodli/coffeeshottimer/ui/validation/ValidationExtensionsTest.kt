@@ -21,34 +21,18 @@ class ValidationExtensionsTest {
         mockStringProvider = mockk<ValidationStringProvider>(relaxed = true)
 
         // Setup common mock responses
-        every { mockStringProvider.getValidNumberError() } returns "Please enter a valid number"
-        every { mockStringProvider.getFieldRequiredError(any()) } returns "Field is required"
         every { mockStringProvider.getRatioConcentratedWarning() } returns "Ratio concentrated"
         every { mockStringProvider.getRatioDilutedWarning() } returns "Ratio diluted"
         every { mockStringProvider.getRatioHigherWarning() } returns "Consider higher ratio"
         every { mockStringProvider.getRatioLowerWarning() } returns "Consider lower ratio"
-        every { mockStringProvider.getGrinderSettingTip() } returns "Remember your last setting"
         every { mockStringProvider.getDescriptiveNameTip() } returns "Use a more descriptive name"
         every { mockStringProvider.getUniqueNameTip() } returns "Make the name unique"
         every { mockStringProvider.getRoastDateTodayTip() } returns "Use today's date"
         every { mockStringProvider.getOldBeansNote() } returns "Beans may have lost flavor"
-        every { mockStringProvider.getNotesHelpfulTip() } returns "Notes are helpful"
         every { mockStringProvider.getCharacterLimitNote() } returns "Approaching character limit"
-        every { mockStringProvider.getShortExtractionSourTip() } returns "Short extraction may taste sour"
-        every { mockStringProvider.getLongExtractionBitterTip() } returns "Long extraction may taste bitter"
-        every { mockStringProvider.getGrindFinerWarning() } returns "Consider grinding finer"
-        every { mockStringProvider.getGrindCoarserWarning() } returns "Consider grinding coarser"
-        every { mockStringProvider.getOptimalTimeSuccess() } returns "Optimal extraction time"
-        every { mockStringProvider.getVeryFreshBeansWarning() } returns "Beans are very fresh"
-        every { mockStringProvider.getFreshBeansSuccess() } returns "Beans are fresh"
-        every { mockStringProvider.getAgingBeansWarning() } returns "Beans are aging"
-        every { mockStringProvider.getOldBeansWarning() } returns "Beans are old"
-        every { mockStringProvider.getOutputWeightLessThanInputError() } returns "Output weight less than input"
 
         validationUtils = ValidationUtils(mockStringProvider)
     }
-
-    // Weight validation tests removed - sliders now handle all weight validation by constraining values to basket configuration ranges
 
     @Test
     fun `validateBeanNameEnhanced should pass for valid names`() {

@@ -71,63 +71,6 @@ class OnboardingPreferences @Inject constructor(
             .apply()
     }
 
-    override suspend fun resetOnboardingState() = withContext(Dispatchers.IO) {
-        sharedPreferences.edit()
-            .remove(KEY_ONBOARDING_COMPLETE)
-            .remove(KEY_ONBOARDING_PROGRESS)
-            .remove(KEY_GRINDER_CONFIG_ID)
-            .apply()
-    }
-
-    override suspend fun backupOnboardingState(): String = withContext(Dispatchers.IO) {
-        val progress = getOnboardingProgress()
-        val isComplete = sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETE, false)
-
-        val backupData = OnboardingBackup(
-            progress = progress.toSerializable(),
-            isComplete = isComplete,
-            backupTimestamp = System.currentTimeMillis()
-        )
-
-        json.encodeToString(backupData)
-    }
-
-    override suspend fun restoreOnboardingState(backupData: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val backup = json.decodeFromString<OnboardingBackup>(backupData)
-            val progress = backup.progress.toOnboardingProgress()
-
-            sharedPreferences.edit()
-                .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(backup.progress))
-                .putBoolean(KEY_ONBOARDING_COMPLETE, backup.isComplete)
-                .apply()
-
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-
-    /**
-     * Gets the stored grinder configuration ID from onboarding.
-     *
-     * @return The grinder configuration ID, or null if not set
-     */
-    suspend fun getGrinderConfigurationId(): String? = withContext(Dispatchers.IO) {
-        sharedPreferences.getString(KEY_GRINDER_CONFIG_ID, null)
-    }
-
-    /**
-     * Stores the grinder configuration ID from equipment setup.
-     *
-     * @param configId The grinder configuration ID to store
-     */
-    suspend fun setGrinderConfigurationId(configId: String) = withContext(Dispatchers.IO) {
-        sharedPreferences.edit()
-            .putString(KEY_GRINDER_CONFIG_ID, configId)
-            .apply()
-    }
-
     // DEBUG METHODS FOR TESTING ONBOARDING FLOWS
 
     override suspend fun resetToNewUser() = withContext(Dispatchers.IO) {
@@ -136,24 +79,6 @@ class OnboardingPreferences @Inject constructor(
             .remove(KEY_ONBOARDING_COMPLETE)
             .remove(KEY_ONBOARDING_PROGRESS)
             .remove(KEY_GRINDER_CONFIG_ID)
-            .apply()
-    }
-
-    override suspend fun resetToExistingUserWithBeans() = withContext(Dispatchers.IO) {
-        // Set state for existing user who has beans (skips intro and bean creation)
-        val existingUserProgress = OnboardingProgress(
-            hasSeenIntroduction = true,
-            hasCompletedEquipmentSetup = true,
-            hasCreatedFirstBean = true,
-            hasRecordedFirstShot = false, // Still needs to record first shot
-            equipmentSetupVersion = OnboardingProgress.CURRENT_EQUIPMENT_SETUP_VERSION,
-            onboardingStartedAt = System.currentTimeMillis() - 86400000, // 24 hours ago
-            lastUpdatedAt = System.currentTimeMillis()
-        )
-
-        sharedPreferences.edit()
-            .putString(KEY_ONBOARDING_PROGRESS, json.encodeToString(existingUserProgress.toSerializable()))
-            .putBoolean(KEY_ONBOARDING_COMPLETE, false) // Not complete until first shot
             .apply()
     }
 
@@ -242,13 +167,3 @@ private fun OnboardingProgress.toSerializable(): SerializableOnboardingProgress 
         lastUpdatedAt = lastUpdatedAt
     )
 }
-
-/**
- * Data class for backing up onboarding state.
- */
-@Serializable
-private data class OnboardingBackup(
-    val progress: SerializableOnboardingProgress,
-    val isComplete: Boolean,
-    val backupTimestamp: Long
-)

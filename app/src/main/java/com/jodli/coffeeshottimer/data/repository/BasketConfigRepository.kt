@@ -3,8 +3,6 @@ package com.jodli.coffeeshottimer.data.repository
 import android.util.Log
 import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
 import com.jodli.coffeeshottimer.data.model.BasketConfiguration
-import com.jodli.coffeeshottimer.data.model.BasketPreset
-import com.jodli.coffeeshottimer.data.model.ValidationResult
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -50,45 +48,6 @@ class BasketConfigRepository @Inject constructor(
                 )
             )
         )
-    }
-
-    /**
-     * Get all basket configurations ordered by creation date.
-     * @return Flow of list of configurations with error handling
-     */
-    fun getAllConfigs(): Flow<Result<List<BasketConfiguration>>> = flow {
-        basketConfigDao.getAllConfigs().collect { configs ->
-            emit(Result.success(configs))
-        }
-    }.catch { exception ->
-        emit(
-            Result.failure(
-                RepositoryException.DatabaseError(
-                    "Failed to get all basket configurations",
-                    exception
-                )
-            )
-        )
-    }
-
-    /**
-     * Get a specific basket configuration by ID.
-     * @param configId The ID of the configuration to retrieve
-     * @return Result containing the configuration or error
-     */
-    suspend fun getConfigById(configId: String): Result<BasketConfiguration?> {
-        return try {
-            if (configId.isBlank()) {
-                Result.failure(RepositoryException.ValidationError("Configuration ID cannot be empty"))
-            } else {
-                executeWithRetry(
-                    operation = { basketConfigDao.getConfigById(configId) },
-                    errorMessage = "Failed to get basket configuration by ID"
-                )
-            }
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to get basket configuration by ID", exception))
-        }
     }
 
     /**
@@ -167,137 +126,6 @@ class BasketConfigRepository @Inject constructor(
     }
 
     /**
-     * Update an existing basket configuration with validation.
-     * @param config The configuration to update
-     * @return Result indicating success or failure with validation errors
-     */
-    suspend fun updateConfig(config: BasketConfiguration): Result<Unit> {
-        return try {
-            // Validate configuration data
-            val validationResult = config.validate()
-            if (!validationResult.isValid) {
-                return Result.failure(
-                    RepositoryException.ValidationError(
-                        "Basket configuration validation failed: ${validationResult.errors.joinToString(", ")}"
-                    )
-                )
-            }
-
-            // Check if configuration exists
-            val existingConfig = basketConfigDao.getConfigById(config.id)
-                ?: return Result.failure(RepositoryException.NotFoundError("Basket configuration not found"))
-
-            // Check for duplicate range configuration (excluding current config)
-            val configWithSameRange = basketConfigDao.getConfigByRanges(
-                config.coffeeInMin,
-                config.coffeeInMax,
-                config.coffeeOutMin,
-                config.coffeeOutMax
-            )
-            if (configWithSameRange != null && configWithSameRange.id != config.id) {
-                return Result.failure(
-                    RepositoryException.ValidationError(
-                        "A configuration with the same ranges already exists"
-                    )
-                )
-            }
-
-            executeWithRetry(
-                operation = {
-                    basketConfigDao.updateConfig(config)
-                    Unit
-                },
-                errorMessage = "Failed to update basket configuration"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to update basket configuration", exception))
-        }
-    }
-
-    /**
-     * Delete a basket configuration.
-     * @param config The configuration to delete
-     * @return Result indicating success or failure
-     */
-    suspend fun deleteConfig(config: BasketConfiguration): Result<Unit> {
-        return try {
-            // Check if configuration exists
-            val existingConfig = basketConfigDao.getConfigById(config.id)
-                ?: return Result.failure(RepositoryException.NotFoundError("Basket configuration not found"))
-
-            executeWithRetry(
-                operation = {
-                    basketConfigDao.deleteConfig(config)
-                    Unit
-                },
-                errorMessage = "Failed to delete basket configuration"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to delete basket configuration", exception))
-        }
-    }
-
-    /**
-     * Delete all basket configurations.
-     * @return Result indicating success or failure
-     */
-    suspend fun deleteAllConfigs(): Result<Unit> {
-        return executeWithRetry(
-            operation = {
-                basketConfigDao.deleteAllConfigs()
-                Unit
-            },
-            errorMessage = "Failed to delete all basket configurations"
-        )
-    }
-
-    /**
-     * Get count of basket configurations.
-     * @return Result containing the count of configurations
-     */
-    suspend fun getConfigCount(): Result<Int> {
-        return executeWithRetry(
-            operation = { basketConfigDao.getConfigCount() },
-            errorMessage = "Failed to get basket configuration count"
-        )
-    }
-
-    /**
-     * Validate basket configuration data without saving.
-     * @param config The configuration to validate
-     * @return ValidationResult with validation status and errors
-     */
-    suspend fun validateConfig(config: BasketConfiguration): ValidationResult {
-        val validationResult = config.validate()
-
-        // Additional repository-level validation
-        if (validationResult.isValid) {
-            try {
-                // Check for duplicate range configuration
-                val existingConfig = basketConfigDao.getConfigByRanges(
-                    config.coffeeInMin,
-                    config.coffeeInMax,
-                    config.coffeeOutMin,
-                    config.coffeeOutMax
-                )
-                if (existingConfig != null && existingConfig.id != config.id) {
-                    return ValidationResult(
-                        isValid = false,
-                        errors = listOf("A configuration with the same ranges already exists")
-                    )
-                }
-            } catch (exception: Exception) {
-                return ValidationResult(
-                    isValid = false,
-                    errors = listOf("Failed to validate configuration uniqueness")
-                )
-            }
-        }
-
-        return validationResult
-    }
-
-    /**
      * Get or create a default basket configuration.
      * If no configuration exists, creates and saves the default one.
      * @return Result containing the current active or newly created default configuration
@@ -329,62 +157,6 @@ class BasketConfigRepository @Inject constructor(
             Result.failure(
                 RepositoryException.DatabaseError("Failed to get or create default configuration", exception)
             )
-        }
-    }
-
-    /**
-     * Save a preset configuration.
-     * @param preset The preset to save (SINGLE or DOUBLE)
-     * @return Result indicating success or failure
-     */
-    suspend fun savePresetConfig(preset: BasketPreset): Result<Unit> {
-        return try {
-            val presetConfig = when (preset) {
-                BasketPreset.SINGLE -> BasketConfiguration.SINGLE_SHOT
-                BasketPreset.DOUBLE -> BasketConfiguration.DOUBLE_SHOT
-            }
-            saveConfig(presetConfig)
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to save preset configuration", exception))
-        }
-    }
-
-    /**
-     * Clean up old configurations, keeping only the most recent ones.
-     * @param keepCount Number of configurations to keep (default: 10)
-     * @return Result indicating success or failure
-     */
-    suspend fun cleanupOldConfigs(keepCount: Int = 10): Result<Unit> {
-        return try {
-            if (keepCount < 1) {
-                return Result.failure(RepositoryException.ValidationError("Keep count must be at least 1"))
-            }
-
-            executeWithRetry(
-                operation = {
-                    basketConfigDao.deleteOldConfigs(keepCount)
-                    Unit
-                },
-                errorMessage = "Failed to cleanup old basket configurations"
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to cleanup old basket configurations", exception))
-        }
-    }
-
-    /**
-     * Check if the user has any basket configuration set up.
-     * @return Result containing true if any configuration exists
-     */
-    suspend fun hasAnyConfig(): Result<Boolean> {
-        return try {
-            val countResult = getConfigCount()
-            countResult.fold(
-                onSuccess = { count -> Result.success(count > 0) },
-                onFailure = { Result.failure(it) }
-            )
-        } catch (exception: Exception) {
-            Result.failure(RepositoryException.DatabaseError("Failed to check if any configuration exists", exception))
         }
     }
 

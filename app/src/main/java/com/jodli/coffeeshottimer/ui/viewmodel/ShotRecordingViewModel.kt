@@ -25,7 +25,6 @@ import com.jodli.coffeeshottimer.ui.components.ValidationUtils
 import com.jodli.coffeeshottimer.ui.util.DomainErrorTranslator
 import com.jodli.coffeeshottimer.ui.util.StringResourceProvider
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
-import com.jodli.coffeeshottimer.ui.validation.getBrewRatioWarnings
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -100,28 +99,9 @@ class ShotRecordingViewModel @Inject constructor(
     private val _notes = MutableStateFlow("")
     val notes: StateFlow<String> = _notes.asStateFlow()
 
-    // Validation state
-    private val _coffeeWeightInError = MutableStateFlow<String?>(null)
-    val coffeeWeightInError: StateFlow<String?> = _coffeeWeightInError.asStateFlow()
-
-    private val _coffeeWeightOutError = MutableStateFlow<String?>(null)
-    val coffeeWeightOutError: StateFlow<String?> = _coffeeWeightOutError.asStateFlow()
-
-    private val _grinderSettingError = MutableStateFlow<String?>(null)
-    val grinderSettingError: StateFlow<String?> = _grinderSettingError.asStateFlow()
-
     // Brew ratio calculation
-    private val _brewRatio = MutableStateFlow<Double?>(null)
-    val brewRatio: StateFlow<Double?> = _brewRatio.asStateFlow()
-
     private val _formattedBrewRatio = MutableStateFlow<String?>(null)
     val formattedBrewRatio: StateFlow<String?> = _formattedBrewRatio.asStateFlow()
-
-    private val _isOptimalBrewRatio = MutableStateFlow(false)
-    val isOptimalBrewRatio: StateFlow<Boolean> = _isOptimalBrewRatio.asStateFlow()
-
-    // Enhanced validation warnings
-    private val _brewRatioWarnings = MutableStateFlow<List<String>>(emptyList())
 
     // Timer state (delegated to use case)
     val timerState = recordShotUseCase.timerState
@@ -149,10 +129,7 @@ class ShotRecordingViewModel @Inject constructor(
     val basketCoffeeInMax: StateFlow<Float> = _basketCoffeeInMax.asStateFlow()
 
     private val _basketCoffeeOutMin = MutableStateFlow(10f)
-    val basketCoffeeOutMin: StateFlow<Float> = _basketCoffeeOutMin.asStateFlow()
-
     private val _basketCoffeeOutMax = MutableStateFlow(55f)
-    val basketCoffeeOutMax: StateFlow<Float> = _basketCoffeeOutMax.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
@@ -170,10 +147,6 @@ class ShotRecordingViewModel @Inject constructor(
 
     private val _recordedShotData = MutableStateFlow<RecordedShotData?>(null)
     val recordedShotData: StateFlow<RecordedShotData?> = _recordedShotData.asStateFlow()
-
-    // Timer validation feedback state
-    private val _showTimerValidation = MutableStateFlow(false)
-    val showTimerValidation: StateFlow<Boolean> = _showTimerValidation.asStateFlow()
 
     // Draft auto-save state
     private val _isDraftSaved = MutableStateFlow(false)
@@ -361,7 +334,7 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Load basket configuration for weight slider ranges.
+     * Load basket configuration for weight ranges.
      * Uses reactive Flow to automatically update when configuration changes.
      */
     private fun loadBasketConfiguration() {
@@ -509,11 +482,9 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Update coffee weight in.
-     * No validation needed as sliders constrain values to basket configuration ranges.
      */
     fun updateCoffeeWeightIn(value: String) {
         _coffeeWeightIn.value = value
-        _coffeeWeightInError.value = null // Clear any previous errors
 
         calculateBrewRatio()
         validateForm()
@@ -521,11 +492,9 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Update coffee weight out.
-     * No validation needed as sliders constrain values to basket configuration ranges.
      */
     fun updateCoffeeWeightOut(value: String) {
         _coffeeWeightOut.value = value
-        _coffeeWeightOutError.value = null // Clear any previous errors
 
         calculateBrewRatio()
         validateForm()
@@ -547,11 +516,9 @@ class ShotRecordingViewModel @Inject constructor(
 
     /**
      * Update grinder setting.
-     * No validation needed as slider constrains values to grinder configuration ranges.
      */
     fun updateGrinderSetting(value: String) {
         _grinderSetting.value = value
-        _grinderSettingError.value = null // Clear any previous errors
 
         validateForm()
     }
@@ -564,25 +531,18 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Calculate and update brew ratio in real-time with enhanced warnings.
+     * Calculate and update brew ratio in real-time.
      */
     private fun calculateBrewRatio() {
         val weightIn = _coffeeWeightIn.value.toDoubleOrNull()
         val weightOut = _coffeeWeightOut.value.toDoubleOrNull()
 
         val ratio = recordShotUseCase.calculateBrewRatio(weightIn ?: 0.0, weightOut ?: 0.0)
-        _brewRatio.value = ratio
 
         if (ratio != null) {
             _formattedBrewRatio.value = recordShotUseCase.formatBrewRatio(ratio)
-            _isOptimalBrewRatio.value = recordShotUseCase.isTypicalBrewRatio(ratio)
-
-            // Update brew ratio warnings using enhanced validation
-            _brewRatioWarnings.value = ratio.getBrewRatioWarnings(validationUtils)
         } else {
             _formattedBrewRatio.value = null
-            _isOptimalBrewRatio.value = false
-            _brewRatioWarnings.value = emptyList()
         }
     }
 
@@ -592,11 +552,8 @@ class ShotRecordingViewModel @Inject constructor(
     private fun validateForm() {
         val hasValidBean = _selectedBean.value != null
         val hasValidWeights = _coffeeWeightIn.value.isNotBlank() &&
-            _coffeeWeightOut.value.isNotBlank() &&
-            _coffeeWeightInError.value == null &&
-            _coffeeWeightOutError.value == null
-        val hasValidGrinder = _grinderSetting.value.isNotBlank() &&
-            _grinderSettingError.value == null
+            _coffeeWeightOut.value.isNotBlank()
+        val hasValidGrinder = _grinderSetting.value.isNotBlank()
 
         // Use effective extraction time based on current mode
         val effectiveTime = getEffectiveExtractionTime()
@@ -605,16 +562,6 @@ class ShotRecordingViewModel @Inject constructor(
         val isValid = hasValidBean && hasValidWeights && hasValidGrinder && hasValidTimer
 
         _isFormValid.value = isValid
-
-        // Show timer validation feedback if everything else is valid but timer is insufficient
-        val shouldShowTimerValidation = hasValidBean && hasValidWeights && hasValidGrinder &&
-            !hasValidTimer && effectiveTime > 0
-
-        if (shouldShowTimerValidation && !_showTimerValidation.value) {
-            _showTimerValidation.value = true
-        } else if (!shouldShowTimerValidation && _showTimerValidation.value) {
-            _showTimerValidation.value = false
-        }
     }
 
     /**
@@ -623,7 +570,6 @@ class ShotRecordingViewModel @Inject constructor(
     fun startTimer() {
         recordShotUseCase.startTimer()
         saveTimerState() // Save state after starting timer
-        _showTimerValidation.value = false // Clear validation feedback when timer starts
         validateForm() // Revalidate as timer state affects form validity
     }
 
@@ -633,7 +579,6 @@ class ShotRecordingViewModel @Inject constructor(
     fun pauseTimer() {
         recordShotUseCase.pauseTimer()
         saveTimerState() // Save state after pausing timer
-        _showTimerValidation.value = false // Clear validation feedback when timer stops
         validateForm()
     }
 
@@ -643,7 +588,6 @@ class ShotRecordingViewModel @Inject constructor(
     fun resetTimer() {
         recordShotUseCase.resetTimer()
         saveTimerState() // Save state after resetting timer
-        _showTimerValidation.value = false // Clear validation feedback when timer resets
         validateForm()
     }
 
@@ -712,16 +656,9 @@ class ShotRecordingViewModel @Inject constructor(
         // Use effective extraction time based on current mode
         val effectiveExtractionTime = getEffectiveExtractionTime()
 
-        // Check minimum extraction time and show visual feedback
+        // Check minimum extraction time
         if (effectiveExtractionTime < ValidationUtils.MIN_EXTRACTION_TIME) {
-            _showTimerValidation.value = true
             _errorMessage.value = context.getString(R.string.error_extraction_time_minimum, ValidationUtils.MIN_EXTRACTION_TIME)
-
-            // Auto-hide validation feedback after 3 seconds
-            viewModelScope.launch {
-                delay(3000L)
-                _showTimerValidation.value = false
-            }
             return
         }
 
@@ -821,13 +758,7 @@ class ShotRecordingViewModel @Inject constructor(
 
         // Only clear non-persistent fields
         _notes.value = ""
-        _coffeeWeightInError.value = null
-        _coffeeWeightOutError.value = null
-        _grinderSettingError.value = null
-        _brewRatio.value = null
         _formattedBrewRatio.value = null
-        _isOptimalBrewRatio.value = false
-
         // Recalculate brew ratio with kept values
         calculateBrewRatio()
         validateForm()
@@ -1016,13 +947,6 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Get taste preselection based on extraction time.
-     */
-    fun getTastePreselectionFor(extractionTimeSeconds: Int): TastePrimary? {
-        return com.jodli.coffeeshottimer.ui.components.TasteUtils.getTasteRecommendation(extractionTimeSeconds)
-    }
-
-    /**
      * Record taste feedback for the recently recorded shot.
      * This saves the taste to the database and updates persistent recommendations with taste data.
      * Epic 4: Enhanced to update persistent recommendations with taste feedback.
@@ -1092,35 +1016,6 @@ class ShotRecordingViewModel @Inject constructor(
      */
     fun clearErrorMessage() {
         _errorMessage.value = null
-    }
-
-    /**
-     * Clear timer validation feedback.
-     */
-    fun clearTimerValidation() {
-        _showTimerValidation.value = false
-    }
-
-    /**
-     * Apply grind adjustment recommendation.
-     * Updates the current grinder setting with the suggested value.
-     */
-    fun applyGrindAdjustment() {
-        val recommendation = _grindAdjustmentRecommendation.value
-        if (recommendation?.hasAdjustment() == true) {
-            _grinderSetting.value = recommendation.suggestedGrindSetting
-            _grindAdjustmentRecommendation.value = null
-
-            // Validate form with new grinder setting
-            validateForm()
-        }
-    }
-
-    /**
-     * Dismiss grind adjustment recommendation.
-     */
-    fun dismissGrindAdjustment() {
-        _grindAdjustmentRecommendation.value = null
     }
 
     /**
@@ -1205,21 +1100,6 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Trigger timer validation feedback (useful for testing or manual validation).
-     */
-    fun triggerTimerValidation() {
-        if (timerState.value.elapsedTimeSeconds < ValidationUtils.MIN_EXTRACTION_TIME) {
-            _showTimerValidation.value = true
-
-            // Auto-hide validation feedback after 3 seconds
-            viewModelScope.launch {
-                delay(3000L)
-                _showTimerValidation.value = false
-            }
-        }
-    }
-
-    /**
      * Manually save draft (called when user navigates away or app goes to background).
      */
     fun saveDraftManually() {
@@ -1291,40 +1171,6 @@ class ShotRecordingViewModel @Inject constructor(
     }
 
     /**
-     * Apply the persistent grind recommendation.
-     * Updates the current grinder setting and marks the recommendation as followed.
-     * Epic 4: Enhanced with analytics tracking.
-     */
-    fun applyPersistentRecommendation() {
-        val recommendation = _persistentRecommendation.value
-        if (recommendation != null) {
-            val oldSetting = _grinderSetting.value
-
-            // Apply the grinder setting
-            _grinderSetting.value = recommendation.suggestedGrindSetting
-
-            // Mark as followed
-            viewModelScope.launch {
-                manageGrindRecommendationUseCase.markRecommendationFollowed(recommendation.beanId)
-                // Update the local state to reflect it was followed
-                _persistentRecommendation.value = recommendation.markAsFollowed()
-            }
-
-            // Epic 4: Log that user explicitly applied the recommendation
-            if (BuildConfig.DEBUG) {
-                android.util.Log.d(
-                    "RecommendationTracking",
-                    "User applied recommendation: Bean=${recommendation.beanId}, " +
-                        "From=$oldSetting To=${recommendation.suggestedGrindSetting}"
-                )
-            }
-
-            // Validate form with new grinder setting
-            validateForm()
-        }
-    }
-
-    /**
      * Dismiss the persistent grind recommendation.
      * Clears the recommendation from storage and UI.
      */
@@ -1336,14 +1182,6 @@ class ShotRecordingViewModel @Inject constructor(
                 _persistentRecommendation.value = null
             }
         }
-    }
-
-    /**
-     * Refresh persistent recommendations for the currently selected bean.
-     * Epic 4: Called when returning from other screens to ensure recommendations are up-to-date.
-     */
-    fun refreshPersistentRecommendation() {
-        loadPersistentRecommendation()
     }
 
     /**

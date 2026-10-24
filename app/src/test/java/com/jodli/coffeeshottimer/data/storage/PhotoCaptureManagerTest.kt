@@ -195,45 +195,4 @@ class PhotoCaptureManagerTest {
         assertFalse("Temp file should be deleted", tempFile.exists())
         assertTrue("Other file should not be deleted", otherFile.exists())
     }
-
-    @Test
-    fun `cleanupOldTempFiles should remove files older than specified age`() = runTest {
-        // Arrange
-        val tempPhotosDir = File(testCacheDir, "temp_photos")
-        tempPhotosDir.mkdirs()
-
-        val oldFile = File(tempPhotosDir, "old_temp.jpg")
-        val newFile = File(tempPhotosDir, "new_temp.jpg")
-
-        oldFile.createNewFile()
-        newFile.createNewFile()
-
-        // Make old file appear old by setting last modified time
-        val oldTime = System.currentTimeMillis() - (25 * 60 * 60 * 1000) // 25 hours ago
-        oldFile.setLastModified(oldTime)
-
-        val maxAge = 24 * 60 * 60 * 1000L // 24 hours
-
-        assertTrue("Old file should exist before cleanup", oldFile.exists())
-        assertTrue("New file should exist before cleanup", newFile.exists())
-
-        // Act
-        val photoCaptureManagerImpl = photoCaptureManager as PhotoCaptureManagerImpl
-        photoCaptureManagerImpl.cleanupOldTempFiles(maxAge)
-
-        // Assert
-        assertFalse("Old file should be deleted", oldFile.exists())
-        assertTrue("New file should remain", newFile.exists())
-    }
-
-    @Test
-    fun `cleanupOldTempFiles should handle non-existent directory gracefully`() = runTest {
-        // Arrange
-        val tempPhotosDir = File(testCacheDir, "temp_photos")
-        // Don't create the directory
-
-        // Act & Assert - Should not throw exception
-        val photoCaptureManagerImpl = photoCaptureManager as PhotoCaptureManagerImpl
-        photoCaptureManagerImpl.cleanupOldTempFiles()
-    }
 }

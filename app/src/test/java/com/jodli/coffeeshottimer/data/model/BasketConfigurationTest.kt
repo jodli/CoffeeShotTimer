@@ -249,168 +249,6 @@ class BasketConfigurationTest {
     }
 
     @Test
-    fun `getCoffeeInRangeSize calculates correct range size`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When
-        val result = config.getCoffeeInRangeSize()
-
-        // Then
-        assertEquals("Should calculate correct coffee in range size", 8f, result, 0.01f)
-    }
-
-    @Test
-    fun `getCoffeeOutRangeSize calculates correct range size`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When
-        val result = config.getCoffeeOutRangeSize()
-
-        // Then
-        assertEquals("Should calculate correct coffee out range size", 27f, result, 0.01f)
-    }
-
-    @Test
-    fun `getCoffeeInMiddleValue calculates correct middle value`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When
-        val result = config.getCoffeeInMiddleValue()
-
-        // Then
-        assertEquals("Should calculate correct coffee in middle value", 18f, result, 0.01f)
-    }
-
-    @Test
-    fun `getCoffeeOutMiddleValue calculates correct middle value`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When
-        val result = config.getCoffeeOutMiddleValue()
-
-        // Then
-        assertEquals("Should calculate correct coffee out middle value", 41.5f, result, 0.01f)
-    }
-
-    @Test
-    fun `isCoffeeInValueInRange returns true for value within range`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When & Then
-        assertTrue("Should accept value at minimum", config.isCoffeeInValueInRange(14f))
-        assertTrue("Should accept value at maximum", config.isCoffeeInValueInRange(22f))
-        assertTrue("Should accept value in middle", config.isCoffeeInValueInRange(18f))
-    }
-
-    @Test
-    fun `isCoffeeInValueInRange returns false for value outside range`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When & Then
-        assertFalse("Should reject value below minimum", config.isCoffeeInValueInRange(13.9f))
-        assertFalse("Should reject value above maximum", config.isCoffeeInValueInRange(22.1f))
-    }
-
-    @Test
-    fun `isCoffeeOutValueInRange returns true for value within range`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When & Then
-        assertTrue("Should accept value at minimum", config.isCoffeeOutValueInRange(28f))
-        assertTrue("Should accept value at maximum", config.isCoffeeOutValueInRange(55f))
-        assertTrue("Should accept value in middle", config.isCoffeeOutValueInRange(40f))
-    }
-
-    @Test
-    fun `isCoffeeOutValueInRange returns false for value outside range`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When & Then
-        assertFalse("Should reject value below minimum", config.isCoffeeOutValueInRange(27.9f))
-        assertFalse("Should reject value above maximum", config.isCoffeeOutValueInRange(55.1f))
-    }
-
-    @Test
-    fun `clampCoffeeInValue clamps value to range`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When & Then
-        assertEquals("Should clamp below minimum", 14f, config.clampCoffeeInValue(10f), 0.01f)
-        assertEquals("Should clamp above maximum", 22f, config.clampCoffeeInValue(25f), 0.01f)
-        assertEquals("Should not change value in range", 18f, config.clampCoffeeInValue(18f), 0.01f)
-    }
-
-    @Test
-    fun `clampCoffeeOutValue clamps value to range`() {
-        // Given
-        val config = BasketConfiguration(
-            coffeeInMin = 14f,
-            coffeeInMax = 22f,
-            coffeeOutMin = 28f,
-            coffeeOutMax = 55f
-        )
-
-        // When & Then
-        assertEquals("Should clamp below minimum", 28f, config.clampCoffeeOutValue(20f), 0.01f)
-        assertEquals("Should clamp above maximum", 55f, config.clampCoffeeOutValue(60f), 0.01f)
-        assertEquals("Should not change value in range", 40f, config.clampCoffeeOutValue(40f), 0.01f)
-    }
-
-    @Test
     fun `configuration has default values for optional fields`() {
         // Given
         val config = BasketConfiguration(
@@ -535,24 +373,28 @@ class BasketConfigurationTest {
         // 1:2 ratio (ristretto): 10g in -> 20g out (both in range)
         assertTrue(
             "Single shot should allow 1:2 ratio",
-            singleShot.isCoffeeInValueInRange(10f) && singleShot.isCoffeeOutValueInRange(20f)
+            10f in singleShot.coffeeInMin..singleShot.coffeeInMax &&
+                20f in singleShot.coffeeOutMin..singleShot.coffeeOutMax
         )
         // 1:3 ratio (normale): 10g in -> 30g out (both in range)
         assertTrue(
             "Single shot should allow 1:3 ratio",
-            singleShot.isCoffeeInValueInRange(10f) && singleShot.isCoffeeOutValueInRange(30f)
+            10f in singleShot.coffeeInMin..singleShot.coffeeInMax &&
+                30f in singleShot.coffeeOutMin..singleShot.coffeeOutMax
         )
 
         // When & Then for double shot
         // 1:2 ratio (ristretto): 18g in -> 36g out (both in range)
         assertTrue(
             "Double shot should allow 1:2 ratio",
-            doubleShot.isCoffeeInValueInRange(18f) && doubleShot.isCoffeeOutValueInRange(36f)
+            18f in doubleShot.coffeeInMin..doubleShot.coffeeInMax &&
+                36f in doubleShot.coffeeOutMin..doubleShot.coffeeOutMax
         )
         // 1:2.5 ratio (normale): 18g in -> 45g out (both in range)
         assertTrue(
             "Double shot should allow 1:2.5 ratio",
-            doubleShot.isCoffeeInValueInRange(18f) && doubleShot.isCoffeeOutValueInRange(45f)
+            18f in doubleShot.coffeeInMin..doubleShot.coffeeInMax &&
+                45f in doubleShot.coffeeOutMin..doubleShot.coffeeOutMax
         )
     }
 }

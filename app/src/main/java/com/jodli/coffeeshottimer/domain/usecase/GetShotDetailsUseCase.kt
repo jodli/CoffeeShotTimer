@@ -7,9 +7,6 @@ import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.exception.DomainException
 import com.jodli.coffeeshottimer.domain.model.DomainErrorCode
 import kotlinx.coroutines.flow.first
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
-import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -91,7 +88,7 @@ class GetShotDetailsUseCase @Inject constructor(
                 ?: return Result.failure(DomainException(DomainErrorCode.ASSOCIATED_BEAN_NOT_FOUND))
 
             // Calculate additional metrics
-            val daysSinceRoast = ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now()).toInt()
+            val daysSinceRoast = bean.daysSinceRoast().toInt()
 
             // Get related shots for context
             val relatedShotsResult = shotRepository.getShotsByBean(shot.beanId).first()
@@ -148,86 +145,6 @@ class GetShotDetailsUseCase @Inject constructor(
                     exception
                 } else {
                     DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error getting shot details", exception)
-                }
-            )
-        }
-    }
-
-    /**
-     * Get shot comparison data for analyzing differences between shots.
-     * @param shotId1 ID of the first shot
-     * @param shotId2 ID of the second shot
-     * @return Result containing shot comparison data
-     */
-    suspend fun compareShotsDetails(shotId1: String, shotId2: String): Result<ShotComparison> {
-        return try {
-            val shot1Result = getShotDetails(shotId1)
-            val shot2Result = getShotDetails(shotId2)
-
-            if (shot1Result.isFailure) {
-                return Result.failure(
-                    shot1Result.exceptionOrNull() ?: DomainException(DomainErrorCode.FAILED_TO_GET_SHOT)
-                )
-            }
-            if (shot2Result.isFailure) {
-                return Result.failure(
-                    shot2Result.exceptionOrNull() ?: DomainException(DomainErrorCode.FAILED_TO_GET_SHOT)
-                )
-            }
-
-            val shot1Details = shot1Result.getOrNull()!!
-            val shot2Details = shot2Result.getOrNull()!!
-
-            val comparison = ShotComparison(
-                shot1 = shot1Details,
-                shot2 = shot2Details,
-                weightInDifference = shot2Details.shot.coffeeWeightIn - shot1Details.shot.coffeeWeightIn,
-                weightOutDifference = shot2Details.shot.coffeeWeightOut - shot1Details.shot.coffeeWeightOut,
-                extractionTimeDifference = shot2Details.shot.extractionTimeSeconds - shot1Details.shot.extractionTimeSeconds,
-                brewRatioDifference = shot2Details.shot.brewRatio - shot1Details.shot.brewRatio,
-                sameBeanUsed = shot1Details.bean.id == shot2Details.bean.id,
-                sameGrinderSetting = shot1Details.shot.grinderSetting == shot2Details.shot.grinderSetting
-            )
-
-            Result.success(comparison)
-        } catch (exception: Exception) {
-            Result.failure(
-                if (exception is DomainException) {
-                    exception
-                } else {
-                    DomainException(DomainErrorCode.UNKNOWN_ERROR, "Unexpected error comparing shots", exception)
-                }
-            )
-        }
-    }
-
-    /**
-     * Get the last shot for a specific bean (useful for comparison).
-     * @param beanId The ID of the bean
-     * @return Result containing the last shot details or null if no shots exist
-     */
-    suspend fun getLastShotForBean(beanId: String): Result<ShotDetails?> {
-        return try {
-            val lastShotResult = shotRepository.getLastShotForBean(beanId)
-            if (lastShotResult.isFailure) {
-                return Result.failure(
-                    lastShotResult.exceptionOrNull() ?: DomainException(DomainErrorCode.FAILED_TO_GET_SHOT)
-                )
-            }
-
-            val lastShot = lastShotResult.getOrNull() ?: return Result.success(null)
-
-            getShotDetails(lastShot.id)
-        } catch (exception: Exception) {
-            Result.failure(
-                if (exception is DomainException) {
-                    exception
-                } else {
-                    DomainException(
-                        DomainErrorCode.UNKNOWN_ERROR,
-                        "Unexpected error getting last shot for bean",
-                        exception
-                    )
                 }
             )
         }
@@ -588,50 +505,6 @@ enum class QualityTier {
             score >= GOOD_MIN_SCORE -> GOOD
             else -> NEEDS_WORK
         }
-    }
-}
-
-/**
- * Data class for comparing two shots.
- */
-data class ShotComparison(
-    val shot1: ShotDetails,
-    val shot2: ShotDetails,
-    val weightInDifference: Double,
-    val weightOutDifference: Double,
-    val extractionTimeDifference: Int,
-    val brewRatioDifference: Double,
-    val sameBeanUsed: Boolean,
-    val sameGrinderSetting: Boolean
-) {
-    /**
-     * Get formatted difference strings for UI display.
-     */
-    fun getFormattedDifferences(): Map<String, String> {
-        return mapOf(
-            "weightIn" to "${if (weightInDifference >= 0) "+" else ""}${
-                String.format(
-                    java.util.Locale.ROOT,
-                    "%.1f",
-                    weightInDifference
-                )
-            }g",
-            "weightOut" to "${if (weightOutDifference >= 0) "+" else ""}${
-                String.format(
-                    java.util.Locale.ROOT,
-                    "%.1f",
-                    weightOutDifference
-                )
-            }g",
-            "extractionTime" to "${if (extractionTimeDifference >= 0) "+" else ""}${extractionTimeDifference}s",
-            "brewRatio" to "${if (brewRatioDifference >= 0) "+" else ""}${
-                String.format(
-                    java.util.Locale.ROOT,
-                    "%.2f",
-                    brewRatioDifference
-                )
-            }"
-        )
     }
 }
 

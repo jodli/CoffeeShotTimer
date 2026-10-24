@@ -190,62 +190,6 @@ class GrindRecommendationPreferencesTest {
     }
 
     @Test
-    fun `getAllRecommendationBeanIds returns correct bean IDs`() = runTest {
-        // Given
-        val allKeys = mapOf(
-            "grind_recommendation_bean1" to "json1",
-            "grind_recommendation_bean2" to "json2",
-            "other_preference" to "value",
-            "grind_recommendation_bean3" to "json3"
-        )
-        every { mockSharedPreferences.all } returns allKeys
-
-        // When
-        val result = grindRecommendationPreferences.getAllRecommendationBeanIds()
-
-        // Then
-        assertEquals(listOf("bean1", "bean2", "bean3"), result.sorted())
-    }
-
-    @Test
-    fun `getAllRecommendationBeanIds returns empty list when no recommendations exist`() = runTest {
-        // Given
-        val allKeys = mapOf(
-            "other_preference1" to "value1",
-            "other_preference2" to "value2"
-        )
-        every { mockSharedPreferences.all } returns allKeys
-
-        // When
-        val result = grindRecommendationPreferences.getAllRecommendationBeanIds()
-
-        // Then
-        assertTrue(result.isEmpty())
-    }
-
-    @Test
-    fun `clearAllRecommendations removes only recommendation keys`() = runTest {
-        // Given
-        val allKeys = mapOf(
-            "grind_recommendation_bean1" to "json1",
-            "grind_recommendation_bean2" to "json2",
-            "other_preference" to "value",
-            "grind_recommendation_bean3" to "json3"
-        )
-        every { mockSharedPreferences.all } returns allKeys
-
-        // When
-        grindRecommendationPreferences.clearAllRecommendations()
-
-        // Then
-        verify { mockEditor.remove("grind_recommendation_bean1") }
-        verify { mockEditor.remove("grind_recommendation_bean2") }
-        verify { mockEditor.remove("grind_recommendation_bean3") }
-        verify(exactly = 0) { mockEditor.remove("other_preference") }
-        verify { mockEditor.apply() }
-    }
-
-    @Test
     fun `SerializableGrindRecommendation create method sets correct defaults`() {
         // Given
         val now = LocalDateTime.now()

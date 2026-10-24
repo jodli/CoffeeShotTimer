@@ -34,7 +34,6 @@ private const val Y_MIN_RATIO = 1.5
 private const val Y_MAX_RATIO = 3.0
 private const val X_TICK_SECONDS = 5
 private const val Y_TICK_RATIO = 0.25
-private const val LABEL_EVERY_X_TICKS = 2
 
 /**
  * The control chart: extraction time against brew ratio with the sour and

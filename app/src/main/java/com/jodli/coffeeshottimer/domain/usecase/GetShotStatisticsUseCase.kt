@@ -1,6 +1,5 @@
 package com.jodli.coffeeshottimer.domain.usecase
 
-import com.jodli.coffeeshottimer.data.dao.ShotStatistics
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.domain.exception.DomainException
@@ -18,44 +17,6 @@ import javax.inject.Singleton
 class GetShotStatisticsUseCase @Inject constructor(
     private val shotRepository: ShotRepository
 ) {
-
-    /**
-     * Get basic shot statistics for a specific bean.
-     * @param beanId The ID of the bean
-     * @return Result containing shot statistics or error
-     */
-    suspend fun getBeanStatistics(beanId: String): Result<ShotStatistics?> {
-        return shotRepository.getShotStatistics(beanId)
-    }
-
-    /**
-     * Get comprehensive shot analytics for a specific bean.
-     * @param beanId The ID of the bean
-     * @return Result containing detailed analytics
-     */
-    suspend fun getBeanAnalytics(beanId: String): Result<BeanAnalytics> {
-        return try {
-            val result = shotRepository.getShotsByBean(beanId).first()
-
-            result.fold(
-                onSuccess = { shots ->
-                    if (shots.isEmpty()) {
-                        Result.success(BeanAnalytics.empty())
-                    } else {
-                        val analytics = calculateBeanAnalytics(shots)
-                        Result.success(analytics)
-                    }
-                },
-                onFailure = {
-                    // Return empty analytics when repository fails
-                    Result.success(BeanAnalytics.empty())
-                }
-            )
-        } catch (exception: Exception) {
-            // Return empty analytics when any exception occurs
-            Result.success(BeanAnalytics.empty())
-        }
-    }
 
     /**
      * Get overall shot statistics across all beans.
@@ -241,47 +202,6 @@ class GetShotStatisticsUseCase @Inject constructor(
                 }
             )
         }
-    }
-
-    /**
-     * Calculate comprehensive bean analytics from shot data.
-     */
-    private fun calculateBeanAnalytics(shots: List<Shot>): BeanAnalytics {
-        if (shots.isEmpty()) return BeanAnalytics.empty()
-
-        val totalShots = shots.size
-        val avgBrewRatio = shots.map { it.brewRatio }.average()
-        val avgExtractionTime = shots.map { it.extractionTimeSeconds }.average()
-        val avgWeightIn = shots.map { it.coffeeWeightIn }.average()
-        val avgWeightOut = shots.map { it.coffeeWeightOut }.average()
-
-        val optimalExtractionCount = shots.count { it.isOptimalExtractionTime() }
-        val typicalRatioCount = shots.count { it.isTypicalBrewRatio() }
-
-        val bestShot = shots.maxByOrNull { shot ->
-            var score = 0
-            if (shot.isOptimalExtractionTime()) score += 2
-            if (shot.isTypicalBrewRatio()) score += 2
-            score
-        }
-
-        val consistencyScore = calculateConsistencyScore(shots)
-        val improvementTrend = calculateImprovementTrend(shots)
-
-        return BeanAnalytics(
-            totalShots = totalShots,
-            avgBrewRatio = avgBrewRatio,
-            avgExtractionTime = avgExtractionTime,
-            avgWeightIn = avgWeightIn,
-            avgWeightOut = avgWeightOut,
-            optimalExtractionPercentage = (optimalExtractionCount.toDouble() / totalShots) * 100,
-            typicalRatioPercentage = (typicalRatioCount.toDouble() / totalShots) * 100,
-            bestShot = bestShot,
-            consistencyScore = consistencyScore,
-            improvementTrend = improvementTrend,
-            lastShotDate = shots.maxByOrNull { it.timestamp }?.timestamp,
-            firstShotDate = shots.minByOrNull { it.timestamp }?.timestamp
-        )
     }
 
     /**
@@ -494,76 +414,6 @@ class GetShotStatisticsUseCase @Inject constructor(
             tooSlowPercentage = (tooSlowCount.toDouble() / shots.size) * 100,
             distribution = buckets
         )
-    }
-
-    /**
-     * Calculate consistency score based on standard deviation of key metrics.
-     */
-    private fun calculateConsistencyScore(shots: List<Shot>): Double {
-        if (shots.size < 2) return 100.0
-
-        val ratios = shots.map { it.brewRatio }
-        val times = shots.map { it.extractionTimeSeconds.toDouble() }
-
-        val ratioStdDev = calculateStandardDeviation(ratios)
-        val timeStdDev = calculateStandardDeviation(times)
-
-        // Lower standard deviation = higher consistency score
-        val ratioScore = (1.0 - (ratioStdDev / 2.0).coerceAtMost(1.0)) * 50
-        val timeScore = (1.0 - (timeStdDev / 10.0).coerceAtMost(1.0)) * 50
-
-        return (ratioScore + timeScore).coerceIn(0.0, 100.0)
-    }
-
-    /**
-     * Calculate improvement trend based on recent vs older shots.
-     */
-    private fun calculateImprovementTrend(shots: List<Shot>): Double {
-        if (shots.size < 4) return 0.0
-
-        val sortedShots = shots.sortedBy { it.timestamp }
-        val quarterSize = sortedShots.size / 4
-
-        val oldShots = sortedShots.take(quarterSize)
-        val recentShots = sortedShots.takeLast(quarterSize)
-
-        val oldOptimalPercentage =
-            (oldShots.count { it.isOptimalExtractionTime() }.toDouble() / oldShots.size) * 100
-        val recentOptimalPercentage =
-            (recentShots.count { it.isOptimalExtractionTime() }.toDouble() / recentShots.size) * 100
-
-        return recentOptimalPercentage - oldOptimalPercentage
-    }
-
-    /**
-     * Calculate standard deviation for a list of values.
-     */
-    private fun calculateStandardDeviation(values: List<Double>): Double {
-        if (values.size < 2) return 0.0
-
-        val mean = values.average()
-        val variance = values.map { (it - mean) * (it - mean) }.average()
-        return kotlin.math.sqrt(variance)
-    }
-}
-
-// Data classes for statistics and analysis results
-data class BeanAnalytics(
-    val totalShots: Int,
-    val avgBrewRatio: Double,
-    val avgExtractionTime: Double,
-    val avgWeightIn: Double,
-    val avgWeightOut: Double,
-    val optimalExtractionPercentage: Double,
-    val typicalRatioPercentage: Double,
-    val bestShot: Shot?,
-    val consistencyScore: Double,
-    val improvementTrend: Double,
-    val lastShotDate: LocalDateTime?,
-    val firstShotDate: LocalDateTime?
-) {
-    companion object {
-        fun empty() = BeanAnalytics(0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, null, 0.0, 0.0, null, null)
     }
 }
 

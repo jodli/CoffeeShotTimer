@@ -1,24 +1,11 @@
 package com.jodli.coffeeshottimer.di
 
-import android.content.SharedPreferences
-import com.jodli.coffeeshottimer.data.dao.BasketConfigDao
-import com.jodli.coffeeshottimer.data.dao.BeanDao
-import com.jodli.coffeeshottimer.data.dao.GrinderConfigDao
-import com.jodli.coffeeshottimer.data.dao.ShotDao
-import com.jodli.coffeeshottimer.data.preferences.GrindRecommendationPreferences
-import com.jodli.coffeeshottimer.data.repository.BasketConfigRepository
-import com.jodli.coffeeshottimer.data.repository.BeanRepository
-import com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository
-import com.jodli.coffeeshottimer.data.repository.ShotRepository
 import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManager
 import com.jodli.coffeeshottimer.data.storage.PhotoCaptureManagerImpl
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManager
 import com.jodli.coffeeshottimer.data.storage.PhotoStorageManagerImpl
-import com.jodli.coffeeshottimer.data.util.MemoryOptimizer
-import com.jodli.coffeeshottimer.domain.usecase.ManageGrindRecommendationUseCase
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -30,106 +17,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-
-    companion object {
-        /**
-         * Provides the BeanRepository instance.
-         * Uses singleton scope to ensure consistent data access.
-         *
-         * @param beanDao The BeanDao dependency
-         * @param photoStorageManager The PhotoStorageManager dependency
-         * @param beanPrefs The SharedPreferences for bean selection persistence
-         * @return BeanRepository instance
-         */
-        @Provides
-        @Singleton
-        fun provideBeanRepository(
-            beanDao: BeanDao,
-            photoStorageManager: PhotoStorageManager,
-            @BeanPrefs beanPrefs: SharedPreferences
-        ): BeanRepository {
-            return BeanRepository(beanDao, photoStorageManager, beanPrefs)
-        }
-
-        /**
-         * Provides the ShotRepository instance.
-         * Uses singleton scope to ensure consistent data access.
-         *
-         * @param shotDao The ShotDao dependency
-         * @param beanDao The BeanDao dependency (needed for bean validation)
-         * @return ShotRepository instance
-         */
-        @Provides
-        @Singleton
-        fun provideShotRepository(
-            shotDao: ShotDao,
-            beanDao: BeanDao
-        ): ShotRepository {
-            return ShotRepository(shotDao, beanDao)
-        }
-
-        /**
-         * Provides the GrinderConfigRepository instance.
-         * Uses singleton scope to ensure consistent data access.
-         *
-         * @param grinderConfigDao The GrinderConfigDao dependency
-         * @return GrinderConfigRepository instance
-         */
-        @Provides
-        @Singleton
-        fun provideGrinderConfigRepository(
-            grinderConfigDao: GrinderConfigDao
-        ): GrinderConfigRepository {
-            return GrinderConfigRepository(grinderConfigDao)
-        }
-
-        /**
-         * Provides the BasketConfigRepository instance.
-         * Uses singleton scope to ensure consistent data access.
-         *
-         * @param basketConfigDao The BasketConfigDao dependency
-         * @return BasketConfigRepository instance
-         */
-        @Provides
-        @Singleton
-        fun provideBasketConfigRepository(
-            basketConfigDao: BasketConfigDao
-        ): BasketConfigRepository {
-            return BasketConfigRepository(basketConfigDao)
-        }
-
-        /**
-         * Provides the MemoryOptimizer instance.
-         * Uses singleton scope to ensure consistent memory management across the app.
-         *
-         * @return MemoryOptimizer instance
-         */
-        @Provides
-        @Singleton
-        fun provideMemoryOptimizer(): MemoryOptimizer {
-            return MemoryOptimizer()
-        }
-
-        /**
-         * Provides the ManageGrindRecommendationUseCase instance.
-         * Uses singleton scope to ensure consistent recommendation management.
-         *
-         * @param grindRecommendationPreferences The preferences storage dependency
-         * @param beanRepository The bean repository dependency
-         * @return ManageGrindRecommendationUseCase instance
-         */
-        @Provides
-        @Singleton
-        fun provideManageGrindRecommendationUseCase(
-            grindRecommendationPreferences: GrindRecommendationPreferences,
-            beanRepository: BeanRepository
-        ): ManageGrindRecommendationUseCase {
-            return ManageGrindRecommendationUseCase(
-                grindRecommendationPreferences,
-                beanRepository
-            )
-        }
-    }
 
     /**
      * Binds the PhotoStorageManagerImpl to PhotoStorageManager interface.

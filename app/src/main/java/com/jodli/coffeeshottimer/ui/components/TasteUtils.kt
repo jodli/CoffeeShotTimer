@@ -27,7 +27,6 @@ object TasteUtils {
 
     /**
      * Get the recommended taste based on extraction time.
-     * Uses the same logic as GetTastePreselectionUseCase.
      */
     fun getTasteRecommendation(extractionTimeSeconds: Int?): TastePrimary? {
         if (extractionTimeSeconds == null || extractionTimeSeconds <= 0) {

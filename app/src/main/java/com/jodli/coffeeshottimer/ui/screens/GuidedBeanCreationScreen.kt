@@ -51,7 +51,6 @@ import com.jodli.coffeeshottimer.ui.theme.landscapeSpacing
 import com.jodli.coffeeshottimer.ui.theme.zoneColors
 import com.jodli.coffeeshottimer.ui.viewmodel.GuidedBeanCreationViewModel
 import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 
 /**
  * Main screen for the guided bean creation flow during onboarding.
@@ -385,10 +384,6 @@ fun BeanCreationSuccess(
     }
 }
 
-/** Roast date as a relative figure: today, yesterday, or N days ago. */
-private fun daysSinceRoast(bean: Bean): Long =
-    ChronoUnit.DAYS.between(bean.roastDate, LocalDate.now())
-
 /**
  * Bean summary as ruled ledger cells: roast date, freshness, notes.
  */
@@ -398,7 +393,7 @@ private fun BeanSummaryLedger(
     freshnessMessage: String,
     modifier: Modifier = Modifier
 ) {
-    val days = daysSinceRoast(bean)
+    val days = bean.daysSinceRoast()
     val roastDateText = when {
         days == 0L -> stringResource(R.string.format_roasted_today)
         days == 1L -> stringResource(R.string.format_roasted_yesterday)

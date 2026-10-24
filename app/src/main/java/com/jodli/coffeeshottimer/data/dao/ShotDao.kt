@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import androidx.room.Update
 import com.jodli.coffeeshottimer.data.model.Shot
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
@@ -82,12 +81,6 @@ interface ShotDao {
     suspend fun getShotById(shotId: String): Shot?
 
     /**
-     * Get recent shots (last N shots).
-     */
-    @Query("SELECT * FROM shots ORDER BY timestamp DESC LIMIT :limit")
-    fun getRecentShots(limit: Int): Flow<List<Shot>>
-
-    /**
      * Get shots within a date range.
      */
     @Query("SELECT * FROM shots WHERE timestamp BETWEEN :startDate AND :endDate ORDER BY timestamp DESC")
@@ -112,51 +105,16 @@ interface ShotDao {
     ): Flow<List<Shot>>
 
     /**
-     * Get shots by grinder setting.
-     */
-    @Query("SELECT * FROM shots WHERE grinderSetting = :grinderSetting ORDER BY timestamp DESC")
-    fun getShotsByGrinderSetting(grinderSetting: String): Flow<List<Shot>>
-
-    /**
      * Insert a new shot.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertShot(shot: Shot)
 
     /**
-     * Update an existing shot.
-     */
-    @Update
-    suspend fun updateShot(shot: Shot)
-
-    /**
      * Delete a shot.
      */
     @Delete
     suspend fun deleteShot(shot: Shot)
-
-    /**
-     * Delete all shots for a specific bean.
-     */
-    @Query("DELETE FROM shots WHERE beanId = :beanId")
-    suspend fun deleteShotsByBean(beanId: String)
-
-    /**
-     * Get shot statistics for a specific bean.
-     */
-    @Query(
-        """
-        SELECT 
-            COUNT(*) as totalShots,
-            AVG(coffeeWeightIn) as avgWeightIn,
-            AVG(coffeeWeightOut) as avgWeightOut,
-            AVG(extractionTimeSeconds) as avgExtractionTime,
-            AVG(coffeeWeightOut / coffeeWeightIn) as avgBrewRatio
-        FROM shots 
-        WHERE beanId = :beanId
-    """
-    )
-    suspend fun getShotStatistics(beanId: String): ShotStatistics?
 
     /**
      * Get the last shot for a specific bean (for grinder setting memory).
@@ -169,30 +127,6 @@ interface ShotDao {
      */
     @Query("SELECT COUNT(*) FROM shots")
     suspend fun getTotalShotCount(): Int
-
-    /**
-     * Get shots with brew ratio in a specific range.
-     */
-    @Query(
-        """
-        SELECT * FROM shots 
-        WHERE (coffeeWeightOut / coffeeWeightIn) BETWEEN :minRatio AND :maxRatio
-        ORDER BY timestamp DESC
-    """
-    )
-    fun getShotsByBrewRatioRange(minRatio: Double, maxRatio: Double): Flow<List<Shot>>
-
-    /**
-     * Get shots with extraction time in a specific range.
-     */
-    @Query(
-        """
-        SELECT * FROM shots 
-        WHERE extractionTimeSeconds BETWEEN :minSeconds AND :maxSeconds
-        ORDER BY timestamp DESC
-    """
-    )
-    fun getShotsByExtractionTimeRange(minSeconds: Int, maxSeconds: Int): Flow<List<Shot>>
 
     /**
      * Update taste feedback for a specific shot.
@@ -209,55 +143,4 @@ interface ShotDao {
         tastePrimary: TastePrimary?,
         tasteSecondary: TasteSecondary?
     )
-
-    /**
-     * Get shots with specific taste feedback.
-     */
-    @Query(
-        """
-        SELECT * FROM shots 
-        WHERE (:tastePrimary IS NULL OR tastePrimary = :tastePrimary)
-        AND (:beanId IS NULL OR beanId = :beanId)
-        ORDER BY timestamp DESC
-    """
-    )
-    fun getShotsByTaste(
-        tastePrimary: TastePrimary?,
-        beanId: String?
-    ): Flow<List<Shot>>
-
-    /**
-     * Get taste distribution statistics for a bean.
-     */
-    @Query(
-        """
-        SELECT 
-            tastePrimary,
-            COUNT(*) as count
-        FROM shots 
-        WHERE beanId = :beanId 
-        AND tastePrimary IS NOT NULL
-        GROUP BY tastePrimary
-    """
-    )
-    suspend fun getTasteDistributionForBean(beanId: String): List<TasteDistribution>
 }
-
-/**
- * Data class for shot statistics aggregation.
- */
-data class ShotStatistics(
-    val totalShots: Int,
-    val avgWeightIn: Double,
-    val avgWeightOut: Double,
-    val avgExtractionTime: Double,
-    val avgBrewRatio: Double
-)
-
-/**
- * Data class for taste distribution statistics.
- */
-data class TasteDistribution(
-    val tastePrimary: TastePrimary,
-    val count: Int
-)

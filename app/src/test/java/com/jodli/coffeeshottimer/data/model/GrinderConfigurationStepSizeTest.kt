@@ -67,55 +67,6 @@ class GrinderConfigurationStepSizeTest {
     }
 
     @Test
-    fun `getValidGrindValues returns correct values for step size`() {
-        val config = GrinderConfiguration(
-            scaleMin = 0,
-            scaleMax = 10,
-            stepSize = 2.5
-        )
-        val values = config.getValidGrindValues()
-
-        val expected = listOf(0.0, 2.5, 5.0, 7.5, 10.0)
-        assertEquals("Should return correct step values", expected, values)
-    }
-
-    @Test
-    fun `getValidGrindValues handles non-divisible ranges`() {
-        val config = GrinderConfiguration(
-            scaleMin = 1,
-            scaleMax = 10,
-            stepSize = 0.3
-        )
-        val values = config.getValidGrindValues()
-
-        assertTrue("Should start at minimum", values.first() == 1.0)
-        assertTrue("Should not exceed maximum", values.last() <= 10.0)
-
-        // Check that steps are consistent
-        for (i in 1 until values.size) {
-            val diff = values[i] - values[i - 1]
-            assertEquals("Step size should be consistent", 0.3, diff, 0.001)
-        }
-    }
-
-    @Test
-    fun `roundToNearestStep rounds correctly`() {
-        val config = GrinderConfiguration(
-            scaleMin = 0,
-            scaleMax = 10,
-            stepSize = 0.5
-        )
-
-        assertEquals(2.5, config.roundToNearestStep(2.4), 0.001)
-        assertEquals(2.5, config.roundToNearestStep(2.6), 0.001)
-        assertEquals(3.0, config.roundToNearestStep(2.8), 0.001)
-
-        // Test boundaries
-        assertEquals(0.0, config.roundToNearestStep(-1.0), 0.001)
-        assertEquals(10.0, config.roundToNearestStep(11.0), 0.001)
-    }
-
-    @Test
     fun `formatGrindValue formats according to step size`() {
         // Whole number step size
         val config1 = GrinderConfiguration(

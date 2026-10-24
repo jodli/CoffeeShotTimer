@@ -323,28 +323,20 @@
     <string name="validation_fill_required">Bitte fülle alle Pflichtfelder aus</string>
 
     <!-- Validation Error Messages -->
-    <string name="validation_field_required">%1$s ist erforderlich</string>
-    <string name="validation_extraction_time_minimum">Extraktionszeit muss mindestens %1$d Sekunden betragen</string>
-    <string name="validation_extraction_time_maximum">Extraktionszeit darf %1$d Sekunden nicht überschreiten</string>
     <string name="validation_bean_name_minimum_length">Bohnenname muss mindestens %1$d Zeichen haben</string>
     <string name="validation_bean_name_maximum_length">Bohnenname darf %1$d Zeichen nicht überschreiten</string>
     <string name="validation_bean_name_invalid_characters">Bohnenname enthält ungültige Zeichen</string>
     <string name="validation_roast_date_future">Röstdatum darf nicht in der Zukunft liegen</string>
     <string name="validation_roast_date_too_old">Röstdatum darf nicht mehr als 365 Tage zurückliegen</string>
     <string name="validation_notes_maximum_length">Notizen dürfen %1$d Zeichen nicht überschreiten</string>
-    <string name="validation_output_weight_less_than_input">Ausgabegewicht darf nicht geringer als Eingabegewicht sein</string>
 
     <!-- Validation Tips and Warnings -->
-    <string name="validation_tip_grinder_setting">Tipp: Notiere deine Mühleneinstellung, um zu merken, was gut funktioniert hat</string>
     <string name="validation_tip_descriptive_name">Tipp: Versuche einen beschreibenderen Namen wie \'Äthiopischer Yirgacheffe\'</string>
     <string name="validation_tip_basic_punctuation">Tipp: Verwende nur Buchstaben, Zahlen, Leerzeichen und einfache Satzzeichen</string>
     <string name="validation_tip_unique_name">Tipp: Versuche den Röster-Namen oder Röstgrad hinzuzufügen, um ihn eindeutig zu machen</string>
     <string name="validation_tip_roast_date_today">Tipp: Verwende das heutige Datum, wenn du dir beim genauen Röstdatum unsicher bist</string>
     <string name="validation_note_old_beans">Hinweis: Bohnen älter als 30 Tage haben möglicherweise etwas Geschmack verloren</string>
-    <string name="validation_tip_notes_helpful">Tipp: Notizen helfen dir, dich daran zu erinnern, was dir an dieser Bohne gefallen hat</string>
     <string name="validation_note_character_limit">Hinweis: Du näherst dich dem Zeichenlimit</string>
-    <string name="validation_tip_short_extraction_sour">Tipp: Sehr kurze Extraktionen schmecken oft sauer</string>
-    <string name="validation_tip_long_extraction_bitter">Tipp: Sehr lange Extraktionen schmecken oft bitter</string>
 
     <!-- Brew Ratio Warnings -->
     <string name="validation_warning_ratio_concentrated">Dieses Verhältnis ist ziemlich konzentriert – es könnte sehr stark schmecken</string>
@@ -352,20 +344,8 @@
     <string name="validation_warning_ratio_higher">Erwäge ein etwas höheres Verhältnis für bessere Balance</string>
     <string name="validation_warning_ratio_lower">Erwäge ein etwas niedrigeres Verhältnis für mehr Intensität</string>
 
-    <!-- Extraction Time Warnings -->
-    <string name="validation_warning_grind_finer">Erwäge feiner zu mahlen oder mehr Kaffee für längere Extraktion zu verwenden</string>
-    <string name="validation_warning_grind_coarser">Erwäge gröber zu mahlen oder weniger Kaffee für kürzere Extraktion zu verwenden</string>
-    <string name="validation_success_optimal_time">Großartige Extraktionszeit! Das liegt im optimalen Bereich für Espresso</string>
 
-    <!-- Bean Age Warnings -->
-    <string name="validation_warning_very_fresh_beans">Sehr frische Bohnen – erwäge 2–4 Tage zu warten für optimalen Geschmack</string>
-    <string name="validation_success_fresh_beans">Frische Bohnen – perfektes Timing für Espresso!</string>
-    <string name="validation_warning_aging_beans">Bohnen werden älter, aber noch gut für Espresso</string>
-    <string name="validation_warning_old_beans">Ältere Bohnen - Geschmack könnte vermindert sein</string>
 
-    <!-- Content Descriptions for Validation -->
-    <string name="validation_cd_error">Fehler</string>
-    <string name="validation_cd_warning">Warnung</string>
 
     <!-- Placeholders -->
     <string name="placeholder_grinder_setting">z.B. 15, Fein, Mittel-Fein</string>
@@ -388,7 +368,6 @@
 
     <!-- Special Characters and Symbols -->
 
-    <!-- Weight Slider -->
 
     <!-- Additional format strings -->
     <string name="button_reset">Zurücksetzen</string>
@@ -693,13 +672,10 @@
     <string name="coaching_dial_in_achieved">%1$s in %2$d Shots eingestellt!</string>
     <string name="coaching_dial_in_exploring">Erkunde %1$s - %2$d Shots bisher</string>
     
-    <!-- Coaching Insights - Grind Coaching Effectiveness -->
-    
     <!-- Coaching Insights Card -->
     <string name="coaching_insights_title_with_bean">Coaching · %1$s</string>
     <string name="coaching_insights_section_recent">Aktuelles Muster</string>
     <string name="coaching_insights_section_progress">Fortschritt</string>
-    <string name="coaching_insights_section_coaching">Coaching-Einfluss</string>
     
     <!-- Achievement Badges -->
     <string name="achievement_first_perfect">Erster perfekter Shot mit %1$s!</string>

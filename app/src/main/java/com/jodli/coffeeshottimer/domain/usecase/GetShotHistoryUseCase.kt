@@ -29,37 +29,6 @@ class GetShotHistoryUseCase @Inject constructor(
     }
 
     /**
-     * Get shots for a specific bean ordered by timestamp.
-     * @param beanId The ID of the bean to filter by
-     * @return Flow of Result containing filtered shots
-     */
-    fun getShotsByBean(beanId: String): Flow<Result<List<Shot>>> {
-        return shotRepository.getShotsByBean(beanId)
-    }
-
-    /**
-     * Get recent shots with a specified limit.
-     * @param limit Maximum number of shots to return
-     * @return Flow of Result containing recent shots
-     */
-    fun getRecentShots(limit: Int = 10): Flow<Result<List<Shot>>> {
-        return shotRepository.getRecentShots(limit)
-    }
-
-    /**
-     * Get shots within a specific date range.
-     * @param startDate Start of the date range
-     * @param endDate End of the date range
-     * @return Flow of Result containing shots in the date range
-     */
-    fun getShotsByDateRange(
-        startDate: LocalDateTime,
-        endDate: LocalDateTime
-    ): Flow<Result<List<Shot>>> {
-        return shotRepository.getShotsByDateRange(startDate, endDate)
-    }
-
-    /**
      * Get shots with comprehensive filtering options.
      * @param filter ShotHistoryFilter containing all filter criteria
      * @return Flow of Result containing filtered shots
@@ -119,80 +88,6 @@ class GetShotHistoryUseCase @Inject constructor(
                 filteredShots
             }
         }
-    }
-
-    /**
-     * Get shots by grinder setting.
-     * @param grinderSetting The grinder setting to filter by
-     * @return Flow of Result containing shots with the specified grinder setting
-     */
-    fun getShotsByGrinderSetting(grinderSetting: String): Flow<Result<List<Shot>>> {
-        return shotRepository.getShotsByGrinderSetting(grinderSetting)
-    }
-
-    /**
-     * Get shots within a brew ratio range.
-     * @param minRatio Minimum brew ratio (inclusive)
-     * @param maxRatio Maximum brew ratio (inclusive)
-     * @return Flow of Result containing shots within the brew ratio range
-     */
-    fun getShotsByBrewRatioRange(
-        minRatio: Double,
-        maxRatio: Double
-    ): Flow<Result<List<Shot>>> {
-        return shotRepository.getShotsByBrewRatioRange(minRatio, maxRatio)
-    }
-
-    /**
-     * Get shots within an extraction time range.
-     * @param minSeconds Minimum extraction time in seconds (inclusive)
-     * @param maxSeconds Maximum extraction time in seconds (inclusive)
-     * @return Flow of Result containing shots within the extraction time range
-     */
-    fun getShotsByExtractionTimeRange(
-        minSeconds: Int,
-        maxSeconds: Int
-    ): Flow<Result<List<Shot>>> {
-        return shotRepository.getShotsByExtractionTimeRange(minSeconds, maxSeconds)
-    }
-
-    /**
-     * Get shots with optimal extraction time (25-30 seconds).
-     * @return Flow of Result containing shots with optimal extraction time
-     */
-    fun getOptimalExtractionTimeShots(): Flow<Result<List<Shot>>> {
-        return getShotsByExtractionTimeRange(25, 30)
-    }
-
-    /**
-     * Get shots with typical brew ratio (1.5-3.0).
-     * @return Flow of Result containing shots with typical brew ratio
-     */
-    fun getTypicalBrewRatioShots(): Flow<Result<List<Shot>>> {
-        return getShotsByBrewRatioRange(1.5, 3.0)
-    }
-
-    /**
-     * Search shots by notes content.
-     * @param searchTerm The term to search for in shot notes
-     * @return Flow of Result containing shots with matching notes
-     */
-    fun searchShotsByNotes(searchTerm: String): Flow<Result<List<Shot>>> {
-        return getAllShots().map { result ->
-            result.map { shots ->
-                shots.filter { shot ->
-                    shot.notes.contains(searchTerm, ignoreCase = true)
-                }
-            }
-        }
-    }
-
-    /**
-     * Get total shot count.
-     * @return Result containing the total number of shots
-     */
-    suspend fun getTotalShotCount(): Result<Int> {
-        return shotRepository.getTotalShotCount()
     }
 
     // PERFORMANCE OPTIMIZATION METHODS
@@ -260,42 +155,5 @@ data class ShotHistoryFilter(
             maxExtractionTime != null ||
             onlyOptimalExtractionTime == true ||
             onlyTypicalBrewRatio == true
-    }
-
-    /**
-     * Create a copy with only date range filters.
-     * @return ShotHistoryFilter with only date filters
-     */
-    fun dateRangeOnly(): ShotHistoryFilter {
-        return copy(
-            beanId = null,
-            grinderSetting = null,
-            minBrewRatio = null,
-            maxBrewRatio = null,
-            minExtractionTime = null,
-            maxExtractionTime = null,
-            onlyOptimalExtractionTime = null,
-            onlyTypicalBrewRatio = null,
-            limit = null
-        )
-    }
-
-    /**
-     * Create a copy with only bean filter.
-     * @return ShotHistoryFilter with only bean filter
-     */
-    fun beanOnly(): ShotHistoryFilter {
-        return copy(
-            startDate = null,
-            endDate = null,
-            grinderSetting = null,
-            minBrewRatio = null,
-            maxBrewRatio = null,
-            minExtractionTime = null,
-            maxExtractionTime = null,
-            onlyOptimalExtractionTime = null,
-            onlyTypicalBrewRatio = null,
-            limit = null
-        )
     }
 }

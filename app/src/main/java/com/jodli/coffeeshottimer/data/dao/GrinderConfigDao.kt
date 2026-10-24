@@ -80,20 +80,4 @@ interface GrinderConfigDao {
      */
     @Query("SELECT * FROM grinder_configuration WHERE scaleMin = :scaleMin AND scaleMax = :scaleMax LIMIT 1")
     suspend fun getConfigByRange(scaleMin: Int, scaleMax: Int): GrinderConfiguration?
-
-    /**
-     * Delete old configurations, keeping only the most recent N configurations.
-     * Useful for cleanup to prevent unlimited configuration history.
-     */
-    @Query(
-        """
-        DELETE FROM grinder_configuration 
-        WHERE id NOT IN (
-            SELECT id FROM grinder_configuration 
-            ORDER BY createdAt DESC 
-            LIMIT :keepCount
-        )
-    """
-    )
-    suspend fun deleteOldConfigs(keepCount: Int = 5)
 }
