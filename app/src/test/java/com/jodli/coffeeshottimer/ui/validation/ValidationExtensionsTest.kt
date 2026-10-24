@@ -105,23 +105,6 @@ class ValidationExtensionsTest {
     }
 
     @Test
-    fun `validateExtractionTimeEnhanced should provide contextual feedback`() {
-        val shortResult = 3.validateExtractionTimeEnhanced(validationUtils)
-        assertFalse("Very short time should fail", shortResult.isValid)
-        assertTrue(
-            "Should warn about sour taste",
-            shortResult.errors.any { it.contains("sour", ignoreCase = true) }
-        )
-
-        val longResult = 150.validateExtractionTimeEnhanced(validationUtils)
-        assertFalse("Very long time should fail", longResult.isValid)
-        assertTrue(
-            "Should warn about bitter taste",
-            longResult.errors.any { it.contains("bitter", ignoreCase = true) }
-        )
-    }
-
-    @Test
     fun `getBrewRatioWarnings should provide appropriate feedback`() {
         val lowRatio = 1.2.getBrewRatioWarnings(validationUtils)
         assertTrue("Low ratio should have warning", lowRatio.isNotEmpty())
@@ -143,104 +126,6 @@ class ValidationExtensionsTest {
             "Optimal ratio warnings should be mild or empty",
             optimalRatio.isEmpty() || optimalRatio.all { !it.contains("very", ignoreCase = true) }
         )
-    }
-
-    @Test
-    fun `getExtractionTimeWarnings should provide appropriate feedback`() {
-        val shortTime = 20.getExtractionTimeWarnings(validationUtils)
-        assertTrue("Short time should have warning", shortTime.isNotEmpty())
-        assertTrue(
-            "Should suggest grinding finer",
-            shortTime.any { it.contains("finer", ignoreCase = true) }
-        )
-
-        val longTime = 35.getExtractionTimeWarnings(validationUtils)
-        assertTrue("Long time should have warning", longTime.isNotEmpty())
-        assertTrue(
-            "Should suggest grinding coarser",
-            longTime.any { it.contains("coarser", ignoreCase = true) }
-        )
-
-        val optimalTime = 27.getExtractionTimeWarnings(validationUtils)
-        assertTrue("Optimal time should have positive feedback", optimalTime.isNotEmpty())
-        assertTrue(
-            "Should mention optimal range",
-            optimalTime.any { it.contains("optimal", ignoreCase = true) }
-        )
-    }
-
-    @Test
-    fun `validateCompleteShot should validate all parameters together`() {
-        val validResult = validateCompleteShot(
-            coffeeWeightIn = "18.0",
-            coffeeWeightOut = "36.0",
-            extractionTimeSeconds = 27,
-            notes = "Perfect shot",
-            validationUtils = validationUtils
-        )
-        assertTrue("Valid complete shot should pass", validResult.isValid)
-
-        val invalidResult = validateCompleteShot(
-            coffeeWeightIn = "18.0", // Valid weights - sliders constrain values
-            coffeeWeightOut = "36.0",
-            extractionTimeSeconds = 200, // Invalid time
-            notes = "",
-            validationUtils = validationUtils
-        )
-        assertFalse("Invalid extraction time should fail", invalidResult.isValid)
-    }
-
-    @Test
-    fun `validateCompleteShot should catch cross-field validation errors`() {
-        val result = validateCompleteShot(
-            coffeeWeightIn = "18.0",
-            coffeeWeightOut = "15.0", // Less than input
-            extractionTimeSeconds = 27,
-            notes = "",
-            validationUtils = validationUtils
-        )
-        assertFalse("Output less than input should fail", result.isValid)
-    }
-
-    @Test
-    fun `validateCompleteBean should validate all bean parameters together`() {
-        val validResult = validateCompleteBean(
-            name = "Ethiopian Yirgacheffe",
-            roastDate = LocalDate.now().minusDays(7),
-            notes = "Floral and bright",
-            validationUtils = validationUtils
-        )
-        assertTrue("Valid complete bean should pass", validResult.isValid)
-
-        val invalidResult = validateCompleteBean(
-            name = "",
-            roastDate = LocalDate.now().plusDays(1),
-            notes = "x".repeat(600), // Too long
-            validationUtils = validationUtils
-        )
-        assertFalse("Invalid complete bean should fail", invalidResult.isValid)
-        assertTrue("Should have multiple errors", invalidResult.errors.size > 1)
-    }
-
-    @Test
-    fun `validateCompleteBean should provide contextual warnings about bean age`() {
-        val freshResult = validateCompleteBean(
-            name = "Fresh Bean",
-            roastDate = LocalDate.now().minusDays(10),
-            notes = "",
-            validationUtils = validationUtils
-        )
-        assertTrue("Fresh bean validation should pass", freshResult.isValid)
-        // Should have warnings about very fresh beans
-
-        val oldResult = validateCompleteBean(
-            name = "Old Bean",
-            roastDate = LocalDate.now().minusDays(300),
-            notes = "",
-            validationUtils = validationUtils
-        )
-        assertTrue("Old bean validation should pass basic validation", oldResult.isValid)
-        // Should have warnings about older beans
     }
 
     @Test

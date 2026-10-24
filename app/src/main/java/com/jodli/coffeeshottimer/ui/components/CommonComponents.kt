@@ -183,37 +183,6 @@ fun CoffeeTextField(
 }
 
 /**
- * Section header with consistent styling
- */
-@Composable
-fun SectionHeader(
-    title: String,
-    modifier: Modifier = Modifier,
-    subtitle: String? = null
-) {
-    val spacing = LocalSpacing.current
-
-    Column(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-
-        if (subtitle != null) {
-            Spacer(modifier = Modifier.height(spacing.extraSmall))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-/**
  * Empty state component
  */
 @Composable

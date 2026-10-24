@@ -6,26 +6,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.data.model.ValidationResult
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 import com.jodli.coffeeshottimer.ui.validation.ValidationStringProvider
@@ -210,124 +199,5 @@ fun GentleValidationMessage(
                 )
             }
         }
-    }
-}
-
-/**
- * Enhanced text field with built-in validation and error display.
- */
-@Composable
-fun ValidatedTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    validationUtils: ValidationUtils,
-    modifier: Modifier = Modifier,
-    errorMessage: String? = null,
-    warningMessage: String? = null,
-    isRequired: Boolean = false,
-    keyboardType: KeyboardType = KeyboardType.Text,
-    imeAction: ImeAction = ImeAction.Next,
-    maxLength: Int? = null,
-    singleLine: Boolean = true,
-    enabled: Boolean = true,
-    placeholder: String? = null,
-    supportingText: String? = null,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    trailingIcon: @Composable (() -> Unit)? = null,
-    onValidationChange: ((Boolean) -> Unit)? = null
-) {
-    val focusManager = LocalFocusManager.current
-    val hasError = errorMessage != null
-    val hasWarning = warningMessage != null && !hasError
-
-    // Notify parent of validation state changes
-    LaunchedEffect(hasError) {
-        onValidationChange?.invoke(!hasError)
-    }
-
-    Column(modifier = modifier) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = { newValue ->
-                val filteredValue = if (maxLength != null) {
-                    newValue.take(maxLength)
-                } else {
-                    newValue
-                }
-                onValueChange(filteredValue)
-            },
-            label = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(label)
-                    if (isRequired) {
-                        Text(
-                            text = stringResource(R.string.validation_required_field),
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    }
-                }
-            },
-            placeholder = placeholder?.let { { Text(it) } },
-            leadingIcon = leadingIcon,
-            trailingIcon = trailingIcon ?: if (hasError || hasWarning) {
-                {
-                    Icon(
-                        imageVector = if (hasError) Icons.Default.Error else Icons.Default.Warning,
-                        contentDescription = if (hasError) validationUtils.stringProvider.getErrorContentDescription() else validationUtils.stringProvider.getWarningContentDescription(),
-                        tint = if (hasError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.tertiary
-                    )
-                }
-            } else {
-                null
-            },
-            isError = hasError,
-            singleLine = singleLine,
-            enabled = enabled,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType,
-                imeAction = imeAction
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) },
-                onDone = { focusManager.clearFocus() }
-            ),
-            supportingText = {
-                Column {
-                    // Error message takes priority
-                    if (hasError) {
-                        Text(
-                            text = errorMessage!!,
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    } else if (hasWarning) {
-                        Text(
-                            text = warningMessage!!,
-                            color = MaterialTheme.colorScheme.tertiary,
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    } else if (supportingText != null) {
-                        Text(
-                            text = supportingText,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    // Character count for fields with max length
-                    if (maxLength != null) {
-                        Text(
-                            text = stringResource(R.string.validation_character_count, value.length, maxLength),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
     }
 }

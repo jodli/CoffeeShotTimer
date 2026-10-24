@@ -223,7 +223,6 @@
     <string name="cd_saving">Saving…</string>
     <string name="button_save">Save</string>
     <string name="cd_close">Close</string>
-    <string name="cd_pause">Pause</string>
     <string name="cd_start">Start</string>
     <string name="cd_back">Back</string>
     <string name="cd_close_debug_dialog">Close debug dialog</string>

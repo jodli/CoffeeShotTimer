@@ -12,22 +12,17 @@
     <ID>CyclomaticComplexMethod:DomainErrorTranslator.kt$DomainErrorTranslator$fun translate(errorCode: DomainErrorCode, details: String? = null): String</ID>
     <ID>CyclomaticComplexMethod:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$override suspend fun compressImage(imageUri: Uri): Result&lt;Uri&gt;</ID>
     <ID>CyclomaticComplexMethod:ShotHistoryScreen.kt$private fun getActiveFilterTexts( filter: ShotHistoryFilter, availableBeans: List&lt;com.jodli.coffeeshottimer.data.model.Bean&gt; ): List&lt;String&gt;</ID>
-    <ID>CyclomaticComplexMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
     <ID>ExplicitGarbageCollectionCall:MemoryOptimizer.kt$MemoryOptimizer$gc()</ID>
     <ID>Filename:package-info.kt$com.jodli.coffeeshottimer.ui.components.analytics.package-info.kt</ID>
-    <ID>FunctionParameterNaming:TimerComponents.kt$timer_seconds_suffix: String = "s"</ID>
     <ID>LargeClass:ShotHistoryViewModel.kt$ShotHistoryViewModel : ViewModel</ID>
     <ID>LargeClass:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest</ID>
     <ID>LargeClass:ShotRecordingViewModel.kt$ShotRecordingViewModel : ViewModel</ID>
     <ID>LongMethod:AppNavigation.kt$@Composable fun AppNavigation( navController: NavHostController, modifier: Modifier = Modifier, startDestination: String = NavigationDestinations.RecordShot.route )</ID>
     <ID>LongMethod:DebugDialog.kt$@Composable fun DebugDialog( isVisible: Boolean, onDismiss: () -&gt; Unit, onFillDatabase: () -&gt; Unit, onClearDatabase: () -&gt; Unit, onResetToNewUser: () -&gt; Unit, onResetToExistingUserNoBeans: () -&gt; Unit, onForceEquipmentSetup: () -&gt; Unit, isLoading: Boolean, operationResult: String?, showConfirmation: Boolean, onShowConfirmation: () -&gt; Unit, onHideConfirmation: () -&gt; Unit )</ID>
-    <ID>LongMethod:GrindAdjustmentCard.kt$@Composable fun GrindAdjustmentCard( recommendation: GrindAdjustmentRecommendation, onApply: (() -&gt; Unit)? = null, onDismiss: (() -&gt; Unit)? = null, modifier: Modifier = Modifier, isCompact: Boolean = false )</ID>
     <ID>LongMethod:ShotDetailsScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun ShotDetailsScreen( shotId: String, onNavigateBack: () -&gt; Unit = {}, onNavigateToShot: (String) -&gt; Unit = {}, viewModel: ShotDetailsViewModel = hiltViewModel() )</ID>
     <ID>LongMethod:ShotHistoryFilterDialog.kt$@Composable fun ShotHistoryFilterDialog( currentFilter: ShotHistoryFilter, availableBeans: List&lt;Bean&gt;, onApplyFilter: (ShotHistoryFilter) -&gt; Unit, onDismiss: () -&gt; Unit )</ID>
     <ID>LongMethod:ShotRecordedDialog.kt$@Composable fun ShotRecordedDialog( brewRatio: String, extractionTime: String, suggestedTaste: TastePrimary? = null, grindAdjustment: GrindAdjustmentRecommendation? = null, onTasteSelected: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Reactive UI updates onSubmit: ((TastePrimary?, TasteSecondary?) -&gt; Unit)? = null, // Save to database onDismiss: () -&gt; Unit, onViewDetails: (() -&gt; Unit)? = null, modifier: Modifier = Modifier )</ID>
     <ID>LongMethod:TimerCircle.kt$@Composable fun ManualTimerCircle( size: Dp, fontSize: TextUnit, manualTimeSeconds: Int, onTimeChange: (Int) -&gt; Unit, onTapToEdit: () -&gt; Unit, modifier: Modifier = Modifier )</ID>
-    <ID>LongMethod:TimerComponents.kt$@Composable private fun CircularTimerInternal( currentTime: Long, targetTime: Long?, isRunning: Boolean, showColorCoding: Boolean = true, onStartStop: (() -&gt; Unit)? = null, timerSize: Dp, modifier: Modifier = Modifier, useLandscapeTimer: Boolean = false )</ID>
-    <ID>LongMethod:WeightSliderComponents.kt$@Composable fun GrinderSettingSlider( value: String, onValueChange: (String) -&gt; Unit, modifier: Modifier = Modifier, errorMessage: String? = null, enabled: Boolean = true, suggestedSetting: String? = null, previousSuccessfulSettings: List&lt;String&gt; = emptyList(), minSetting: Float, maxSetting: Float, stepSize: Float = 0.5f )</ID>
     <ID>LongParameterList:AddEditBeanViewModel.kt$AddEditBeanViewModel$( private val addBeanUseCase: AddBeanUseCase, private val updateBeanUseCase: UpdateBeanUseCase, private val addPhotoToBeanUseCase: AddPhotoToBeanUseCase, private val removePhotoFromBeanUseCase: RemovePhotoFromBeanUseCase, private val checkPhotoCapabilityUseCase: CheckPhotoCapabilityUseCase, private val photoCaptureManager: PhotoCaptureManager, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val domainErrorTranslator: DomainErrorTranslator )</ID>
     <ID>LongParameterList:PersistentGrindRecommendationTest.kt$PersistentGrindRecommendationTest$( beanId: String = "test_bean", suggestedGrindSetting: String = "5.5", adjustmentDirection: AdjustmentDirection = AdjustmentDirection.FINER, reason: String = "Test reason", recommendedDose: Double = 18.0, targetExtractionTime: IntRange = 25..30, timestamp: LocalDateTime = LocalDateTime.now(), wasFollowed: Boolean = false, basedOnTaste: Boolean = true, confidence: ConfidenceLevel = ConfidenceLevel.HIGH )</ID>
     <ID>LongParameterList:ShotRecordingViewModel.kt$ShotRecordingViewModel$( private val recordShotUseCase: RecordShotUseCase, private val getShotDetailsUseCase: GetShotDetailsUseCase, private val recordTasteFeedbackUseCase: RecordTasteFeedbackUseCase, private val calculateGrindAdjustmentUseCase: CalculateGrindAdjustmentUseCase, private val manageGrindRecommendationUseCase: ManageGrindRecommendationUseCase, private val beanRepository: BeanRepository, private val shotRepository: ShotRepository, private val domainErrorTranslator: DomainErrorTranslator, private val stringResourceProvider: StringResourceProvider, private val validationStringProvider: ValidationStringProvider, private val grinderConfigRepository: com.jodli.coffeeshottimer.data.repository.GrinderConfigRepository, private val basketConfigRepository: com.jodli.coffeeshottimer.data.repository.BasketConfigRepository, @param:ApplicationContext private val context: Context, private val savedStateHandle: SavedStateHandle )</ID>
@@ -99,9 +94,6 @@
     <ID>MagicNumber:EquipmentSetupSummaryScreen.kt$10</ID>
     <ID>MagicNumber:EquipmentSetupSummaryScreen.kt$14</ID>
     <ID>MagicNumber:EquipmentSetupSummaryScreen.kt$20</ID>
-    <ID>MagicNumber:FormStateManager.kt$FormStateManager$1000L</ID>
-    <ID>MagicNumber:FormStateManager.kt$FormStateManager$24</ID>
-    <ID>MagicNumber:FormStateManager.kt$FormStateManager$60</ID>
     <ID>MagicNumber:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$14</ID>
     <ID>MagicNumber:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$15</ID>
     <ID>MagicNumber:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$30</ID>
@@ -135,7 +127,6 @@
     <ID>MagicNumber:GetShotStatisticsUseCase.kt$GetShotStatisticsUseCase$7</ID>
     <ID>MagicNumber:GetTastePreselectionUseCase.kt$GetTastePreselectionUseCase$25.0</ID>
     <ID>MagicNumber:GetTastePreselectionUseCase.kt$GetTastePreselectionUseCase$30.0</ID>
-    <ID>MagicNumber:GrindAdjustmentCard.kt$1200</ID>
     <ID>MagicNumber:GrinderConfiguration.kt$GrinderConfiguration$0.01</ID>
     <ID>MagicNumber:GrinderConfiguration.kt$GrinderConfiguration$10</ID>
     <ID>MagicNumber:GrinderConfiguration.kt$GrinderConfiguration$10.0</ID>
@@ -251,25 +242,6 @@
     <ID>MagicNumber:TimerCircle.kt$60000</ID>
     <ID>MagicNumber:TimerCircle.kt$60000f</ID>
     <ID>MagicNumber:TimerCircle.kt$90f</ID>
-    <ID>MagicNumber:TimerComponents.kt$0.98f</ID>
-    <ID>MagicNumber:TimerComponents.kt$0xFF4CAF50</ID>
-    <ID>MagicNumber:TimerComponents.kt$0xFFF44336</ID>
-    <ID>MagicNumber:TimerComponents.kt$0xFFFF9800</ID>
-    <ID>MagicNumber:TimerComponents.kt$0xFFFFC107</ID>
-    <ID>MagicNumber:TimerComponents.kt$1.02f</ID>
-    <ID>MagicNumber:TimerComponents.kt$10</ID>
-    <ID>MagicNumber:TimerComponents.kt$100</ID>
-    <ID>MagicNumber:TimerComponents.kt$1000</ID>
-    <ID>MagicNumber:TimerComponents.kt$1000L</ID>
-    <ID>MagicNumber:TimerComponents.kt$10L</ID>
-    <ID>MagicNumber:TimerComponents.kt$1500</ID>
-    <ID>MagicNumber:TimerComponents.kt$20</ID>
-    <ID>MagicNumber:TimerComponents.kt$200</ID>
-    <ID>MagicNumber:TimerComponents.kt$25</ID>
-    <ID>MagicNumber:TimerComponents.kt$25L</ID>
-    <ID>MagicNumber:TimerComponents.kt$300L</ID>
-    <ID>MagicNumber:TimerComponents.kt$35</ID>
-    <ID>MagicNumber:TimerComponents.kt$60</ID>
     <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$180f</ID>
     <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$270f</ID>
     <ID>MagicNumber:TimerScaleMapper.kt$TimerScaleMapper$360f</ID>
@@ -279,13 +251,6 @@
     <ID>MagicNumber:ValidationExtensions.kt$0.8</ID>
     <ID>MagicNumber:ValidationExtensions.kt$30</ID>
     <ID>MagicNumber:ValidationExtensions.kt$90</ID>
-    <ID>MagicNumber:WeightSliderComponents.kt$0.01f</ID>
-    <ID>MagicNumber:WeightSliderComponents.kt$0.1f</ID>
-    <ID>MagicNumber:WeightSliderComponents.kt$0.5f</ID>
-    <ID>MagicNumber:WeightSliderComponents.kt$10f</ID>
-    <ID>MagicNumber:WeightSliderComponents.kt$3</ID>
-    <ID>MagicNumber:WeightsDisplay.kt$1.5</ID>
-    <ID>MagicNumber:WeightsDisplay.kt$2.5</ID>
     <ID>MatchingDeclarationName:TrendLineGraph.kt$TrendDataPoint</ID>
     <ID>MatchingDeclarationName:ValidationComponents.kt$ValidationUtils</ID>
     <ID>MaximumLineLength:AddEditBeanViewModel.kt$AddEditBeanViewModel$ </ID>
@@ -315,11 +280,8 @@
     <ID>MaximumLineLength:ShotHistoryViewModel.kt$ShotHistoryViewModel$ </ID>
     <ID>MaximumLineLength:ShotHistoryViewModelTest.kt$ShotHistoryViewModelTest$ </ID>
     <ID>MaximumLineLength:ShotRecordingViewModel.kt$ShotRecordingViewModel$ </ID>
-    <ID>MaximumLineLength:TimerComponents.kt$ </ID>
     <ID>MaximumLineLength:TypographyAndSpacingTest.kt$TypographyAndSpacingTest$ </ID>
     <ID>MaximumLineLength:ValidationComponents.kt$ </ID>
-    <ID>MaximumLineLength:ValidationHelpersTest.kt$ValidationHelpersTest$ </ID>
-    <ID>MaximumLineLength:WeightSliderComponents.kt$ </ID>
     <ID>NestedBlockDepth:UpdateBeanUseCase.kt$UpdateBeanUseCase$suspend fun getBeanForEditing(beanId: String): Result&lt;Bean&gt;</ID>
     <ID>NoWildcardImports:AddBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:AddPhotoToBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
@@ -334,27 +296,17 @@
     <ID>NoWildcardImports:CalculateGrindAdjustmentUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ComponentTypographyUsageTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:DesignSystemValidationTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:EnhancedTimerButtonTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ExampleUnitTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetActiveBeansUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetBeanHistoryUseCaseTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:GetBeanPhotoUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetShotDetailsUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetShotHistoryUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetShotStatisticsUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GetTastePreselectionUseCaseTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.animation.core.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.foundation.layout.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material.icons.filled.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.material3.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import androidx.compose.runtime.*</ID>
-    <ID>NoWildcardImports:GrindAdjustmentCard.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
     <ID>NoWildcardImports:GrindRecommendationPreferencesTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GrinderConfigDaoTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GrinderConfigRepositoryTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:GrinderConfigurationTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:GrinderSettingSliderTest.kt$import androidx.compose.ui.test.*</ID>
     <ID>NoWildcardImports:GuidedBeanCreationViewModelTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:LoadingAndErrorStateTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ManageGrindRecommendationUseCaseTest.kt$import org.junit.Assert.*</ID>
@@ -365,8 +317,6 @@
     <ID>NoWildcardImports:PhotoCaptureManagerTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:PhotoStorageManagerTest.kt$import io.mockk.*</ID>
     <ID>NoWildcardImports:PhotoStorageManagerTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:RecommendationCard.kt$import androidx.compose.foundation.layout.*</ID>
-    <ID>NoWildcardImports:RecommendationCard.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:RecordShotUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:RecordTasteFeedbackUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:RemovePhotoFromBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
@@ -382,18 +332,14 @@
     <ID>NoWildcardImports:ShotRepositoryTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ShotTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:StandardizedComponentsTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:TasteFeedbackDisplay.kt$import androidx.compose.foundation.layout.*</ID>
-    <ID>NoWildcardImports:TasteFeedbackDisplay.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.material3.*</ID>
     <ID>NoWildcardImports:TasteFeedbackEditor.kt$import androidx.compose.runtime.*</ID>
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>NoWildcardImports:TasteUtils.kt$import androidx.compose.material3.*</ID>
-    <ID>NoWildcardImports:TimerComponentsTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:TypographyAndSpacingTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:UpdateBeanUseCaseTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:ValidationExtensionsTest.kt$import org.junit.Assert.*</ID>
-    <ID>NoWildcardImports:ValidationHelpersTest.kt$import org.junit.Assert.*</ID>
     <ID>NoWildcardImports:WeightSliderComponentsTest.kt$import org.junit.Assert.*</ID>
     <ID>ReturnCount:AddPhotoToBeanUseCase.kt$AddPhotoToBeanUseCase$suspend fun execute(beanId: String, imageUri: Uri): Result&lt;String&gt;</ID>
     <ID>ReturnCount:BasketConfigRepository.kt$BasketConfigRepository$suspend fun saveConfig(config: BasketConfiguration): Result&lt;Unit&gt;</ID>
@@ -413,7 +359,6 @@
     <ID>ReturnCount:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$fun navigateForward()</ID>
     <ID>ReturnCount:EquipmentSetupSummaryScreen.kt$@Composable private fun determineBasketType(coffeeInMin: String, coffeeInMax: String): String</ID>
     <ID>ReturnCount:EquipmentSetupSummaryScreen.kt$private fun calculateGrinderSteps(grinderMin: String, grinderMax: String, stepSize: String): Int</ID>
-    <ID>ReturnCount:GetBeanPhotoUseCase.kt$GetBeanPhotoUseCase$suspend fun execute(photoPath: String): Result&lt;File&gt;</ID>
     <ID>ReturnCount:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$suspend fun compareShotsDetails(shotId1: String, shotId2: String): Result&lt;ShotComparison&gt;</ID>
     <ID>ReturnCount:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$suspend fun getLastShotForBean(beanId: String): Result&lt;ShotDetails?&gt;</ID>
     <ID>ReturnCount:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$suspend fun getShotDetails(shotId: String): Result&lt;ShotDetails&gt;</ID>
@@ -444,7 +389,6 @@
     <ID>SwallowedException:Converters.kt$Converters$e: IllegalArgumentException</ID>
     <ID>SwallowedException:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$e: Exception</ID>
     <ID>SwallowedException:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$exception: Exception</ID>
-    <ID>SwallowedException:FormStateManager.kt$FormStateManager$e: Exception</ID>
     <ID>SwallowedException:GetShotStatisticsUseCase.kt$GetShotStatisticsUseCase$exception: Exception</ID>
     <ID>SwallowedException:GrindRecommendationPreferences.kt$GrindRecommendationPreferences$e: Exception</ID>
     <ID>SwallowedException:GrinderConfigRepository.kt$GrinderConfigRepository$exception: Exception</ID>
@@ -455,7 +399,6 @@
     <ID>SwallowedException:PhotoStorageManagerImpl.kt$PhotoStorageManagerImpl$e: Exception</ID>
     <ID>SwallowedException:ShotRecordingViewModel.kt$ShotRecordingViewModel$exception: Exception</ID>
     <ID>SwallowedException:ShotRepository.kt$ShotRepository$exception: Exception</ID>
-    <ID>SwallowedException:WeightSliderComponents.kt$e: Exception</ID>
     <ID>TooGenericExceptionCaught:AddBeanUseCase.kt$AddBeanUseCase$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:AddEditBeanScreen.kt$e: Exception</ID>
     <ID>TooGenericExceptionCaught:AddEditBeanViewModel.kt$AddEditBeanViewModel$e: Exception</ID>
@@ -472,10 +415,8 @@
     <ID>TooGenericExceptionCaught:EquipmentSettingsViewModel.kt$EquipmentSettingsViewModel$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$e: Exception</ID>
     <ID>TooGenericExceptionCaught:EquipmentSetupFlowViewModel.kt$EquipmentSetupFlowViewModel$exception: Exception</ID>
-    <ID>TooGenericExceptionCaught:FormStateManager.kt$FormStateManager$e: Exception</ID>
     <ID>TooGenericExceptionCaught:GetActiveBeansUseCase.kt$GetActiveBeansUseCase$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:GetBeanHistoryUseCase.kt$GetBeanHistoryUseCase$exception: Exception</ID>
-    <ID>TooGenericExceptionCaught:GetBeanPhotoUseCase.kt$GetBeanPhotoUseCase$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:GetShotDetailsUseCase.kt$GetShotDetailsUseCase$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:GetShotStatisticsUseCase.kt$GetShotStatisticsUseCase$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:GrindRecommendationPreferences.kt$GrindRecommendationPreferences$e: Exception</ID>
@@ -494,7 +435,6 @@
     <ID>TooGenericExceptionCaught:ShotRecordingViewModel.kt$ShotRecordingViewModel$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:ShotRepository.kt$ShotRepository$exception: Exception</ID>
     <ID>TooGenericExceptionCaught:UpdateBeanUseCase.kt$UpdateBeanUseCase$exception: Exception</ID>
-    <ID>TooGenericExceptionCaught:WeightSliderComponents.kt$e: Exception</ID>
     <ID>TooGenericExceptionThrown:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$throw RuntimeException( "Migration 3-&gt;4 failed: ${e.message}. This migration adds basket_configuration table and ensures all existing indices are properly aligned.", e )</ID>
     <ID>TooGenericExceptionThrown:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$throw RuntimeException( "Migration 4-&gt;5 failed: ${e.message}. This migration fixes date format consistency in basket_configuration table.", e )</ID>
     <ID>TooGenericExceptionThrown:AppDatabase.kt$AppDatabase.Companion.&lt;no name provided&gt;$throw RuntimeException( "Migration 5-&gt;6 failed: ${e.message}. This migration adds stepSize column to grinder_configuration table and ensures all indices are properly aligned.", e )</ID>
@@ -525,20 +465,9 @@
     <ID>VariableNaming:ValidationComponents.kt$ValidationUtils$val OPTIMAL_EXTRACTION_TIME_MAX = Companion.OPTIMAL_EXTRACTION_TIME_MAX</ID>
     <ID>VariableNaming:ValidationComponents.kt$ValidationUtils$val OPTIMAL_EXTRACTION_TIME_MIN = Companion.OPTIMAL_EXTRACTION_TIME_MIN</ID>
     <ID>WildcardImport:CalculateGrindAdjustmentUseCase.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.animation.core.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.material.icons.automirrored.filled.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.material.icons.filled.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.material3.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:GrindAdjustmentCard.kt$import com.jodli.coffeeshottimer.domain.model.*</ID>
-    <ID>WildcardImport:RecommendationCard.kt$import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:RecommendationCard.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:ShotRecordedDialog.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>WildcardImport:ShotRecordedDialog.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:ShotRecordedDialog.kt$import androidx.compose.runtime.*</ID>
-    <ID>WildcardImport:TasteFeedbackDisplay.kt$import androidx.compose.foundation.layout.*</ID>
-    <ID>WildcardImport:TasteFeedbackDisplay.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:TasteFeedbackEditor.kt$import androidx.compose.foundation.layout.*</ID>
     <ID>WildcardImport:TasteFeedbackEditor.kt$import androidx.compose.material3.*</ID>
     <ID>WildcardImport:TasteFeedbackEditor.kt$import androidx.compose.runtime.*</ID>

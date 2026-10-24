@@ -229,7 +229,6 @@
     <string name="cd_saving">Speichere…</string>
     <string name="button_save">Speichern</string>
     <string name="cd_close">Schließen</string>
-    <string name="cd_pause">Pausieren</string>
     <string name="cd_start">Starten</string>
     <string name="cd_back">Zurück</string>
     <string name="cd_close_debug_dialog">Debug-Dialog schließen</string>

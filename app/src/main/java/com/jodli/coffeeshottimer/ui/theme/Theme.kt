@@ -18,47 +18,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-
-// Custom spacing system
-data class Spacing(
-    val extraSmall: Dp = 4.dp,
-    val small: Dp = 8.dp,
-    val medium: Dp = 16.dp,
-    val large: Dp = 24.dp,
-    val extraLarge: Dp = 32.dp,
-    val touchTarget: Dp = 48.dp, // Material minimum touch target
-    val cardPadding: Dp = 16.dp,
-    val screenPadding: Dp = 16.dp,
-    // Icon sizes
-    val iconSmall: Dp = 16.dp,
-    val iconMedium: Dp = 24.dp,
-    val iconLarge: Dp = 32.dp,
-    val iconEmptyState: Dp = 64.dp,
-    // Corner radius values
-    // near-square corners: the app is a printed chart, not a stack of pills
-    val cornerSmall: Dp = 2.dp,
-    val cornerMedium: Dp = 2.dp,
-    val cornerLarge: Dp = 4.dp,
-    // Elevation values
-    // flat sheet: cards are separated by rules, not shadows
-    val elevationCard: Dp = 0.dp,
-    val elevationDialog: Dp = 2.dp,
-    // Component-specific sizes
-    val timerSize: Dp = 200.dp,
-    val buttonMaxWidth: Dp = 200.dp,
-    val sliderHeight: Dp = 32.dp,
-    val qualityIndicator: Dp = 8.dp,
-    val priorityIndicator: Dp = 6.dp,
-    val fabSize: Dp = 56.dp,
-    val fabSizeSmall: Dp = 40.dp,
-    val timerButtonSize: Dp = 80.dp,
-    val iconButtonSize: Dp = 32.dp,
-    val sliderHeightSmall: Dp = 24.dp,
-    // Landscape-specific values
-    val landscapeTimerSize: Dp = 220.dp, // Used as fallback when BoxWithConstraints isn't available
-    val landscapeContentSpacing: Dp = 12.dp
-)
 
 val LocalSpacing = staticCompositionLocalOf { Spacing() }
 
@@ -66,57 +25,7 @@ val LocalSpacing = staticCompositionLocalOf { Spacing() }
 val LocalIsLandscape = staticCompositionLocalOf { false }
 
 /**
- * Configuration data class for landscape-specific layout information
- */
-data class LandscapeConfiguration(
-    val isLandscape: Boolean,
-    val screenWidthDp: Int,
-    val screenHeightDp: Int,
-    val timerSize: Dp,
-    val contentSpacing: Dp
-)
-
-/**
- * Returns adaptive timer size for landscape mode based on available space.
- * Uses BoxWithConstraints to calculate optimal size as a percentage of available space.
- * Falls back to landscapeTimerSize if constraints aren't available.
- */
-@Composable
-fun Spacing.adaptiveTimerSize(
-    availableHeight: Dp,
-    availableWidth: Dp,
-    isLandscape: Boolean = false
-): Dp {
-    return if (isLandscape) {
-        // Enhanced adaptive sizing: maximize screen height usage
-        // Account for card header (~32dp) + padding (~32dp total) + margins (~24dp)
-        val cardOverhead = 64.dp
-        val usableHeight = (availableHeight - cardOverhead).coerceAtLeast(160.dp)
-
-        // Use 85% of usable height or 70% of available width, whichever is smaller
-        minOf(
-            usableHeight, // 85% of usable height for maximum timer size
-            availableWidth, // 70% of available width
-            350.dp // Increased max size to allow larger timers
-        ).coerceAtLeast(160.dp) // Never go below 160dp
-    } else {
-        timerSize // Use standard size for portrait
-    }
-}
-
-/**
- * Extension function to get landscape-aware timer size.
- * In landscape mode, returns adaptive size based on available space.
- * In portrait mode, returns standard timer size.
- */
-@Composable
-fun Spacing.landscapeTimerSize(): Dp {
-    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
-    return if (isLandscape) landscapeTimerSize else timerSize
-}
-
-/**
- * Extension function to get landscape-appropriate content spacing
+ * Landscape-appropriate content spacing
  */
 @Composable
 fun Spacing.landscapeSpacing(): Dp {
