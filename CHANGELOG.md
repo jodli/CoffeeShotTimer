@@ -18,11 +18,15 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - New shot timer dial with the 25-30 s target always visible.
 - Record Shot is laid out in brewing order, with grind suggestions next to your current setting.
 - New app icon and splash screen.
+- Onboarding restyled on the same ruled sections, opening on the shot chart.
+- Taste feedback uses the chart's colour swatches instead of emoji; the suggested taste is marked with a border and caption. The history filter, taste editor and grind suggestion on Record Shot follow the same flat style.
 
 ### Fixed
 
 - Shot History and Shot Details now show the same quality score for a shot.
 - Shot position ("shot N of M") in Shot Details was wrong; ranking and neighbouring shots are now correct and tappable.
+- Back from Record Shot no longer returns into setup when onboarding resumed part-way.
+- A failed shot save now explains why instead of doing nothing.
 
 ## [2.2.0]
 
