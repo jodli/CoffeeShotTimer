@@ -2,6 +2,7 @@ package com.jodli.coffeeshottimer.ui.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,12 +13,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
+import com.jodli.coffeeshottimer.ui.theme.ExtractionZone
+import com.jodli.coffeeshottimer.ui.theme.zoneColors
 
 /**
  * Utility functions for taste feedback components
@@ -44,11 +45,12 @@ object TasteUtils {
 }
 
 /**
- * Shared primary taste button component used in both TasteQuickPick and TasteFeedbackEditSheet.
+ * Shared primary taste button component used in the recorded-shot dialog and
+ * the taste editor. The swatch carries the extraction-zone colour for the taste.
  */
 @Composable
 fun TastePrimaryButton(
-    emoji: String,
+    taste: TastePrimary,
     label: String,
     isSelected: Boolean,
     isRecommended: Boolean,
@@ -63,15 +65,6 @@ fun TastePrimaryButton(
             else -> MaterialTheme.colorScheme.outline
         },
         label = "border_color"
-    )
-
-    val containerColor by animateColorAsState(
-        targetValue = when {
-            isSelected -> MaterialTheme.colorScheme.primaryContainer
-            isRecommended -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)
-            else -> Color.Transparent
-        },
-        label = "container_color"
     )
 
     // Compute content description using string resources
@@ -93,22 +86,22 @@ fun TastePrimaryButton(
             color = borderColor
         ),
         colors = ButtonDefaults.outlinedButtonColors(
-            containerColor = containerColor
+            containerColor = Color.Transparent
         )
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = emoji,
-                fontSize = 24.sp,
-                modifier = Modifier.padding(bottom = 4.dp)
+            Box(
+                modifier = Modifier
+                    .size(14.dp)
+                    .background(MaterialTheme.zoneColors.fill(taste.zone()))
             )
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium,
-                fontWeight = if (isSelected || isRecommended) FontWeight.Bold else FontWeight.Normal
+                modifier = Modifier.padding(top = 6.dp)
             )
             if (isRecommended && !isSelected) {
                 Text(
@@ -121,40 +114,10 @@ fun TastePrimaryButton(
     }
 }
 
-/**
- * Shared secondary taste chip component.
- */
-@Composable
-fun TasteSecondaryChip(
-    emoji: String,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    // Compute content description using string resources
-    val contentDesc = if (isSelected) {
-        stringResource(R.string.cd_taste_qualifier_selected, label)
-    } else {
-        stringResource(R.string.cd_taste_qualifier_not_selected, label)
-    }
-
-    FilterChip(
-        selected = isSelected,
-        onClick = onClick,
-        label = {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(text = emoji, fontSize = 16.sp)
-                Text(text = label)
-            }
-        },
-        modifier = modifier.semantics {
-            contentDescription = contentDesc
-        }
-    )
+private fun TastePrimary.zone(): ExtractionZone = when (this) {
+    TastePrimary.SOUR -> ExtractionZone.FAST
+    TastePrimary.PERFECT -> ExtractionZone.IDEAL
+    TastePrimary.BITTER -> ExtractionZone.SLOW
 }
 
 /**
@@ -174,7 +137,7 @@ fun TastePrimaryButtonRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TastePrimaryButton(
-            emoji = "😖",
+            taste = TastePrimary.SOUR,
             label = stringResource(R.string.taste_sour),
             isSelected = selectedTaste == TastePrimary.SOUR,
             isRecommended = suggestedTaste == TastePrimary.SOUR,
@@ -190,7 +153,7 @@ fun TastePrimaryButtonRow(
         )
 
         TastePrimaryButton(
-            emoji = "😊",
+            taste = TastePrimary.PERFECT,
             label = stringResource(R.string.taste_perfect),
             isSelected = selectedTaste == TastePrimary.PERFECT,
             isRecommended = suggestedTaste == TastePrimary.PERFECT,
@@ -206,7 +169,7 @@ fun TastePrimaryButtonRow(
         )
 
         TastePrimaryButton(
-            emoji = "😣",
+            taste = TastePrimary.BITTER,
             label = stringResource(R.string.taste_bitter),
             isSelected = selectedTaste == TastePrimary.BITTER,
             isRecommended = suggestedTaste == TastePrimary.BITTER,
@@ -224,7 +187,8 @@ fun TastePrimaryButtonRow(
 }
 
 /**
- * Shared row of secondary taste chips.
+ * Shared row of secondary taste qualifiers: two square label buttons; tapping
+ * the selected one clears it.
  */
 @Composable
 fun TasteSecondaryChipRow(
@@ -236,26 +200,58 @@ fun TasteSecondaryChipRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        TasteSecondaryChip(
-            emoji = "💧",
+        TasteSecondaryButton(
             label = stringResource(R.string.taste_weak),
             isSelected = selectedSecondary == TasteSecondary.WEAK,
             onClick = {
                 onSecondarySelected(
                     if (selectedSecondary == TasteSecondary.WEAK) null else TasteSecondary.WEAK
                 )
-            }
+            },
+            modifier = Modifier.weight(1f)
         )
 
-        TasteSecondaryChip(
-            emoji = "💪",
+        TasteSecondaryButton(
             label = stringResource(R.string.taste_strong),
             isSelected = selectedSecondary == TasteSecondary.STRONG,
             onClick = {
                 onSecondarySelected(
                     if (selectedSecondary == TasteSecondary.STRONG) null else TasteSecondary.STRONG
                 )
-            }
+            },
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun TasteSecondaryButton(
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val contentDesc = if (isSelected) {
+        stringResource(R.string.cd_taste_qualifier_selected, label)
+    } else {
+        stringResource(R.string.cd_taste_qualifier_not_selected, label)
+    }
+
+    OutlinedButton(
+        onClick = onClick,
+        modifier = modifier.semantics { contentDescription = contentDesc },
+        border = BorderStroke(
+            width = if (isSelected) 2.dp else 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+        ),
+        colors = ButtonDefaults.outlinedButtonColors(
+            containerColor = Color.Transparent
+        )
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

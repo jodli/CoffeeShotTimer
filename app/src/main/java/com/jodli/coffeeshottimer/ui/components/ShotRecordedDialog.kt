@@ -17,7 +17,6 @@ import com.jodli.coffeeshottimer.R
 import com.jodli.coffeeshottimer.domain.model.GrindAdjustmentRecommendation
 import com.jodli.coffeeshottimer.domain.model.TastePrimary
 import com.jodli.coffeeshottimer.domain.model.TasteSecondary
-import com.jodli.coffeeshottimer.domain.usecase.ShotRecommendation
 import com.jodli.coffeeshottimer.ui.theme.LocalSpacing
 
 private const val EXTRACTION_TIME_FAST_THRESHOLD = -3
@@ -147,23 +146,17 @@ fun ShotRecordedDialog(
                         else -> "" // Don't show for perfect shots
                     }
 
-                    // Only render the Surface if there's actual content
+                    // Only render the explanation if there's actual content
                     if (explanationText.isNotEmpty()) {
                         HorizontalDivider(modifier = Modifier.padding(vertical = spacing.small))
 
-                        Surface(
-                            color = MaterialTheme.colorScheme.secondaryContainer,
-                            shape = MaterialTheme.shapes.medium,
+                        Text(
+                            text = explanationText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = explanationText,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(spacing.medium)
-                            )
-                        }
+                        )
                     }
                 }
             }
@@ -198,99 +191,4 @@ fun ShotRecordedDialog(
             }
         }
     )
-}
-
-/**
- * Bottom sheet version for showing shot recorded with recommendations.
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShotRecordedBottomSheet(
-    brewRatio: String,
-    extractionTime: String,
-    recommendations: List<ShotRecommendation> = emptyList(),
-    onDismiss: () -> Unit,
-    onViewDetails: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    val spacing = LocalSpacing.current
-
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(spacing.screenPadding)
-                .padding(bottom = spacing.large),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(spacing.medium)
-        ) {
-            // Success icon and title
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = stringResource(R.string.cd_shot_recorded_success),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(spacing.iconEmptyState)
-            )
-
-            Text(
-                text = stringResource(R.string.dialog_shot_recorded_successfully),
-                style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
-            )
-
-            // Shot summary
-            Text(
-                text = stringResource(R.string.text_record_successfully, brewRatio, extractionTime),
-                style = MaterialTheme.typography.bodyMedium,
-                textAlign = TextAlign.Center
-            )
-
-            // Next steps based on this shot
-            if (recommendations.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                Text(
-                    text = stringResource(R.string.text_next_steps_based_on_shot),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(spacing.small))
-
-                RecommendationCard(
-                    recommendations = recommendations,
-                    showAsNextSteps = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-            // Action buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(spacing.small)
-            ) {
-                CoffeeSecondaryButton(
-                    text = stringResource(R.string.text_dialog_dismiss),
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f)
-                )
-
-                if (onViewDetails != null) {
-                    CoffeePrimaryButton(
-                        text = stringResource(R.string.button_view_details),
-                        onClick = {
-                            onViewDetails()
-                            onDismiss()
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-        }
-    }
 }
