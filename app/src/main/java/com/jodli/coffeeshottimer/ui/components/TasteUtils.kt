@@ -81,6 +81,7 @@ fun TastePrimaryButton(
             .semantics {
                 contentDescription = contentDesc
             },
+        shape = MaterialTheme.shapes.small,
         border = BorderStroke(
             width = if (isSelected || isRecommended) 2.dp else 1.dp,
             color = borderColor
@@ -103,13 +104,6 @@ fun TastePrimaryButton(
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(top = 6.dp)
             )
-            if (isRecommended && !isSelected) {
-                Text(
-                    text = stringResource(R.string.text_suggested),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
-                )
-            }
         }
     }
 }
@@ -240,6 +234,7 @@ private fun TasteSecondaryButton(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier.semantics { contentDescription = contentDesc },
+        shape = MaterialTheme.shapes.small,
         border = BorderStroke(
             width = if (isSelected) 2.dp else 1.dp,
             color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
