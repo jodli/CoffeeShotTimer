@@ -574,7 +574,7 @@
     <string name="cd_decrease_coffee_out">Ausgabe um 1 Gramm verringern</string>
     <string name="cd_increase_coffee_out">Ausgabe um 1 Gramm erhöhen</string>
     <string name="cd_adjust_grinder">Mahlgrad anpassen</string>
-    <string name="cd_tap_to_edit_time">Tippen zum Bearbeiten der Zeit</string>
+    <string name="cd_tap_to_edit_time">Tippen zum Ändern</string>
     
     <!-- RecordShotScreen Strings -->
     <string name="text_mode_timer">Timer</string>

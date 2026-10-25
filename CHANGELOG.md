@@ -27,6 +27,7 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 - Shot position ("shot N of M") in Shot Details was wrong; ranking and neighbouring shots are now correct and tappable.
 - Back from Record Shot no longer returns into setup when onboarding resumed part-way.
 - A failed shot save now explains why instead of doing nothing.
+- On the Beans list, the shot count no longer wraps next to a bag photo; the German manual-timer hint fits inside the dial.
 
 ## [2.2.0]
 

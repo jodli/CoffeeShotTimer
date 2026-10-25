@@ -610,14 +610,19 @@ private fun BeanRowDetails(
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             BeanStatusMark(status = beanStatus, isActive = bean.isActive)
+            // The brewing tag yields width first so the shot count never wraps.
             if (isCurrentBean) {
                 Text(
                     text = " · " + stringResource(R.string.label_brewing),
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.zoneColors.idealInk
+                    color = MaterialTheme.zoneColors.idealInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
             }
-            Spacer(modifier = Modifier.weight(1f))
             if (shotCount > 0) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -632,7 +637,8 @@ private fun BeanRowDetails(
                     Text(
                         text = stringResource(R.string.bean_shot_count, shotCount),
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
+                        softWrap = false
                     )
                     Spacer(modifier = Modifier.width(spacing.extraSmall))
                     Icon(
