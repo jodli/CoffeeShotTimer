@@ -3,43 +3,23 @@
 Coffee Shot Timer
 
 ## Kurzbeschreibung
-Espresso-Timer und Shot-Log, der dir sagt, wie du den Mahlgrad anpasst
+Espresso-Timer, der dir sagt, ob du feiner oder gröber mahlen sollst
 
 ## Vollständige Beschreibung
 
-Stell deinen Espresso Shot für Shot ein, jeder Shot sichtbar am 25–30-Sekunden-Ziel.
+Coffee Shot Timer ist ein Espresso-Timer mit Shot-Tagebuch für alle, die zu Hause ihren Mahlgrad einstellen.
 
-Coffee Shot Timer ist ein Shot-Log für Heim-Baristas. Du stoppst den Shot, bewertest den Geschmack, und die App sagt dir, in welche Richtung du die Mühle für den nächsten Shot drehst. Jeder Shot gehört zu seiner Bohne: Öffnest du die Packung wieder, warten der letzte Mahlgrad und der Vorschlag schon auf dich.
+Du startest den Timer zusammen mit dem Bezug. Das Zifferblatt markiert 25 bis 30 Sekunden, du siehst also schon während der Shot läuft, wo er landen wird. Hast du die Zeit an der Maschine abgelesen, trägst du sie einfach von Hand ein.
 
-Timer
-- Ein Zifferblatt mit dem 25–30-s-Zielbereich, immer sichtbar, damit du siehst, wie der Shot darin landet
-- Manueller Modus, wenn du die Zeit selbst gemessen hast
-- Mahlgrad, Pulver rein und Kaffee raus auf einem Bildschirm, das Verhältnis wird mitgerechnet
+Danach notierst du, wie er geschmeckt hat (sauer, perfekt oder bitter), und die App rechnet den nächsten Mahlgrad in den Stufen deiner Mühle aus, zum Beispiel „3 Schritte feiner → 3.5“. Der Vorschlag wird bei der Bohne gespeichert und ist noch da, wenn du die Packung das nächste Mal aufmachst.
 
-Nach dem Shot
-- Bewerte ihn als sauer, perfekt oder bitter, optional schwach oder stark
-- Ein Mahlgrad-Vorschlag in Schritten deiner eigenen Mühle („3 Schritte feiner → 3.5"), pro Bohne gespeichert
-- Punkte von 0 bis 100, aufgeschlüsselt nach Geschmack, Zeit, Verhältnis, Konstanz und Präzision
+Jeder Shot bekommt bis zu 100 Punkte für Geschmack, Zeit, Verhältnis und Konstanz. Im Verlauf steht jeder Shot in einer Zeile, filterbar nach Bohne und Zeitraum. Die Analyse trägt deine letzten Shots nach Zeit und Verhältnis in ein Diagramm ein, daran siehst du, wie nah eine Bohne am Zielbereich ist.
 
-Verlauf und Analyse
-- Eine Zeile pro Shot: Zeit nach Zone eingefärbt, Verhältnis, Mahlgrad und Punkte
-- Filter auf eine Bohne oder einen Zeitraum
-- Die letzten Shots im Zeit-Verhältnis-Diagramm, mit dem Einstellweg jeder Bohne
-- Coaching-Hinweise und der Qualitätsverlauf deiner letzten Shots
+Zu jeder Bohne speicherst du Röstdatum, Notizen und ein Foto der Packung. Das Röstalter wechselt die Farbe, während die Bohne bis zum 4. Tag ruht, bis zum 21. Tag frisch bleibt und danach über ihren Höhepunkt kommt.
 
-Bohnen
-- Röstalter als farbige Zahl: ruhend, frisch (4–21 Tage) oder über dem Höhepunkt
-- Einstellstatus pro Bohne: neu, Experimentieren, Verbesserungsbedarf oder eingestellt
-- Ein Foto der Packung, damit du sie beim Nachkaufen wiedererkennst
+Einmal einrichten musst du die Skala deiner Mühle, etwa 1 bis 10 in Schritten von 0,1, und dein Sieb, einfach oder doppelt.
 
-Deine Ausrüstung
-- Skalenbereich und Schrittweite deiner Mühle, damit die Vorschläge zu den Zahlen auf deiner Skala passen
-- Einfaches oder doppeltes Sieb, mit passenden Bereichen für Pulver und Ausbeute
-
-Privat und offline
-Die App hat keine Internetberechtigung. Shots, Bohnen und Fotos bleiben auf deinem Handy.
-
-Heller und dunkler Modus, auf Deutsch und Englisch.
+Die App hat keine Internetberechtigung, deine Shots und Fotos bleiben auf dem Handy. Es gibt sie auf Deutsch und Englisch, mit hellem und dunklem Design.
 
 ## App icon
 ![](../icon.png)

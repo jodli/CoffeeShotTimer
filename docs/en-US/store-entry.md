@@ -3,43 +3,23 @@
 Coffee Shot Timer
 
 ## Short description
-Espresso timer and shot log that tells you how to adjust your grind
+Espresso timer that tells you whether to grind finer or coarser next
 
 ## Full description
 
-Dial in espresso shot by shot, with every shot plotted against the 25–30 second target.
+Coffee Shot Timer is an espresso timer and shot log for dialing in at home.
 
-Coffee Shot Timer is a shot log for home baristas. You time the shot, rate the taste, and the app tells you which way to turn the grinder for the next one. Each shot is kept with its bean, so the next time you open that bag, the last grind setting and the suggestion are waiting for you.
+You start the timer when you start the shot. The dial marks 25 to 30 seconds, so you can see where the shot will land while it is still running. If you timed it on the machine instead, type the time in.
 
-Timer
-- A dial with the 25–30 s target band always visible, so you can see the shot land in it
-- Manual mode for entering a time you measured yourself
-- Grinder setting, dose and yield on one screen, with the brew ratio calculated as you go
+Afterwards you note how it tasted (sour, perfect or bitter), and the app works out the next grind setting in your grinder's own steps, for example "3 steps finer → 3.5". The suggestion is saved with the bean, so it is still there the next time you open that bag.
 
-After the shot
-- Rate it sour, perfect or bitter, optionally weak or strong
-- Get a grind suggestion in steps of your own grinder ("3 steps finer → 3.5"), saved per bean
-- A score out of 100 with a breakdown of taste, time, ratio, consistency and precision
+Each shot gets a score out of 100 for taste, time, ratio and consistency. History lists one shot per line and can be filtered by bean or date. The analysis view plots your recent shots by time and ratio, which shows how close a bean is to the target box.
 
-History and analysis
-- One ruled line per shot: time coloured by zone, ratio, grind and score
-- Filter to one bean or a date range
-- Recent shots plotted on a time-by-ratio chart, with the dial-in path for each bean
-- Coaching notes and a quality trend across your recent shots
+For every bean you keep the roast date, notes and a photo of the bag. The roast age changes colour as the bean rests until day 4, stays fresh up to day 21 and then goes past its peak.
 
-Beans
-- Roast age shown as a colour-coded figure: resting, fresh (4–21 days) or past its peak
-- Dial-in status per bean: new, experimenting, needs work or dialed in
-- A photo of the bag, so you recognise it when you buy it again
+You set up your grinder's scale once, for example 1 to 10 in steps of 0.1, and pick a single or double basket.
 
-Your equipment
-- Set your grinder's scale range and step size, so suggestions match the numbers on your dial
-- Single or double basket, with matching dose and yield ranges
-
-Private and offline
-The app has no internet permission. Your shots, beans and photos stay on your phone.
-
-Light and dark mode, in English and German.
+The app has no internet permission, so your shots and photos stay on your phone. It comes in English and German, with a light and a dark theme.
 
 ## App icon
 ![](../icon.png)
