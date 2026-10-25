@@ -6,6 +6,8 @@ The format is based on Keep a Changelog, and this project adheres to Semantic Ve
 
 ## [Unreleased]
 
+## [2.3.0]
+
 ### Changed
 
 - [*] Shot History, Analysis and Shot Details rebuilt around the shot chart: every shot on one ruled line, recent shots plotted against the 25–30 s target, and a verdict that names the next grind step.
