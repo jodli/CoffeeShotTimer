@@ -3,47 +3,43 @@
 Coffee Shot Timer
 
 ## Short description
-Espresso timer with analytics for home baristas
+Espresso timer and shot log that tells you how to adjust your grind
 
 ## Full description
 
-The precision app for perfect espresso extraction
+Dial in espresso shot by shot, with every shot plotted against the 25–30 second target.
 
-Coffee Shot Timer was built specifically for espresso machine enthusiasts who want to systematically take their brewing skills to the next level. The app combines intelligent timing with detailed data capture to help you achieve consistent, dialed-in espresso extractions.
+Coffee Shot Timer is a shot log for home baristas. You time the shot, rate the taste, and the app tells you which way to turn the grinder for the next one. Each shot is kept with its bean, so the next time you open that bag, the last grind setting and the suggestion are waiting for you.
 
-What you can expect:
+Timer
+- A dial with the 25–30 s target band always visible, so you can see the shot land in it
+- Manual mode for entering a time you measured yourself
+- Grinder setting, dose and yield on one screen, with the brew ratio calculated as you go
 
-Precision timer with visual feedback: Large, touch-friendly timer display with color-coded visualization. Optimal extraction times are signaled through color changes - you'll instantly know when your shot is running perfectly.
+After the shot
+- Rate it sour, perfect or bitter, optionally weak or strong
+- Get a grind suggestion in steps of your own grinder ("3 steps finer → 3.5"), saved per bean
+- A score out of 100 with a breakdown of taste, time, ratio, consistency and precision
 
-Brew ratio tracking: Track coffee input and espresso output through intuitive sliders that support single-shot baskets (down to 5g). The app automatically calculates your brew ratio and shows you when you're hitting the sweet spot.
+History and analysis
+- One ruled line per shot: time coloured by zone, ratio, grind and score
+- Filter to one bean or a date range
+- Recent shots plotted on a time-by-ratio chart, with the dial-in path for each bean
+- Coaching notes and a quality trend across your recent shots
 
-Smart bean management: Manage your coffee beans with roast dates and automatic freshness indicators. Attach photos of bean packages for easier re-purchasing. The app lets you know when beans are still too fresh or past their prime.
+Beans
+- Roast age shown as a colour-coded figure: resting, fresh (4–21 days) or past its peak
+- Dial-in status per bean: new, experimenting, needs work or dialed in
+- A photo of the bag, so you recognise it when you buy it again
 
-Comprehensive shot logging: Record grinder settings, extraction times, and tasting notes. Every shot is saved with all relevant parameters - so you'll never forget a successful setup again.
+Your equipment
+- Set your grinder's scale range and step size, so suggestions match the numbers on your dial
+- Single or double basket, with matching dose and yield ranges
 
-Analysis and optimization: Visualize your brewing patterns over time and spot trends. The history feature helps you reproduce and develop successful settings with consistent shot analysis.
+Private and offline
+The app has no internet permission. Your shots, beans and photos stay on your phone.
 
-Equipment setup: Configure your grinder scale range to tailor the app to your specific equipment and get relevant guidance for your setup.
-
-Beginner-friendly onboarding: App introduction and guided setup for a smooth first-run experience, making it easy for newcomers to get started.
-
-Designed for daily use:
-- Works 100% offline - perfect even without WiFi
-- Automatic draft saving prevents data loss
-- Quick input during active brewing
-- Large interface elements for relaxed, stress-free operation
-- Streamlined navigation and fast UI
-
-Perfect fit if you:
-- Own an espresso machine or manual espresso maker
-- Want reproducible results
-- Like to learn systematically with data-driven improvement
-- Want to refine your technique
-- Are serious about home coffee quality
-
-The app supports you in achieving consistent espresso quality and developing your personal taste preferences. Through the structured approach, you'll gradually improve your brewing skills.
-
-Coffee Shot Timer transforms espresso making from guesswork into precise craftsmanship - without any stress.
+Light and dark mode, in English and German.
 
 ## App icon
 ![](../icon.png)

@@ -1,4 +1,4 @@
 {
-  "prompt": "Origin: real app screenshot docs/en-US/shot_history.png (captured via update-screenshots.sh), resized to 600px wide with cwebp -q 82. Not generated.",
-  "createdAt": "2026-10-11T08:52:32.525Z"
+  "prompt": "Origin: real app screenshot docs/en-US/shot_history.png (captured from the emulator), resized to 600px wide with cwebp -q 82. Not generated.",
+  "createdAt": "2026-10-25T13:53:07.000Z"
 }

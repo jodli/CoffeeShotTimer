@@ -3,47 +3,43 @@
 Coffee Shot Timer
 
 ## Kurzbeschreibung
-Espresso-Timer mit Analyse für Heim-Baristas
+Espresso-Timer und Shot-Log, der dir sagt, wie du den Mahlgrad anpasst
 
 ## Vollständige Beschreibung
 
-Die Präzisions-App für perfekte Espresso-Extraktion
+Stell deinen Espresso Shot für Shot ein, jeder Shot sichtbar am 25–30-Sekunden-Ziel.
 
-Coffee Shot Timer wurde speziell für Espressomaschinen-Enthusiasten entwickelt, die ihre Brühfähigkeiten systematisch auf das nächste Level bringen möchten. Die App kombiniert intelligente Zeitmessung mit detaillierter Datenerfassung, um Ihnen zu helfen, konsistente, perfekt abgestimmte Espresso-Extraktionen zu erreichen.
+Coffee Shot Timer ist ein Shot-Log für Heim-Baristas. Du stoppst den Shot, bewertest den Geschmack, und die App sagt dir, in welche Richtung du die Mühle für den nächsten Shot drehst. Jeder Shot gehört zu seiner Bohne: Öffnest du die Packung wieder, warten der letzte Mahlgrad und der Vorschlag schon auf dich.
 
-Was Sie erwarten können:
+Timer
+- Ein Zifferblatt mit dem 25–30-s-Zielbereich, immer sichtbar, damit du siehst, wie der Shot darin landet
+- Manueller Modus, wenn du die Zeit selbst gemessen hast
+- Mahlgrad, Pulver rein und Kaffee raus auf einem Bildschirm, das Verhältnis wird mitgerechnet
 
-Präzisions-Timer mit visueller Rückmeldung: Großes, berührungsfreundliches Timer-Display mit farbkodierter Visualisierung. Optimale Extraktionszeiten werden durch Farbwechsel signalisiert - Sie wissen sofort, wann Ihr Shot perfekt läuft.
+Nach dem Shot
+- Bewerte ihn als sauer, perfekt oder bitter, optional schwach oder stark
+- Ein Mahlgrad-Vorschlag in Schritten deiner eigenen Mühle („3 Schritte feiner → 3.5"), pro Bohne gespeichert
+- Punkte von 0 bis 100, aufgeschlüsselt nach Geschmack, Zeit, Verhältnis, Konstanz und Präzision
 
-Brühverhältnis-Verfolgung: Verfolgen Sie Kaffee-Input und Espresso-Output über intuitive Schieberegler, die Single-Shot-Siebträger unterstützen (ab 5g). Die App berechnet automatisch Ihr Brühverhältnis und zeigt Ihnen, wann Sie den Sweet Spot treffen.
+Verlauf und Analyse
+- Eine Zeile pro Shot: Zeit nach Zone eingefärbt, Verhältnis, Mahlgrad und Punkte
+- Filter auf eine Bohne oder einen Zeitraum
+- Die letzten Shots im Zeit-Verhältnis-Diagramm, mit dem Einstellweg jeder Bohne
+- Coaching-Hinweise und der Qualitätsverlauf deiner letzten Shots
 
-Intelligente Bohnenverwaltung: Verwalten Sie Ihre Kaffeebohnen mit Röstdaten und automatischen Frische-Indikatoren. Fügen Sie Fotos der Bohnenverpackung hinzu für einfacheres Nachkaufen. Die App lässt Sie wissen, wann Bohnen noch zu frisch oder bereits über ihre beste Zeit hinaus sind.
+Bohnen
+- Röstalter als farbige Zahl: ruhend, frisch (4–21 Tage) oder über dem Höhepunkt
+- Einstellstatus pro Bohne: neu, Experimentieren, Verbesserungsbedarf oder eingestellt
+- Ein Foto der Packung, damit du sie beim Nachkaufen wiedererkennst
 
-Umfassende Shot-Protokollierung: Erfassen Sie Mühleneinstellungen, Extraktionszeiten und Verkostungsnotizen. Jeder Shot wird mit allen relevanten Parametern gespeichert - so vergessen Sie nie wieder eine erfolgreiche Einstellung.
+Deine Ausrüstung
+- Skalenbereich und Schrittweite deiner Mühle, damit die Vorschläge zu den Zahlen auf deiner Skala passen
+- Einfaches oder doppeltes Sieb, mit passenden Bereichen für Pulver und Ausbeute
 
-Analyse und Optimierung: Visualisieren Sie Ihre Brühmuster über die Zeit und erkennen Sie Trends. Die Verlaufsfunktion hilft Ihnen, erfolgreiche Einstellungen mit konsistenter Shot-Analyse zu reproduzieren und weiterzuentwickeln.
+Privat und offline
+Die App hat keine Internetberechtigung. Shots, Bohnen und Fotos bleiben auf deinem Handy.
 
-Ausrüstungs-Setup: Konfigurieren Sie Ihren Mühlen-Skalenbereich, um die App an Ihre spezifische Ausrüstung anzupassen und relevante Anleitungen für Ihr Setup zu erhalten.
-
-Anfängerfreundliches Onboarding: App-Einführung und geführte Einrichtung für eine reibungslose erste Nutzung, die es Neulingen leicht macht, zu beginnen.
-
-Für den täglichen Gebrauch konzipiert:
-- Funktioniert 100% offline - perfekt auch ohne WLAN
-- Automatisches Entwurf-Speichern verhindert Datenverlust
-- Schnelle Eingabe während des aktiven Brühens
-- Große Bedienelemente für entspannte, stressfreie Bedienung
-- Optimierte Navigation und schnelle Benutzeroberfläche
-
-Perfekt geeignet, wenn Sie:
-- Eine Espressomaschine oder manuelle Espresso-Zubereitung besitzen
-- Reproduzierbare Ergebnisse wollen
-- Gerne systematisch mit datengestützter Verbesserung lernen
-- Ihre Technik verfeinern möchten
-- Ernsthaft an hochwertigen Heim-Kaffee interessiert sind
-
-Die App unterstützt Sie dabei, konsistente Espresso-Qualität zu erreichen und Ihre persönlichen Geschmackspräferenzen zu entwickeln. Durch den strukturierten Ansatz verbessern Sie schrittweise Ihre Brühfähigkeiten.
-
-Coffee Shot Timer verwandelt Espresso-Zubereitung von Rätselraten in präzises Handwerk - ganz ohne Stress.
+Heller und dunkler Modus, auf Deutsch und Englisch.
 
 ## App icon
 ![](../icon.png)

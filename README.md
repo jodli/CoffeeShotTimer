@@ -14,13 +14,13 @@ Coffee Shot Timer is a precision Android app designed specifically for espresso 
 
 ## Features
 
-- Precision timer with clear visual feedback
-- Brew ratio tracking with intuitive sliders; supports single-shot baskets (down to 5 g)
-- Shot logging and analysis: times, grinder settings, tasting notes, and trends over time
-- Bean management with roast dates, freshness indicators, and attachable package photos
-- Grinder setup tailored to your equipment; record and compare grinder settings
-- Simple onboarding and streamlined navigation; About screen and in-app feedback
-- Built for daily use: 100% offline, autosave drafts, and a fast, stress-free UI
+- Shot timer dial with the 25–30 s target always visible, plus a manual mode
+- Grinder setting, dose and yield on one screen, with the brew ratio calculated as you go
+- Taste feedback (sour, perfect, bitter) and a next-shot grind suggestion in steps of your grinder, saved per bean
+- History as a ledger, one line per shot, filterable by bean and date
+- Analysis on a time-by-ratio shot chart, with a score out of 100, coaching notes and the quality trend
+- Bean management with colour-coded roast age (fresh 4–21 days), dial-in status and package photos
+- Grinder range, step size and basket size configurable; works fully offline
 
 ## Screenshots
 
